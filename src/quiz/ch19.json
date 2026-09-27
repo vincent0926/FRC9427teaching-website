@@ -1,57 +1,91 @@
 [
   {
+    "type": "recall",
     "q": "roboRIO 1.0 在電壓低於多少時進入 brownout 保護（第 2 階段）？",
+    "e": "6.8 V 是第 1 階段，4.5 V 以下可能斷電；roboRIO 2.0 預設 6.75 V。",
     "o": [
+      "6.3 V",
       "7.5 V",
       "6.8 V",
-      "6.3 V",
       "4.5 V"
     ],
-    "a": 2,
-    "e": "6.8 V 是第 1 階段，4.5 V 以下可能斷電；roboRIO 2.0 預設 6.75 V。"
+    "a": 0
   },
   {
-    "q": "發生 brownout 後，哪裡可以看到次數？",
+    "type": "scenario",
+    "s": {
+      "symptom": "比賽中機構動作偶爾停一下又恢復，駕駛覺得「程式當了」。",
+      "evidence": [
+        "DS 的 CAN/Power 分頁 12V fault 計數增加",
+        "DS Log 在那幾個時間點電壓掉到 6 V 附近"
+      ]
+    },
+    "q": "最可能的原因和下一步是？",
+    "e": "brownout 時 roboRIO 會停用 CAN 馬達控制器的輸出，電壓回升後恢復。預期結果：換電池、設好電流限制後不再發生。",
+    "lab": "triage",
     "o": [
-      "Tuner X",
-      "PathPlanner",
-      "VS Code 終端機",
-      "Driver Station CAN/Power 分頁的 12V fault 計數"
+      "brownout；先換充飽的電池、檢查接頭，並確認各機構的電流限制",
+      "CAN 斷線，換線",
+      "程式 bug，馬上改程式",
+      "無線電重開"
     ],
-    "a": 3,
-    "e": "DS 日誌也會記錄 brownout 事件。"
+    "a": 0
   },
   {
-    "q": "Driver Station 顯示「No robot code is currently running」代表？",
+    "type": "scenario",
+    "s": {
+      "symptom": "上場後 Driver Station 顯示「No robot code is currently running」。",
+      "evidence": [
+        "Communications 是綠的",
+        "剛剛在 Pit 部署了新程式"
+      ]
+    },
+    "q": "下一步做什麼？",
+    "e": "通訊正常但程式沒在跑，可能是當掉、還在開機或部署失敗。預期結果：Robot Code 燈變綠。",
+    "lab": "triage",
     "o": [
-      "roboRIO 有連上，但程式沒在執行",
-      "DS 和機器人完全沒連上",
-      "搖桿沒插",
-      "電池沒電"
+      "看 Console 有沒有例外；來不及查就部署已知可以動的版本",
+      "換無線電",
+      "重開 Driver Station",
+      "換電池"
     ],
-    "a": 0,
-    "e": "可能是程式當掉、還在開機或部署失敗。"
+    "a": 0
   },
   {
-    "q": "在 Pit 搖線測試時，應該怎麼連接機器人？",
+    "type": "scenario",
+    "s": {
+      "symptom": "DS Log 顯示斷線期間其他裝置都 ping 得到，只有 roboRIO 不回應，接著出現「Time since robot boot」事件。",
+      "evidence": [
+        "斷線約 30 秒"
+      ]
+    },
+    "q": "判斷是什麼問題？",
+    "e": "這是 WPILib 文件中 roboRIO 重開的典型樣子。預期結果：鎖緊電源、避免 brownout 後不再重開。",
+    "lab": "triage",
     "o": [
-      "USB 線",
-      "網路線",
-      "無線",
-      "都可以"
+      "無線電重開",
+      "roboRIO 重開：檢查 roboRIO 的電源線與 brownout",
+      "Driver Station 筆電睡眠",
+      "網路線卡榫斷了"
     ],
-    "a": 1,
-    "e": "用 USB 測不到機器人上真正的通訊路徑。"
+    "a": 1
   },
   {
-    "q": "兩場比賽之間發現 bug，時間只夠改但來不及測，最好的做法是？",
+    "type": "scenario",
+    "s": {
+      "symptom": "兩場比賽之間發現自動程式有 bug，只剩時間改，來不及在練習場測。",
+      "evidence": [
+        "上一個版本在比賽中可以正常動"
+      ]
+    },
+    "q": "最好的做法是？",
+    "e": "沒測過的修改風險通常比原本的問題更大。預期結果：這場用穩定版本完成，下一段空檔再修並測試。",
     "o": [
-      "改了直接上場",
       "同時改好幾個地方碰運氣",
-      "用已知可以動的版本上場",
-      "關掉自動程式"
+      "直接部署修改後的版本",
+      "把自動程式關掉並不告訴隊友",
+      "用已知可以動的版本上場，比賽後再修"
     ],
-    "a": 2,
-    "e": "沒測過的修改風險通常比原本的問題更大。"
+    "a": 3
   }
 ]

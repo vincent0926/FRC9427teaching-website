@@ -35,7 +35,7 @@ function showChapter(id){
   insertLearningCard(id);
   view.querySelectorAll("pre code").forEach(el => { el.innerHTML = highlight(el.textContent); });
   const q = view.querySelector(".quiz");
-  if (q && QUIZZES[id]) initQuiz(q, QUIZZES[id]);
+  if (q && QUIZZES[id]) initQuiz(q, QUIZZES[id], id);
   (LABS[id] || []).forEach(init => init());
   decorateLabs(id);
   insertToolTasks(id);

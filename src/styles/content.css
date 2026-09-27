@@ -108,3 +108,12 @@ p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);
 .outline li.next{background:var(--surface);border-radius:8px}
 .outline .ttl .diff{margin-left:10px;font-size:12px;color:var(--ink-2);letter-spacing:1px;font-weight:400}
 .mastery{margin-top:28px;color:var(--ink-2);font-size:14.5px;border-top:1px dashed var(--line);padding-top:12px}
+/* quiz types */
+.qtype{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-right:8px;border:1px solid var(--line);color:var(--ink-2);vertical-align:2px}
+.q.scenario .qtype{border-color:var(--can-h);color:var(--ink)}
+.q-case{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:0 0 10px;font-size:15.5px}
+.q-case p{margin:0 0 4px}
+.q-case b{margin-right:8px}
+.q-case ul{margin:0 0 2px;padding-left:20px}
+.q-ask{font-weight:700;margin:0 0 10px}
+.qlab{white-space:nowrap}

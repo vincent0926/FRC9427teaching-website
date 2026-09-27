@@ -1,57 +1,89 @@
 [
   {
-    "q": "重播時修改了手臂的 kP，日誌裡的手臂位置會怎樣？",
-    "o": [
-      "跟著改變",
-      "變成 0",
-      "不變，因為位置是從日誌讀回的輸入",
-      "無法重播"
-    ],
-    "a": 2,
-    "e": "修改的輸出不能影響重播的輸入（replay bubble）。"
-  },
-  {
-    "q": "下列哪一個會讓 AdvantageKit 重播失準？",
-    "o": [
-      "用 SmartDashboard.getNumber 讀調參數值",
-      "用 Timer.getTimestamp()",
-      "用 Logger.recordOutput 記錄 Pose2d",
-      "在 Subsystem periodic 裡讀 inputs"
-    ],
-    "a": 0,
-    "e": "NetworkTables 的值沒有被記錄，要用 AdvantageKit 的儀表板類別。"
-  },
-  {
-    "q": "RobotContainer 應該在 Robot 建構子的哪裡建立？",
-    "o": [
-      "Logger 設定之前",
-      "robotPeriodic 裡",
-      "autonomousInit 裡",
-      "Logger.start() 之後"
-    ],
-    "a": 3,
-    "e": "Logger.start() 之前讀到的時間與 DS 資料不是確定的。"
-  },
-  {
+    "type": "recall",
     "q": "重播時 setUseTiming(false) 會？",
+    "e": "AdvantageKit 文件明確說明不影響準確度。",
     "o": [
-      "讓重播結果不準",
+      "只重播前 15 秒",
       "讓重播盡快跑完，不影響準確度",
-      "關閉日誌",
-      "只重播前 15 秒"
+      "讓重播結果不準",
+      "關閉日誌"
     ],
-    "a": 1,
-    "e": "AdvantageKit 文件明確說明不影響準確度。"
+    "a": 1
   },
   {
-    "q": "Event Deploy 的作用是？",
+    "type": "scenario",
+    "s": {
+      "symptom": "你在重播時把手臂的 kP 改大，想看手臂會不會少一點過衝，結果日誌裡的手臂位置完全沒變。",
+      "evidence": [
+        "手臂照第 6 章的 IO 架構寫"
+      ]
+    },
+    "q": "正確的解讀是？",
+    "e": "修改的輸出不能影響重播的輸入。預期結果：改用模擬（第 6 章 D 部分）才看得到新參數下的動作。",
     "o": [
-      "部署前自動把修改 commit 到 event 分支",
-      "自動上傳日誌",
-      "自動選擇自動程式",
-      "加快部署速度"
+      "kP 沒有部署",
+      "重播壞了",
+      "要把 setUseTiming 設成 true",
+      "重播改變不了輸入：位置是從日誌讀回的；要看新的動作請用模擬"
     ],
-    "a": 0,
-    "e": "讓每一場的程式版本都找得回來，方便重播。"
+    "a": 3
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "重播出來的 Arm/AtGoal 和比賽時操作手看到的完全對不上。",
+      "evidence": [
+        "Metadata 的 GitSHA 是上週的 commit",
+        "你用的是今天的程式重播",
+        "BuildConstants 顯示 dirty"
+      ]
+    },
+    "q": "下一步做什麼？",
+    "e": "重播需要當時的程式。Event Deploy 會在部署前自動 commit，所以要保留 event 分支。預期結果：用正確版本重播，輸出和當時一致。",
+    "o": [
+      "git checkout 回日誌裡的 GitSHA；dirty 表示當時有沒 commit 的修改，要從 event 分支找",
+      "直接相信重播結果",
+      "把 kP 調回去再重播",
+      "把日誌刪掉"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "比賽後才發現某場的日誌是空的。",
+      "evidence": [
+        "roboRIO 上沒有插隨身碟",
+        "程式用 WPILOGWriter 預設路徑"
+      ]
+    },
+    "q": "要怎麼避免下次再發生？",
+    "e": "WPILOGWriter 在 roboRIO 上預設寫到 USB 隨身碟。預期結果：每場都有日誌可以查。",
+    "o": [
+      "把「FAT32 隨身碟有插、有空間」放進賽前檢查，或在程式裡偵測後發 Alert",
+      "只用 DS Log",
+      "改用 SmartDashboard 記錄",
+      "在 Pit 手動複製"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "重播時自動程式選到的和比賽時不一樣。",
+      "evidence": [
+        "自動程式選單用 SmartDashboard.putData(AutoBuilder.buildAutoChooser())"
+      ]
+    },
+    "q": "應該怎麼改？",
+    "e": "從 NetworkTables 讀的值沒被記錄，重播時讀不到當時的選擇。預期結果：重播使用當時選的自動程式。",
+    "o": [
+      "重播時手動選",
+      "把選單放在 Constants",
+      "改用 LoggedDashboardChooser 包住選單，讓選擇被記錄成輸入",
+      "把選單刪掉，只用一個自動程式"
+    ],
+    "a": 2
   }
 ]

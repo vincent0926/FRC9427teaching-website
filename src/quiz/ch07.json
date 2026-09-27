@@ -1,68 +1,93 @@
 [
   {
-    "q": "autonomousInit() 什麼時候被呼叫？",
-    "o": [
-      "程式啟動時一次",
-      "自動階段中每 20 毫秒一次",
-      "每次從其他模式進入 Autonomous 時一次",
-      "只有連上 FMS 時"
-    ],
-    "a": 2,
-    "e": "init 在每次進入該模式時呼叫一次，就像每次進入新時段班長喊一次起立。"
-  },
-  {
+    "type": "recall",
     "q": "robotPeriodic() 在哪些模式會執行？",
+    "e": "robotPeriodic 在每一種模式、每一輪都會呼叫。",
+    "lab": "loop",
     "o": [
-      "只有 Teleop",
-      "只有 Enable 時",
+      "只有 Disabled",
       "所有模式，而且排在該模式的 periodic 之後",
-      "所有模式，而且排在該模式的 periodic 之前"
+      "只有 Teleop",
+      "只有有 Enable 的時候"
     ],
-    "a": 2,
-    "e": "警衛每一輪都巡，而且總是在老師巡完之後。"
+    "a": 1
   },
   {
-    "q": "Command-based 專案的 robotPeriodic() 裡沒有 CommandScheduler.getInstance().run()，會怎樣？",
+    "type": "scenario",
+    "s": {
+      "symptom": "Enable 後整台機器人卡住，按鍵沒反應，Console 一直出現 Loop time of 0.02s overrun。",
+      "evidence": [
+        "teleopPeriodic 裡寫了 while (!limit.get()) { }",
+        "卡住前一刻剛按下歸零鍵"
+      ]
+    },
+    "q": "原因與修正是？",
+    "e": "periodic 必須很快回傳，等待要交給指令架構每輪檢查。預期結果：overrun 消失，其他 Subsystem 繼續更新。",
+    "lab": "loop",
     "o": [
-      "沒有影響",
-      "只有自動階段不能動",
-      "排程器不會執行任何指令，Subsystem 的 periodic 也不會被呼叫",
-      "編譯失敗"
+      "把 20 ms 改成 100 ms",
+      "把 while 改成 for",
+      "while 迴圈讓主迴圈卡住；改成用 Trigger 或指令的 until 條件，每一輪檢查一次",
+      "roboRIO 太慢，要換新的"
     ],
-    "a": 2,
-    "e": "官方強調這一行是必要的。Subsystem 的 periodic 也是由排程器的 run() 呼叫的。"
+    "a": 2
   },
   {
-    "q": "在 teleopPeriodic() 裡寫 while (!sensor.get()) {} 等感測器觸發，會發生什麼事？",
+    "type": "scenario",
+    "s": {
+      "symptom": "Command-based 專案裡，所有按鍵綁定都沒反應，Subsystem 的 periodic 也從沒執行。",
+      "evidence": [
+        "程式可以部署，也沒有例外",
+        "Robot.java 的 robotPeriodic() 是空的"
+      ]
+    },
+    "q": "下一步檢查什麼？",
+    "e": "排程器每輪 run() 才會呼叫 Subsystem 的 periodic、檢查按鍵、執行指令。預期結果：補上那一行後綁定開始作用。",
+    "lab": "loop",
     "o": [
-      "等到觸發後正常繼續",
-      "主迴圈卡住，其他 Subsystem、按鍵、指令都停止更新，並出現 overrun 警告",
-      "編譯器會報錯",
-      "WPILib 會自動跳過"
+      "robotPeriodic() 裡有沒有 CommandScheduler.getInstance().run()",
+      "搖桿的 USB 順序",
+      "CAN ID 有沒有重複",
+      "vendordep 版本"
     ],
-    "a": 1,
-    "e": "所有 periodic 在同一條執行緒上依序執行，一個卡住就全部卡住。"
+    "a": 0
   },
   {
-    "q": "使用 AdvantageKit 時，Robot 建構子裡 Logger 的設定應該放在哪裡？",
+    "type": "scenario",
+    "s": {
+      "symptom": "使用 AdvantageKit 時，某個 Subsystem 在建構子裡讀了 Timer.getTimestamp()，重播時結果和實機不同。",
+      "evidence": [
+        "Robot 的欄位直接寫 private final Intake intake = new Intake();",
+        "Logger.start() 寫在 Robot 建構子裡"
+      ]
+    },
+    "q": "原因是什麼？",
+    "e": "Logger.start() 之前讀的時間和 DS 資料不是確定的。改成在 Logger.start() 之後才建立 RobotContainer。預期結果：重播與實機一致。",
     "o": [
-      "建立 RobotContainer 之後",
-      "建構子最前面，任何其他初始化之前",
-      "robotPeriodic() 裡",
-      "autonomousInit() 裡"
+      "Logger.start() 要放在 robotPeriodic",
+      "欄位初始化比建構子先執行，Intake 在 Logger.start() 之前就讀了時間",
+      "重播不支援 Timer",
+      "Intake 應該改成 static"
     ],
-    "a": 1,
-    "e": "AdvantageKit 文件要求 Logger 在任何其他初始化之前設定並啟動，Logger.start() 之後就不能再加接收端。"
+    "a": 1
   },
   {
-    "q": "Robot 的建構子會執行幾次？",
+    "type": "scenario",
+    "s": {
+      "symptom": "自動階段結束進入 Teleop 後，駕駛怎麼推搖桿手臂都不理，要等幾秒才正常。",
+      "evidence": [
+        "自動指令在自動階段結束前還沒跑完",
+        "teleopInit() 是空的"
+      ]
+    },
+    "q": "應該怎麼改？",
+    "e": "沒跑完的自動指令會繼續佔住 Subsystem，駕駛的指令搶不到。預期結果：進入 Teleop 後駕駛立刻取得控制。",
     "o": [
-      "每次 Enable 一次",
-      "每 20 毫秒一次",
-      "程式啟動時一次",
-      "每次切換模式一次"
+      "把自動階段縮短",
+      "在 teleopInit() 取消還在執行的自動指令",
+      "把手臂的預設指令刪掉",
+      "在 disabledInit() 什麼都不做"
     ],
-    "a": 2,
-    "e": "建構子只在程式啟動時執行一次，就像工友每天早上開門一次。"
+    "a": 1
   }
 ]

@@ -1,79 +1,91 @@
 [
   {
+    "type": "recall",
     "q": "IO 架構裡，ArmSubsystem 的 IO 欄位型別應該是？",
+    "e": "Subsystem 只認介面，才能換實作。",
     "o": [
+      "TalonFX",
+      "Object",
       "ArmIOHardware",
-      "ArmIOSim",
-      "ArmIO（介面）",
-      "TalonFX"
+      "ArmIO（介面）"
     ],
-    "a": 2,
-    "e": "Subsystem 只認介面，才能在不改程式的情況下換成模擬或重播。"
+    "a": 3
   },
   {
-    "q": "隊上的手臂用 TalonFX 內建的 MotionMagic，ArmIO 的主要輸出方法應該是？",
+    "type": "scenario",
+    "s": {
+      "symptom": "Command 在 initialize() 裡呼叫 arm.setGoal(SCORE)，你懷疑新目標晚了一輪才送到 TalonFX。",
+      "evidence": [
+        "排程器每一輪先跑所有 Subsystem 的 periodic，再執行指令",
+        "setGoal 只改欄位，periodic 才呼叫 io.setPositionGoal"
+      ]
+    },
+    "q": "這個延遲的正確解讀是？",
+    "e": "只在 periodic 呼叫 IO，確保每輪只有一個地方決定輸出；代價是最多一輪的延遲。預期結果：行為可預測，模擬與重播也一致。",
+    "lab": "arch",
     "o": [
-      "setVoltage(volts)",
-      "setPositionGoal(positionRad)",
-      "setPID(kP, kI, kD)",
-      "getTalonFX()"
+      "新目標在下一輪 periodic 才送出，最多晚 20 ms，這是設計上可接受的",
+      "要改用 while 迴圈等待",
+      "要把 periodic 移到 Command 裡",
+      "這是 bug，要在 setGoal 裡直接呼叫 IO"
     ],
-    "a": 1,
-    "e": "閉迴路在控制器內部執行，所以 IO 送的是目標位置；setVoltage 只保留給 SysId 和手動測試。"
+    "a": 0
   },
   {
-    "q": "2026 年的 Phoenix 6，TalonFX 接在名為 9427 的 CANivore 上，應該怎麼寫？",
+    "type": "scenario",
+    "s": {
+      "symptom": "模擬時手臂動作正常，實機上手臂一動就往下掉。",
+      "evidence": [
+        "實機的 GravityType 沒設定（預設 Elevator_Static）",
+        "模擬用的是 roboRIO 上的 ArmFeedforward"
+      ]
+    },
+    "q": "最可能的原因與修正是？",
+    "e": "模擬和實機用了不同的控制器設定，所以結果不同。這也是為什麼推薦模擬時用 TalonFXSimState 跑同一份設定。預期結果：手臂在各角度都撐得住。",
     "o": [
-      "new TalonFX(id, \"9427\")",
-      "new TalonFX(id, new CANBus(\"9427\"))",
-      "new TalonFX(id)",
-      "new TalonFX(\"9427\", id)"
+      "把 kP 調大十倍",
+      "實機的 TalonFX 用了錯的重力模型；GravityType 設成 Arm_Cosine，並確認 0 度是水平",
+      "模擬器壞了",
+      "實機要用 DutyCycleOut"
     ],
-    "a": 1,
-    "e": "字串版建構子在 2026 年已標為 deprecated，預計 2027 年移除。"
+    "a": 1
   },
   {
-    "q": "Follower 使用 MotorAlignmentValue.Opposed，意思是？",
+    "type": "scenario",
+    "s": {
+      "symptom": "兩顆手臂馬達互相對抗、發熱，手臂幾乎不動。",
+      "evidence": [
+        "follower 用 Follower(leaderId, MotorAlignmentValue.Aligned)",
+        "兩顆馬達在機構上是面對面裝的"
+      ]
+    },
+    "q": "下一步怎麼修正？",
+    "e": "Aligned／Opposed 是相對於 leader 的 Invert 設定，不看 follower 自己的 Inverted。面對面裝通常要 Opposed。預期結果：兩顆同向出力，電流下降。",
     "o": [
-      "和 follower 自己的 Inverted 相反",
-      "和 leader 設定的 Invert 相反",
-      "停止跟隨",
-      "反向讀取編碼器"
+      "把 follower 的 Inverted 設反就好",
+      "改成 MotorAlignmentValue.Opposed，並先用低電壓確認方向",
+      "把兩顆都設成 leader",
+      "提高電流限制"
     ],
-    "a": 1,
-    "e": "Aligned 和 Opposed 都是相對於 leader 的 Invert 設定。"
+    "a": 1
   },
   {
-    "q": "手臂的 GravityType 應該設成什麼？",
+    "type": "scenario",
+    "s": {
+      "symptom": "一個 Command 直接呼叫 io.setVoltage(3)，結果手臂抖一下就回到原本的目標。",
+      "evidence": [
+        "ArmSubsystem.periodic 每一輪都呼叫 io.setPositionGoal(goal)"
+      ]
+    },
+    "q": "應該怎麼改？",
+    "e": "IO 只該在 periodic 呼叫，否則會被下一輪蓋掉，重播也無法重現。預期結果：模式切換後 periodic 穩定送出 3 V。",
+    "lab": "arch",
     "o": [
-      "預設的 Elevator_Static",
-      "Arm_Cosine",
-      "不需要設定",
-      "Arm_Sine"
+      "讓 Command 也每輪呼叫 IO",
+      "Command 只呼叫 Subsystem 的公開方法（例如切換成電壓模式），讓 periodic 送出輸出",
+      "把 periodic 刪掉",
+      "把 IO 改成 public static"
     ],
-    "a": 1,
-    "e": "手臂的重力補償隨角度變化，要選 Arm_Cosine，而且 0 度必須是水平。"
-  },
-  {
-    "q": "Command 在 initialize() 裡呼叫 arm.setGoal(SCORE)，新目標什麼時候送到 TalonFX？",
-    "o": [
-      "同一行立刻送出",
-      "下一個週期的 ArmSubsystem.periodic()",
-      "Command 結束時",
-      "下次部署時"
-    ],
-    "a": 1,
-    "e": "排程器先跑 Subsystem 的 periodic，再執行指令，所以新目標在下一輪的 periodic 才送出。"
-  },
-  {
-    "q": "為什麼 ArmIOSim 推薦用 Phoenix 的 TalonFXSimState？",
-    "o": [
-      "比較快",
-      "模擬時跑的是同一份 MotionMagic 和 kG 設定",
-      "不需要齒輪比",
-      "可以用多條 CAN bus"
-    ],
-    "a": 1,
-    "e": "這樣模擬驗證的就是實機會用的設定。注意模擬時所有 CAN bus 會合併，ID 必須唯一。"
+    "a": 1
   }
 ]

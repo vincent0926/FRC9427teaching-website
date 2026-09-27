@@ -81,17 +81,29 @@ for (const f of readdirSync(src("chapters")).filter(f => f.endsWith(".html"))) {
   if (/<div class="quiz">/.test(html) && !existsSync(src(`quiz/ch${pad(n)}.json`))) err(f, "有小測驗區塊但沒有題庫");
 }
 
-// ---- 小測驗
+// ---- 小測驗：格式、情境題的症狀與證據、實驗連結；情境題約七成（規格：約 30% 記憶、70% 情境）
+let totalQ = 0, scenarioQ = 0;
 for (const f of readdirSync(src("quiz")).filter(f => f.endsWith(".json"))) {
   let qs;
   try { qs = JSON.parse(read(src("quiz/" + f))); } catch (e) { err(f, "JSON 格式錯誤：" + e.message); continue; }
+  const n = Number(f.match(/\d+/)[0]);
+  const labs = (chapters.find(c => c.id === n)?.labs || []).map(l => l.id);
+  let sc = 0;
   qs.forEach((q, i) => {
     const w = `${f} 第 ${i + 1} 題`;
+    if (!["recall", "scenario"].includes(q.type)) err(w, "type 要是 recall 或 scenario");
+    if (q.type === "scenario" && (!q.s?.symptom || !q.s?.evidence?.length)) err(w, "情境題要有 s.symptom 與 s.evidence");
+    if (q.type === "scenario") sc++;
     if (!q.q || !Array.isArray(q.o) || q.o.length < 2 || typeof q.a !== "number" || !q.e) err(w, "缺少 q／o／a／e");
     else if (q.a < 0 || q.a >= q.o.length) err(w, `答案索引 ${q.a} 超出選項範圍`);
     if (q.o && new Set(q.o).size !== q.o.length) err(w, "選項重複");
+    if (q.lab && !labs.includes(q.lab)) err(w, `連到不存在的實驗 ${q.lab}`);
   });
+  if (qs.length && sc / qs.length < 0.5) warn(f, `情境題只有 ${sc} / ${qs.length}`);
+  totalQ += qs.length; scenarioQ += sc;
 }
+if (totalQ && scenarioQ / totalQ < 0.65) err("小測驗", `情境題只佔 ${(100 * scenarioQ / totalQ).toFixed(0)}%，目標約 70%`);
+console.log(`小測驗：${totalQ} 題，情境題 ${scenarioQ}（${(100 * scenarioQ / totalQ).toFixed(0)}%）`);
 
 for (const w of warnings) console.log("注意　" + w);
 for (const e of errors) console.log("錯誤　" + e);

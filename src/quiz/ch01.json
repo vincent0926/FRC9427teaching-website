@@ -1,57 +1,86 @@
 [
   {
-    "q": "Roller a = new Roller(\"A\"); Roller b = new Roller(\"B\"); a.run(10.0); 之後，b.getVoltage() 是多少？",
-    "o": [
-      "10.0",
-      "0.0",
-      "12.0",
-      "編譯錯誤"
-    ],
-    "a": 1,
-    "e": "a 和 b 是兩張獨立的表格，各有自己的 voltage 欄位。"
-  },
-  {
+    "type": "recall",
     "q": "建構子在什麼時候執行？",
+    "e": "建構子在 new 的時候執行一次，用來設定物件的初始狀態。",
     "o": [
-      "每次呼叫方法之前",
-      "程式編譯時",
+      "每次呼叫方法時",
       "用 new 建立物件時",
-      "機器人 Enable 時"
+      "物件被刪除時",
+      "程式編譯時"
     ],
-    "a": 2,
-    "e": "new 會配置一個新物件，接著執行建構子來填好欄位，就像新生報到時填表。"
+    "a": 1
   },
   {
-    "q": "建構子裡 this.name = name; 的 this.name 指的是？",
+    "type": "scenario",
+    "s": {
+      "symptom": "程式一 Enable 就當掉，Console 出現例外。",
+      "evidence": [
+        "例外是 NullPointerException",
+        "堆疊指向 shooter.run(6.0) 那一行",
+        "欄位宣告是 private Roller shooter;"
+      ]
+    },
+    "q": "原因是什麼？",
+    "e": "只宣告不 new，變數的值是 null，呼叫方法就會丟出 NullPointerException。修正：在建構子裡 new 出物件。預期結果：不再丟例外，shooter 可以正常呼叫。",
+    "lab": "roller",
     "o": [
-      "傳進來的參數",
-      "這個物件自己的 name 欄位",
-      "類別的 static 欄位",
-      "另一個物件"
+      "Roller 類別沒有 run 方法",
+      "6.0 超過電壓上限",
+      "shooter 只有宣告、沒有 new，所以是 null",
+      "shooter 應該宣告成 public"
     ],
-    "a": 1,
-    "e": "this 代表「我自己」。參數和欄位同名時，用 this 指欄位。"
+    "a": 2
   },
   {
-    "q": "宣告 private TalonFX leader; 但忘了 new，會發生什麼事？",
+    "type": "scenario",
+    "s": {
+      "symptom": "你讓 intake 跑 8 V，卻發現 feeder 也顯示 8 V。",
+      "evidence": [
+        "intake 和 feeder 都是 Roller",
+        "voltage 欄位宣告成 private static double voltage"
+      ]
+    },
+    "q": "問題出在哪？",
+    "e": "static 欄位屬於類別，所有物件共用。每個物件各自的狀態要用非 static 欄位。預期結果：拿掉 static 後兩個物件各自獨立。",
+    "lab": "roller",
     "o": [
-      "編譯失敗",
-      "WPILib 自動建立",
-      "執行到 leader.setControl(...) 時丟出 NullPointerException",
-      "馬達以 0V 運轉"
+      "feeder 沒有 new",
+      "intake 和 feeder 用了同一個 CAN ID",
+      "voltage 是 static，所有 Roller 共用同一個值",
+      "run 方法沒有 this"
     ],
-    "a": 2,
-    "e": "欄位是 null，就像點名冊上的空座位。編譯器不攔，執行時才崩潰。"
+    "a": 2
   },
   {
+    "type": "scenario",
+    "s": {
+      "symptom": "你寫了 this.name = name; 這行，但印出來的 name 永遠是 null。",
+      "evidence": [
+        "建構子參數叫 nam（少一個 e）",
+        "欄位叫 name"
+      ]
+    },
+    "q": "原因是什麼？",
+    "e": "參數叫 nam，右邊的 name 就指向欄位本身，等於 name = name。修正參數名稱。預期結果：欄位拿到建構時傳入的值。",
+    "o": [
+      "要先呼叫 super()",
+      "字串不能存在欄位裡",
+      "右邊的 name 其實是欄位自己，參數名稱打錯了，所以是把 null 設給自己",
+      "this 不能用在建構子裡"
+    ],
+    "a": 2
+  },
+  {
+    "type": "recall",
     "q": "下面哪一個最適合寫成 static final 常數？",
+    "e": "所有物件共用而且不會改變的值才適合 static final。",
     "o": [
-      "滾輪目前的電壓",
+      "目前按下的按鍵",
       "所有滾輪共用的電壓上限 12.0",
-      "飛輪目前的轉速",
+      "每個滾輪目前的電壓",
       "手臂現在的角度"
     ],
-    "a": 1,
-    "e": "就像印在表頭的校名：對所有物件都一樣而且不變。其他三個是每個物件各自、會變動的狀態。"
+    "a": 1
   }
 ]

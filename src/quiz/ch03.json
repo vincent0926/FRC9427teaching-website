@@ -1,57 +1,70 @@
 [
   {
-    "q": "IntakeSubsystem extends SubsystemBase，下面哪個敘述正確？",
-    "o": [
-      "IntakeSubsystem 還能再 extends 另一個類別",
-      "IntakeSubsystem 自動擁有 SubsystemBase 的方法，例如 runOnce()",
-      "SubsystemBase 自動擁有 IntakeSubsystem 自己寫的方法",
-      "兩者沒有關係"
-    ],
-    "a": 1,
-    "e": "子類別沿用父類別的方法，反過來不成立。Java 只能 extends 一個父類別。"
-  },
-  {
-    "q": "IntakeSubsystem 的建構子裡沒寫 super()，SubsystemBase 的建構子還會執行嗎？",
-    "o": [
-      "不會，所以 periodic() 不會被呼叫",
-      "會，編譯器自動在第一行插入 super()",
-      "只有在模擬時會",
-      "要手動呼叫 register() 才會"
-    ],
-    "a": 1,
-    "e": "沒有明確呼叫時，編譯器會自動插入呼叫父類別無參數建構子的 super()，SubsystemBase 因此完成註冊。"
-  },
-  {
-    "q": "在 Robot 裡把 teleopPeriodic() 打錯成 teleopPeriodc()，但有加 @Override，會怎樣？",
-    "o": [
-      "執行時才出錯",
-      "編譯器報錯",
-      "自動改成正確名稱",
-      "沒有任何影響"
-    ],
-    "a": 1,
-    "e": "@Override 讓編譯器檢查父類別真的有這個方法，打錯馬上被抓。沒加的話，機器人在手動階段會什麼都不做。"
-  },
-  {
+    "type": "recall",
     "q": "RollerIO io = new RollerIOSim(); io.setVoltage(8.0); 會執行誰的 setVoltage()？",
+    "e": "多型：實際執行的是物件真正類別的實作。",
     "o": [
-      "RollerIO 介面的",
       "RollerIOSim 的",
-      "RollerIOHardware 的",
-      "編譯錯誤"
+      "都不執行",
+      "RollerIO 介面的 default",
+      "編譯失敗"
     ],
-    "a": 1,
-    "e": "變數型別是介面，實際執行的是物件本身的做法，就像衛生股長只看職責、不管今天是誰。"
+    "a": 0
   },
   {
-    "q": "真馬達和模擬器都要能「設定電壓、回報轉速」，最適合用什麼表達？",
+    "type": "scenario",
+    "s": {
+      "symptom": "你在 Robot 裡寫了 teleopPeriodc()（打錯字），Teleop 時什麼都不會發生，也沒有任何錯誤。",
+      "evidence": [
+        "方法上面沒有 @Override",
+        "程式編譯成功"
+      ]
+    },
+    "q": "怎麼讓這種錯誤在編譯時就被抓到？",
+    "e": "@Override 要求編譯器確認父類別真的有這個方法。預期結果：打錯的名稱會編譯失敗，改對後 Teleop 正常執行。",
     "o": [
-      "讓 RollerIOSim extends RollerIOHardware",
-      "定義 RollerIO 介面，兩者都 implements",
-      "複製貼上兩份程式",
-      "用 static 方法"
+      "在覆寫的方法上加 @Override，打錯字時編譯器會報錯",
+      "把方法改成 static",
+      "改用 extends Object",
+      "在方法裡加 System.out.println"
     ],
-    "a": 1,
-    "e": "模擬器不是一種真馬達，只是能做同樣的事，這正是介面的用途，就像掃地機器人能當值日生。"
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "IntakeSubsystem 繼承 SubsystemBase，但它的 periodic() 從來沒被呼叫。",
+      "evidence": [
+        "建構子第一行寫了 super();",
+        "periodic() 的簽章是 public void periodic(int n)"
+      ]
+    },
+    "q": "原因是什麼？",
+    "e": "參數不同就不是覆寫。加上 @Override 會直接編譯失敗，提醒你簽章不對。預期結果：改成 periodic() 後每 20 ms 被呼叫。",
+    "o": [
+      "periodic 必須是 static",
+      "SubsystemBase 不會自動註冊",
+      "periodic(int n) 是新的多載方法，不是覆寫；排程器呼叫的是沒有參數的 periodic()",
+      "super() 讓 periodic 失效"
+    ],
+    "a": 2
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "隊上想讓同一個 IntakeSubsystem 在實機用 TalonFX、在模擬用假的馬達。",
+      "evidence": [
+        "目前 IntakeSubsystem 裡直接 new TalonFX"
+      ]
+    },
+    "q": "哪個設計最合適？",
+    "e": "介面描述「能做什麼」，實作可以替換，這就是第 6 章 IO 架構的基礎。預期結果：Subsystem 不用改就能換實作。",
+    "o": [
+      "寫兩個不同的 IntakeSubsystem",
+      "在 IntakeSubsystem 裡用 if 判斷是不是模擬",
+      "讓 TalonFX 繼承模擬類別",
+      "定義 RollerIO 介面，實機與模擬各自 implements，Subsystem 只認介面"
+    ],
+    "a": 3
   }
 ]

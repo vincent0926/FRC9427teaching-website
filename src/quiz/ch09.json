@@ -1,57 +1,73 @@
 [
   {
+    "type": "recall",
     "q": "按住才吸入、放開就停，應該用哪種綁定？",
+    "e": "whileTrue 在條件變 true 時排程，變 false 時取消。",
+    "lab": "bindings",
     "o": [
-      "onTrue",
       "whileTrue",
+      "onFalse",
       "toggleOnTrue",
-      "onFalse"
+      "onTrue"
     ],
-    "a": 1,
-    "e": "whileTrue 在變成 true 時排程，變成 false 時取消。"
+    "a": 0
   },
   {
-    "q": "不會自己結束的指令綁在 onTrue，放開按鍵後會怎樣？",
+    "type": "scenario",
+    "s": {
+      "symptom": "操作手按一下吸入鍵，Intake 就一直轉，放開也不停，直到按了別的鍵。",
+      "evidence": [
+        "綁定是 onTrue(intake.run(...))",
+        "run 建立的指令不會自己結束"
+      ]
+    },
+    "q": "要做到「按著轉、放開停」，應該改成？",
+    "e": "onTrue 只負責開始，不會在放開時取消；whileTrue 會。預期結果：放開時指令被取消，end 把電壓歸零。",
+    "lab": "bindings",
     "o": [
-      "立刻停止",
-      "繼續執行，直到被別的指令打斷",
-      "重新開始",
-      "編譯失敗"
+      "再加一個 onTrue",
+      "toggleOnTrue",
+      "onFalse",
+      "whileTrue"
     ],
-    "a": 1,
-    "e": "onTrue 在放開時什麼都不做。"
+    "a": 3
   },
   {
-    "q": "toggleOnTrue 在指令正在執行時被按下，會怎樣？",
+    "type": "scenario",
+    "s": {
+      "symptom": "射球鍵只有在手臂到位時才應該作用，但操作手太早按就射歪了。",
+      "evidence": [
+        "目前綁定是 operator.rightTrigger(0.5).onTrue(shoot())"
+      ]
+    },
+    "q": "最合適的改法是？",
+    "e": "用 Trigger 組合條件，兩者都成立時才排程。預期結果：手臂沒到位時按下不會射。",
+    "lab": "bindings",
     "o": [
-      "再排程一次",
-      "取消指令",
-      "什麼都不做",
-      "暫停指令"
+      "new Trigger(arm::atGoal).and(operator.rightTrigger(0.5)).onTrue(shoot())",
+      "在 shoot() 裡用 while 等手臂到位",
+      "把綁定放進 periodic 每輪建立一次",
+      "叫操作手不要太早按"
     ],
-    "a": 1,
-    "e": "像電燈開關：沒在執行就排程，正在執行就取消。"
+    "a": 0
   },
   {
-    "q": "按鍵綁定應該寫在哪裡？",
+    "type": "scenario",
+    "s": {
+      "symptom": "按一下按鍵，一個指令被排程了好幾次，Console 顯示同一個指令一直重新開始。",
+      "evidence": [
+        "綁定寫在 ArmSubsystem.periodic() 裡",
+        "每一輪都執行 controller.a().onTrue(...)"
+      ]
+    },
+    "q": "原因與修正是？",
+    "e": "綁定是一次性的宣告，重複宣告會疊加。預期結果：移到 configureBindings 之後每按一次只排程一次。",
     "o": [
-      "robotPeriodic()",
-      "Subsystem 的 periodic()",
-      "RobotContainer 建構時（configureBindings）",
-      "每個指令的 execute()"
+      "onTrue 本來就會重複排程",
+      "要加 withTimeout",
+      "要改用 toggleOnTrue",
+      "每一輪都新增一個綁定；綁定只在 RobotContainer 建構時宣告一次"
     ],
-    "a": 2,
-    "e": "綁定是宣告式的，初始化時宣告一次。寫在 periodic 裡會每輪新增綁定。"
-  },
-  {
-    "q": "new Trigger(arm::atGoal).and(operator.rightTrigger(0.5)) 什麼時候為 true？",
-    "o": [
-      "任一個成立",
-      "兩個都成立",
-      "都不成立",
-      "arm 到位後 0.5 秒"
-    ],
-    "a": 1,
-    "e": "and 代表兩個條件都要成立。"
+    "a": 3
   }
 ]

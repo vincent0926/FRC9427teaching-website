@@ -1,57 +1,92 @@
 [
   {
-    "q": "指令的 initialize() 什麼時候被呼叫？",
-    "o": [
-      "每輪一次",
-      "指令被排程時一次",
-      "指令結束時",
-      "機器人開機時"
-    ],
-    "a": 1,
-    "e": "initialize 在排程時呼叫一次，就像活動開始時集合。"
-  },
-  {
-    "q": "手臂正在執行指令 A（預設中斷行為），此時排程了同樣 require 手臂的指令 B，會怎樣？",
-    "o": [
-      "B 排程失敗",
-      "A 被取消，B 開始執行",
-      "兩個同時執行",
-      "A 結束後 B 才執行"
-    ],
-    "a": 1,
-    "e": "預設是 kCancelSelf：正在執行的指令被取消，新指令排程成功。"
-  },
-  {
+    "type": "recall",
     "q": "A 被 B 打斷時，A 的 end(interrupted) 收到什麼？",
+    "e": "被打斷或取消時一樣會呼叫 end，參數為 true。",
+    "lab": "scheduler",
     "o": [
       "不會呼叫 end",
+      "會丟出例外",
       "interrupted = false",
-      "interrupted = true",
-      "會丟出例外"
+      "interrupted = true"
     ],
-    "a": 2,
-    "e": "被打斷或取消時一樣會呼叫 end，參數為 true。"
+    "a": 3
   },
   {
-    "q": "Commands.runOnce(() -> arm.setGoal(ArmState.STOW)) 少了什麼？",
+    "type": "scenario",
+    "s": {
+      "symptom": "按下得分鍵後手臂開始動，操作手接著按了收回鍵，手臂立刻改去收回位置，得分動作沒做完。",
+      "evidence": [
+        "兩個指令都 require arm",
+        "得分指令使用預設的中斷行為"
+      ]
+    },
+    "q": "這個結果是？",
+    "e": "預設是 kCancelSelf。如果得分動作不應被打斷，可以用 withInterruptBehavior(kCancelIncoming)。預期結果：依需求選擇誰優先。",
+    "lab": "scheduler",
     "o": [
-      "什麼都不少",
-      "requirements：沒有傳入 arm",
+      "預期行為：新指令排程時，正在執行、require 同一個 Subsystem 的指令會被取消",
+      "bug：兩個指令應該同時執行",
+      "CAN 延遲造成",
+      "bug：新指令應該排隊等待"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "一個 Command 把手臂設到 STOW，但同時執行的另一個手臂指令沒有被取消，兩個一起改目標。",
+      "evidence": [
+        "第一個指令寫成 Commands.runOnce(() -> arm.setGoal(ArmState.STOW))"
+      ]
+    },
+    "q": "少了什麼？",
+    "e": "Commands 工具類別的 factory 要自己傳 Subsystem；Subsystem 自己的 runOnce 才會自動 require。預期結果：排程時正確取消衝突的指令。",
+    "lab": "scheduler",
+    "o": [
       "isFinished",
-      "withTimeout"
+      "withTimeout",
+      "requirements：沒有把 arm 傳進 Commands.runOnce",
+      "defaultCommand"
     ],
-    "a": 1,
-    "e": "Commands 工具類別的 factory 要自己把 Subsystem 傳進去；Subsystem 自己的 factory 才會自動 require。"
+    "a": 2
   },
   {
-    "q": "預設指令最適合用哪個 factory 建立？",
+    "type": "scenario",
+    "s": {
+      "symptom": "預設指令用 runOnce 建立，手臂在其他指令結束後，只保持了一瞬間就沒有再被控制。",
+      "evidence": [
+        "預設指令是 arm.runOnce(() -> arm.hold())",
+        "其他時候手臂慢慢往下滑"
+      ]
+    },
+    "q": "應該怎麼改？",
+    "e": "預設指令結束後會被重新排程，但 runOnce 每次只執行一輪；持續保持應該用 run。預期結果：沒有其他指令時手臂一直被保持。",
     "o": [
-      "runOnce",
-      "run",
-      "waitSeconds",
-      "none"
+      "預設指令用 run（持續執行直到被打斷）",
+      "改成 onTrue 綁定",
+      "在 Robot.java 裡 while 迴圈呼叫 hold",
+      "把預設指令刪掉"
     ],
-    "a": 1,
-    "e": "預設指令不應自己結束，run 會一直執行直到被打斷，並自動 require 該 Subsystem。"
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "機器人 Disable 再 Enable 之後，手臂立刻衝向上一次的目標，差點打到人。",
+      "evidence": [
+        "ArmSubsystem 在 Disabled 時停止輸出，但保留 goal",
+        "沒有人在 Enable 前檢查目標"
+      ]
+    },
+    "q": "比較安全的改法是？",
+    "e": "保留目標本身不是錯，但要決定 Enable 那一刻機構會做什麼。預期結果：重新 Enable 時手臂停在安全位置或慢慢回去。",
+    "o": [
+      "在 Disabled 時把目標設回安全位置（例如 STOW），並且 Enable 前喊出來",
+      "把 kP 調小",
+      "把 Brake 改成 Coast",
+      "在 Enable 後等 5 秒"
+    ],
+    "a": 0
   }
 ]
