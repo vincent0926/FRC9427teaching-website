@@ -452,7 +452,13 @@
         "判斷一份 SysId 結果能不能信，再填回程式"
       ],
       "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch15",
-      "labs": [],
+      "labs": [
+        {
+          "id": "fit",
+          "title": "用資料擬合 kS、kG、kV",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch15/fit"
+        }
+      ],
       "toolTasks": [
         {
           "track": "elevator",

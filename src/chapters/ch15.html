@@ -46,6 +46,65 @@
   </ul>
   <p>兩種測試都要往前、往後各做一次，共四項。順序不拘，但建議做完往前立刻做往後，機構大致會回到原位<a class="ref" href="#src15-2">[2]</a>。</p>
 
+  <h2>收了哪些資料</h2>
+  <p>每一個取樣點記下三樣東西：馬達的<strong>電壓</strong>、機構的<strong>位置</strong>與<strong>速度</strong>，再加上現在跑的是哪一項測試（SysId 用「state」字串分段）<a class="ref" href="#src15-7">[7]</a>。加速度沒有直接量，是從速度變化算出來的，所以雜訊特別多。</p>
+  <p>每一個點都代入同一條式子。以升降機構為例：</p>
+  <pre><code>V = kS·sgn(v) + kG + kV·v + kA·a</code></pre>
+  <p>一次測試有幾百個點，就有幾百條這樣的式子，但未知數只有 kS、kG、kV、kA 四個。每個點都有量測誤差，不可能每條式子都剛好成立。</p>
+
+  <h2>回歸：從資料找出係數</h2>
+  <p>SysId 做的是最小平方法之類的曲線擬合：找一組 kS、kG、kV、kA，讓所有點的「預測電壓」和「實際電壓」差距的平方加起來最小<a class="ref" href="#src15-1">[1]</a>。四項測試各自負責讓某些係數能被分辨出來：</p>
+  <table class="map">
+    <thead><tr><th>測試</th><th>資料的特性</th><th>主要幫忙分辨</th></tr></thead>
+    <tbody>
+      <tr><td>Quasistatic</td><td>加速度幾乎是 0，電壓和速度幾乎是一條直線</td><td>斜率 ≈ kV；截距裡有 kS 與 kG</td></tr>
+      <tr><td>Dynamic</td><td>突然給固定電壓，加速度很大</td><td>kA</td></tr>
+      <tr><td>正向＋反向</td><td>摩擦方向相反，重力方向不變</td><td>把 kS 和 kG 分開</td></tr>
+    </tbody>
+  </table>
+  <p>最後一列是為什麼一定要做正反兩個方向。升降機構往上時截距是 kG + kS，往下時是 kG − kS（摩擦反過來，重力不變）。只有一個方向，就只看得到兩者的和，分不開。手臂的 kG 還乘上 cos θ，會隨角度變化，所以也分得開，但一樣需要兩個方向來判斷摩擦。</p>
+
+  <h2>動手試：用資料擬合 kS、kG、kV</h2>
+  <p>下面是一台模擬升降機構的 quasistatic 資料（正向、反向）。擬合只用 quasistatic，所以只估 kS、kG、kV。先看乾淨資料的結果，再一個一個打開壞資料，看擬合出來的參數怎麼偏掉。</p>
+  <div class="lab">
+    <div class="calls" role="group" aria-label="資料狀況">
+      <button class="call sid" data-sid="tail" aria-pressed="false">速度門檻太低（包含還沒動的點）</button>
+      <button class="call sid" data-sid="limit" aria-pressed="false">撞到機械極限</button>
+      <button class="call sid" data-sid="noise" aria-pressed="false">速度訊號雜訊大</button>
+      <button class="call sid" data-sid="oneway" aria-pressed="false">只做正向</button>
+    </div>
+    <canvas id="sidCanvas" class="pidplot" width="640" height="260" role="img" aria-label="電壓對速度的散佈圖與擬合線"></canvas>
+    <div class="console" id="sidConsole" aria-live="polite"></div>
+  </div>
+
+  <h2>怎麼判斷資料能不能信</h2>
+  <p>WPILib 的 SysId 在 Diagnostics 區塊提供三個擬合指標<a class="ref" href="#src15-9">[9]</a>：</p>
+  <ul>
+    <li><strong>模擬速度 r²</strong>：用擬合出的參數，從實際電壓模擬出速度，和量到的速度比較。文件說大於 0.9 代表擬合良好。</li>
+    <li><strong>加速度 r²</strong>：機構振動讓加速度很吵，即使很好的資料也很少超過 0.5；低於約 0.2 時，kA 的可信度就很有疑問。</li>
+    <li><strong>模擬速度 RMSE</strong>：模擬速度誤差的標準差，可以當作測試過程雜訊大小的估計。</li>
+  </ul>
+  <p>也要看圖。文件說明，好的 quasistatic 速度對時間圖幾乎是直線，dynamic 則是指數形狀地接近穩定速度；偏離這些形狀就代表機構設定、分析設定或測試過程有問題。常見的壞資料<a class="ref" href="#src15-9">[9]</a>：</p>
+  <table class="map">
+    <thead><tr><th>狀況</th><th>圖上看起來</th><th>怎麼處理</th></tr></thead>
+    <tbody>
+      <tr><td>速度門檻太低</td><td>quasistatic 圖前面有一段「尾巴」：還沒開始動的點被算進去</td><td>調高 Velocity Threshold 重新分析</td></tr>
+      <tr><td>速度門檻太高</td><td>加速度對速度的圖中間有一大段空白</td><td>調低門檻重新分析</td></tr>
+      <tr><td>速度訊號雜訊大</td><td>圖上的點上下亂跳</td><td>檢查編碼器安裝（軸心、磁鐵位置）；可以加大 Window Size，但根本原因還是要修</td></tr>
+      <tr><td>撞到機械極限</td><td>速度突然掉到 0，電壓卻還在升</td><td>丟掉那段資料，下次提早放開</td></tr>
+    </tbody>
+  </table>
+  <p>文件也提到：機構相對馬達很輕時，kA 會趨近 0，前饋可以忽略它；但 kA 量不準時，算出的回饋增益也會不準，需要手動調<a class="ref" href="#src15-9">[9]</a>。</p>
+
+  <h3>為什麼和理論值不一樣</h3>
+  <p>第 13 章的 kG、kV、kA 可以從質量、齒輪比和馬達常數估計 [MODEL]，但 SysId [SYSID] 量到的幾乎一定不同。常見原因：</p>
+  <ul>
+    <li><strong>模型沒算到的東西</strong>：齒輪箱與鏈條的效率損失、軸承摩擦、線材的拉力、螺絲和電線的質量。</li>
+    <li><strong>模型假設的誤差</strong>：質量、力臂或重心估錯；每顆馬達的常數也有個體差異。</li>
+    <li><strong>機構資料填錯</strong>：差很多（例如差好幾倍）時，通常不是摩擦，而是齒輪比、鼓輪半徑或單位填錯。工具站 4F 單元二會把 SysId 結果和理論值比較，推測可能填錯的資料（見本章的工具站任務）。</li>
+  </ul>
+  <p>差一點是正常的，這就是為什麼要量：理論值告訴你數量級對不對，SysId 告訴你真實機構是多少。</p>
+
   <h2>寫 SysIdRoutine</h2>
   <p>WPILib 提供 <code>SysIdRoutine</code>：<code>Config</code> 描述測試設定（quasistatic 的電壓上升速率、dynamic 的步階電壓、安全用的最長時間、記錄測試狀態的回呼），<code>Mechanism</code> 描述怎麼驅動馬達和記錄資料<a class="ref" href="#src15-2">[2]</a>。文件建議把 routine 和回呼都寫在 Subsystem 裡<a class="ref" href="#src15-2">[2]</a>。</p>
   <p>用 TalonFX 時，CTRE 建議不用 <code>SysIdRoutine</code> 自己記錄，而是用 Phoenix 的 <code>SignalLogger</code><a class="ref" href="#src15-2">[2]</a>。它的好處是自動擷取所有狀態訊號、帶著 CAN 上的時間戳，而且不受主迴圈時間和 Java GC 影響，能明顯提高系統鑑別的準確度<a class="ref" href="#src15-3">[3]</a>。下面依照 CTRE 官方 SysId 範例的寫法<a class="ref" href="#src15-4">[4]</a>，加到第 6 章的 <code>ArmSubsystem</code>：</p>
@@ -176,4 +235,5 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
     <li id="src15-6">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tools/log-extractor.html" target="_blank" rel="noopener">Extracting Signal Logs</a>（Tuner X 下載與轉檔）</li>
     <li id="src15-7">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/loading-data.html" target="_blank" rel="noopener">Loading Data</a></li>
     <li id="src15-8">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/analyzing-gains.html" target="_blank" rel="noopener">Analyzing Data</a>（回饋增益只是起點、控制器設定）</li>
+    <li id="src15-9">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/viewing-diagnostics.html" target="_blank" rel="noopener">Viewing Diagnostics</a>（三個擬合指標、診斷圖、常見失敗型態）</li>
   </ol>

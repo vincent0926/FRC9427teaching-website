@@ -594,7 +594,28 @@
           "check": "兩點法和 SysId 各自需要哪些假設？"
         }
       ],
-      "labs": []
+      "labs": [
+        {
+          "id": "fit",
+          "title": "用資料擬合 kS、kG、kV",
+          "objective": "看出正反向資料怎麼分開 kS 與 kG，以及壞資料怎麼讓擬合結果偏掉。",
+          "kind": "model",
+          "modeled": [
+            "升降機構 quasistatic 測試的電壓與速度（真實值 kS 0.15 V、kG 0.45 V、kV 2.0 V/(m/s)，只在模擬中有意義）",
+            "速度量測雜訊",
+            "速度門檻太低、撞到極限、只做正向四種狀況"
+          ],
+          "approximated": [
+            "加速度當作 0（只擬合 quasistatic）",
+            "擬合品質用電壓的 r² 與 RMSE，不是 SysId 實際使用的模擬速度 r²"
+          ],
+          "omitted": [
+            "dynamic 測試與 kA",
+            "SysId 的資料濾波與切段",
+            "手臂的 cos θ 項"
+          ]
+        }
+      ]
     },
     {
       "id": 16,
