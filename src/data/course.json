@@ -685,6 +685,14 @@
           "title": "4F 兩點法量 kS、kG",
           "do": "用兩個定速量出 kS 與 kG，填回 1F。",
           "check": "兩點法和 SysId 各自需要哪些假設？"
+        },
+        {
+          "track": "arm",
+          "page": "learn",
+          "section": "unit2",
+          "title": "手臂 4F 單元二：用 SysId 量手臂",
+          "do": "看手臂的 SysId 和升降機構差在哪裡（kG 乘 cos θ、0 度必須水平）。",
+          "check": "手臂的 kG 為什麼一定要在水平附近量？"
         }
       ],
       "labs": [
@@ -827,6 +835,13 @@
           "title": "2F 用範例日誌練習診斷",
           "do": "載入一份範例日誌，照步驟 0 到步驟 3 找第一優先問題。",
           "check": "為什麼一次只改一個參數？"
+        },
+        {
+          "track": "arm",
+          "page": "tune",
+          "title": "手臂 2F：用範例日誌練習診斷",
+          "do": "載入手臂的範例日誌，看工具站怎麼從日誌偵測 GravityType 設錯。",
+          "check": "日誌裡哪個現象代表 kG 沒有乘 cos θ？"
         }
       ],
       "labs": [],
@@ -934,7 +949,7 @@
     "name": "電梯／手臂調參工作站",
     "url": "https://vincent0926.github.io/FRC-elevator-PID-Teaching-website/",
     "repo": "vincent0926/FRC-elevator-PID-Teaching-website",
-    "minVersion": "0.12",
+    "minVersion": "0.13",
     "pages": [
       "home",
       "calc",
@@ -978,11 +993,13 @@
       "unit4",
       "measure-ks"
     ],
-    "note": "scenarios 與 sections 要和工具站的 simScenarios.ts、armScenarios.ts、LearnPage.tsx 一致；手臂目前只有 home、calc、sim。",
+    "note": "scenarios 與 sections 要和工具站的 simScenarios.ts、armScenarios.ts、LearnPage.tsx、ArmLearnPage.tsx 一致；電梯與手臂的 4F 都有 measure-ks、unit1～unit4。",
     "armPages": [
       "home",
       "calc",
-      "sim"
+      "tune",
+      "sim",
+      "learn"
     ]
   },
   "stack": {

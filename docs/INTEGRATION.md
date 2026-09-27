@@ -1,7 +1,7 @@
 # 課程網站與工具站的串接
 
 - 課程網站：https://vincent0926.github.io/FRC9427teaching-website/（本 repo）
-- 工具站：電梯／手臂調參工作站 https://vincent0926.github.io/FRC-elevator-PID-Teaching-website/（`vincent0926/FRC-elevator-PID-Teaching-website`，需要 v0.12 以上）
+- 工具站：電梯／手臂調參工作站 https://vincent0926.github.io/FRC-elevator-PID-Teaching-website/（`vincent0926/FRC-elevator-PID-Teaching-website`，需要 v0.13 以上）
 
 分工：課程網站負責觀念、程式架構與比賽實務；前饋與 PID 的計算、模擬、日誌診斷與 SysId 實作交給工具站。課程第 13～15、18 章不重複工具站已經做得很深的內容，而是在章節裡用「到工具站實作」直接連過去。
 
@@ -24,9 +24,9 @@
 |---|---|
 | `track` | `elevator` 或 `arm`，直接進該機構 |
 | `scenario` | 3F 情境 id，進 3F 時直接載入 |
-| `section` | 捲到該區塊並打開，例如 4F 的 `unit2`、`measure-ks` |
+| `section` | 捲到該區塊並打開，例如 4F 的 `unit2`、`measure-ks`（電梯與手臂都有） |
 | `from=course&ch=N` | 工具站顯示「回到課程第 N 章」 |
-| `#calc` `#tune` `#sim` `#learn` | 樓層（手臂目前只有 `#calc`、`#sim`） |
+| `#calc` `#tune` `#sim` `#learn` | 樓層（電梯與手臂都有） |
 
 工具站有哪些情境、單元，列在 `course.json` 的 `tool.scenarios`、`tool.sections`。`node tools/check.mjs` 會確認每個任務都指到存在的情境與單元。**工具站改了情境 id 或單元 id，這份清單要一起改。**
 

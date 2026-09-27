@@ -51,7 +51,7 @@
   "tool": {
     "name": "電梯／手臂調參工作站",
     "url": "https://vincent0926.github.io/FRC-elevator-PID-Teaching-website/",
-    "minVersion": "0.12"
+    "minVersion": "0.13"
   },
   "chapters": [
     {
@@ -471,6 +471,12 @@
           "page": "learn",
           "section": "measure-ks",
           "title": "4F 兩點法量 kS、kG"
+        },
+        {
+          "track": "arm",
+          "page": "learn",
+          "section": "unit2",
+          "title": "手臂 4F 單元二：用 SysId 量手臂"
         }
       ]
     },
@@ -544,6 +550,11 @@
           "track": "elevator",
           "page": "tune",
           "title": "2F 用範例日誌練習診斷"
+        },
+        {
+          "track": "arm",
+          "page": "tune",
+          "title": "手臂 2F：用範例日誌練習診斷"
         }
       ]
     },
