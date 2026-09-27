@@ -186,6 +186,14 @@ p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);
 .pidgrid output{color:var(--ink-2);font-size:12.5px}
 .pidgrid input{width:100%;accent-color:var(--blue)}
 .pidplot{display:block;width:100%;height:auto;background:var(--bg);border:1px solid var(--line);border-radius:6px;margin-bottom:14px}
+/* ch17 fusion bar / ch19 triage */
+.fuse{position:relative;height:64px;margin:6px 8px 30px;border-bottom:2px solid var(--line)}
+.fmark{position:absolute;transform:translateX(-50%);font-size:12.5px;font-family:var(--mono);padding:2px 6px;border-radius:6px;white-space:nowrap;background:var(--bg);border:2px solid}
+.fmark::after{content:"";position:absolute;left:50%;width:2px;height:10px;background:currentColor}
+.fmark.odo{top:2px;color:var(--blue)} .fmark.odo::after{top:100%}
+.fmark.vis{top:2px;color:var(--can-h)} .fmark.vis::after{top:100%}
+.fmark.fus{bottom:-14px;color:var(--can-l);font-weight:700} .fmark.fus::after{bottom:100%}
+.nodeinfo ol{margin:6px 0 0;padding-left:22px}
 /* ---------- landing ---------- */
 body.on-landing .layout, body.on-landing .menu-btn{display:none}
 .landing{position:relative;min-height:100vh;min-height:100dvh;overflow:hidden;background:#0D1720;color:#EEF2F5;display:flex;flex-direction:column;justify-content:center}
@@ -3794,6 +3802,492 @@ autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
   </ol>
 </template>
 
+<template id="tpl-ch17">
+  <p class="headline-code">CAN ID 17｜上場</p>
+  <h1>視覺與定位：看門牌校正位置</h1>
+  <p class="lede">讀完這章，你會知道 AprilTag 是什麼、為什麼要把視覺量測「融合」進里程計而不是直接取代、標準差代表什麼、怎麼用 Limelight 的 MegaTag2 更新 CTRE swerve 的位置，以及兩種瞄準做法的差別。</p>
+  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 文件，以及 CTRE Phoenix6-Examples 附的 LimelightHelpers。Limelight 與 PhotonVision 的韌體與函式庫每年更新，使用前請對照當年的版本。本章延續第 16 章，以 CTRE swerve 為例。</div>
+
+  <h2>生活比喻：看門牌校正位置</h2>
+  <div class="story">
+    <p><strong>靠步數記位置，走久了會偏。</strong>第 16 章的校外教學，司機靠里程表推算位置。走得越久、被擦撞越多次，推算就偏得越多。</p>
+    <p><strong>路邊有門牌。</strong>每棟建築物門口都釘著一塊門牌，門牌的位置在地圖上早就標好了。看到門牌、量出自己離它多遠、在它哪一側，就能算出自己在地圖上的哪裡。</p>
+    <p><strong>但看門牌也會看錯。</strong>門牌很遠的時候看不清楚，估出來的距離誤差很大；同時看到兩三塊門牌，就準得多。車子在急轉彎時看出去的畫面是糊的，這時候看到的最好別信。</p>
+    <p><strong>所以不是「看到門牌就全聽它的」。</strong>聰明的司機會把兩種資訊合起來：步數推算很穩但會慢慢偏，門牌很準但偶爾會跳。門牌看得清楚時多信門牌一點，看不清楚時多信自己的推算。</p>
+    <p><strong>方向盤比門牌更知道車頭朝哪。</strong>車頭朝哪個方向，看車上的指南針就很準，不需要靠遠方的門牌推算。</p>
+  </div>
+  <table class="map">
+    <thead><tr><th>比喻</th><th>程式</th></tr></thead>
+    <tbody>
+      <tr><td>靠步數記位置</td><td>里程計（編碼器 + 陀螺儀）</td></tr>
+      <tr><td>地圖上標好位置的門牌</td><td>場上位置已知的 AprilTag</td></tr>
+      <tr><td>看門牌算出自己在哪</td><td>視覺位置估計（vision pose）</td></tr>
+      <tr><td>遠的門牌看不清楚</td><td>距離越遠，量測的標準差越大</td></tr>
+      <tr><td>急轉彎時畫面糊掉</td><td>高速旋轉時的量測不可靠，應丟掉</td></tr>
+      <tr><td>兩種資訊合起來、看情況決定信誰</td><td>位置估計器（pose estimator）的融合</td></tr>
+      <tr><td>車上的指南針</td><td>陀螺儀的朝向</td></tr>
+    </tbody>
+  </table>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>司機看到門牌是「現在」看到的；相機的影像從拍攝、處理到送進程式，中間有延遲。位置估計器會用量測的時間戳，把這筆資料對回「拍照那一刻」機器人在哪裡，所以時間戳一定要正確。</div>
+
+  <h2>AprilTag</h2>
+  <p>WPILib 文件說明：AprilTag 是密西根大學研究人員開發的視覺標籤系統，能以低運算量提供高精度的定位；在 FRC 裡，它讓機器人知道自己在場上的位置，以便對準目標。從 2023 年起，場上散布著多個 AprilTag，每一個都在已知的位置；從 2024 年起使用 36h11 家族<a class="ref" href="#src17-1">[1]</a>。</p>
+  <p>練習場自己貼 AprilTag 時要注意：文件提醒要把標籤固定在硬的背板上保持平整，因為辨識演算法假設標籤是平的<a class="ref" href="#src17-1">[1]</a>。</p>
+
+  <h2>融合，而不是取代</h2>
+  <p>WPILib 提供 <code>SwerveDrivePoseEstimator</code> 等位置估計器，可以直接取代里程計，並把「有延遲補償的視覺位置」和編碼器、陀螺儀的量測融合在一起<a class="ref" href="#src17-2">[2]</a>。用法是每一輪呼叫 <code>update</code> 放入里程計資料，偶爾有視覺結果時呼叫 <code>addVisionMeasurement</code><a class="ref" href="#src17-2">[2]</a>。CTRE 的 swerve 底盤已經內建同樣的機制，所以直接呼叫 drivetrain 的 <code>addVisionMeasurement</code> 就好<a class="ref" href="#src17-3">[3]</a>。</p>
+
+  <h3>標準差：你有多相信這筆資料</h3>
+  <p>WPILib 文件說明，位置估計器可以設定模型和量測的標準差。標準差描述雜訊有多分散；給某個量越小的標準差，融合時就越相信它。例如把視覺量測的標準差調大，估計器就比較不受雜亂的視覺資料影響，代價是修正偏差比較慢<a class="ref" href="#src17-2">[2]</a>。</p>
+  <p>針對 AprilTag，文件給了三條具體建議<a class="ref" href="#src17-2">[2]</a>：</p>
+  <ul>
+    <li>視覺的朝向標準差設得<strong>非常大</strong>（朝向交給陀螺儀）。</li>
+    <li>陀螺儀的朝向標準差設得小。</li>
+    <li>視覺的 x、y 標準差<strong>隨著和標籤的距離放大</strong>。</li>
+  </ul>
+
+  <h2>動手試：信誰多一點</h2>
+  <p>下面把問題簡化成一維：里程計說機器人在 x = 3.00 m，視覺說在 x = 3.40 m。調整兩者的標準差，看融合後的估計會落在哪裡。這是用「變異數倒數加權」算的，和位置估計器（卡爾曼濾波）融合時的想法一樣。</p>
+  <div class="lab">
+    <div class="pidgrid">
+      <label>里程計標準差 <output id="fuOv"></output><input type="range" id="fuO" min="0.02" max="1" step="0.02" value="0.1"></label>
+      <label>和標籤的距離 <output id="fuDv"></output><input type="range" id="fuD" min="0.5" max="6" step="0.1" value="2"></label>
+      <label>看到的標籤數 <output id="fuNv"></output><input type="range" id="fuN" min="1" max="3" step="1" value="1"></label>
+    </div>
+    <div class="fuse" id="fuBar" aria-hidden="true"></div>
+    <div class="console" id="fuConsole" aria-live="polite"></div>
+  </div>
+  <p>這個實驗裡，視覺的標準差設成「0.05 m × 距離²，看到多個標籤時除以標籤數」。這只是示範用的經驗式，不是官方公式；隊上要用實際資料調整。</p>
+
+  <h2>用 Limelight 更新位置</h2>
+  <p>CTRE 的 swerve 範例附了一段 Limelight 整合的程式，使用 <code>LimelightHelpers</code> 的 MegaTag2 位置估計<a class="ref" href="#src17-4">[4]</a>。MegaTag2 需要先告訴 Limelight 機器人的朝向，<code>LimelightHelpers</code> 的註解寫明呼叫 <code>getBotPoseEstimate_wpiBlue_MegaTag2</code> 之前要先呼叫 <code>SetRobotOrientation</code>，而且 yaw 為 0 代表機器人面向紅方牆面，也就是第 16 章「原點在藍方」的場地座標<a class="ref" href="#src17-5">[5]</a>。</p>
+  <p>下面照 CTRE 範例的流程，加上文件建議的「距離越遠越不信」：</p>
+  <pre><code>private static final String LL = "limelight"; // TODO: 和 Limelight 網頁設定的名稱一致
+
+@Override
+public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+
+    var drivetrain = m_robotContainer.drivetrain; // CTRE 範例把底盤放在 RobotContainer
+    var state = drivetrain.getState();
+    double headingDeg = state.Pose.getRotation().getDegrees();
+    double omegaRps = Units.radiansToRotations(state.Speeds.omegaRadiansPerSecond);
+
+    // 1. 先告訴 Limelight 機器人朝哪
+    LimelightHelpers.SetRobotOrientation(LL, headingDeg, 0, 0, 0, 0, 0);
+    // 2. 取得 MegaTag2 的位置估計
+    var est = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LL);
+    // 3. 沒看到標籤、或正在快速旋轉時丟掉
+    if (est != null &amp;&amp; est.tagCount &gt; 0 &amp;&amp; Math.abs(omegaRps) &lt; 2.0) {
+        double xyStd = 0.05 * est.avgTagDist * est.avgTagDist / est.tagCount; // TODO: 依實測調整
+        drivetrain.addVisionMeasurement(
+            est.pose,
+            est.timestampSeconds,
+            VecBuilder.fill(xyStd, xyStd, 9999999)); // 朝向幾乎不信視覺，交給陀螺儀
+    }
+}</code></pre>
+  <p>幾個重點：</p>
+  <ul>
+    <li><strong>旋轉太快就丟掉。</strong>CTRE 範例的門檻是每秒 2 圈<a class="ref" href="#src17-4">[4]</a>。範例的註解也說明，這段程式只是示範「可以整合視覺」，通常還需要依距離和標籤數調整標準差，實際做法要依隊伍需求調整<a class="ref" href="#src17-4">[4]</a>。</li>
+    <li><strong>時間戳的時基。</strong>CTRE swerve 的 <code>addVisionMeasurement</code> 在範例裡被覆寫，用 <code>Utils.fpgaToCurrentTime</code> 把 FPGA 時間轉成 Phoenix 的時基再交給底盤<a class="ref" href="#src17-3">[3]</a>。用 Tuner X 產生的 <code>CommandSwerveDrivetrain</code> 已經包含這段；自己寫的話不能漏掉。</li>
+    <li><strong>朝向交給陀螺儀。</strong>第三個標準差設極大，對應 WPILib 的建議<a class="ref" href="#src17-2">[2]</a>。</li>
+  </ul>
+  <div class="note"><strong>放在 IO 架構裡</strong>本章為了對照 CTRE 範例，把程式寫在 <code>robotPeriodic</code>。依第 6 章的架構，比較好的做法是寫一個 <code>VisionIO</code>（硬體版讀 Limelight、模擬版回傳空結果；重播時和第 6 章一樣用空實作，資料由日誌填回），讓 Vision Subsystem 在 periodic 裡取得結果再交給底盤，這樣視覺資料也能被記錄與重播（第 18 章）。</div>
+  <p>PhotonVision 是另一套常見的開源選擇，也能在協同處理器上辨識 AprilTag 並輸出位置估計，最後同樣交給 <code>addVisionMeasurement</code>。不管用哪一套，「融合、依距離調整標準差、丟掉不可靠的量測」這三件事都一樣。</p>
+
+  <h2>瞄準的兩種做法</h2>
+  <table class="map">
+    <thead><tr><th>做法</th><th>怎麼算</th><th>優點</th><th>缺點</th></tr></thead>
+    <tbody>
+      <tr><td>直接用畫面偏移</td><td>相機回報目標在畫面中心左右幾度（Limelight 的 <code>tx</code>），用 PID 轉到 0</td><td>簡單，不需要場地座標</td><td>看不到目標就不能用；相機不在旋轉中心時會有誤差</td></tr>
+      <tr><td>用估計的位置</td><td>從估計的 <code>Pose2d</code> 和目標在場上的座標，算出該朝哪個角度</td><td>看不到目標也能轉；和自動階段用同一套座標</td><td>位置估計要準，視覺融合要做好</td></tr>
+    </tbody>
+  </table>
+  <p><code>LimelightHelpers.getTX</code> 回傳準心到目標的水平偏移角度（度），<code>getTV</code> 回傳是否有看到目標<a class="ref" href="#src17-5">[5]</a>。第一種做法大致如下：</p>
+  <pre><code>private final PIDController aimPid = new PIDController(0.0, 0.0, 0.0); // TODO: 輸入度，輸出 rad/s
+
+public Command aimWithTx(DoubleSupplier forward, DoubleSupplier strafe) {
+    return drivetrain.applyRequest(() -&gt; {
+        double rot = LimelightHelpers.getTV(LL)
+            ? aimPid.calculate(LimelightHelpers.getTX(LL), 0.0)
+            : 0.0; // 沒看到目標就不轉
+        return driveRequest
+            .withVelocityX(forward.getAsDouble())
+            .withVelocityY(strafe.getAsDouble())
+            .withRotationalRate(rot);
+    });
+}</code></pre>
+  <p>PID 的輸出正負號一定要上機確認：WPILib 的旋轉是逆時針為正（第 16 章），而 <code>tx</code> 的正負代表目標在準心的哪一側，兩者方向不一定相同。先把 kP 設很小，確認機器人是「轉向」目標而不是「轉離」目標，再慢慢加大。</p>
+  <p>第二種做法用第 16 章的座標：目標在場上的座標減掉機器人的座標，得到一個向量，它的角度就是機器人應該面對的方向，再交給 CTRE 的 <code>FieldCentricFacingAngle</code> 之類「朝向固定角度」的請求。這種做法在紅方時要記得目標座標也要換成紅方那一個。</p>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>看到標籤就直接 resetPose</strong>視覺量測偶爾會跳，直接把位置重設成它，機器人在場上會瞬間移位，路徑跟隨跟著亂跑。用 <code>addVisionMeasurement</code> 融合。</div>
+  <div class="note warn"><strong>時間戳用錯時基</strong>把 FPGA 時間直接交給 CTRE swerve 而沒有轉換，估計器會把量測對到錯的時間點，位置被拉來拉去。</div>
+  <div class="note warn"><strong>相機位置沒量準</strong>Limelight 要知道相機裝在機器人上的哪裡、朝哪個角度。這組數字錯了，所有視覺位置都會偏。</div>
+  <div class="note warn"><strong>忘了呼叫 SetRobotOrientation</strong>MegaTag2 需要機器人的朝向，沒有提供時結果不可靠。</div>
+  <div class="note warn"><strong>練習場的標籤貼歪、沒貼平</strong>演算法假設標籤是平的，彎曲或位置跟場地圖不一致的標籤會讓練習時的結果和正式比賽不同。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：記錄被丟掉的量測</h2>
+  <p>在上面的視覺程式裡，加上兩個計數：接受了幾筆量測、因為旋轉太快丟掉幾筆，每輪用 <code>SmartDashboard.putNumber</code> 顯示。想一想：這兩個數字在比賽中能幫你發現什麼問題？</p>
+  <details>
+    <summary>看參考答案</summary>
+    <pre><code>private int acceptedCount = 0;
+private int rejectedSpinCount = 0;
+
+// robotPeriodic 裡
+if (est != null &amp;&amp; est.tagCount &gt; 0) {
+    if (Math.abs(omegaRps) &lt; 2.0) {
+        acceptedCount++;
+        drivetrain.addVisionMeasurement(est.pose, est.timestampSeconds,
+            VecBuilder.fill(xyStd, xyStd, 9999999));
+    } else {
+        rejectedSpinCount++;
+    }
+}
+SmartDashboard.putNumber("Vision/Accepted", acceptedCount);
+SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
+    <p>如果整場比賽 Accepted 幾乎沒增加，可能是相機沒連上、名稱打錯、曝光設定不對，或是機器人大部分時間都看不到標籤。如果 RejectedSpin 很多，代表門檻可能太嚴，或是駕駛習慣一直邊轉邊移動。把這些數字記錄下來（第 18 章），賽後就能回頭查。</p>
+  </details>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src17-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/vision-processing/apriltag/apriltag-intro.html" target="_blank" rel="noopener">What Are AprilTags?</a>（定義、2023 年起用於 FRC、36h11、標籤要平整）</li>
+    <li id="src17-2">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-pose-estimators.html" target="_blank" rel="noopener">Pose Estimators</a>（融合、update 與 addVisionMeasurement、標準差的意義與 AprilTag 建議）</li>
+    <li id="src17-3">CTR Electronics. <a href="https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/main/java/SwerveWithPathPlanner/src/main/java/frc/robot/subsystems/CommandSwerveDrivetrain.java" target="_blank" rel="noopener">Phoenix6-Examples：CommandSwerveDrivetrain</a>（addVisionMeasurement 與 fpgaToCurrentTime）</li>
+    <li id="src17-4">CTR Electronics. <a href="https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/main/java/SwerveWithPathPlanner/src/main/java/frc/robot/Robot.java" target="_blank" rel="noopener">Phoenix6-Examples：SwerveWithPathPlanner Robot.java</a>（Limelight MegaTag2 整合範例與注意事項）</li>
+    <li id="src17-5">Limelight. <a href="https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/main/java/SwerveWithPathPlanner/src/main/java/frc/robot/LimelightHelpers.java" target="_blank" rel="noopener">LimelightHelpers（隨 CTRE 範例附帶的版本）</a>（SetRobotOrientation、MegaTag2、getTX、getTV 的說明）</li>
+  </ol>
+</template>
+
+<template id="tpl-ch18">
+  <p class="headline-code">CAN ID 18｜上場</p>
+  <h1>模擬、日誌與重播：比賽錄影和賽後檢討</h1>
+  <p class="lede">讀完這章，你會知道模擬、日誌、重播三者差在哪裡，怎麼從機器人取出日誌、用 AdvantageScope 看資料，重播的完整步驟，哪些寫法會讓重播失準，以及怎麼讓每一場比賽的程式版本都找得回來。</p>
+  <div class="note"><strong>版本說明</strong>本章依據 AdvantageKit 2026 版（v26.0.2）的文件。AdvantageKit 網站和 GitHub main 分支已經開始出現 2027 版的內容（例如類別改名），查資料時要確認版本。第 6 章 E 部分已經介紹過 <code>@AutoLog</code>、<code>Logger.processInputs</code> 和三種模式，本章接著講怎麼用。</div>
+
+  <h2>生活比喻：比賽錄影和賽後檢討</h2>
+  <div class="story">
+    <p><strong>體育課的練習賽全程錄影。</strong>每一場練習賽，攝影機都把「場上發生的事」完整錄下來：誰在哪裡、球往哪裡飛、裁判吹了什麼哨。另外，每個球員也把「自己當時怎麼想、決定做什麼」寫在筆記上。</p>
+    <p><strong>賽後一起看錄影。</strong>教練把錄影和筆記放在同一個時間軸上，一格一格看：球員在第 12 秒為什麼沒有傳球？原來他當時以為隊友被擋住了。</p>
+    <p><strong>重新推演：換一套想法會怎樣？</strong>教練還可以說：「用同一段錄影，照新的戰術重新想一次，每一格你會怎麼決定？」因為看到的畫面完全一樣，新的決定可以和原本的決定逐格比較。</p>
+    <p><strong>但推演改變不了錄影。</strong>在推演裡決定「這時候往左跑」，錄影裡的你還是往右跑了，之後的畫面也不會因此改變。推演只能回答「看到這些畫面時，新想法會怎麼決定」，不能回答「照新想法打，比賽會變成怎樣」。</p>
+    <p><strong>錄影要標上是哪一版戰術。</strong>戰術本每場之間都在改，如果錄影沒標註當時用的是哪一版，事後就不知道要拿哪一版來推演。</p>
+  </div>
+  <table class="map">
+    <thead><tr><th>比喻</th><th>AdvantageKit</th></tr></thead>
+    <tbody>
+      <tr><td>錄下場上發生的事</td><td>記錄輸入（inputs）：感測器、Driver Station、儀表板</td></tr>
+      <tr><td>球員寫下自己的決定</td><td>記錄輸出（outputs）：<code>Logger.recordOutput</code></td></tr>
+      <tr><td>放在同一個時間軸上看</td><td>用 AdvantageScope 看日誌</td></tr>
+      <tr><td>用同一段錄影、新想法重新推演</td><td>重播（replay）</td></tr>
+      <tr><td>推演改變不了錄影</td><td>重播的限制（replay bubble）</td></tr>
+      <tr><td>錄影標上戰術版本</td><td>日誌 metadata 記錄 Git commit</td></tr>
+    </tbody>
+  </table>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>錄影只能看到鏡頭拍到的東西；AdvantageKit 的重播要求程式讀到的<strong>每一個</strong>外部資料都被記錄下來，只要漏了一個，重播出來的決定就可能和當時不同。這就是本章後半「確定性」要講的。</div>
+
+  <h2>模擬、日誌、重播</h2>
+  <table class="map">
+    <thead><tr><th></th><th>模擬</th><th>日誌</th><th>重播</th></tr></thead>
+    <tbody>
+      <tr><td>在哪裡跑</td><td>電腦</td><td>真的機器人</td><td>電腦</td></tr>
+      <tr><td>輸入從哪來</td><td>物理模型（第 6 章 D 部分）</td><td>真的硬體</td><td>日誌檔</td></tr>
+      <tr><td>用來做什麼</td><td>還沒有機器人時開發、測試</td><td>記錄每一場發生了什麼</td><td>賽後找 bug、補記錄、試新演算法</td></tr>
+      <tr><td>IO 實作</td><td><code>ArmIOSim</code></td><td><code>ArmIOHardware</code></td><td><code>new ArmIO() {}</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>取得日誌</h2>
+  <p>AdvantageKit 文件說明，在 roboRIO 上 <code>WPILOGWriter</code> 預設寫到 USB 隨身碟（<code>/U/logs</code>），所以 roboRIO 上<strong>必須插一支 FAT32 格式的隨身碟</strong><a class="ref" href="#src18-1">[1]</a>。取出日誌最方便的方法是 AdvantageScope：在偏好設定填好機器人位址與日誌資料夾，然後用 File → Download Logs 下載，最新的日誌會排在最上面<a class="ref" href="#src18-2">[2]</a>。</p>
+  <p>AdvantageScope 能開的格式包括 WPILib 與 AdvantageKit 產生的 <code>.wpilog</code>，以及 Phoenix 6 SignalLogger 的 <code>.hoot</code>（第 15 章）。同時開啟多個檔案時，時間會自動對齊<a class="ref" href="#src18-2">[2]</a>，所以可以把 AdvantageKit 日誌和 hoot 放在一起看。</p>
+
+  <h2>在 AdvantageScope 裡看什麼</h2>
+  <table class="map">
+    <thead><tr><th>分頁</th><th>適合看</th></tr></thead>
+    <tbody>
+      <tr><td>Line Graph</td><td>目標與實際位置、電流、電壓隨時間變化（第 13、14 章調參）</td></tr>
+      <tr><td>2D Field / 3D Field</td><td>機器人在場上的位置、路徑、視覺估計（第 16、17 章）</td></tr>
+      <tr><td>Swerve</td><td>每個模組的速度和角度</td></tr>
+      <tr><td>Mechanism</td><td>手臂、升降機構的示意動畫</td></tr>
+      <tr><td>Console</td><td>程式印出的訊息和錯誤</td></tr>
+      <tr><td>Joysticks</td><td>操作手當時按了什麼</td></tr>
+      <tr><td>Metadata</td><td>程式版本（Git commit）等資訊</td></tr>
+    </tbody>
+  </table>
+  <p>AdvantageKit 會自動記錄一些東西，不需要設定：時間戳、Driver Station 與搖桿的所有資料、透過 AdvantageKit 儀表板類別讀的輸入、WPILib Alert 的狀態（第 12 章）、Console 輸出，以及預設 CAN ID 的 PDP / PDH 各通道電流<a class="ref" href="#src18-3">[3]</a>。</p>
+
+  <h3>要記錄哪些輸出</h3>
+  <p>AdvantageKit 文件把輸出定義為「能在模擬中重新算出的值」，例如里程計位置、馬達電壓、內部狀態、給駕駛的狀態資訊。雖然這些值重播時算得出來，但實機上還是應該記錄重要的輸出，因為比賽之間通常來不及重播<a class="ref" href="#src18-4">[4]</a>。<code>Pose2d</code> 這類 WPILib 幾何物件可以直接記錄，在 2D Field 分頁顯示<a class="ref" href="#src18-4">[4]</a>。</p>
+  <pre><code>Logger.recordOutput("Arm/Goal", goal);                 // enum
+Logger.recordOutput("Drive/Pose", drivetrain.getState().Pose);
+Logger.recordOutput("Vision/Accepted", acceptedCount);  // 第 17 章的練習</code></pre>
+  <p>AdvantageKit 2026 版新增了單位資訊的記錄，例如 <code>Logger.recordOutput("MyAngle", 3.141, "radians")</code>，AdvantageScope 畫圖時就能正確換算單位<a class="ref" href="#src18-5">[5]</a>。</p>
+
+  <h2>重播的完整步驟</h2>
+  <ol>
+    <li><strong>找到當時的程式版本。</strong>在 AdvantageScope 的 Metadata 分頁找到 <code>GitSHA</code>，用 <code>git checkout</code> 回到那個 commit<a class="ref" href="#src18-6">[6]</a>（怎麼記錄 GitSHA 見下一節）。</li>
+    <li><strong>切換成重播模式。</strong>AdvantageKit 範本專案只要把 <code>Constants.java</code> 的 <code>simMode</code> 改成 <code>REPLAY</code><a class="ref" href="#src18-7">[7]</a>（第 6 章 E-4）。</li>
+    <li><strong>指定日誌。</strong><code>LogFileUtil.findReplayLog()</code> 依序使用：環境變數 <code>AKIT_LOG_PATH</code>、AdvantageScope 目前開著的檔案、執行時跳出的選擇視窗<a class="ref" href="#src18-7">[7]</a>。最簡單的做法是先在 AdvantageScope 開好那份日誌。</li>
+    <li><strong>用模擬模式執行程式。</strong>WPILib 的 Simulate Robot Code，<strong>不要開模擬 GUI</strong>（範本預設已關閉）<a class="ref" href="#src18-7">[7]</a>。</li>
+    <li><strong>看結果。</strong>產生的新日誌會自動在 AdvantageScope 開啟。重播算出的輸出在 <code>ReplayOutputs</code> 表，原本的輸入與輸出保持不變，可以直接對照<a class="ref" href="#src18-7">[7]</a>。</li>
+  </ol>
+  <p>第 6 章 E-5 的 <code>setUseTiming(false)</code> 讓重播盡快跑完，文件特別說明這<strong>不會影響</strong>重播的準確度<a class="ref" href="#src18-7">[7]</a>。</p>
+  <div class="note"><strong>Replay Watch</strong>調整位置估計這類需要反覆嘗試的工作，可以用 <code>./gradlew replayWatch</code>（Windows 是 <code>gradle.bat replayWatch</code>）：每次修改 <code>src</code> 裡的程式，重播就自動再跑一次，AdvantageScope 也會保留時間範圍和畫面。它每次會覆蓋上一次的重播結果，但不會修改原始日誌；日誌越短、電腦單核效能越好，越好用<a class="ref" href="#src18-8">[8]</a>。</div>
+  <div class="note warn"><strong>重播的限制</strong>AdvantageKit 文件說明，重播時修改程式的輸出<strong>不能影響</strong>重播的輸入<a class="ref" href="#src18-7">[7]</a>。例如把手臂的 kP 改大後重播，記錄裡的手臂位置還是當時的位置，因為那是從日誌讀回來的輸入。重播適合回答「看到同樣的資料，新的邏輯會怎麼決定」，不能回答「照新的邏輯，機器人會怎麼動」；後者要用模擬。</div>
+
+  <h2>確定性：重播準確的前提</h2>
+  <p>AdvantageKit 文件說明，重播要求所有資料來源都是確定、同步的；IO 介面保證了 Subsystem 的部分，但很容易不小心讀到沒被記錄的資料，所以建議開發過程中定期測試重播<a class="ref" href="#src18-9">[9]</a>。文件列出的常見陷阱<a class="ref" href="#src18-9">[9]</a>：</p>
+  <table class="map">
+    <thead><tr><th>陷阱</th><th>改成</th></tr></thead>
+    <tbody>
+      <tr><td>在 <code>Logger.start()</code> 之前就讀時間或 Driver Station 資料</td><td>在 <code>Robot</code> 建構子最後才建立 <code>RobotContainer</code><a class="ref" href="#src18-10">[10]</a></td></tr>
+      <tr><td>用 FPGA 原始時間 <code>Timer.getFPGATimestamp()</code></td><td>用 <code>Timer.getTimestamp()</code></td></tr>
+      <tr><td>直接從 NetworkTables / 儀表板讀值（例如 <code>SmartDashboard.getNumber</code>）</td><td>用 AdvantageKit 的儀表板類別，或把 NT 當成硬體寫一層 IO</td></tr>
+      <tr><td>大型硬體函式庫直接操作硬體，例如 Phoenix 6 swerve、YAGSL</td><td>改用 AdvantageKit 的 swerve 範本專案</td></tr>
+      <tr><td>讀 roboRIO 上的檔案</td><td>讀進來的資料要當成輸入處理</td></tr>
+      <tr><td>亂數、走訪無序集合（例如 HashMap）</td><td>避免，或把結果當輸入記錄</td></tr>
+    </tbody>
+  </table>
+  <p>另外，主要的機器人邏輯必須是單執行緒；真的需要執行緒時，只能放在 IO 實作裡。<code>recordOutput</code>、<code>processInputs</code> 也不是執行緒安全的，只能在主執行緒呼叫<a class="ref" href="#src18-11">[11]</a>。</p>
+
+  <h3>第 16、17 章的 CTRE swerve 怎麼辦</h3>
+  <p>上面表格的第四條要特別說明：第 16、17 章用的是 Tuner X 產生的 CTRE swerve，它直接操作硬體，沒有經過 IO 層，所以<strong>底盤的部分無法準確重播</strong><a class="ref" href="#src18-9">[9]</a>。手臂、Intake 等照第 6 章寫的 Subsystem 不受影響。</p>
+  <p>如果隊上需要底盤也能重播，AdvantageKit 提供 TalonFX swerve 範本專案：一樣可以用 Tuner X 的 swerve 產生器設定，並提供高頻里程計、斷線警告、位置估計器整合、模擬，以及保證準確的重播<a class="ref" href="#src18-12">[12]</a>。要不要換，是隊上在賽季開始前就要決定的事，不要在比賽前換。</p>
+
+  <h3>自動程式選單也是輸入</h3>
+  <p>第 16 章用 <code>SmartDashboard.putData</code> 放的自動程式選單，是從 NetworkTables 讀值，重播時讀不到當時選了什麼。AdvantageKit 提供 <code>LoggedDashboardChooser</code>，可以直接包住 PathPlanner 的 <code>buildAutoChooser()</code><a class="ref" href="#src18-13">[13]</a>：</p>
+  <pre><code>private final LoggedDashboardChooser&lt;Command&gt; autoChooser;
+
+public RobotContainer() {
+    // ...Subsystem 與 Named Commands（第 16 章）
+    autoChooser = new LoggedDashboardChooser&lt;&gt;("Auto Routine", AutoBuilder.buildAutoChooser());
+}
+
+public Command getAutonomousCommand() {
+    return autoChooser.get();
+}</code></pre>
+
+  <h2>讓每一場的程式版本找得回來</h2>
+  <p>重播需要當時在機器人上跑的程式。AdvantageKit 範本已經裝好兩個工具<a class="ref" href="#src18-6">[6]</a>：</p>
+  <ul>
+    <li><strong>Gversion</strong>：編譯時產生 <code>BuildConstants.java</code>，裡面有 Git commit 的 hash，以及是否有尚未 commit 的修改（dirty）。在 <code>Robot</code> 建構子裡用 <code>Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA)</code> 記進日誌。<code>BuildConstants.java</code> 要加進 <code>.gitignore</code>。</li>
+    <li><strong>Event Deploy</strong>：比賽期間程式一直在改，常常帶著沒 commit 的修改就部署。這個 Gradle 任務會在部署前，把目前的修改自動 commit 到名稱以 <code>event</code> 開頭的分支。</li>
+  </ul>
+  <p>比賽時的流程<a class="ref" href="#src18-6">[6]</a>：</p>
+  <ol>
+    <li>出發前建立並切換到 <code>event_</code> 開頭的分支，例如 <code>event_2026twcmp</code>，每個賽事（例如一場區域賽）一個分支。</li>
+    <li>照平常方式部署，每次部署前會自動產生一個 commit。</li>
+    <li>比賽結束後，把分支 squash and merge 回開發分支，保持歷史乾淨。</li>
+    <li>要重播時，從日誌的 metadata 找到 hash，<code>git checkout</code> 回去；即使之後被 squash，只要 event 分支還在，原本的 commit 就找得回來，所以 event 分支不要刪。</li>
+  </ol>
+  <div class="note coach"><strong>教練提醒：隨身碟也是檢查項目</strong>沒插隨身碟、隨身碟滿了、格式不是 FAT32，日誌就不會寫進去，出問題時什麼都查不到。把「隨身碟有插、有空間」放進第 19 章的賽前檢查。</div>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>重播時開著模擬 GUI</strong>文件明確要求重播時關閉模擬 GUI。</div>
+  <div class="note warn"><strong>拿錯版本的程式重播</strong>程式已經改過還直接重播舊日誌，輸出對不上，還以為找到了 bug。先確認 GitSHA，並注意 dirty 標記。</div>
+  <div class="note warn"><strong>在 Robot 欄位裡直接 new Subsystem</strong>欄位初始化會在 <code>Logger.start()</code> 之前執行，Subsystem 建構子讀到的時間和 DS 資料就不是確定的。</div>
+  <div class="note warn"><strong>用 SmartDashboard.getNumber 調參數</strong>重播時讀不到當時的值。改用 <code>LoggedNetworkNumber</code> 等 AdvantageKit 的儀表板類別<a class="ref" href="#src18-13">[13]</a>。</div>
+  <div class="note warn"><strong>以為改了 kP 重播就能看到新的動作</strong>重播改變不了輸入，要看新的動作請用模擬。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：賽後找出為什麼沒射球</h2>
+  <p>比賽中有一次，操作手按了射球鍵，但機器人沒有射。日誌裡有 <code>Flywheel/VelocityRps</code>（輸入）和 <code>Flywheel/AtSpeed</code>（輸出），但射球的判斷條件是 <code>flywheel.atSpeed() &amp;&amp; arm.atGoal()</code>，<code>Arm/AtGoal</code> 當時沒有記錄（假設這支程式還沒加上第 6 章 E-3 的那幾行 <code>recordOutput</code>）。你會怎麼查？</p>
+  <details>
+    <summary>看參考答案</summary>
+    <ol>
+      <li>在 AdvantageScope 的 Joysticks 分頁找到按下射球鍵的時間點。</li>
+      <li>在 Line Graph 看那段時間的 <code>Flywheel/AtSpeed</code>。如果它是 false，原因就在飛輪（第 13 章）。</li>
+      <li>如果飛輪到速了，懷疑是手臂。這時用<strong>重播</strong>：checkout 當時的 GitSHA，在 <code>ArmSubsystem.periodic</code> 補上 <code>Logger.recordOutput("Arm/AtGoal", atGoal())</code>，切換成 REPLAY 執行。</li>
+      <li>在 <code>ReplayOutputs</code> 表看 <code>Arm/AtGoal</code>。因為手臂的位置是從日誌讀回來的輸入，重播算出的 <code>atGoal()</code> 就和當時完全一樣。</li>
+    </ol>
+    <p>這正是重播最擅長的事：補記錄當時忘了記錄的輸出。只要手臂是照第 6 章用 IO 層寫的，重播的結果就是準確的。找到原因後，把這行 <code>recordOutput</code> 留在程式裡，下次就不用重播了。</p>
+  </details>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src18-1">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/getting-started/installation/existing-projects.md" target="_blank" rel="noopener">Installing AdvantageKit: Existing Projects</a>（WPILOGWriter 寫到 /U/logs、需要 FAT32 隨身碟）</li>
+    <li id="src18-2">AdvantageScope. <a href="https://docs.advantagescope.org/overview/log-files" target="_blank" rel="noopener">Log Files</a>（支援格式、多檔對齊、Download Logs）</li>
+    <li id="src18-3">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/data-flow/built-in-logging.md" target="_blank" rel="noopener">Built-In Logging</a></li>
+    <li id="src18-4">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/data-flow/recording-outputs/index.md" target="_blank" rel="noopener">Recording Outputs</a></li>
+    <li id="src18-5">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/whats-new.md" target="_blank" rel="noopener">What's New in 2026?</a>（單位記錄）</li>
+    <li id="src18-6">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/getting-started/installation/version-control.md" target="_blank" rel="noopener">Version Control</a>（Gversion、GitSHA metadata、Event Deploy）</li>
+    <li id="src18-7">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/getting-started/traditional-replay.md" target="_blank" rel="noopener">How To: Traditional Replay</a>（設定、findReplayLog 順序、關閉模擬 GUI、ReplayOutputs、replay bubble）</li>
+    <li id="src18-8">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/getting-started/replay-watch.md" target="_blank" rel="noopener">How To: Replay Watch</a></li>
+    <li id="src18-9">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/getting-started/common-issues/non-deterministic-data-sources.md" target="_blank" rel="noopener">Non-Deterministic Data Sources</a></li>
+    <li id="src18-10">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/getting-started/common-issues/uninitialized-inputs.md" target="_blank" rel="noopener">Uninitialized Inputs</a></li>
+    <li id="src18-11">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/getting-started/common-issues/multithreading.md" target="_blank" rel="noopener">Multithreading</a></li>
+    <li id="src18-12">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/getting-started/template-projects/talonfx-swerve-template.md" target="_blank" rel="noopener">TalonFX(S) Swerve Template</a></li>
+    <li id="src18-13">AdvantageKit. <a href="https://github.com/Mechanical-Advantage/AdvantageKit/blob/v26.0.2/docs/docs/data-flow/recording-inputs/dashboard-inputs.md" target="_blank" rel="noopener">Dashboard Inputs</a>（LoggedDashboardChooser 與 PathPlanner）</li>
+  </ol>
+</template>
+
+<template id="tpl-ch19">
+  <p class="headline-code">CAN ID 19｜上場</p>
+  <h1>上場檢查與 Pit 除錯：考試當天</h1>
+  <p class="lede">讀完這章，你會知道出發前、每場比賽前、每場比賽後各要檢查什麼，怎麼從 Driver Station 看出 brownout、roboRIO 重開或網路問題，以及在兩場比賽之間的短短時間裡，照什麼順序把問題找出來、改程式時要守哪些規矩。</p>
+  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 文件（roboRIO 與 NI Driver Station）。2027 年起控制系統換成 SystemCore，Driver Station 與部分檢查項目會不同。本章的檢查清單結合了官方文件與一般隊伍常見的做法，隊上應依自己的機器人調整。</div>
+
+  <h2>生活比喻：考試當天</h2>
+  <div class="story">
+    <p><strong>前一晚就把文具準備好。</strong>准考證、2B 鉛筆、橡皮擦、手錶，前一晚就放進袋子裡。考試當天早上才發現鉛筆沒削，已經來不及了。</p>
+    <p><strong>每一節考試前，再確認一次。</strong>進考場前摸一下：准考證在嗎？座位號碼對嗎？手機關了嗎？這些檢查很無聊，但一節考試只有一次機會。</p>
+    <p><strong>考試中出狀況，先看最簡單的原因。</strong>筆寫不出來，先看是不是沒按下筆頭，再看是不是沒水了，最後才懷疑是不是桌子有問題。從最常見、最容易檢查的原因開始。</p>
+    <p><strong>下課十分鐘只能修小東西。</strong>兩節考試之間只有十分鐘。可以換一支筆、借一個橡皮擦，但不可能重新複習一整章。</p>
+    <p><strong>考完對答案。</strong>每節考完，把題目和自己的答案記下來，回家才知道錯在哪裡。</p>
+  </div>
+  <table class="map">
+    <thead><tr><th>比喻</th><th>比賽</th></tr></thead>
+    <tbody>
+      <tr><td>前一晚準備文具</td><td>出發前：Driver Station 筆電、程式版本、備品</td></tr>
+      <tr><td>每一節考試前確認</td><td>每場比賽前的檢查清單</td></tr>
+      <tr><td>從最常見的原因開始查</td><td>Pit 除錯的分診順序</td></tr>
+      <tr><td>下課十分鐘只能修小東西</td><td>兩場之間只做最小、最有把握的修改</td></tr>
+      <tr><td>考完對答案</td><td>每場後下載日誌、看 DS Log</td></tr>
+    </tbody>
+  </table>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>考試出狀況通常只影響自己；機器人出狀況會影響整個聯盟。另外，考試不能在考場外練習同一份題目，但機器人可以在 Pit 裡重現問題：WPILib 文件建議在 Pit 通電、用網路線連著時搖動線材，甚至把機器人一側抬起再放下，讓問題在 Pit 裡發生，而不是在場上<a class="ref" href="#src19-1">[1]</a>。</div>
+
+  <h2>出發前</h2>
+  <h3>Driver Station 筆電</h3>
+  <p>WPILib 的 Driver Station 最佳實務文件建議<a class="ref" href="#src19-2">[2]</a>：</p>
+  <ul>
+    <li>準備一台<strong>專門用來開車</strong>的筆電，只裝 Driver Station 和儀表板，不拿來寫程式。</li>
+    <li>電源設定改成不睡眠、關閉省電、效能最佳；確認電池在這些設定下至少撐一小時，排隊上場時沒有插座也不怕。</li>
+    <li>出發前裝完所有 Windows 更新並實際連機器人測試，然後<strong>暫停更新</strong>涵蓋整個比賽期間，並設定使用時段避免比賽中安裝更新。</li>
+    <li>帶一條可靠的 USB 線和網路線，用來直接連 roboRIO。</li>
+    <li>Driver Station 不支援 ARM 處理器的筆電。</li>
+  </ul>
+  <h3>程式與工具</h3>
+  <ul>
+    <li>建立 <code>event_</code> 開頭的比賽分支（第 18 章），確認部署時會自動 commit。</li>
+    <li>所有 vendordep（Phoenix 6、PathPlannerLib、AdvantageKit…）更新到要用的版本並在機器人上測過。比賽場地通常沒有網路，文件也提醒不要打算在現場用網路更新軟體<a class="ref" href="#src19-2">[2]</a>。</li>
+    <li>準備一個「已知可以動」的程式版本（例如打一個 Git tag），真的改壞時可以立刻退回。</li>
+    <li>FAT32 隨身碟（第 18 章）至少兩支，一支插在機器人上，一支備用。</li>
+  </ul>
+
+  <h2>每場比賽前</h2>
+  <p>WPILib 文件對 Driver Station 的建議<a class="ref" href="#src19-2">[2]</a><a class="ref" href="#src19-1">[1]</a>：前一場結束前就把筆電開機並登入；關掉不需要的程式；<strong>一定要帶筆電充電器</strong>到場上，因為插電時 Windows 的電源管理比較不激進，Driver Station 表現比較穩定；用魔鬼氈把筆電固定在操作台上。現場要關閉 Windows 防火牆和 Wi-Fi<a class="ref" href="#src19-2">[2]</a>。</p>
+  <p>下面是一份程式組可以用的檢查清單：</p>
+  <table class="map">
+    <thead><tr><th>項目</th><th>怎麼確認</th><th>相關章節</th></tr></thead>
+    <tbody>
+      <tr><td>電池充飽、接頭鎖緊</td><td>電壓表或 Battery Beak；用力扳動電池線，接頭不能動</td><td>本章</td></tr>
+      <tr><td>程式是這一場要用的版本</td><td>儀表板顯示 GitSHA，或確認最後一次部署</td><td>18</td></tr>
+      <tr><td>自動程式選對</td><td>儀表板的選單不是預設的 None</td><td>16</td></tr>
+      <tr><td>機器人擺放位置和 Auto 起始位置一致</td><td>對照 PathPlanner 的起點</td><td>16</td></tr>
+      <tr><td>所有 CAN 裝置都在</td><td>儀表板沒有斷線 Alert；有疑慮時用 Tuner X 掃描</td><td>12</td></tr>
+      <tr><td>機構在安全的起始位置</td><td>手臂收好、升降在底部；需要歸零的機構已歸零</td><td>12</td></tr>
+      <tr><td>視覺相機有畫面</td><td>儀表板看得到相機、看得到 AprilTag</td><td>17</td></tr>
+      <tr><td>隨身碟有插、有空間</td><td>目視；或在程式裡偵測後發 Alert</td><td>18</td></tr>
+    </tbody>
+  </table>
+
+  <h2>每場比賽後</h2>
+  <ol>
+    <li>用 AdvantageScope 下載 AdvantageKit 日誌（第 18 章），檔名或資料夾標上場次。</li>
+    <li>打開 Driver Station 的 Log Viewer，看這一場的電壓、延遲、掉封包和模式。</li>
+    <li>看 Driver Station 的 CAN/Power 分頁，12V fault 計數有沒有增加（見下方 brownout）。</li>
+    <li>問駕駛和操作手：有沒有哪裡「感覺不對」？把時間點記下來，再去日誌裡找。</li>
+    <li>換電池、充電，電池編號和場次一起記錄。</li>
+  </ol>
+
+  <h2>看懂 Brownout</h2>
+  <p>電池電壓在大電流時會瞬間掉下來。WPILib 文件說明 roboRIO（1.0）的分段保護<a class="ref" href="#src19-3">[3]</a>：</p>
+  <table class="map">
+    <thead><tr><th>階段</th><th>電壓</th><th>發生什麼</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>低於 6.8 V</td><td>PWM 腳位的 6V 輸出開始下降</td></tr>
+      <tr><td>2</td><td>低於 6.3 V</td><td>進入 brownout 保護：PWM 輸出關閉、使用者電源軌關閉、CAN 馬達控制器收到停用命令；電壓回到 7.5 V 以上才恢復</td></tr>
+      <tr><td>3</td><td>低於約 4.5 V</td><td>可能直接斷電，電壓回升後重新開機</td></tr>
+    </tbody>
+  </table>
+  <p>roboRIO 2.0 的第 2 階段預設門檻是 6.75 V，可以用 <code>RobotController.setBrownoutVoltage</code> 調整；roboRIO 1.0 固定 6.3 V<a class="ref" href="#src19-3">[3]</a>。發生 brownout 時，roboRIO 的電源燈變琥珀色、Driver Station 的電壓底色變紅並顯示 Voltage Brownout、CAN/Power 分頁的 12V fault 計數加一，DS 日誌也會記錄<a class="ref" href="#src19-3">[3]</a>。</p>
+  <p>程式能做的事：第 11 章的電流限制是最直接的預防。文件也建議做「電流預算」：列出各機構的電流需求，如果某些功能不會同時使用，就在程式裡強制它們不同時動作<a class="ref" href="#src19-3">[3]</a>。</p>
+
+  <h2>從 DS Log 看出斷線原因</h2>
+  <p>Driver Station 的 Log Viewer 會畫出電壓、延遲（trip time）、roboRIO CPU、掉封包與機器人模式，並標出事件<a class="ref" href="#src19-4">[4]</a>。文件整理了幾種典型的斷線樣子，其中最常用來判斷的是<strong>roboRIO 重開</strong>：主要線索是 DS 事件裡的「Time since robot boot」訊息，斷線後其他裝置都 ping 得到、只有 roboRIO 不回應，接著 roboRIO 重新回應<a class="ref" href="#src19-4">[4]</a>。常見的另外兩種是機器人上的網路線問題與無線電重開，看到斷線時先對照文件中的圖例。</p>
+  <p>Driver Station 訊息也有幫助<a class="ref" href="#src19-5">[5]</a>：「No robot code is currently running」表示 roboRIO 有連上，但程式沒在跑（程式當掉、還在開機、或部署失敗）；「The Driver Station has lost communication with the robot」則是 DS 和機器人的通訊中斷。</p>
+
+  <h2>Pit 分診：從最簡單的原因查起</h2>
+  <p>兩場比賽之間時間很短。和第 12 章的 CAN 除錯一樣，先查最常見、最容易檢查的原因。</p>
+  <div class="lab">
+    <div class="calls" role="group" aria-label="選擇症狀">
+      <button class="call tri" data-tri="nomove" aria-pressed="false">整台都不動</button>
+      <button class="call tri" data-tri="onemech" aria-pressed="false">一個機構不動</button>
+      <button class="call tri" data-tri="disconnect" aria-pressed="false">場上斷線</button>
+      <button class="call tri" data-tri="weak" aria-pressed="false">越打越無力、偶爾重開</button>
+      <button class="call tri" data-tri="auto" aria-pressed="false">自動程式走錯</button>
+      <button class="call tri" data-tri="vision" aria-pressed="false">瞄準不準</button>
+    </div>
+    <div class="nodeinfo" id="triInfo" aria-live="polite"></div>
+  </div>
+
+  <h2>比賽期間改程式的規矩</h2>
+  <p>下面是一般隊伍在比賽期間常用的原則，不是官方規定，但能避免大多數「越改越糟」的情況：</p>
+  <ol>
+    <li><strong>一次只改一件事。</strong>同時改兩個地方，出問題時就不知道是哪一個。</li>
+    <li><strong>只改和問題直接相關的地方。</strong>「順便」重構、改命名、升級函式庫，都留到比賽後。</li>
+    <li><strong>改完要在 Pit 測過才上場。</strong>至少 Enable 一次，動一下改到的機構；自動程式的修改要在練習場跑一次，或至少把底盤架高、在模擬裡跑過。</li>
+    <li><strong>改數字前先記下原本的值。</strong>比賽分支的自動 commit（第 18 章）會幫你記，但口頭也要跟隊友說。</li>
+    <li><strong>來不及測，就不要改。</strong>用已知可以動的版本上場，比帶著沒測過的修改上場安全。</li>
+    <li><strong>每次部署後確認版本。</strong>部署失敗但沒注意到，就會帶著舊程式上場。</li>
+  </ol>
+  <div class="note coach"><strong>教練提醒：分工</strong>Pit 裡同時有機構組在修東西時，Enable 前一定要大聲喊，確認所有人的手都離開機器人（第 0 章）。程式組改程式時，指定一個人負責部署，避免兩台電腦先後部署不同版本。</div>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>沒帶筆電充電器上場</strong>Windows 在電池模式下的電源管理比較激進，Driver Station 的表現比較難預測<a class="ref" href="#src19-2">[2]</a>。</div>
+  <div class="note warn"><strong>比賽中 Windows 開始更新</strong>出發前沒暫停更新、沒設使用時段，結果上場前筆電在重新開機。</div>
+  <div class="note warn"><strong>把 brownout 當成程式 bug</strong>機構動作突然停一下又恢復，先看 12V fault 計數和 DS Log 的電壓，不要急著改程式。</div>
+  <div class="note warn"><strong>用 USB 線測線材</strong>文件提醒搖線測試時要用網路線連接，不是 USB，否則測不到機器人上真正的通訊路徑<a class="ref" href="#src19-1">[1]</a>。</div>
+  <div class="note warn"><strong>在 Pit 大改程式</strong>兩場之間重寫一整個指令，沒時間測就上場，常常比原本的問題更嚴重。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：讓程式幫你做賽前檢查</h2>
+  <p>用第 12 章的 <code>Alert</code>，在 Disabled 時檢查兩件事：電池電壓太低（門檻由隊上決定），以及自動程式選單還是預設值。提示：<code>RobotController.getBatteryVoltage()</code> 回傳電池電壓；<code>AutoBuilder.getAllAutoNames()</code> 回傳專案裡所有 Auto 的名字，可以用它自己建立選單，並記住預設選項。</p>
+  <details>
+    <summary>看參考答案</summary>
+    <pre><code>// RobotContainer
+private static final double LOW_BATTERY_VOLTS = 12.0; // TODO: 隊上決定門檻
+private final Alert lowBattery = new Alert("電池電壓偏低，上場前請換電池", AlertType.kWarning);
+private final Alert noAuto = new Alert("尚未選擇自動程式", AlertType.kWarning);
+private final Debouncer batteryDebounce = new Debouncer(1.0, Debouncer.DebounceType.kRising);
+private final Command doNothing = Commands.none().withName("DoNothing");
+
+// 建構子裡（Named Commands 註冊之後，第 16 章）
+autoChooser = new SendableChooser&lt;&gt;();
+autoChooser.setDefaultOption("Do Nothing", doNothing);
+for (String name : AutoBuilder.getAllAutoNames()) {
+    autoChooser.addOption(name, new PathPlannerAuto(name)); // 開機時就建立
+}
+SmartDashboard.putData("Auto Chooser", autoChooser);
+
+/** 在 Robot.robotPeriodic() 裡呼叫。 */
+public void updatePreMatchAlerts() {
+    boolean disabled = DriverStation.isDisabled();
+    lowBattery.set(disabled
+        &amp;&amp; batteryDebounce.calculate(RobotController.getBatteryVoltage() &lt; LOW_BATTERY_VOLTS));
+    noAuto.set(disabled &amp;&amp; autoChooser.getSelected() == doNothing);
+}</code></pre>
+    <p>幾個重點：電壓會跳動，用 <code>Debouncer</code> 要求持續 1 秒低於門檻才警告（第 12 章）；只在 Disabled 時檢查，因為比賽中大電流時電壓本來就會掉。<code>buildAutoChooser()</code> 的預設選項是它內部建立的 <code>Commands.none()</code>，程式拿不到那個物件；所以這裡自己建立選單，把自己的 <code>doNothing</code> 當預設選項，就能用 <code>==</code> 判斷有沒有換過。用 AdvantageKit 時，選單換成第 18 章的 <code>LoggedDashboardChooser</code>，判斷方式相同。Alert 會自動被 AdvantageKit 記錄（第 18 章），賽後也查得到。</p>
+  </details>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src19-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/hardware/hardware-basics/preemptive-troubleshooting.html" target="_blank" rel="noopener">Robot Preemptive Troubleshooting</a>（搖線與抬起放下測試、用網路線連接、Driver Station 檢查）</li>
+    <li id="src19-2">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station-best-practices.html" target="_blank" rel="noopener">Driver Station Best Practices</a>（筆電、電源、更新、比賽前與每場前的建議）</li>
+    <li id="src19-3">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/roborio-info/roborio-brownouts.html" target="_blank" rel="noopener">roboRIO Brownout and Understanding Current Draw</a></li>
+    <li id="src19-4">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station-log-viewer.html" target="_blank" rel="noopener">Driver Station Log File Viewer</a></li>
+    <li id="src19-5">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station-errors-warnings.html" target="_blank" rel="noopener">Driver Station Errors/Warnings</a></li>
+  </ol>
+</template>
+
 <template id="tpl-soon">
   <p class="headline-code" id="soonId"></p>
   <h1 id="soonTitle"></h1>
@@ -3834,9 +4328,9 @@ const COURSE = [
   ]},
   { part: "上場", items: [
     [16, "自動階段與路徑", "校外教學的行程表：座標與里程計、PathPlanner、紅藍翻轉、Named Commands 與自動程式選單。", true],
-    [17, "視覺與定位", "AprilTag、Limelight / PhotonVision，瞄準與位置校正。"],
-    [18, "模擬、日誌與重播", "AdvantageKit 完整設定、AdvantageScope 看資料、賽後重播找 bug。"],
-    [19, "上場檢查與 Pit 除錯", "賽前檢查清單、Driver Station 設定、比賽之間 10 分鐘內修好程式。"]
+    [17, "視覺與定位", "看門牌校正位置：AprilTag、融合與標準差、Limelight MegaTag2、兩種瞄準做法。", true],
+    [18, "模擬、日誌與重播", "比賽錄影和賽後檢討：取得日誌、AdvantageScope、重播步驟、確定性、版本追蹤。", true],
+    [19, "上場檢查與 Pit 除錯", "考試當天：出發前與每場前後的檢查、brownout、DS Log、Pit 分診與改程式的規矩。", true]
   ]}
 ];
 const ALL = COURSE.flatMap(p => p.items);
@@ -3844,6 +4338,27 @@ const READY = ALL.filter(x => x[3]).map(x => x[0]);
 const pad = n => String(n).padStart(2, "0");
 
 const QUIZZES = {
+  17: [
+    { q: "看到 AprilTag 算出的位置，最好的用法是？", o: ["直接 resetPose 成這個位置", "用 addVisionMeasurement 融合進位置估計", "只用在自動階段", "只在 Disabled 時使用"], a: 1, e: "視覺量測偶爾會跳，融合才能兼顧準確與穩定。" },
+    { q: "WPILib 對 AprilTag 視覺量測的朝向標準差建議怎麼設？", o: ["非常小", "和 x、y 一樣", "設為 0", "非常大，把朝向交給陀螺儀"], a: 3, e: "陀螺儀的朝向標準差小、視覺的朝向標準差大。" },
+    { q: "視覺 x、y 的標準差應該怎麼隨距離變化？", o: ["距離越遠越小", "固定不變", "距離越遠越大", "看到越多標籤越大"], a: 2, e: "遠的標籤看不清楚，量測越不可信。" },
+    { q: "呼叫 getBotPoseEstimate_wpiBlue_MegaTag2 之前要先做什麼？", o: ["呼叫 SetRobotOrientation 提供機器人朝向", "重設里程計", "關閉 LED", "切換到 Test 模式"], a: 0, e: "LimelightHelpers 的註解寫明 MegaTag2 需要先提供朝向。" },
+    { q: "CTRE 範例在什麼情況下丟掉視覺量測？", o: ["電池電壓低", "機器人旋轉速度超過每秒 2 圈或沒看到標籤", "自動階段", "紅方時"], a: 1, e: "快速旋轉時影像與時間對應容易出錯。" }
+  ],
+  18: [
+    { q: "重播時修改了手臂的 kP，日誌裡的手臂位置會怎樣？", o: ["跟著改變", "變成 0", "不變，因為位置是從日誌讀回的輸入", "無法重播"], a: 2, e: "修改的輸出不能影響重播的輸入（replay bubble）。" },
+    { q: "下列哪一個會讓 AdvantageKit 重播失準？", o: ["用 SmartDashboard.getNumber 讀調參數值", "用 Timer.getTimestamp()", "用 Logger.recordOutput 記錄 Pose2d", "在 Subsystem periodic 裡讀 inputs"], a: 0, e: "NetworkTables 的值沒有被記錄，要用 AdvantageKit 的儀表板類別。" },
+    { q: "RobotContainer 應該在 Robot 建構子的哪裡建立？", o: ["Logger 設定之前", "robotPeriodic 裡", "autonomousInit 裡", "Logger.start() 之後"], a: 3, e: "Logger.start() 之前讀到的時間與 DS 資料不是確定的。" },
+    { q: "重播時 setUseTiming(false) 會？", o: ["讓重播結果不準", "讓重播盡快跑完，不影響準確度", "關閉日誌", "只重播前 15 秒"], a: 1, e: "AdvantageKit 文件明確說明不影響準確度。" },
+    { q: "Event Deploy 的作用是？", o: ["部署前自動把修改 commit 到 event 分支", "自動上傳日誌", "自動選擇自動程式", "加快部署速度"], a: 0, e: "讓每一場的程式版本都找得回來，方便重播。" }
+  ],
+  19: [
+    { q: "roboRIO 1.0 在電壓低於多少時進入 brownout 保護（第 2 階段）？", o: ["7.5 V", "6.8 V", "6.3 V", "4.5 V"], a: 2, e: "6.8 V 是第 1 階段，4.5 V 以下可能斷電；roboRIO 2.0 預設 6.75 V。" },
+    { q: "發生 brownout 後，哪裡可以看到次數？", o: ["Tuner X", "PathPlanner", "VS Code 終端機", "Driver Station CAN/Power 分頁的 12V fault 計數"], a: 3, e: "DS 日誌也會記錄 brownout 事件。" },
+    { q: "Driver Station 顯示「No robot code is currently running」代表？", o: ["roboRIO 有連上，但程式沒在執行", "DS 和機器人完全沒連上", "搖桿沒插", "電池沒電"], a: 0, e: "可能是程式當掉、還在開機或部署失敗。" },
+    { q: "在 Pit 搖線測試時，應該怎麼連接機器人？", o: ["USB 線", "網路線", "無線", "都可以"], a: 1, e: "用 USB 測不到機器人上真正的通訊路徑。" },
+    { q: "兩場比賽之間發現 bug，時間只夠改但來不及測，最好的做法是？", o: ["改了直接上場", "同時改好幾個地方碰運氣", "用已知可以動的版本上場", "關掉自動程式"], a: 2, e: "沒測過的修改風險通常比原本的問題更大。" }
+  ],
   13: [
     { q: "手臂只用 P 控制，最後停在目標下方一點點不動。最根本的原因是？", o: ["kP 太大", "感測器壞了", "kD 太小", "手臂在目標處仍需要輸出撐住重力，純 P 要有誤差才有輸出"], a: 3, e: "誤差為 0 時 P 的輸出也是 0，撐不住重力。補上 kG 前饋才是正解。" },
     { q: "D 項在 WPILib 文件裡被比喻成什麼？", o: ["彈簧", "門上的緩衝器（阻尼）", "油門", "計步器"], a: 1, e: "P 像軟體彈簧，D 像軟體阻尼，速度越快阻力越大。" },
@@ -4037,6 +4552,8 @@ function showChapter(id){
   if (id === 12) initCanLab();
   if (id === 13) initPidLab();
   if (id === 14) initProfileLab();
+  if (id === 17) initFuseLab();
+  if (id === 19) initTriageLab();
   view.querySelectorAll("a.ref").forEach(a => a.addEventListener("click", e => {
     e.preventDefault();
     const t = document.getElementById(a.getAttribute("href").slice(1));
@@ -4407,6 +4924,44 @@ function initProfileLab(){
   };
   [Dd, Vv, Aa].forEach(el => el.oninput = upd);
   upd();
+}
+
+/* ---------- ch17 fusion / ch19 triage ---------- */
+function initFuseLab(){
+  const O = document.getElementById("fuO"), D = document.getElementById("fuD"), N = document.getElementById("fuN");
+  const bar = document.getElementById("fuBar"), con = document.getElementById("fuConsole");
+  const odo = 3.0, vis = 3.4, lo = 2.8, hi = 3.6;
+  const pct = x => ((x - lo) / (hi - lo) * 100).toFixed(1) + "%";
+  const upd = () => {
+    const so = +O.value, d = +D.value, n = +N.value, sv = 0.05 * d * d / n;
+    const wo = 1 / (so * so), wv = 1 / (sv * sv), fused = (odo * wo + vis * wv) / (wo + wv), share = wv / (wo + wv);
+    document.getElementById("fuOv").textContent = so.toFixed(2) + " m";
+    document.getElementById("fuDv").textContent = d.toFixed(1) + " m";
+    document.getElementById("fuNv").textContent = n + " 個";
+    bar.innerHTML = `<span class="fmark odo" style="left:${pct(odo)}">里程計</span><span class="fmark vis" style="left:${pct(vis)}">視覺</span><span class="fmark fus" style="left:${pct(fused)}">融合</span>`;
+    con.innerHTML = `<span class="c">// 視覺標準差 = 0.05 × ${d.toFixed(1)}² ÷ ${n} = ${sv.toFixed(3)} m</span>\n` +
+      `<span class="c">// 融合結果 x = ${fused.toFixed(3)} m，視覺佔 ${(share * 100).toFixed(0)}% 的權重</span>`;
+  };
+  [O, D, N].forEach(el => el.oninput = upd);
+  upd();
+}
+function initTriageLab(){
+  const info = {
+    nomove: ["整台都不動", ["看 Driver Station 三個燈：Communications、Robot Code、Joysticks 是否都是綠的。", "Robot Code 是紅的 → 程式沒在跑，看 Console 有沒有例外；必要時重新部署已知可以動的版本。", "Communications 是紅的 → 看 DS Log 判斷是 roboRIO 重開、無線電還是網路線。", "都綠但不動 → 確認真的 Enable 了、模式正確，搖桿的 USB 順序沒有跑掉。"]],
+    onemech: ["一個機構不動", ["看儀表板有沒有該機構的斷線 Alert（第 12 章）。", "用 Tuner X 掃描，看裝置是否消失；消失的從哪一顆開始？（daisy-chain）", "看該馬達的斷路器、電源線有沒有鬆。", "裝置都在 → 看 AdvantageScope 裡該機構的目標和輸出電壓：程式有沒有送出命令？是不是被軟體極限或電流限制擋住？"]],
+    disconnect: ["場上斷線", ["打開 DS Log Viewer 找到那一場。", "有「Time since robot boot」事件、其他裝置 ping 得到只有 roboRIO 不回應 → roboRIO 重開，查 roboRIO 電源線與 brownout。", "對照文件的圖例判斷是否為無線電重開或網路線問題：檢查無線電電源、網路線卡榫有沒有斷。", "在 Pit 用網路線連著、通電搖線，嘗試重現。"]],
+    weak: ["越打越無力、偶爾重開", ["看 CAN/Power 分頁 12V fault 計數，和 DS Log 的電壓曲線。", "換一顆確定充飽的電池，檢查電池接頭與主斷路器螺帽。", "檢查各馬達的電流限制是否設定並啟用（第 11 章）。", "看哪些機構同時大電流：考慮在程式裡讓它們不要同時動作。"]],
+    auto: ["自動程式走錯", ["確認選單選的是對的 Auto，不是 None。", "確認機器人擺放位置和 Auto 起點一致、DS 的聯盟顏色正確（第 16 章）。", "看 AdvantageScope 2D Field：規劃的路徑和實際位置差多少？一開始就偏 → 起始位置或陀螺儀；越走越偏 → 里程計、Robot Config 或 PID。", "Named Command 沒執行 → 名字大小寫是否和 GUI 一致、是否在建立 Auto 前註冊。"]],
+    vision: ["瞄準不準", ["看相機畫面是否正常、曝光是否適合場地燈光。", "看 AdvantageScope：視覺估計的位置和里程計差多少？Accepted / Rejected 計數有沒有增加（第 17 章）？", "確認相機裝設位置的設定和實際一致，相機支架有沒有被撞歪。", "只有某些距離不準 → 調整標準差與距離的關係。"]]
+  };
+  const box = document.getElementById("triInfo"), btns = view.querySelectorAll(".tri");
+  const pick = k => {
+    btns.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tri === k)));
+    const [t, steps] = info[k];
+    box.innerHTML = `<h4>${esc(t)}：依序檢查</h4><ol>${steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>`;
+  };
+  btns.forEach(b => b.onclick = () => pick(b.dataset.tri));
+  box.innerHTML = "<p>選一個症狀，看看要依序檢查什麼。</p>";
 }
 
 /* ---------- quiz ---------- */
