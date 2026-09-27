@@ -71,5 +71,6 @@ function pathsHTML(){
     </section>`;
   }).join("") + `<section class="pathsec"><h3><span class="ptag">檢核</span>完成核心路徑後</h3>
       <p class="pgoal"><a href="#final">最終程式能力評量</a>：一題沒看過的除錯題，看你能不能用證據找出問題、決定先查什麼，並在上機前做好檢查。</p></section>
-    <p class="mastery">${esc(COURSE_DATA.mastery)}</p>`;
+    <p class="mastery">${esc(COURSE_DATA.mastery)}</p>
+    <p class="mastery">學習紀錄只存在這台瀏覽器。<button class="btn ghost small" id="exportBtn">下載學習紀錄給教練</button>　教練請到<a href="#coach">彙整頁</a>。</p>`;
 }

@@ -21,6 +21,7 @@ function showHome(){
   mount("tpl-home");
   const done = loadDone();
   document.getElementById("outline").innerHTML = pathsHTML();
+  document.getElementById("exportBtn").onclick = () => exportProgress();
   renderMap(null);
 }
 
@@ -29,6 +30,12 @@ function showFinal(){
   view.querySelectorAll("pre code").forEach(el => { el.innerHTML = highlight(el.textContent); });
   initFinal();
   renderMap("final");
+}
+
+function showCoach(){
+  mount("tpl-coach");
+  initCoach();
+  renderMap("coach");
 }
 
 function showSoon(id){

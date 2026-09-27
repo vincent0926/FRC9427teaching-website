@@ -217,6 +217,9 @@ pre .prov[data-prov="SIM"]{color:#C4A8F5}
 .llegacy summary{cursor:pointer}
 .llegacy ul{margin:4px 0 0;padding-left:18px}
 .brand-ver{font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-top:22px}
+.btn.small{font-size:13.5px;padding:5px 12px;border-width:1px;vertical-align:1px}
+table.coach{font-size:14px}
+table.coach td,table.coach th{white-space:nowrap}
 /* ch6 parts */
 .partmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:22px 0}
 .pcard{text-align:left;font:inherit;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
@@ -4639,6 +4642,16 @@ public void updatePreMatchAlerts() {
   </ol>
 </template>
 
+<template id="tpl-coach">
+  <p class="headline-code">COACH｜教練彙整</p>
+  <h1>教練：彙整學生的學習紀錄</h1>
+  <p class="lede">學生在首頁或最終評量按「下載學習紀錄」，會得到一個 JSON 檔。把全隊的檔案一起選進來，這一頁會整理成一張表。</p>
+  <div class="note"><strong>資料不會離開這台電腦</strong>檔案只在瀏覽器裡讀取，不會上傳到任何地方。網站沒有後端，所以要由學生自己匯出、交給你。</div>
+  <p><label class="btn ghost" for="coachFiles">選擇學習紀錄檔案（可以一次選多個）</label>
+     <input type="file" id="coachFiles" accept=".json,application/json" multiple hidden></p>
+  <div id="coachResult"></div>
+</template>
+
 <template id="tpl-final">
   <p class="headline-code">FINAL｜最終程式能力評量</p>
   <h1>最終評量：資格賽第 23 場，手臂掉下來了</h1>
@@ -4749,6 +4762,48 @@ function registerLab(chapterId, ...inits){ (LABS[chapterId] = LABS[chapterId] ||
 /* ---------- progress ---------- */
 function loadDone(){ try { return JSON.parse(localStorage.getItem("frc9427-done") || "[]"); } catch(e){ return []; } }
 function saveDone(arr){ try { localStorage.setItem("frc9427-done", JSON.stringify(arr)); } catch(e){} }
+
+/* ---------- 教練彙整（#coach） ----------
+ * 讀學生匯出的學習紀錄 JSON（見 progress.js 的 exportProgress），整理成一張表。只在瀏覽器裡處理。
+ */
+function summarizeProgress(snap){
+  const done = snap.done || [], p = snap.progress || {};
+  const pathStat = PATHS.map(path => `${path.chapters.filter(id => done.includes(id)).length}/${path.chapters.length}`);
+  const quiz = Object.entries(p.quiz || {});
+  const pctOf = q => q.total ? q.correct / q.total : 0;
+  const avg = quiz.length ? quiz.reduce((a, [, q]) => a + pctOf(q), 0) / quiz.length : null;
+  const weak = quiz.filter(([, q]) => pctOf(q) < 0.8).map(([ch]) => Number(ch)).sort((a, b) => a - b);
+  const sawSolution = Object.entries(p.hints || {}).filter(([, n]) => n >= 4).map(([ch]) => Number(ch));
+  return {
+    name: snap.name || "（沒有名字）", at: (snap.exportedAt || "").slice(0, 10),
+    paths: pathStat, quizAvg: avg, quizCount: quiz.length, weak,
+    labs: Object.keys(p.labs || {}).length, tools: Object.keys(p.tools || {}).length,
+    sawSolution, final: p.final && p.final.submittedAt ? `${p.final.score} 分${p.final.pass ? "（通過）" : "（未通過）"}` : "未作答",
+  };
+}
+
+function initCoach(){
+  const input = document.getElementById("coachFiles"), out = document.getElementById("coachResult");
+  input.onchange = async () => {
+    const rows = [], bad = [];
+    for (const f of input.files){
+      try {
+        const snap = JSON.parse(await f.text());
+        if (snap.course !== "frc9427-course") throw new Error("不是本課程的學習紀錄");
+        rows.push(summarizeProgress(snap));
+      } catch(e){ bad.push(`${f.name}：${e.message}`); }
+    }
+    rows.sort((a, b) => a.name.localeCompare(b.name, "zh-Hant"));
+    out.innerHTML = (bad.length ? `<div class="note warn"><strong>有 ${bad.length} 個檔案讀不了</strong>${bad.map(esc).join("<br>")}</div>` : "") +
+      (rows.length ? `<table class="map coach"><thead><tr><th>學生</th><th>匯出日期</th>${PATHS.map(p => `<th>${esc(p.name)}</th>`).join("")}<th>小測驗平均</th><th>未達 80% 的章</th><th>實驗</th><th>工具站任務</th><th>直接看解答的章</th><th>最終評量</th></tr></thead><tbody>
+        ${rows.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.at)}</td>${r.paths.map(x => `<td>${x}</td>`).join("")}
+          <td>${r.quizAvg === null ? "—" : Math.round(100 * r.quizAvg) + "%（" + r.quizCount + " 章）"}</td>
+          <td>${r.weak.length ? r.weak.join("、") : "無"}</td><td>${r.labs}</td><td>${r.tools}</td>
+          <td>${r.sawSolution.length ? r.sawSolution.join("、") : "無"}</td><td>${esc(r.final)}</td></tr>`).join("")}
+        </tbody></table>
+        <p class="mastery">「直接看解答的章」是看到完整解答的章節，不代表沒學會，但可以優先確認他能不能自己寫出來。小測驗只記最近一次作答。</p>` : "");
+  };
+}
 
 /* ---------- 最終程式能力評量（#final） ----------
  * 七個問題自由作答，送出後顯示參考解答與評分表。評分表逐項勾選，
@@ -5048,7 +5103,8 @@ function pathsHTML(){
     </section>`;
   }).join("") + `<section class="pathsec"><h3><span class="ptag">檢核</span>完成核心路徑後</h3>
       <p class="pgoal"><a href="#final">最終程式能力評量</a>：一題沒看過的除錯題，看你能不能用證據找出問題、決定先查什麼，並在上機前做好檢查。</p></section>
-    <p class="mastery">${esc(COURSE_DATA.mastery)}</p>`;
+    <p class="mastery">${esc(COURSE_DATA.mastery)}</p>
+    <p class="mastery">學習紀錄只存在這台瀏覽器。<button class="btn ghost small" id="exportBtn">下載學習紀錄給教練</button>　教練請到<a href="#coach">彙整頁</a>。</p>`;
 }
 
 /* 共用的折線圖（第 13、14 章實驗） */
@@ -5676,6 +5732,7 @@ function showHome(){
   mount("tpl-home");
   const done = loadDone();
   document.getElementById("outline").innerHTML = pathsHTML();
+  document.getElementById("exportBtn").onclick = () => exportProgress();
   renderMap(null);
 }
 
@@ -5684,6 +5741,12 @@ function showFinal(){
   view.querySelectorAll("pre code").forEach(el => { el.innerHTML = highlight(el.textContent); });
   initFinal();
   renderMap("final");
+}
+
+function showCoach(){
+  mount("tpl-coach");
+  initCoach();
+  renderMap("coach");
 }
 
 function showSoon(id){
@@ -5764,6 +5827,7 @@ function route(){
   setLanding(h === "");
   if (h === "") renderMap(null);
   else if (h === "final") showFinal();
+  else if (h === "coach") showCoach();
   else if (m){ const id = +m[1]; READY.includes(id) ? showChapter(id) : ALL.some(x => x[0] === id) ? showSoon(id) : showHome(); }
   else showHome();
   const anchor = m && m[2] && (document.getElementById("lab-" + m[2]) || document.getElementById(m[2]));
