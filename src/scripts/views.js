@@ -37,6 +37,8 @@ function showChapter(id){
   const q = view.querySelector(".quiz");
   if (q && QUIZZES[id]) initQuiz(q, QUIZZES[id]);
   (LABS[id] || []).forEach(init => init());
+  decorateLabs(id);
+  insertToolTasks(id);
   view.querySelectorAll("a.ref").forEach(a => a.addEventListener("click", e => {
     e.preventDefault();
     const t = document.getElementById(a.getAttribute("href").slice(1));

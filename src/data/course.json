@@ -73,7 +73,9 @@
       "awareness": [
         "Driver Station 各分頁的用途",
         "build.gradle 的細節"
-      ]
+      ],
+      "tools": [],
+      "labs": []
     },
     {
       "id": 1,
@@ -92,6 +94,15 @@
       ],
       "awareness": [
         "static 欄位的進階用法"
+      ],
+      "tools": [],
+      "labs": [
+        {
+          "id": "roller",
+          "title": "兩個物件，各自的狀態",
+          "objective": "看出兩個物件的欄位各自獨立，以及沒有 new 的變數會發生什麼。",
+          "kind": "logic"
+        }
       ]
     },
     {
@@ -110,7 +121,9 @@
       ],
       "awareness": [
         "protected 與套件存取的細節"
-      ]
+      ],
+      "tools": [],
+      "labs": []
     },
     {
       "id": 3,
@@ -129,7 +142,9 @@
       ],
       "awareness": [
         "default 方法的進階用法"
-      ]
+      ],
+      "tools": [],
+      "labs": []
     },
     {
       "id": 4,
@@ -147,7 +162,9 @@
       ],
       "awareness": [
         "java.util.function 其他介面"
-      ]
+      ],
+      "tools": [],
+      "labs": []
     },
     {
       "id": 5,
@@ -166,7 +183,9 @@
       ],
       "awareness": [
         "enum 帶欄位與方法的進階寫法"
-      ]
+      ],
+      "tools": [],
+      "labs": []
     },
     {
       "id": 6,
@@ -187,6 +206,29 @@
       "awareness": [
         "AdvantageKit 重播的完整流程（第 18 章）",
         "用假的 IO 寫單元測試"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "calc",
+          "title": "下載一份完整的電梯子系統",
+          "do": "在 1F 按「下載完整子系統 .zip」，對照本章的 IO 架構找出 IO 介面、硬體實作和 Subsystem 各在哪個檔案。",
+          "check": "哪一層負責換算單位？哪一層決定目標？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "arch",
+          "title": "分層全貌",
+          "objective": "點每一層，說出它該做和不該做的事。",
+          "kind": "logic"
+        },
+        {
+          "id": "env",
+          "title": "換一個人點名",
+          "objective": "確認 Subsystem 不變、只換 IO 實作，就能在實機、模擬、重播之間切換。",
+          "kind": "logic"
+        }
       ]
     },
     {
@@ -205,6 +247,15 @@
       ],
       "awareness": [
         "LoggedRobot 與 TimedRobot 的細部差異"
+      ],
+      "tools": [],
+      "labs": [
+        {
+          "id": "loop",
+          "title": "一步一步跑 20 毫秒",
+          "objective": "預測每一輪哪些方法依什麼順序被呼叫。",
+          "kind": "logic"
+        }
       ]
     },
     {
@@ -225,6 +276,15 @@
       ],
       "awareness": [
         "Disabled 時執行指令的細節"
+      ],
+      "tools": [],
+      "labs": [
+        {
+          "id": "scheduler",
+          "title": "搶體育館",
+          "objective": "預測兩個指令搶同一個 Subsystem 時誰會被取消。",
+          "kind": "logic"
+        }
       ]
     },
     {
@@ -244,6 +304,15 @@
       ],
       "awareness": [
         "防連按（debounce）的參數選擇"
+      ],
+      "tools": [],
+      "labs": [
+        {
+          "id": "bindings",
+          "title": "三種按鈕",
+          "objective": "分辨 onTrue、whileTrue、toggleOnTrue 在按下與放開時的差別。",
+          "kind": "logic"
+        }
       ]
     },
     {
@@ -262,7 +331,9 @@
       ],
       "awareness": [
         "各種修飾方法的完整清單"
-      ]
+      ],
+      "tools": [],
+      "labs": []
     },
     {
       "id": 11,
@@ -282,7 +353,26 @@
       "awareness": [
         "EnableFOC 與 Pro 授權的細節",
         "TorqueCurrentFOC"
-      ]
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "currentLimit",
+          "title": "3F 情境：超過電流限制",
+          "do": "看電流被限制時，電梯為什麼跟不上軌跡。",
+          "check": "本章的 StatorCurrentLimit 設太低會出現什麼症狀？"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "supplyLimit",
+          "title": "3F 情境：Supply 電流限制設太低",
+          "do": "比較 Stator 與 Supply 電流限制造成的差別。",
+          "check": "Supply 限制太低時，高速段和起步段哪個先受影響？"
+        }
+      ],
+      "labs": []
     },
     {
       "id": 12,
@@ -301,6 +391,37 @@
       ],
       "awareness": [
         "FusedCANcoder／SyncCANcoder（需要 Pro）"
+      ],
+      "tools": [
+        {
+          "track": "arm",
+          "page": "sim",
+          "scenario": "wrongZero",
+          "title": "手臂 3F 情境：編碼器零點不在水平",
+          "do": "看零點偏掉時 kG·cos θ 算錯的樣子，對照本章 MagnetOffset 的量法。",
+          "check": "零點偏了 10 度，手臂在哪個角度最撐不住？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "can",
+          "title": "CAN bus 除錯台",
+          "objective": "從掃描結果和電阻值推斷是斷線、少終端還是 ID 重複。",
+          "kind": "model",
+          "modeled": [
+            "daisy-chain 斷點之後的裝置消失",
+            "兩端終端電阻並聯約 60 Ω",
+            "同型號同 ID 衝突、不同型號不衝突"
+          ],
+          "approximated": [
+            "少一端終端時「可能時好時壞」只是文字提示"
+          ],
+          "omitted": [
+            "訊號反射與波形",
+            "匯流排負載與錯誤訊框",
+            "接觸不良造成的間歇斷線"
+          ]
+        }
       ]
     },
     {
@@ -321,6 +442,65 @@
       ],
       "awareness": [
         "積分防飽和的各種做法"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "calc",
+          "title": "1F 教學關卡",
+          "do": "用隊上機構的資料算出 kG、kV、kA，完成五個教學關卡（含純 PID 對前饋＋PID）。",
+          "check": "哪些參數可以算、哪些一定要量？"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "noKg",
+          "title": "3F 情境：沒有 kG",
+          "do": "看電梯停在目標下方，再把 kP 加倍、把 kG 填回，比較誤差變化。",
+          "check": "為什麼加大 kP 只能讓誤差變小，不會變成 0？"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "whyNoKi",
+          "title": "3F 情境：為什麼不用 kI",
+          "do": "用 kI 補重力，觀察反應速度與過衝。",
+          "check": "本章說前饋做好後通常不需要 I，這個情境的證據是什麼？"
+        },
+        {
+          "track": "arm",
+          "page": "sim",
+          "scenario": "armAsElevator",
+          "title": "手臂 3F 情境：把手臂當電梯",
+          "do": "kG 沒乘 cos θ 時，手臂在不同角度的表現。",
+          "check": "為什麼手臂要選 Arm_Cosine？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "pid",
+          "title": "調一支手臂",
+          "objective": "用證據判斷缺的是 kG、kP 還是 kD，而不是亂猜參數。",
+          "kind": "model",
+          "modeled": [
+            "重力（kG·cos θ，真實值 0.6 V）",
+            "庫侖摩擦（kS 0.1 V）",
+            "反電動勢（kV）與慣性（kA）",
+            "±12 V 輸出飽和",
+            "10 ms 量測延遲",
+            "1 kHz 控制週期"
+          ],
+          "approximated": [
+            "手臂的動態直接用 WPILib ArmFeedforward 的電壓平衡式代替",
+            "摩擦只有固定大小，靜止時小於 kS 的輸出不會動"
+          ],
+          "omitted": [
+            "電流限制與電池壓降",
+            "感測器雜訊與量化",
+            "齒輪背隙與彈性",
+            "TalonFX 韌體的實際演算法細節"
+          ]
+        }
       ]
     },
     {
@@ -341,6 +521,40 @@
       "awareness": [
         "MotionMagic Expo",
         "Dynamic MotionMagic（需要 Pro）"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "calc",
+          "title": "1F Motion Magic 參數",
+          "do": "看工具站怎麼從馬達能力算出巡航速度與加速度的上限（扣掉 kG、kS）。",
+          "check": "工具站算出的巡航速度上限，和本章「12 ÷ kV」的粗估差在哪裡？"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "controlPeriod",
+          "title": "3F 情境：控制週期 TalonFX 對 roboRIO",
+          "do": "比較 1 kHz 與 50 Hz 控制同一組參數的結果。",
+          "check": "為什麼本章建議讓 MotionMagic 在控制器內跑？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "profile",
+          "title": "畫出速度曲線",
+          "objective": "看出距離、巡航速度、加速度如何決定梯形或三角形軌跡與總時間。",
+          "kind": "model",
+          "modeled": [
+            "理想梯形與三角形速度曲線"
+          ],
+          "approximated": [],
+          "omitted": [
+            "jerk（S-curve）",
+            "機構實際的跟隨誤差",
+            "馬達飽和時跟不上軌跡"
+          ]
+        }
       ]
     },
     {
@@ -361,7 +575,26 @@
       ],
       "awareness": [
         "LQR 回饋增益的推導"
-      ]
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "learn",
+          "section": "unit2",
+          "title": "4F 單元二：用 SysId 量測參數",
+          "do": "照單元二跑一次（或用範例資料），把結果和 1F 理論值比較。",
+          "check": "SysId 的 kV 比理論值大很多，可能是哪個機構資料填錯？"
+        },
+        {
+          "track": "elevator",
+          "page": "learn",
+          "section": "measure-ks",
+          "title": "4F 兩點法量 kS、kG",
+          "do": "用兩個定速量出 kS 與 kG，填回 1F。",
+          "check": "兩點法和 SysId 各自需要哪些假設？"
+        }
+      ],
+      "labs": []
     },
     {
       "id": 16,
@@ -381,7 +614,9 @@
       ],
       "awareness": [
         "PathPlanner 的即時路徑產生（pathfinding）"
-      ]
+      ],
+      "tools": [],
+      "labs": []
     },
     {
       "id": 17,
@@ -400,6 +635,26 @@
       ],
       "awareness": [
         "PhotonVision 的設定細節"
+      ],
+      "tools": [],
+      "labs": [
+        {
+          "id": "fusion",
+          "title": "信誰多一點",
+          "objective": "看出標準差如何決定融合時信誰比較多。",
+          "kind": "model",
+          "modeled": [
+            "一維的變異數倒數加權"
+          ],
+          "approximated": [
+            "視覺標準差用「0.05 m × 距離² ÷ 標籤數」的示範經驗式"
+          ],
+          "omitted": [
+            "卡爾曼濾波的時間推進",
+            "量測延遲與時間戳",
+            "朝向與二維位置"
+          ]
+        }
       ]
     },
     {
@@ -420,7 +675,25 @@
       "awareness": [
         "Replay Watch",
         "AdvantageKit swerve 範本的細節"
-      ]
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "learn",
+          "section": "unit1",
+          "title": "4F 單元一：用 AdvantageKit 錄日誌",
+          "do": "對照單元一的欄位與記錄頻率，檢查隊上的 Logger.recordOutput 有沒有漏。",
+          "check": "調參需要哪些欄位是輸入、哪些是輸出？"
+        },
+        {
+          "track": "elevator",
+          "page": "tune",
+          "title": "2F 用範例日誌練習診斷",
+          "do": "載入一份範例日誌，照步驟 0 到步驟 3 找第一優先問題。",
+          "check": "為什麼一次只改一個參數？"
+        }
+      ],
+      "labs": []
     },
     {
       "id": 19,
@@ -439,6 +712,24 @@
       ],
       "awareness": [
         "Driver Station 筆電的完整設定"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "lowBattery",
+          "title": "3F 情境：電池電壓太低",
+          "do": "看電壓不足時機構的反應，對照本章 brownout 的症狀。",
+          "check": "比賽中看到機構變慢，怎麼分辨是電池還是參數？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "triage",
+          "title": "Pit 分診",
+          "objective": "遇到症狀時，照從簡單到困難的順序列出檢查項目。",
+          "kind": "logic"
+        }
       ]
     }
   ],
@@ -488,5 +779,60 @@
       ]
     }
   ],
-  "mastery": "精通標準：學習目標都做得到、小測驗答對 80% 以上、練習先自己寫過再看提示。只需知道的部分，看得懂、需要時查得到就好。"
+  "mastery": "精通標準：學習目標都做得到、小測驗答對 80% 以上、練習先自己寫過再看提示。只需知道的部分，看得懂、需要時查得到就好。",
+  "tool": {
+    "name": "電梯／手臂調參工作站",
+    "url": "https://vincent0926.github.io/FRC-elevator-PID-Teaching-website/",
+    "repo": "vincent0926/FRC-elevator-PID-Teaching-website",
+    "minVersion": "0.12",
+    "pages": [
+      "home",
+      "calc",
+      "tune",
+      "sim",
+      "learn"
+    ],
+    "scenarios": {
+      "elevator": [
+        "onlyKp",
+        "noKg",
+        "kPTooBig",
+        "kDTooBig",
+        "whyNoKi",
+        "antiWindup",
+        "controlPeriod",
+        "sensorDelay",
+        "lowBattery",
+        "currentLimit",
+        "asymFriction",
+        "stageJump",
+        "softLimit",
+        "supplyLimit",
+        "sparkNoComp"
+      ],
+      "arm": [
+        "armAsElevator",
+        "noKg",
+        "crossVertical",
+        "heavyPayload",
+        "wrongZero",
+        "armWindup",
+        "armKpTooBig"
+      ]
+    },
+    "sections": [
+      "unit0",
+      "unit1",
+      "unit2",
+      "unit3",
+      "unit4",
+      "measure-ks"
+    ],
+    "note": "scenarios 與 sections 要和工具站的 simScenarios.ts、armScenarios.ts、LearnPage.tsx 一致；手臂目前只有 home、calc、sim。",
+    "armPages": [
+      "home",
+      "calc",
+      "sim"
+    ]
+  }
 }

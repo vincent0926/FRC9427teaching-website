@@ -44,14 +44,33 @@ export function build() {
     .replace("<!--@scripts-->\n", () => scripts);
 }
 
+// 公開的課程清單（給工具站或其他程式讀）：章節、路徑、學習目標、工具站任務與每章網址
+export function manifest() {
+  const course = JSON.parse(read(src("data/course.json")));
+  const pkg = JSON.parse(read(join(root, "package.json")));
+  const site = "https://vincent0926.github.io/FRC9427teaching-website/";
+  return JSON.stringify({
+    schema: 1,
+    version: pkg.version,
+    site,
+    paths: course.paths,
+    tool: { name: course.tool.name, url: course.tool.url, minVersion: course.tool.minVersion },
+    chapters: course.chapters.map(c => ({
+      id: c.id, title: c.title, desc: c.desc, path: c.path, difficulty: c.difficulty,
+      prereqs: c.prereqs, objectives: c.objectives, url: `${site}#ch${c.id}`,
+      labs: (c.labs || []).map(l => ({ id: l.id, title: l.title, url: `${site}#ch${c.id}/${l.id}` })),
+      toolTasks: (c.tools || []).map(t => ({ track: t.track, page: t.page, scenario: t.scenario, section: t.section, title: t.title })),
+    })),
+  }, null, 2) + "\n";
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const out = build();
-  const target = join(root, "index.html");
+  const outputs = { "index.html": build(), "course.json": manifest() };
   if (process.argv.includes("--check")) {
-    const same = existsSync(target) && read(target) === out;
-    console.log(same ? "index.html 是最新的" : "index.html 不是最新的，請執行 node tools/build.mjs");
-    process.exit(same ? 0 : 1);
+    const stale = Object.entries(outputs).filter(([f, text]) => !existsSync(join(root, f)) || read(join(root, f)) !== text).map(([f]) => f);
+    console.log(stale.length ? `${stale.join("、")} 不是最新的，請執行 node tools/build.mjs` : "index.html、course.json 是最新的");
+    process.exit(stale.length ? 1 : 0);
   }
-  writeFileSync(target, out);
-  console.log(`已產生 index.html（${(out.length / 1024).toFixed(0)} KB）`);
+  for (const [f, text] of Object.entries(outputs)) writeFileSync(join(root, f), text);
+  console.log(`已產生 index.html（${(outputs["index.html"].length / 1024).toFixed(0)} KB）與 course.json`);
 }

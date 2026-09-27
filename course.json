@@ -1,0 +1,576 @@
+{
+  "schema": 1,
+  "version": "2.0.0",
+  "site": "https://vincent0926.github.io/FRC9427teaching-website/",
+  "paths": [
+    {
+      "id": "core",
+      "name": "核心路徑",
+      "required": true,
+      "goal": "能寫出、部署並除錯一個機構的子系統。每位程式組成員都要完成。",
+      "chapters": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        6,
+        12
+      ]
+    },
+    {
+      "id": "controls",
+      "name": "進階控制路徑",
+      "required": false,
+      "goal": "能量出、調好並驗證一個有重力的機構（手臂或升降）。負責機構控制的人必修。",
+      "chapters": [
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "competition",
+      "name": "競賽實務路徑",
+      "required": false,
+      "goal": "能寫自動程式、用日誌找問題，並在比賽中處理狀況。上場前每位程式組成員都要讀第 19 章。",
+      "chapters": [
+        16,
+        17,
+        18,
+        19
+      ]
+    }
+  ],
+  "tool": {
+    "name": "電梯／手臂調參工作站",
+    "url": "https://vincent0926.github.io/FRC-elevator-PID-Teaching-website/",
+    "minVersion": "0.12"
+  },
+  "chapters": [
+    {
+      "id": 0,
+      "title": "開發環境與專案結構",
+      "desc": "開學前的準備：要裝哪些軟體、專案裡每個檔案的角色、vendordep、編譯與部署、Driver Station。",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [],
+      "objectives": [
+        "建立 WPILib Command-based 專案並部署到機器人",
+        "用 Git commit 與 push 保存程式",
+        "看懂專案裡 Robot、RobotContainer、Constants、vendordeps 各自的角色"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch0",
+      "labs": [],
+      "toolTasks": []
+    },
+    {
+      "id": 1,
+      "title": "類別與物件",
+      "desc": "學籍資料表與填好的每一份：欄位、方法、建構子、this、static。",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [
+        0
+      ],
+      "objectives": [
+        "寫出有欄位、建構子和方法的類別",
+        "分辨類別和物件，說出 new 做了什麼",
+        "看到 NullPointerException 時找出哪個物件沒有 new"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch1",
+      "labs": [
+        {
+          "id": "roller",
+          "title": "兩個物件，各自的狀態",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch1/roller"
+        }
+      ],
+      "toolTasks": []
+    },
+    {
+      "id": 2,
+      "title": "封裝與存取修飾詞",
+      "desc": "成績簿不能放在講台上：private、public、getter，以及為什麼 Subsystem 不讓外面碰馬達。",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [
+        1
+      ],
+      "objectives": [
+        "把欄位設成 private，只開放必要的 public 方法",
+        "說明為什麼 Subsystem 不讓外面直接碰馬達"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch2",
+      "labs": [],
+      "toolTasks": []
+    },
+    {
+      "id": 3,
+      "title": "繼承與介面",
+      "desc": "導師是一種老師，值日生是一份職責：extends、implements、@Override、多型。",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        2
+      ],
+      "objectives": [
+        "分辨 extends 和 implements，並寫出實作介面的類別",
+        "看懂 Robot extends TimedRobot、XxxSubsystem extends SubsystemBase",
+        "正確使用 @Override"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch3",
+      "labs": [],
+      "toolTasks": []
+    },
+    {
+      "id": 4,
+      "title": "Lambda 與方法參考",
+      "desc": "給代課老師的字條：() -> 與 ::，傳遞和呼叫的差別。",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        3
+      ],
+      "objectives": [
+        "寫出 lambda 與方法參考",
+        "分辨「交出一個做法」和「當場執行」，避開搖桿只讀一次的 bug"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch4",
+      "labs": [],
+      "toolTasks": []
+    },
+    {
+      "id": 5,
+      "title": "列舉、常數與套件",
+      "desc": "時段、校規和年級班級：enum、Constants、package 與 import。",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [
+        2
+      ],
+      "objectives": [
+        "用 enum 表示機構狀態",
+        "把魔術數字整理進 Constants",
+        "看懂 package 與 import 的錯誤訊息"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch5",
+      "labs": [],
+      "toolTasks": []
+    },
+    {
+      "id": 6,
+      "title": "IO 架構",
+      "desc": "導師只看點名表：以手臂為例，分六部分講觀念、簡易版、硬體層、模擬層、AdvantageKit 與測試。",
+      "path": "core",
+      "difficulty": 3,
+      "prereqs": [
+        8,
+        11
+      ],
+      "objectives": [
+        "照 IO 架構寫出 Subsystem、IO 介面與硬體實作",
+        "說明每一層該做和不該做的事",
+        "讓同一個 Subsystem 換成模擬 IO 執行"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch6",
+      "labs": [
+        {
+          "id": "arch",
+          "title": "分層全貌",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch6/arch"
+        },
+        {
+          "id": "env",
+          "title": "換一個人點名",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch6/env"
+        }
+      ],
+      "toolTasks": [
+        {
+          "track": "elevator",
+          "page": "calc",
+          "title": "下載一份完整的電梯子系統"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "機器人程式的生命週期",
+      "desc": "學校的一天：程式啟動、四種模式、init / periodic / exit 的呼叫順序、loop overrun。",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        3
+      ],
+      "objectives": [
+        "說出四種模式與 init／periodic／exit 的呼叫順序",
+        "判斷一段程式會不會造成 loop overrun"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch7",
+      "labs": [
+        {
+          "id": "loop",
+          "title": "一步一步跑 20 毫秒",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch7/loop"
+        }
+      ],
+      "toolTasks": []
+    },
+    {
+      "id": 8,
+      "title": "Subsystem 與 Command",
+      "desc": "借用體育館：指令的生命週期、requirements、中斷行為、預設指令。",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        4,
+        7
+      ],
+      "objectives": [
+        "寫出有正確 requirements 的 Command",
+        "預測兩個指令搶同一個 Subsystem 時會發生什麼",
+        "設定預設指令"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch8",
+      "labs": [
+        {
+          "id": "scheduler",
+          "title": "搶體育館",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch8/scheduler"
+        }
+      ],
+      "toolTasks": []
+    },
+    {
+      "id": 9,
+      "title": "Trigger 與按鍵綁定",
+      "desc": "門鈴、對講機和電燈開關：onTrue、whileTrue、toggleOnTrue、條件組合與防連按。",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        4,
+        8
+      ],
+      "objectives": [
+        "依需求選擇 onTrue、whileTrue、toggleOnTrue",
+        "用感測器或條件建立 Trigger 並組合條件"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch9",
+      "labs": [
+        {
+          "id": "bindings",
+          "title": "三種按鈕",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch9/bindings"
+        }
+      ],
+      "toolTasks": []
+    },
+    {
+      "id": 10,
+      "title": "組合指令",
+      "desc": "運動會的節目表：sequence、parallel、race、deadline、結束條件與兩條重要規則。",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        8
+      ],
+      "objectives": [
+        "用 sequence、parallel、race、deadline 組出完整動作",
+        "說明同一個指令物件為什麼不能用兩次"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch10",
+      "labs": [],
+      "toolTasks": []
+    },
+    {
+      "id": 11,
+      "title": "Phoenix 6 與 TalonFX",
+      "desc": "班長的工作手冊：CANivore 與 CANBus、完整設定、控制請求、EnableFOC 與 Pro、Tuner X。",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        5
+      ],
+      "objectives": [
+        "在 CANivore 上建立 TalonFX 並寫一份完整設定",
+        "選擇合適的控制請求（Voltage 類）",
+        "用 Tuner X 設定 ID、確認方向"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch11",
+      "labs": [],
+      "toolTasks": [
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "currentLimit",
+          "title": "3F 情境：超過電流限制"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "supplyLimit",
+          "title": "3F 情境：Supply 電流限制設太低"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "感測器與 CAN 除錯",
+      "desc": "計步器、刻度尺和廣播線：內建編碼器與 CANcoder、極限開關與歸零、CAN 接法與除錯順序。",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        6
+      ],
+      "objectives": [
+        "設定 CANcoder 的零點與方向",
+        "選擇極限開關接法並寫出歸零指令",
+        "CAN 找不到裝置時照順序除錯"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch12",
+      "labs": [
+        {
+          "id": "can",
+          "title": "CAN bus 除錯台",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch12/can"
+        }
+      ],
+      "toolTasks": [
+        {
+          "track": "arm",
+          "page": "sim",
+          "scenario": "wrongZero",
+          "title": "手臂 3F 情境：編碼器零點不在水平"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "PID 與前饋",
+      "desc": "推書車上斜坡：P、I、D 各自做什麼，kS、kV、kA、kG 前饋，手動調參的順序。",
+      "path": "controls",
+      "difficulty": 3,
+      "prereqs": [
+        6,
+        11
+      ],
+      "objectives": [
+        "說明 P、I、D 與 kS、kV、kA、kG 各自的作用",
+        "判斷機構停在目標下方時缺的是 kG 而不是 kI",
+        "照 kG → kS → kV → kP → kD 的順序手動調參"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch13",
+      "labs": [
+        {
+          "id": "pid",
+          "title": "調一支手臂",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch13/pid"
+        }
+      ],
+      "toolTasks": [
+        {
+          "track": "elevator",
+          "page": "calc",
+          "title": "1F 教學關卡"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "noKg",
+          "title": "3F 情境：沒有 kG"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "whyNoKi",
+          "title": "3F 情境：為什麼不用 kI"
+        },
+        {
+          "track": "arm",
+          "page": "sim",
+          "scenario": "armAsElevator",
+          "title": "手臂 3F 情境：把手臂當電梯"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "MotionMagic",
+      "desc": "校車開到下一站：梯形、三角形與 S-curve 軌跡，巡航速度、加速度與 jerk 怎麼設。",
+      "path": "controls",
+      "difficulty": 2,
+      "prereqs": [
+        13
+      ],
+      "objectives": [
+        "說明為什麼需要運動軌跡",
+        "依機構能力設定巡航速度與加速度",
+        "判斷何時需要 jerk（S-curve）"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch14",
+      "labs": [
+        {
+          "id": "profile",
+          "title": "畫出速度曲線",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch14/profile"
+        }
+      ],
+      "toolTasks": [
+        {
+          "track": "elevator",
+          "page": "calc",
+          "title": "1F Motion Magic 參數"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "controlPeriod",
+          "title": "3F 情境：控制週期 TalonFX 對 roboRIO"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "SysId 系統鑑別",
+      "desc": "體適能檢測：四項測試、SysIdRoutine 搭配 SignalLogger、轉檔分析、把參數填回程式。",
+      "path": "controls",
+      "difficulty": 3,
+      "prereqs": [
+        9,
+        13
+      ],
+      "objectives": [
+        "說明 SysId 在量什麼、四項測試的目的",
+        "安全地跑完測試並取出資料",
+        "判斷一份 SysId 結果能不能信，再填回程式"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch15",
+      "labs": [],
+      "toolTasks": [
+        {
+          "track": "elevator",
+          "page": "learn",
+          "section": "unit2",
+          "title": "4F 單元二：用 SysId 量測參數"
+        },
+        {
+          "track": "elevator",
+          "page": "learn",
+          "section": "measure-ks",
+          "title": "4F 兩點法量 kS、kG"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "title": "自動階段與路徑",
+      "desc": "校外教學的行程表：座標與里程計、PathPlanner、紅藍翻轉、Named Commands 與自動程式選單。",
+      "path": "competition",
+      "difficulty": 2,
+      "prereqs": [
+        6,
+        10
+      ],
+      "objectives": [
+        "設定 AutoBuilder 與紅藍翻轉",
+        "註冊 Named Commands 並組出自動程式",
+        "上場前檢查自動程式"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch16",
+      "labs": [],
+      "toolTasks": []
+    },
+    {
+      "id": 17,
+      "title": "視覺與定位",
+      "desc": "看門牌校正位置：AprilTag、融合與標準差、Limelight MegaTag2、兩種瞄準做法。",
+      "path": "competition",
+      "difficulty": 3,
+      "prereqs": [
+        16
+      ],
+      "objectives": [
+        "用 addVisionMeasurement 融合視覺，並依距離調整標準差",
+        "丟掉不可靠的視覺量測",
+        "選擇合適的瞄準做法"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch17",
+      "labs": [
+        {
+          "id": "fusion",
+          "title": "信誰多一點",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch17/fusion"
+        }
+      ],
+      "toolTasks": []
+    },
+    {
+      "id": 18,
+      "title": "模擬、日誌與重播",
+      "desc": "比賽錄影和賽後檢討：取得日誌、AdvantageScope、重播步驟、確定性、版本追蹤。",
+      "path": "competition",
+      "difficulty": 3,
+      "prereqs": [
+        6
+      ],
+      "objectives": [
+        "從機器人取出日誌並用 AdvantageScope 找問題",
+        "完成一次重播並補記錄輸出",
+        "避開讓重播失準的寫法"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch18",
+      "labs": [],
+      "toolTasks": [
+        {
+          "track": "elevator",
+          "page": "learn",
+          "section": "unit1",
+          "title": "4F 單元一：用 AdvantageKit 錄日誌"
+        },
+        {
+          "track": "elevator",
+          "page": "tune",
+          "title": "2F 用範例日誌練習診斷"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "title": "上場檢查與 Pit 除錯",
+      "desc": "考試當天：出發前與每場前後的檢查、brownout、DS Log、Pit 分診與改程式的規矩。",
+      "path": "competition",
+      "difficulty": 1,
+      "prereqs": [
+        12
+      ],
+      "objectives": [
+        "照清單完成賽前與賽後檢查",
+        "從 DS Log 判斷 brownout、roboRIO 重開",
+        "在 Pit 依分診順序找問題，並遵守改程式的規矩"
+      ],
+      "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch19",
+      "labs": [
+        {
+          "id": "triage",
+          "title": "Pit 分診",
+          "url": "https://vincent0926.github.io/FRC9427teaching-website/#ch19/triage"
+        }
+      ],
+      "toolTasks": [
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "lowBattery",
+          "title": "3F 情境：電池電壓太低"
+        }
+      ]
+    }
+  ]
+}

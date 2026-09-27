@@ -48,3 +48,22 @@
 .fmark.vis{top:2px;color:var(--can-h)} .fmark.vis::after{top:100%}
 .fmark.fus{bottom:-14px;color:var(--can-l);font-weight:700} .fmark.fus::after{bottom:100%}
 .nodeinfo ol{margin:6px 0 0;padding-left:22px}
+/* lab header, simulation note, tool tasks */
+.labhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:26px 0 -12px}
+.labtag{font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--ink);color:var(--bg)}
+.labgoal{flex-basis:100%;color:var(--ink-2);font-size:14.5px}
+.simnote{margin:14px 0 0;font-size:13.5px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:10px}
+.simnote summary{cursor:pointer}
+.simgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px 18px;margin-top:6px}
+.simgrid h4{margin:6px 0 2px;font-size:13px;color:var(--ink)}
+.simgrid ul{margin:0;padding-left:18px}
+.simgrid p{margin:0}
+.tooltasks{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:0 10px 10px 0;padding:6px 20px 12px;margin:30px 0}
+.tooltasks h2{margin-top:14px}
+.tasklist{padding-left:22px}
+.tasklist li{margin:12px 0;position:relative}
+.tasklist p{margin:2px 0;font-size:15px}
+.tasklink{font-weight:700}
+.tasktrack{font-size:12px;margin-left:8px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--ink-2)}
+.taskcheck{color:var(--ink-2)}
+.taskdone{float:right;font-size:13.5px;color:var(--ink-2);cursor:pointer;margin-left:12px}

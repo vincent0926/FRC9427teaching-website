@@ -39,6 +39,18 @@ for (const c of chapters) {
   if (![1, 2, 3].includes(c.difficulty)) err("course.json", `第 ${c.id} 章的難度要是 1～3`);
 }
 
+// ---- 工具站任務：情境、單元、樓層都要是工具站真的有的（清單在 course.json 的 tool）
+const tool = course.tool || {};
+for (const c of chapters) for (const [i, t] of (c.tools || []).entries()) {
+  const w = `第 ${c.id} 章工具站任務 ${i + 1}`;
+  if (!["elevator", "arm"].includes(t.track)) err(w, `track 要是 elevator 或 arm`);
+  const pages = t.track === "arm" ? tool.armPages : tool.pages;
+  if (!pages?.includes(t.page)) err(w, `${t.track} 沒有 ${t.page} 這一層`);
+  if (t.scenario && (t.page !== "sim" || !tool.scenarios?.[t.track]?.includes(t.scenario))) err(w, `${t.track} 3F 沒有情境 ${t.scenario}`);
+  if (t.section && !tool.sections?.includes(t.section)) err(w, `工具站沒有區塊 ${t.section}`);
+  if (!t.title || !t.do || !t.check) err(w, "缺少 title／do／check");
+}
+
 // ---- 章節 HTML：標籤成對、引用都有來源、來源都有被引用、引用編號與來源一致
 for (const f of readdirSync(src("chapters")).filter(f => f.endsWith(".html"))) {
   const html = read(src("chapters/" + f));
@@ -63,6 +75,9 @@ for (const f of readdirSync(src("chapters")).filter(f => f.endsWith(".html"))) {
   }
   const cited = new Set(cites.map(x => x[1]));
   for (const d of defs) if (!cited.has(d)) warn(f, `來源 [${d}] 沒有在內文被引用`);
+  const labCount = (html.match(/<div class="lab"/g) || []).length;
+  const labMeta = (chapters.find(c => c.id === n)?.labs || []).length;
+  if (labCount !== labMeta) err(f, `有 ${labCount} 個實驗，但 course.json 描述了 ${labMeta} 個`);
   if (/<div class="quiz">/.test(html) && !existsSync(src(`quiz/ch${pad(n)}.json`))) err(f, "有小測驗區塊但沒有題庫");
 }
 
