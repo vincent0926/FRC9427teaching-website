@@ -140,3 +140,14 @@ p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);
 .lg{font-weight:700}
 .lg.goal{color:var(--can-h)}
 .lg.act{color:var(--blue)}
+/* parameter provenance badges：一般文字用主題色，程式碼區塊（深色背景）用亮色 */
+.prov{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.02em;padding:0 6px;border-radius:4px;border:1px solid currentColor;vertical-align:1px;line-height:1.5;white-space:nowrap;cursor:help;color:var(--blue)}
+.prov[data-prov="TUNED"]{color:var(--ink)}
+.prov[data-prov="CONSTRAINT"]{color:var(--red)}
+.prov[data-prov="MEASURED"]{color:var(--can-l)}
+.prov[data-prov="SIM"]{color:var(--ink-2);border-style:dashed}
+pre .prov{color:#8DB7F2}
+pre .prov[data-prov="TUNED"]{color:#F0C36A}
+pre .prov[data-prov="CONSTRAINT"]{color:#F08A8A}
+pre .prov[data-prov="MEASURED"]{color:#6FD39C}
+pre .prov[data-prov="SIM"]{color:#C4A8F5}

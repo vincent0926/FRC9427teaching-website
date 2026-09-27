@@ -46,7 +46,7 @@ CANcoderConfiguration ccConfig = new CANcoderConfiguration();
 // 讀數範圍的「斷點」：0.5 代表讀數在 -0.5 到 0.5 圈之間
 ccConfig.MagnetSensor.withAbsoluteSensorDiscontinuityPoint(Rotations.of(0.5));
 ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive; // TODO: 上機確認
-ccConfig.MagnetSensor.withMagnetOffset(Rotations.of(0.0)); // TODO: 依下面的步驟量測
+ccConfig.MagnetSensor.withMagnetOffset(Rotations.of(0.0)); // [MEASURED] TODO: 依下面的步驟量測
 armEncoder.getConfigurator().apply(ccConfig);</code></pre>
   <p>三個設定的意思：</p>
   <ul>

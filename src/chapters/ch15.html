@@ -120,16 +120,16 @@ controller.x().whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));</co
   <p>SysId 的單位和 Phoenix 6 Slot0 的單位要一致：如果載入的資料是手臂端 rotations，得到的 kV 就是 V/(rot/s)、kA 是 V/(rot/s²)，可以直接填進 Slot0。</p>
   <pre><code>// 量測日期：YYYY-MM-DD，電池編號：__，SysId 資料檔：__
 config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-config.Slot0.kS = 0.0; // TODO: SysId
-config.Slot0.kG = 0.0; // TODO: SysId
-config.Slot0.kV = 0.0; // TODO: SysId，V/(rot/s)
-config.Slot0.kA = 0.0; // TODO: SysId，V/(rot/s²)
-config.Slot0.kP = 0.0; // TODO: 從 SysId 建議值開始，再上機微調
-config.Slot0.kD = 0.0; // TODO
+config.Slot0.kS = 0.0; // [SYSID] TODO: SysId
+config.Slot0.kG = 0.0; // [SYSID] TODO: SysId
+config.Slot0.kV = 0.0; // [SYSID] TODO: SysId，V/(rot/s)
+config.Slot0.kA = 0.0; // [SYSID] TODO: SysId，V/(rot/s²)
+config.Slot0.kP = 0.0; // [TUNED] TODO: 從 SysId 建議值開始，再上機微調
+config.Slot0.kD = 0.0; // [TUNED] TODO
 
 // 用 MotionMagic Expo 時（第 14 章），也可以用 kV、kA 當起點
-config.MotionMagic.MotionMagicExpo_kV = 0.0; // TODO
-config.MotionMagic.MotionMagicExpo_kA = 0.0; // TODO</code></pre>
+config.MotionMagic.MotionMagicExpo_kV = 0.0; // [SYSID] TODO
+config.MotionMagic.MotionMagicExpo_kA = 0.0; // [SYSID] TODO</code></pre>
   <p>把量測日期、電池和資料檔寫在註解裡。機構改過（換馬達、改齒輪比、加重量）就要重測。</p>
   <p>另外，WPILib 文件提到，SysId 算出的前饋不只能用在軌跡追蹤，也能讓開迴路控制更好操作，因為搖桿輸入會更接近機構的實際反應<a class="ref" href="#src15-1">[1]</a>。</p>
 

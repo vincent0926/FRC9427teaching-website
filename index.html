@@ -200,6 +200,17 @@ p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);
 .lg{font-weight:700}
 .lg.goal{color:var(--can-h)}
 .lg.act{color:var(--blue)}
+/* parameter provenance badges：一般文字用主題色，程式碼區塊（深色背景）用亮色 */
+.prov{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.02em;padding:0 6px;border-radius:4px;border:1px solid currentColor;vertical-align:1px;line-height:1.5;white-space:nowrap;cursor:help;color:var(--blue)}
+.prov[data-prov="TUNED"]{color:var(--ink)}
+.prov[data-prov="CONSTRAINT"]{color:var(--red)}
+.prov[data-prov="MEASURED"]{color:var(--can-l)}
+.prov[data-prov="SIM"]{color:var(--ink-2);border-style:dashed}
+pre .prov{color:#8DB7F2}
+pre .prov[data-prov="TUNED"]{color:#F0C36A}
+pre .prov[data-prov="CONSTRAINT"]{color:#F08A8A}
+pre .prov[data-prov="MEASURED"]{color:#6FD39C}
+pre .prov[data-prov="SIM"]{color:#C4A8F5}
 /* ch6 parts */
 .partmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:22px 0}
 .pcard{text-align:left;font:inherit;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
@@ -1722,28 +1733,28 @@ public class ArmIOHardware implements ArmIO {
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO; // 只放齒輪比
 
-        config.Slot0.kP = 0.0; // TODO
-        config.Slot0.kI = 0.0; // TODO
-        config.Slot0.kD = 0.0; // TODO
-        config.Slot0.kS = 0.0; // TODO
-        config.Slot0.kV = 0.0; // TODO
-        config.Slot0.kA = 0.0; // TODO
-        config.Slot0.kG = 0.0; // TODO
+        config.Slot0.kP = 0.0; // [TUNED] TODO
+        config.Slot0.kI = 0.0; // [TUNED] TODO
+        config.Slot0.kD = 0.0; // [TUNED] TODO
+        config.Slot0.kS = 0.0; // [MEASURED／SYSID] TODO
+        config.Slot0.kV = 0.0; // [MODEL→SYSID] TODO
+        config.Slot0.kA = 0.0; // [MODEL→SYSID] TODO
+        config.Slot0.kG = 0.0; // [MODEL→SYSID] TODO
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
         // 單位：手臂端 rot/s、rot/s²、rot/s³（因為設定了 SensorToMechanismRatio）
-        config.MotionMagic.MotionMagicCruiseVelocity = 0.0; // TODO
-        config.MotionMagic.MotionMagicAcceleration = 0.0;   // TODO
-        config.MotionMagic.MotionMagicJerk = 0.0;           // TODO: 非 0 才是 S-curve
+        config.MotionMagic.MotionMagicCruiseVelocity = 0.0; // [CONSTRAINT] TODO
+        config.MotionMagic.MotionMagicAcceleration = 0.0;   // [CONSTRAINT] TODO
+        config.MotionMagic.MotionMagicJerk = 0.0;           // [CONSTRAINT] TODO: 非 0 才是 S-curve
 
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.0; // TODO: 手臂端 rotations
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.0; // [MEASURED] TODO: 手臂端 rotations
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0; // TODO: 手臂端 rotations
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0; // [MEASURED] TODO: 手臂端 rotations
 
-        config.CurrentLimits.StatorCurrentLimit = 0.0; // TODO
+        config.CurrentLimits.StatorCurrentLimit = 0.0; // [CONSTRAINT] TODO
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 0.0; // TODO
+        config.CurrentLimits.SupplyCurrentLimit = 0.0; // [CONSTRAINT] TODO
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         retry(() -&gt; leader.getConfigurator().apply(config, 0.25));
@@ -1914,9 +1925,9 @@ public class ArmIOSim extends ArmIOHardware {
     <h2>D-3　做法 (a)：roboRIO 控制器</h2>
     <pre><code>// ArmIOSimRio implements ArmIO（重點片段）
 private final ProfiledPIDController pid = new ProfiledPIDController(
-    0.0, 0.0, 0.0,                                   // TODO
-    new TrapezoidProfile.Constraints(0.0, 0.0));     // TODO: rad/s、rad/s²
-private final ArmFeedforward ff = new ArmFeedforward(0.0, 0.0, 0.0); // TODO: kS、kG、kV（弧度單位）
+    0.0, 0.0, 0.0,                                   // [TUNED] TODO: kP、kI、kD
+    new TrapezoidProfile.Constraints(0.0, 0.0));     // [CONSTRAINT] TODO: rad/s、rad/s²
+private final ArmFeedforward ff = new ArmFeedforward(0.0, 0.0, 0.0); // [MODEL→SYSID] TODO: kS、kG、kV（弧度單位）
 private Double goalRad = null;
 
 @Override
@@ -2958,9 +2969,9 @@ config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // TODO: 
 config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
 // 電流限制：保護馬達、電池和斷路器
-config.CurrentLimits.StatorCurrentLimit = 0.0;        // TODO
+config.CurrentLimits.StatorCurrentLimit = 0.0;        // [CONSTRAINT] TODO
 config.CurrentLimits.StatorCurrentLimitEnable = true;
-config.CurrentLimits.SupplyCurrentLimit = 0.0;        // TODO
+config.CurrentLimits.SupplyCurrentLimit = 0.0;        // [CONSTRAINT] TODO
 config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
 // 齒輪比：之後讀到的位置、速度都是機構端
@@ -3043,7 +3054,7 @@ armLeader.getConfigurator().apply(config);</code></pre>
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // TODO: 上機確認
-        config.CurrentLimits.SupplyCurrentLimit = 0.0;                         // TODO
+        config.CurrentLimits.SupplyCurrentLimit = 0.0;                         // [CONSTRAINT] TODO
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         motor.getConfigurator().apply(config);
     }
@@ -3128,7 +3139,7 @@ CANcoderConfiguration ccConfig = new CANcoderConfiguration();
 // 讀數範圍的「斷點」：0.5 代表讀數在 -0.5 到 0.5 圈之間
 ccConfig.MagnetSensor.withAbsoluteSensorDiscontinuityPoint(Rotations.of(0.5));
 ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive; // TODO: 上機確認
-ccConfig.MagnetSensor.withMagnetOffset(Rotations.of(0.0)); // TODO: 依下面的步驟量測
+ccConfig.MagnetSensor.withMagnetOffset(Rotations.of(0.0)); // [MEASURED] TODO: 依下面的步驟量測
 armEncoder.getConfigurator().apply(ccConfig);</code></pre>
   <p>三個設定的意思：</p>
   <ul>
@@ -3388,13 +3399,13 @@ public boolean atBottom() {
   <p>第 6 章的手臂已經在 TalonFX 的 Slot0 裡放了這些增益。CTRE 文件說明，控制器內的閉迴路沒有感測延遲，而且以 1 kHz 更新，比在 roboRIO 上跑反應更快<a class="ref" href="#src13-5">[5]</a>。</p>
   <pre><code>Slot0Configs slot0 = config.Slot0;
 slot0.GravityType = GravityTypeValue.Arm_Cosine; // 預設是 Elevator_Static
-slot0.kG = 0.0; // TODO: 讓手臂水平停住的電壓
-slot0.kS = 0.0; // TODO
-slot0.kV = 0.0; // TODO: 單位 V / (rot/s)
-slot0.kA = 0.0; // TODO: 單位 V / (rot/s²)
-slot0.kP = 0.0; // TODO: 單位 V / rot
-slot0.kI = 0.0;
-slot0.kD = 0.0; // TODO: 單位 V / (rot/s)</code></pre>
+slot0.kG = 0.0; // [MODEL→SYSID] TODO: 讓手臂水平停住的電壓
+slot0.kS = 0.0; // [MEASURED／SYSID] TODO
+slot0.kV = 0.0; // [MODEL→SYSID] TODO: 單位 V / (rot/s)
+slot0.kA = 0.0; // [MODEL→SYSID] TODO: 單位 V / (rot/s²)
+slot0.kP = 0.0; // [TUNED] TODO: 單位 V / rot
+slot0.kI = 0.0; // [TUNED] 前饋做好後通常維持 0
+slot0.kD = 0.0; // [TUNED] TODO: 單位 V / (rot/s)</code></pre>
   <p>單位要特別注意。Phoenix 6 的增益是「機構單位」：CTRE 文件舉例，100:1 減速時 kP = 1 代表機構誤差 1 圈輸出 1 V，也就是馬達誤差 100 圈才輸出 1 V<a class="ref" href="#src13-6">[6]</a>。WPILib 的 <code>ArmFeedforward</code>、<code>PIDController</code> 則是你餵什麼單位就用什麼單位，第 6 章 D-3 用的是弧度。同一組數字不能直接在兩邊互換。</p>
   <p>CTRE 文件也提供一個估算 kP 起始值的方法：手臂離目標 0.1 圈時，如果 1 V 就足以讓它慢慢移動，那麼 kP = 1 V ÷ 0.1 rot = 10 V/rot，是一個安全的起點<a class="ref" href="#src13-6">[6]</a>。</p>
 
@@ -3436,6 +3447,29 @@ slot0.kD = 0.0; // TODO: 單位 V / (rot/s)</code></pre>
   <p>飛輪這類速度機構，CTRE 另外建議在低速（約最大速度 10%）調 kS、在高速（約 80%）調 kV，兩者交替調到不再變化，最後才加 kP<a class="ref" href="#src13-6">[6]</a>。手動調出來的數字可以用，但第 15 章的 SysId 能用量測資料直接算出 kS、kV、kA、kG，比猜的準。</p>
   <div class="note coach"><strong>教練提醒：調參時的安全</strong>每次改完增益都先用小目標測試，手指放在 Enter（Disable）或空白鍵（緊急停止）上（第 0 章）。手臂 kG 的正負號錯了，手臂會被往下推而不是撐住。電流限制和軟體極限（第 6 章）在調參時一定要開著。</div>
 
+  <h2>參數從哪裡來</h2>
+  <p>不是每個參數都能用公式算準。每個數字都應該知道它從哪裡來，下次機構改了才知道要重做哪一步。本課程和電梯／手臂調參工作站用同一套分類：</p>
+  <table class="map provtable">
+    <thead><tr><th>參數</th><th>來源</th><th>怎麼得到</th></tr></thead>
+    <tbody>
+      <tr><td>kG</td><td>[MODEL→SYSID]</td><td>用質量、力臂、齒輪比、馬達常數估計初始值，再用 SysId 或開迴路量出實際值（第 15 章）</td></tr>
+      <tr><td>kS</td><td>[MEASURED／SYSID]</td><td>摩擦幾乎無法從模型算準，直接量或用 SysId 擬合</td></tr>
+      <tr><td>kV、kA</td><td>[MODEL→SYSID]</td><td>由馬達常數與齒輪比估計，再用 SysId 修正（效率、摩擦、慣量都會讓實際值不同）</td></tr>
+      <tr><td>kP、kI、kD</td><td>[TUNED]</td><td>上機依回饋調整；SysId 的回饋建議值只是起點</td></tr>
+      <tr><td>巡航速度、加速度、jerk</td><td>[CONSTRAINT]</td><td>依機構能力（扣掉 kG、kS 後）與安全需求決定（第 14 章）</td></tr>
+      <tr><td>電流限制、軟體極限</td><td>[CONSTRAINT] [MEASURED]</td><td>電流限制是保護用的決定；軟體極限要依實際量到的機械極限設在內側</td></tr>
+      <tr><td>上面實驗裡的「真實 kG 0.6 V」</td><td>[SIM]</td><td>只是模擬器的設定，和任何真實機構無關</td></tr>
+    </tbody>
+  </table>
+  <p>把這張表串起來，就是調參的整個流程：</p>
+  <ol>
+    <li><strong>理論／模型</strong>：算出初始預期，知道數量級對不對。</li>
+    <li><strong>系統鑑別（SysId）</strong>：量出真實機構的 kS、kG、kV、kA。</li>
+    <li><strong>閉迴路調參</strong>：在前饋正確的前提下調 kP、kD。</li>
+    <li><strong>實機驗證</strong>：用日誌確認實際位置貼著目標，換電池、換負載也要成立。</li>
+  </ol>
+  <p>程式碼裡每個參數後面的標籤就是這個分類。把滑鼠移到標籤上可以看說明。</p>
+
   <h2>常見錯誤</h2>
   <div class="note warn"><strong>用 I 來補重力</strong>手臂停在目標下方，第一個反應常常是加 kI。它確實會慢慢推上去，但反應慢又容易飽和。缺的其實是 kG。</div>
   <div class="note warn"><strong>忘了改 GravityType</strong>Phoenix 6 預設是 <code>Elevator_Static</code>，手臂忘了改成 <code>Arm_Cosine</code>，kG 在任何角度都是定值，手臂抬高時反而會被推過頭。</div>
@@ -3466,10 +3500,10 @@ slot0.kD = 0.0; // TODO: 單位 V / (rot/s)</code></pre>
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.Feedback.SensorToMechanismRatio = 1.0; // TODO: 齒輪比
-        config.Slot0.kS = 0.0; // TODO: 低速時調
-        config.Slot0.kV = 0.0; // TODO: 高速時調，單位 V/(rot/s)
-        config.Slot0.kP = 0.0; // TODO: 最後才加
-        config.CurrentLimits.SupplyCurrentLimit = 0.0; // TODO
+        config.Slot0.kS = 0.0; // [MEASURED／SYSID] TODO: SysId，或照 CTRE 飛輪步驟在低速時手動調
+        config.Slot0.kV = 0.0; // [MODEL→SYSID] TODO: SysId，或在高速時手動調，單位 V/(rot/s)
+        config.Slot0.kP = 0.0; // [TUNED] TODO: 最後才加
+        config.CurrentLimits.SupplyCurrentLimit = 0.0; // [CONSTRAINT] TODO
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         motor.getConfigurator().apply(config);
     }
@@ -3572,9 +3606,9 @@ public boolean atSpeed() {
   <h2>設定 MotionMagic</h2>
   <p>CTRE 文件寫明，MotionMagic 必須設定巡航速度與加速度，jerk 可選<a class="ref" href="#src14-2">[2]</a>。用第 6 章手臂的設定為例：</p>
   <pre><code>MotionMagicConfigs mm = config.MotionMagic;
-mm.MotionMagicCruiseVelocity = 0.0; // TODO: rot/s（手臂端）
-mm.MotionMagicAcceleration = 0.0;   // TODO: rot/s²
-mm.MotionMagicJerk = 0.0;           // TODO: rot/s³，0 = 梯形，非 0 = S-curve
+mm.MotionMagicCruiseVelocity = 0.0; // [CONSTRAINT] TODO: rot/s（手臂端）
+mm.MotionMagicAcceleration = 0.0;   // [CONSTRAINT] TODO: rot/s²
+mm.MotionMagicJerk = 0.0;           // [CONSTRAINT] TODO: rot/s³，0 = 梯形，非 0 = S-curve
 
 // 在 MotionMagic 裡，Slot0 的每一項這樣用：
 // kG 重力、kS 靜摩擦、kV × 軌跡速度、kA × 軌跡加速度、
@@ -3590,8 +3624,8 @@ public void setPositionGoal(double positionRot) {
 
   <h3>參數怎麼選</h3>
   <ol>
-    <li><strong>先估機構最快能多快。</strong>第 13 章的前饋告訴我們，維持速度 <var>v</var> 大約要 kV × <var>v</var> 伏特。所以 12 V 左右能達到的速度上限大約是 12 ÷ kV（還要扣掉 kS、kG）。巡航速度設在這個上限以下，留一些餘裕給 PID 修正和電池電壓下降。</li>
-    <li><strong>加速度從保守開始。</strong>先設「約 0.5 秒加速到巡航速度」，也就是加速度 = 巡航速度 × 2，確認平順後再往上加。CTRE 的範例正是巡航 80 rps、加速度 160 rps/s（0.5 秒）<a class="ref" href="#src14-2">[2]</a>。</li>
+    <li><strong>先估機構最快能多快。</strong>[MODEL] 第 13 章的前饋告訴我們，維持速度 <var>v</var> 大約要 kV × <var>v</var> 伏特。所以 12 V 左右能達到的速度上限大約是 12 ÷ kV（還要扣掉 kS、kG）。巡航速度設在這個上限以下，留一些餘裕給 PID 修正和電池電壓下降。</li>
+    <li><strong>加速度從保守開始。</strong>[CONSTRAINT] 先設「約 0.5 秒加速到巡航速度」，也就是加速度 = 巡航速度 × 2，確認平順後再往上加。CTRE 的範例正是巡航 80 rps、加速度 160 rps/s（0.5 秒）<a class="ref" href="#src14-2">[2]</a>。</li>
     <li><strong>機構會晃，再加 jerk。</strong>CTRE 的範例 jerk 1600 rot/s³，代表約 0.1 秒從 0 加到 160 rot/s² 的最大加速度<a class="ref" href="#src14-2">[2]</a>。</li>
     <li><strong>看圖調整。</strong>把目標位置、實際位置畫在同一張圖（AdvantageScope 或 Tuner X 的 Plot），實際位置應該貼著軌跡走。跟不上 → 巡航速度或加速度太大，或 kV、kA 不準。</li>
   </ol>
@@ -3788,16 +3822,16 @@ controller.x().whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));</co
   <p>SysId 的單位和 Phoenix 6 Slot0 的單位要一致：如果載入的資料是手臂端 rotations，得到的 kV 就是 V/(rot/s)、kA 是 V/(rot/s²)，可以直接填進 Slot0。</p>
   <pre><code>// 量測日期：YYYY-MM-DD，電池編號：__，SysId 資料檔：__
 config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-config.Slot0.kS = 0.0; // TODO: SysId
-config.Slot0.kG = 0.0; // TODO: SysId
-config.Slot0.kV = 0.0; // TODO: SysId，V/(rot/s)
-config.Slot0.kA = 0.0; // TODO: SysId，V/(rot/s²)
-config.Slot0.kP = 0.0; // TODO: 從 SysId 建議值開始，再上機微調
-config.Slot0.kD = 0.0; // TODO
+config.Slot0.kS = 0.0; // [SYSID] TODO: SysId
+config.Slot0.kG = 0.0; // [SYSID] TODO: SysId
+config.Slot0.kV = 0.0; // [SYSID] TODO: SysId，V/(rot/s)
+config.Slot0.kA = 0.0; // [SYSID] TODO: SysId，V/(rot/s²)
+config.Slot0.kP = 0.0; // [TUNED] TODO: 從 SysId 建議值開始，再上機微調
+config.Slot0.kD = 0.0; // [TUNED] TODO
 
 // 用 MotionMagic Expo 時（第 14 章），也可以用 kV、kA 當起點
-config.MotionMagic.MotionMagicExpo_kV = 0.0; // TODO
-config.MotionMagic.MotionMagicExpo_kA = 0.0; // TODO</code></pre>
+config.MotionMagic.MotionMagicExpo_kV = 0.0; // [SYSID] TODO
+config.MotionMagic.MotionMagicExpo_kA = 0.0; // [SYSID] TODO</code></pre>
   <p>把量測日期、電池和資料檔寫在註解裡。機構改過（換馬達、改齒輪比、加重量）就要重測。</p>
   <p>另外，WPILib 文件提到，SysId 算出的前饋不只能用在軌跡追蹤，也能讓開迴路控制更好操作，因為搖桿輸入會更接近機構的實際反應<a class="ref" href="#src15-1">[1]</a>。</p>
 
@@ -5018,6 +5052,38 @@ function exportProgress(){
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
+/* ---------- 參數來源標籤 ----------
+ * 章節裡（包括程式註解）寫 [SYSID]、[TUNED] 這類標記，顯示時換成標籤。
+ * 分類和電梯／手臂調參工作站一致，另外加上 SIM（只在模擬中有意義）。
+ */
+const PROVENANCE = {
+  "MODEL":        "由物理模型或機構規格算出的初始估計",
+  "MODEL→SYSID":  "先用模型估計，再用系統鑑別（SysId）量出實際值",
+  "MEASURED":     "直接在機構上量測",
+  "MEASURED／SYSID": "直接量測，或由系統鑑別擬合得到",
+  "SYSID":        "由系統鑑別（SysId）擬合得到",
+  "TUNED":        "上機依回饋調整，沒有公式可以直接算準",
+  "CONSTRAINT":   "為了安全或運動限制而決定的值",
+  "SIM":          "只在模擬中有意義，不代表實機",
+};
+const PROV_RE = new RegExp(`\\[(${Object.keys(PROVENANCE).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\]`, "g");
+
+function provBadge(tag){
+  return `<span class="prov" data-prov="${tag}" title="${PROVENANCE[tag]}">${tag}</span>`;
+}
+/** 把畫面上文字裡的 [TAG] 換成標籤（只處理文字節點，不動 HTML 結構與事件） */
+function applyProvenance(root){
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const hits = [];
+  while (walker.nextNode()) if (PROV_RE.test(walker.currentNode.nodeValue)) hits.push(walker.currentNode);
+  for (const node of hits){
+    PROV_RE.lastIndex = 0;
+    const span = document.createElement("span");
+    span.innerHTML = esc(node.nodeValue).replace(PROV_RE, (_, tag) => provBadge(tag));
+    node.replaceWith(...span.childNodes);
+  }
+}
+
 /* ---------- 小測驗 ----------
  * 題目分兩種（src/quiz/chNN.json 的 type）：
  *   recall   觀念記憶題
@@ -5473,6 +5539,7 @@ function showChapter(id){
   mount("tpl-ch" + id);
   insertLearningCard(id);
   view.querySelectorAll("pre code").forEach(el => { el.innerHTML = highlight(el.textContent); });
+  applyProvenance(view);
   const q = view.querySelector(".quiz");
   if (q && QUIZZES[id]) initQuiz(q, QUIZZES[id], id);
   (LABS[id] || []).forEach(init => init());

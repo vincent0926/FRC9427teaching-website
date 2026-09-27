@@ -54,9 +54,9 @@
   <h2>設定 MotionMagic</h2>
   <p>CTRE 文件寫明，MotionMagic 必須設定巡航速度與加速度，jerk 可選<a class="ref" href="#src14-2">[2]</a>。用第 6 章手臂的設定為例：</p>
   <pre><code>MotionMagicConfigs mm = config.MotionMagic;
-mm.MotionMagicCruiseVelocity = 0.0; // TODO: rot/s（手臂端）
-mm.MotionMagicAcceleration = 0.0;   // TODO: rot/s²
-mm.MotionMagicJerk = 0.0;           // TODO: rot/s³，0 = 梯形，非 0 = S-curve
+mm.MotionMagicCruiseVelocity = 0.0; // [CONSTRAINT] TODO: rot/s（手臂端）
+mm.MotionMagicAcceleration = 0.0;   // [CONSTRAINT] TODO: rot/s²
+mm.MotionMagicJerk = 0.0;           // [CONSTRAINT] TODO: rot/s³，0 = 梯形，非 0 = S-curve
 
 // 在 MotionMagic 裡，Slot0 的每一項這樣用：
 // kG 重力、kS 靜摩擦、kV × 軌跡速度、kA × 軌跡加速度、
@@ -72,8 +72,8 @@ public void setPositionGoal(double positionRot) {
 
   <h3>參數怎麼選</h3>
   <ol>
-    <li><strong>先估機構最快能多快。</strong>第 13 章的前饋告訴我們，維持速度 <var>v</var> 大約要 kV × <var>v</var> 伏特。所以 12 V 左右能達到的速度上限大約是 12 ÷ kV（還要扣掉 kS、kG）。巡航速度設在這個上限以下，留一些餘裕給 PID 修正和電池電壓下降。</li>
-    <li><strong>加速度從保守開始。</strong>先設「約 0.5 秒加速到巡航速度」，也就是加速度 = 巡航速度 × 2，確認平順後再往上加。CTRE 的範例正是巡航 80 rps、加速度 160 rps/s（0.5 秒）<a class="ref" href="#src14-2">[2]</a>。</li>
+    <li><strong>先估機構最快能多快。</strong>[MODEL] 第 13 章的前饋告訴我們，維持速度 <var>v</var> 大約要 kV × <var>v</var> 伏特。所以 12 V 左右能達到的速度上限大約是 12 ÷ kV（還要扣掉 kS、kG）。巡航速度設在這個上限以下，留一些餘裕給 PID 修正和電池電壓下降。</li>
+    <li><strong>加速度從保守開始。</strong>[CONSTRAINT] 先設「約 0.5 秒加速到巡航速度」，也就是加速度 = 巡航速度 × 2，確認平順後再往上加。CTRE 的範例正是巡航 80 rps、加速度 160 rps/s（0.5 秒）<a class="ref" href="#src14-2">[2]</a>。</li>
     <li><strong>機構會晃，再加 jerk。</strong>CTRE 的範例 jerk 1600 rot/s³，代表約 0.1 秒從 0 加到 160 rot/s² 的最大加速度<a class="ref" href="#src14-2">[2]</a>。</li>
     <li><strong>看圖調整。</strong>把目標位置、實際位置畫在同一張圖（AdvantageScope 或 Tuner X 的 Plot），實際位置應該貼著軌跡走。跟不上 → 巡航速度或加速度太大，或 kV、kA 不準。</li>
   </ol>

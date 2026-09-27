@@ -67,13 +67,13 @@
   <p>第 6 章的手臂已經在 TalonFX 的 Slot0 裡放了這些增益。CTRE 文件說明，控制器內的閉迴路沒有感測延遲，而且以 1 kHz 更新，比在 roboRIO 上跑反應更快<a class="ref" href="#src13-5">[5]</a>。</p>
   <pre><code>Slot0Configs slot0 = config.Slot0;
 slot0.GravityType = GravityTypeValue.Arm_Cosine; // 預設是 Elevator_Static
-slot0.kG = 0.0; // TODO: 讓手臂水平停住的電壓
-slot0.kS = 0.0; // TODO
-slot0.kV = 0.0; // TODO: 單位 V / (rot/s)
-slot0.kA = 0.0; // TODO: 單位 V / (rot/s²)
-slot0.kP = 0.0; // TODO: 單位 V / rot
-slot0.kI = 0.0;
-slot0.kD = 0.0; // TODO: 單位 V / (rot/s)</code></pre>
+slot0.kG = 0.0; // [MODEL→SYSID] TODO: 讓手臂水平停住的電壓
+slot0.kS = 0.0; // [MEASURED／SYSID] TODO
+slot0.kV = 0.0; // [MODEL→SYSID] TODO: 單位 V / (rot/s)
+slot0.kA = 0.0; // [MODEL→SYSID] TODO: 單位 V / (rot/s²)
+slot0.kP = 0.0; // [TUNED] TODO: 單位 V / rot
+slot0.kI = 0.0; // [TUNED] 前饋做好後通常維持 0
+slot0.kD = 0.0; // [TUNED] TODO: 單位 V / (rot/s)</code></pre>
   <p>單位要特別注意。Phoenix 6 的增益是「機構單位」：CTRE 文件舉例，100:1 減速時 kP = 1 代表機構誤差 1 圈輸出 1 V，也就是馬達誤差 100 圈才輸出 1 V<a class="ref" href="#src13-6">[6]</a>。WPILib 的 <code>ArmFeedforward</code>、<code>PIDController</code> 則是你餵什麼單位就用什麼單位，第 6 章 D-3 用的是弧度。同一組數字不能直接在兩邊互換。</p>
   <p>CTRE 文件也提供一個估算 kP 起始值的方法：手臂離目標 0.1 圈時，如果 1 V 就足以讓它慢慢移動，那麼 kP = 1 V ÷ 0.1 rot = 10 V/rot，是一個安全的起點<a class="ref" href="#src13-6">[6]</a>。</p>
 
@@ -115,6 +115,29 @@ slot0.kD = 0.0; // TODO: 單位 V / (rot/s)</code></pre>
   <p>飛輪這類速度機構，CTRE 另外建議在低速（約最大速度 10%）調 kS、在高速（約 80%）調 kV，兩者交替調到不再變化，最後才加 kP<a class="ref" href="#src13-6">[6]</a>。手動調出來的數字可以用，但第 15 章的 SysId 能用量測資料直接算出 kS、kV、kA、kG，比猜的準。</p>
   <div class="note coach"><strong>教練提醒：調參時的安全</strong>每次改完增益都先用小目標測試，手指放在 Enter（Disable）或空白鍵（緊急停止）上（第 0 章）。手臂 kG 的正負號錯了，手臂會被往下推而不是撐住。電流限制和軟體極限（第 6 章）在調參時一定要開著。</div>
 
+  <h2>參數從哪裡來</h2>
+  <p>不是每個參數都能用公式算準。每個數字都應該知道它從哪裡來，下次機構改了才知道要重做哪一步。本課程和電梯／手臂調參工作站用同一套分類：</p>
+  <table class="map provtable">
+    <thead><tr><th>參數</th><th>來源</th><th>怎麼得到</th></tr></thead>
+    <tbody>
+      <tr><td>kG</td><td>[MODEL→SYSID]</td><td>用質量、力臂、齒輪比、馬達常數估計初始值，再用 SysId 或開迴路量出實際值（第 15 章）</td></tr>
+      <tr><td>kS</td><td>[MEASURED／SYSID]</td><td>摩擦幾乎無法從模型算準，直接量或用 SysId 擬合</td></tr>
+      <tr><td>kV、kA</td><td>[MODEL→SYSID]</td><td>由馬達常數與齒輪比估計，再用 SysId 修正（效率、摩擦、慣量都會讓實際值不同）</td></tr>
+      <tr><td>kP、kI、kD</td><td>[TUNED]</td><td>上機依回饋調整；SysId 的回饋建議值只是起點</td></tr>
+      <tr><td>巡航速度、加速度、jerk</td><td>[CONSTRAINT]</td><td>依機構能力（扣掉 kG、kS 後）與安全需求決定（第 14 章）</td></tr>
+      <tr><td>電流限制、軟體極限</td><td>[CONSTRAINT] [MEASURED]</td><td>電流限制是保護用的決定；軟體極限要依實際量到的機械極限設在內側</td></tr>
+      <tr><td>上面實驗裡的「真實 kG 0.6 V」</td><td>[SIM]</td><td>只是模擬器的設定，和任何真實機構無關</td></tr>
+    </tbody>
+  </table>
+  <p>把這張表串起來，就是調參的整個流程：</p>
+  <ol>
+    <li><strong>理論／模型</strong>：算出初始預期，知道數量級對不對。</li>
+    <li><strong>系統鑑別（SysId）</strong>：量出真實機構的 kS、kG、kV、kA。</li>
+    <li><strong>閉迴路調參</strong>：在前饋正確的前提下調 kP、kD。</li>
+    <li><strong>實機驗證</strong>：用日誌確認實際位置貼著目標，換電池、換負載也要成立。</li>
+  </ol>
+  <p>程式碼裡每個參數後面的標籤就是這個分類。把滑鼠移到標籤上可以看說明。</p>
+
   <h2>常見錯誤</h2>
   <div class="note warn"><strong>用 I 來補重力</strong>手臂停在目標下方，第一個反應常常是加 kI。它確實會慢慢推上去，但反應慢又容易飽和。缺的其實是 kG。</div>
   <div class="note warn"><strong>忘了改 GravityType</strong>Phoenix 6 預設是 <code>Elevator_Static</code>，手臂忘了改成 <code>Arm_Cosine</code>，kG 在任何角度都是定值，手臂抬高時反而會被推過頭。</div>
@@ -145,10 +168,10 @@ slot0.kD = 0.0; // TODO: 單位 V / (rot/s)</code></pre>
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.Feedback.SensorToMechanismRatio = 1.0; // TODO: 齒輪比
-        config.Slot0.kS = 0.0; // TODO: 低速時調
-        config.Slot0.kV = 0.0; // TODO: 高速時調，單位 V/(rot/s)
-        config.Slot0.kP = 0.0; // TODO: 最後才加
-        config.CurrentLimits.SupplyCurrentLimit = 0.0; // TODO
+        config.Slot0.kS = 0.0; // [MEASURED／SYSID] TODO: SysId，或照 CTRE 飛輪步驟在低速時手動調
+        config.Slot0.kV = 0.0; // [MODEL→SYSID] TODO: SysId，或在高速時手動調，單位 V/(rot/s)
+        config.Slot0.kP = 0.0; // [TUNED] TODO: 最後才加
+        config.CurrentLimits.SupplyCurrentLimit = 0.0; // [CONSTRAINT] TODO
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         motor.getConfigurator().apply(config);
     }

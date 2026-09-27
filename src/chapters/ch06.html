@@ -354,28 +354,28 @@ public class ArmIOHardware implements ArmIO {
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO; // 只放齒輪比
 
-        config.Slot0.kP = 0.0; // TODO
-        config.Slot0.kI = 0.0; // TODO
-        config.Slot0.kD = 0.0; // TODO
-        config.Slot0.kS = 0.0; // TODO
-        config.Slot0.kV = 0.0; // TODO
-        config.Slot0.kA = 0.0; // TODO
-        config.Slot0.kG = 0.0; // TODO
+        config.Slot0.kP = 0.0; // [TUNED] TODO
+        config.Slot0.kI = 0.0; // [TUNED] TODO
+        config.Slot0.kD = 0.0; // [TUNED] TODO
+        config.Slot0.kS = 0.0; // [MEASURED／SYSID] TODO
+        config.Slot0.kV = 0.0; // [MODEL→SYSID] TODO
+        config.Slot0.kA = 0.0; // [MODEL→SYSID] TODO
+        config.Slot0.kG = 0.0; // [MODEL→SYSID] TODO
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
         // 單位：手臂端 rot/s、rot/s²、rot/s³（因為設定了 SensorToMechanismRatio）
-        config.MotionMagic.MotionMagicCruiseVelocity = 0.0; // TODO
-        config.MotionMagic.MotionMagicAcceleration = 0.0;   // TODO
-        config.MotionMagic.MotionMagicJerk = 0.0;           // TODO: 非 0 才是 S-curve
+        config.MotionMagic.MotionMagicCruiseVelocity = 0.0; // [CONSTRAINT] TODO
+        config.MotionMagic.MotionMagicAcceleration = 0.0;   // [CONSTRAINT] TODO
+        config.MotionMagic.MotionMagicJerk = 0.0;           // [CONSTRAINT] TODO: 非 0 才是 S-curve
 
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.0; // TODO: 手臂端 rotations
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.0; // [MEASURED] TODO: 手臂端 rotations
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0; // TODO: 手臂端 rotations
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0; // [MEASURED] TODO: 手臂端 rotations
 
-        config.CurrentLimits.StatorCurrentLimit = 0.0; // TODO
+        config.CurrentLimits.StatorCurrentLimit = 0.0; // [CONSTRAINT] TODO
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 0.0; // TODO
+        config.CurrentLimits.SupplyCurrentLimit = 0.0; // [CONSTRAINT] TODO
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         retry(() -&gt; leader.getConfigurator().apply(config, 0.25));
@@ -546,9 +546,9 @@ public class ArmIOSim extends ArmIOHardware {
     <h2>D-3　做法 (a)：roboRIO 控制器</h2>
     <pre><code>// ArmIOSimRio implements ArmIO（重點片段）
 private final ProfiledPIDController pid = new ProfiledPIDController(
-    0.0, 0.0, 0.0,                                   // TODO
-    new TrapezoidProfile.Constraints(0.0, 0.0));     // TODO: rad/s、rad/s²
-private final ArmFeedforward ff = new ArmFeedforward(0.0, 0.0, 0.0); // TODO: kS、kG、kV（弧度單位）
+    0.0, 0.0, 0.0,                                   // [TUNED] TODO: kP、kI、kD
+    new TrapezoidProfile.Constraints(0.0, 0.0));     // [CONSTRAINT] TODO: rad/s、rad/s²
+private final ArmFeedforward ff = new ArmFeedforward(0.0, 0.0, 0.0); // [MODEL→SYSID] TODO: kS、kG、kV（弧度單位）
 private Double goalRad = null;
 
 @Override

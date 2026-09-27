@@ -44,6 +44,7 @@ function showChapter(id){
   mount("tpl-ch" + id);
   insertLearningCard(id);
   view.querySelectorAll("pre code").forEach(el => { el.innerHTML = highlight(el.textContent); });
+  applyProvenance(view);
   const q = view.querySelector(".quiz");
   if (q && QUIZZES[id]) initQuiz(q, QUIZZES[id], id);
   (LABS[id] || []).forEach(init => init());
