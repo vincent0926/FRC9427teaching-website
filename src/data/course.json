@@ -75,7 +75,13 @@
         "build.gradle 的細節"
       ],
       "tools": [],
-      "labs": []
+      "labs": [],
+      "stack": [
+        "wpilib",
+        "java"
+      ],
+      "verified": "2026-09",
+      "legacy": []
     },
     {
       "id": 1,
@@ -103,7 +109,12 @@
           "objective": "看出兩個物件的欄位各自獨立，以及沒有 new 的變數會發生什麼。",
           "kind": "logic"
         }
-      ]
+      ],
+      "stack": [
+        "java"
+      ],
+      "verified": "2026-09",
+      "legacy": []
     },
     {
       "id": 2,
@@ -123,7 +134,12 @@
         "protected 與套件存取的細節"
       ],
       "tools": [],
-      "labs": []
+      "labs": [],
+      "stack": [
+        "java"
+      ],
+      "verified": "2026-09",
+      "legacy": []
     },
     {
       "id": 3,
@@ -144,7 +160,13 @@
         "default 方法的進階用法"
       ],
       "tools": [],
-      "labs": []
+      "labs": [],
+      "stack": [
+        "java",
+        "wpilib"
+      ],
+      "verified": "2026-09",
+      "legacy": []
     },
     {
       "id": 4,
@@ -164,7 +186,13 @@
         "java.util.function 其他介面"
       ],
       "tools": [],
-      "labs": []
+      "labs": [],
+      "stack": [
+        "java",
+        "wpilib"
+      ],
+      "verified": "2026-09",
+      "legacy": []
     },
     {
       "id": 5,
@@ -185,7 +213,12 @@
         "enum 帶欄位與方法的進階寫法"
       ],
       "tools": [],
-      "labs": []
+      "labs": [],
+      "stack": [
+        "java"
+      ],
+      "verified": "2026-09",
+      "legacy": []
     },
     {
       "id": 6,
@@ -229,6 +262,15 @@
           "objective": "確認 Subsystem 不變、只換 IO 實作，就能在實機、模擬、重播之間切換。",
           "kind": "logic"
         }
+      ],
+      "stack": [
+        "wpilib-exact",
+        "phoenix6-exact",
+        "akit"
+      ],
+      "verified": "2026-09",
+      "legacy": [
+        "Phoenix 6 的 Follower 原本的 boolean 參數已改用 MotorAlignmentValue（Aligned／Opposed）。"
       ]
     },
     {
@@ -256,7 +298,13 @@
           "objective": "預測每一輪哪些方法依什麼順序被呼叫。",
           "kind": "logic"
         }
-      ]
+      ],
+      "stack": [
+        "wpilib",
+        "akit"
+      ],
+      "verified": "2026-09",
+      "legacy": []
     },
     {
       "id": 8,
@@ -285,7 +333,12 @@
           "objective": "預測兩個指令搶同一個 Subsystem 時誰會被取消。",
           "kind": "logic"
         }
-      ]
+      ],
+      "stack": [
+        "wpilib"
+      ],
+      "verified": "2026-09",
+      "legacy": []
     },
     {
       "id": 9,
@@ -313,7 +366,12 @@
           "objective": "分辨 onTrue、whileTrue、toggleOnTrue 在按下與放開時的差別。",
           "kind": "logic"
         }
-      ]
+      ],
+      "stack": [
+        "wpilib"
+      ],
+      "verified": "2026-09",
+      "legacy": []
     },
     {
       "id": 10,
@@ -333,7 +391,14 @@
         "各種修飾方法的完整清單"
       ],
       "tools": [],
-      "labs": []
+      "labs": [],
+      "stack": [
+        "wpilib"
+      ],
+      "verified": "2026-09",
+      "legacy": [
+        "deadlineWith 在 2025 年改名為 deadlineFor。"
+      ]
     },
     {
       "id": 11,
@@ -372,7 +437,15 @@
           "check": "Supply 限制太低時，高速段和起步段哪個先受影響？"
         }
       ],
-      "labs": []
+      "labs": [],
+      "stack": [
+        "phoenix6"
+      ],
+      "verified": "2026-09",
+      "legacy": [
+        "用字串指定 CAN bus 的建構子已標為 deprecated，預計 2027 年移除，改用 CANBus 物件。",
+        "CTRE 網站標示 latest 的文件已是 2027 版，查資料請看 stable。"
+      ]
     },
     {
       "id": 12,
@@ -422,6 +495,14 @@
             "接觸不良造成的間歇斷線"
           ]
         }
+      ],
+      "stack": [
+        "wpilib",
+        "phoenix6"
+      ],
+      "verified": "2026-09-27",
+      "legacy": [
+        "CANcoder 的 AbsoluteSensorRange 在 2025 年改成 AbsoluteSensorDiscontinuityPoint。"
       ]
     },
     {
@@ -501,7 +582,13 @@
             "TalonFX 韌體的實際演算法細節"
           ]
         }
-      ]
+      ],
+      "stack": [
+        "wpilib",
+        "phoenix6"
+      ],
+      "verified": "2026-09-27",
+      "legacy": []
     },
     {
       "id": 14,
@@ -555,7 +642,13 @@
             "馬達飽和時跟不上軌跡"
           ]
         }
-      ]
+      ],
+      "stack": [
+        "phoenix6",
+        "wpilib"
+      ],
+      "verified": "2026-09-27",
+      "legacy": []
     },
     {
       "id": 15,
@@ -615,7 +708,13 @@
             "手臂的 cos θ 項"
           ]
         }
-      ]
+      ],
+      "stack": [
+        "wpilib",
+        "phoenix6"
+      ],
+      "verified": "2026-09-27",
+      "legacy": []
     },
     {
       "id": 16,
@@ -637,7 +736,16 @@
         "PathPlanner 的即時路徑產生（pathfinding）"
       ],
       "tools": [],
-      "labs": []
+      "labs": [],
+      "stack": [
+        "wpilib",
+        "pathplanner",
+        "phoenix6"
+      ],
+      "verified": "2026-09-27",
+      "legacy": [
+        "2024 年以前的 HolonomicPathFollowerConfig 已不能用，改用 RobotConfig 與 PPHolonomicDriveController。"
+      ]
     },
     {
       "id": 17,
@@ -676,7 +784,14 @@
             "朝向與二維位置"
           ]
         }
-      ]
+      ],
+      "stack": [
+        "wpilib",
+        "limelight",
+        "phoenix6"
+      ],
+      "verified": "2026-09-27",
+      "legacy": []
     },
     {
       "id": 18,
@@ -714,7 +829,14 @@
           "check": "為什麼一次只改一個參數？"
         }
       ],
-      "labs": []
+      "labs": [],
+      "stack": [
+        "akit"
+      ],
+      "verified": "2026-09-27",
+      "legacy": [
+        "AdvantageKit 網站與 main 分支已出現 2027 版內容（例如 LoggedDashboardChooser 改名），查資料請看 v26。"
+      ]
     },
     {
       "id": 19,
@@ -751,6 +873,13 @@
           "objective": "遇到症狀時，照從簡單到困難的順序列出檢查項目。",
           "kind": "logic"
         }
+      ],
+      "stack": [
+        "wpilib"
+      ],
+      "verified": "2026-09-27",
+      "legacy": [
+        "2027 年起控制系統換成 SystemCore，Driver Station 與部分檢查項目會不同。"
       ]
     }
   ],
@@ -855,5 +984,15 @@
       "calc",
       "sim"
     ]
+  },
+  "stack": {
+    "java": "Java 17",
+    "wpilib": "WPILib 2026",
+    "wpilib-exact": "WPILib 2026.2.2",
+    "phoenix6": "Phoenix 6 26.x（2026）",
+    "phoenix6-exact": "Phoenix 6 26.3.0",
+    "akit": "AdvantageKit 2026（v26）",
+    "pathplanner": "PathPlannerLib 2026",
+    "limelight": "LimelightHelpers v1.10（CTRE 範例附帶）"
   }
 }

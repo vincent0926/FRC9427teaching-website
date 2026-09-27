@@ -39,6 +39,8 @@ function learningCardHTML(id){
       <span class="order">路徑第 ${p.chapters.indexOf(id) + 1} / ${p.chapters.length} 章</span>
     </div>
     ${miss.length ? `<p class="lwarn">建議先完成：${miss.map(chLink).join("、")}。這一章會用到那裡的觀念。</p>` : ""}
+    <p class="lver">依據版本：${(c.stack || []).map(k => esc(COURSE_DATA.stack[k])).join("、")}｜最後查證：${esc(c.verified)}</p>
+    ${(c.legacy || []).length ? `<details class="llegacy"><summary>舊版與即將改變的 API（${c.legacy.length}）</summary><ul>${c.legacy.map(x => `<li>${esc(x)}</li>`).join("")}</ul></details>` : ""}
     <div class="lcard-grid">
       <div><h4>先備章節</h4><ul>${pre}</ul></div>
       <div><h4>學完要能做到</h4><ul>${c.objectives.map(o => `<li>${esc(o)}</li>`).join("")}</ul></div>

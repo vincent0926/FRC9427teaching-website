@@ -151,3 +151,8 @@ pre .prov[data-prov="TUNED"]{color:#F0C36A}
 pre .prov[data-prov="CONSTRAINT"]{color:#F08A8A}
 pre .prov[data-prov="MEASURED"]{color:#6FD39C}
 pre .prov[data-prov="SIM"]{color:#C4A8F5}
+.lver{margin:6px 0 0;font-size:13.5px;color:var(--ink-2)}
+.llegacy{font-size:13.5px;color:var(--ink-2);margin-top:2px}
+.llegacy summary{cursor:pointer}
+.llegacy ul{margin:4px 0 0;padding-left:18px}
+.brand-ver{font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-top:22px}

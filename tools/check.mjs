@@ -25,6 +25,15 @@ for (const c of chapters) {
   if (!existsSync(src(`chapters/ch${pad(c.id)}.html`))) err("course.json", `第 ${c.id} 章沒有 chapters/ch${pad(c.id)}.html`);
 }
 
+// ---- 版本：只以 package.json 為準，README 要寫同一個版本；每章要有版本與查證日期
+const version = JSON.parse(read(join(root, "package.json"))).version;
+const readme = read(join(root, "README.md"));
+if (!readme.includes(`v${version}`)) err("README.md", `沒有寫目前版本 v${version}（package.json）`);
+for (const c of chapters) {
+  if (!c.stack?.length || !c.verified) err("course.json", `第 ${c.id} 章缺少依據版本或查證日期`);
+  for (const k of c.stack || []) if (!course.stack?.[k]) err("course.json", `第 ${c.id} 章的版本代號 ${k} 沒有定義`);
+}
+
 // ---- 學習路徑：每章剛好屬於一條路徑，先備章節要排在前面（核心 → 進階控制 → 競賽實務）
 const order = (course.paths || []).flatMap(p => p.chapters);
 for (const c of chapters) {

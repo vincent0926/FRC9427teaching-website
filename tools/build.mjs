@@ -40,6 +40,7 @@ export function build() {
   ].join("\n");
 
   return read(src("shell.html"))
+    .replaceAll("{{version}}", course.version)
     .replace("<!--@styles-->\n", () => styles)
     .replace("<!--@templates-->", () => templates)
     .replace("<!--@scripts-->\n", () => scripts);
