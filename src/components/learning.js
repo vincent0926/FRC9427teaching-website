@@ -55,7 +55,7 @@ function insertLearningCard(id){
 function pathsHTML(){
   const done = loadDone(), next = recommendNext(done);
   const nextBox = next === null
-    ? `<div class="nextbox"><strong>三條路徑都完成了</strong>接著到最終評量檢查自己能不能獨立除錯。</div>`
+    ? `<div class="nextbox"><strong>三條路徑都完成了</strong><a href="#final">到最終評量</a>，檢查自己能不能獨立除錯。</div>`
     : `<div class="nextbox"><strong>下一步</strong>${chLink(next)}<span>（${esc(pathOf(next).name)}，先備章節都已完成）</span></div>`;
   return nextBox + PATHS.map(p => {
     const n = p.chapters.filter(x => done.includes(x)).length;
@@ -67,5 +67,7 @@ function pathsHTML(){
           <span class="ttl"><a href="#ch${id}">${esc(c.title)}</a>${done.includes(id) ? "（已完成）" : id === next ? "（下一步）" : ""}<span class="diff">${stars(c.difficulty)}</span></span>
           <span class="desc">${esc(c.desc)}</span></li>`; }).join("")}</ol>
     </section>`;
-  }).join("") + `<p class="mastery">${esc(COURSE_DATA.mastery)}</p>`;
+  }).join("") + `<section class="pathsec"><h3><span class="ptag">檢核</span>完成核心路徑後</h3>
+      <p class="pgoal"><a href="#final">最終程式能力評量</a>：一題沒看過的除錯題，看你能不能用證據找出問題、決定先查什麼，並在上機前做好檢查。</p></section>
+    <p class="mastery">${esc(COURSE_DATA.mastery)}</p>`;
 }

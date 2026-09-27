@@ -7,6 +7,7 @@ function route(){
   const m = h.match(/^ch(\d+)(?:\/([A-Za-z0-9_-]+))?$/);
   setLanding(h === "");
   if (h === "") renderMap(null);
+  else if (h === "final") showFinal();
   else if (m){ const id = +m[1]; READY.includes(id) ? showChapter(id) : ALL.some(x => x[0] === id) ? showSoon(id) : showHome(); }
   else showHome();
   const anchor = m && m[2] && (document.getElementById("lab-" + m[2]) || document.getElementById(m[2]));
@@ -16,7 +17,7 @@ function route(){
 document.addEventListener("click", e => {
   const t = e.target.closest("[data-go]");
   if (!t) return;
-  location.hash = t.dataset.go === "home" ? "home" : "ch" + t.dataset.go;
+  location.hash = ["home", "final", "coach"].includes(t.dataset.go) ? t.dataset.go : "ch" + t.dataset.go;
 });
 document.getElementById("startBtn").onclick = () => { location.hash = "home"; };
 window.addEventListener("hashchange", route);

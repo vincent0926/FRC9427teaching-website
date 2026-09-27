@@ -17,6 +17,7 @@ const SCRIPTS_LAST = ["scripts/views.js", "scripts/router.js"];
 
 export function build() {
   const course = JSON.parse(read(src("data/course.json")));
+  course.version = JSON.parse(read(join(root, "package.json"))).version;   // 版本只以 package.json 為準
   const quizzes = {};
   for (const f of list("quiz", ".json")) quizzes[Number(f.match(/\d+/)[0])] = JSON.parse(read(src("quiz/" + f)));
 

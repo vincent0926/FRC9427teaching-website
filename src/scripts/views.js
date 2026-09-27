@@ -7,7 +7,10 @@ function renderMap(current){
       const cls = ["node", ready ? "ready" : "", done.includes(id) ? "done" : "", current === id ? "active" : ""].join(" ");
       return `<li><button class="${cls}" data-go="${id}" ${current===id?'aria-current="page"':''}>
         <span class="id">${pad(id)}</span><span>${title}</span>${ready ? "" : '<span class="soon">撰寫中</span>'}</button></li>`;
-    }).join("")}</ul>`).join("");
+    }).join("")}</ul>`).join("") + `
+    <div class="part">檢核</div>
+    <ul class="nodes"><li><button class="node ready ${current === "final" ? "active" : ""}" data-go="final" ${current === "final" ? 'aria-current="page"' : ""}>
+      <span class="id">FN</span><span>最終程式能力評量</span></button></li></ul>`;
 }
 
 /* ---------- views ---------- */
@@ -19,6 +22,13 @@ function showHome(){
   const done = loadDone();
   document.getElementById("outline").innerHTML = pathsHTML();
   renderMap(null);
+}
+
+function showFinal(){
+  mount("tpl-final");
+  view.querySelectorAll("pre code").forEach(el => { el.innerHTML = highlight(el.textContent); });
+  initFinal();
+  renderMap("final");
 }
 
 function showSoon(id){

@@ -124,3 +124,19 @@ p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);
 .hint-label{font-weight:700;margin:0 0 2px;font-size:14px;color:var(--ink-2)}
 .hint.solution .hint-label{color:var(--ink)}
 .hint-btn{margin-top:10px;font-size:15px;padding:8px 16px}
+/* final assessment */
+.fq{margin:18px 0}
+.fq label{display:block;margin-bottom:6px}
+.fq .must{margin-left:10px;font-size:12.5px;font-weight:700;color:var(--red)}
+.fhint{display:block;color:var(--ink-2);font-size:14.5px}
+.fq textarea{width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);resize:vertical}
+.frev{border-top:1px solid var(--line);padding:12px 0}
+.frev p{margin:4px 0}
+.fmine{color:var(--ink-2);white-space:pre-wrap}
+.fref{background:var(--surface);border-left:4px solid var(--can-l);padding:6px 12px;border-radius:0 6px 6px 0}
+.rubric{list-style:none;padding-left:0;margin:6px 0 0}
+.rubric li{margin:4px 0}
+.fscore{font-weight:700;font-size:18px;margin-top:18px}
+.lg{font-weight:700}
+.lg.goal{color:var(--can-h)}
+.lg.act{color:var(--blue)}

@@ -1,0 +1,60 @@
+  <p class="headline-code">FINAL｜最終程式能力評量</p>
+  <h1>最終評量：資格賽第 23 場，手臂掉下來了</h1>
+  <p class="lede">這是一題沒看過的除錯題。你會拿到症狀、日誌、程式和 Pit 裡的檢查結果，要用文字回答七個問題。評分看的是推理、證據和除錯流程，不只是最後答案對不對。</p>
+  <div class="note"><strong>作答規則</strong>先把七題都寫完再送出。送出後會出現參考解答與評分表，你（或教練）逐項勾選答案有沒有涵蓋。可以翻課程，但不要先看參考解答。答案存在這台瀏覽器，可以匯出給教練。</div>
+  <div class="note limit"><strong>關於題目資料</strong>下面的日誌是為了這題編的教學資料，不是真實比賽的紀錄；數值只用來呈現現象，不代表任何機構的實際參數。</div>
+
+  <h2>狀況</h2>
+  <div class="story">
+    <p><strong>資格賽第 23 場。</strong>自動階段第 6 秒，手臂剛舉到得分位置，機器人被對手撞了一下。手臂接著往下掉，停在接近收起的位置。之後整場 Teleop，操作手怎麼按手臂都不動；底盤、Intake、射球都正常。</p>
+    <p><strong>上一場還好好的。</strong>第 22 場打完之後，程式沒有改過，也沒有重新部署。機構組在兩場之間換了手臂的一根軸，有拆裝過手臂附近的線。</p>
+  </div>
+
+  <h2>證據一：AdvantageKit 日誌</h2>
+  <p>上圖：手臂目標角度（<span class="lg goal">虛線</span>）與實際角度（<span class="lg act">實線</span>）。下圖：leader 記錄到的輸出電壓（<span class="lg act">實線</span>）與 follower 的輸出電壓（<span class="lg goal">虛線</span>）。橫軸是比賽時間（秒）。</p>
+  <canvas id="finalPlotPos" class="pidplot" width="640" height="240" role="img" aria-label="手臂目標與實際角度"></canvas>
+  <canvas id="finalPlotDev" class="pidplot" width="640" height="240" role="img" aria-label="兩顆馬達的輸出電壓與連線狀態"></canvas>
+  <table class="map">
+    <thead><tr><th>欄位（t = 6.1 秒以後）</th><th>值</th></tr></thead>
+    <tbody>
+      <tr><td><code>Arm/LeaderConnected</code></td><td>false（6.1 秒起一直是 false）</td></tr>
+      <tr><td><code>Arm/FollowerConnected</code></td><td>true</td></tr>
+      <tr><td><code>Arm/AppliedVolts</code>（leader）</td><td>停在 6.1 秒前的最後一個值，之後不再更新</td></tr>
+      <tr><td>Follower 的 MotorVoltage（hoot 日誌）</td><td>0 V</td></tr>
+      <tr><td><code>Arm/Goal</code></td><td>Teleop 中隨操作手按鍵在 STOW、INTAKE、SCORE 之間改變</td></tr>
+      <tr><td>其他 CAN 裝置（Intake、射球、CANcoder、Pigeon 2）</td><td>整場都有連線</td></tr>
+      <tr><td>儀表板 Alert</td><td>「手臂主馬達（ID 21）斷線」從 6.6 秒起一直亮著</td></tr>
+    </tbody>
+  </table>
+
+  <h2>證據二：Driver Station</h2>
+  <ul>
+    <li>整場電池電壓最低 10.9 V，CAN/Power 分頁的 12V fault 計數是 0。</li>
+    <li>沒有「No robot code」訊息，通訊沒有中斷。</li>
+    <li>PDH 的電流紀錄：手臂 leader 那一路在 6.1 秒後一直是 0 A；follower 那一路也接近 0 A。</li>
+  </ul>
+
+  <h2>證據三：程式</h2>
+  <pre><code>// ArmIOHardware.updateInputs（和第 6 章相同）
+inputs.leaderConnected = BaseStatusSignal.refreshAll(leaderPos, leaderVel, leaderVolts).isOK();
+inputs.followerConnected = BaseStatusSignal.refreshAll(followerVolts, followerCurrent).isOK();
+inputs.appliedVolts = leaderVolts.getValueAsDouble();
+
+// 建構子
+follower.setControl(new Follower(leader.getDeviceID(), MotorAlignmentValue.Opposed));</code></pre>
+  <p>日誌的 metadata 顯示第 22 場與第 23 場的 <code>GitSHA</code> 相同，<code>dirty</code> 都是 false。</p>
+
+  <h2>證據四：賽後 Pit 檢查</h2>
+  <ul>
+    <li>機器人通電後，手臂 leader（ID 21）的 LED 完全不亮；follower 的 LED 正常閃爍。</li>
+    <li>Tuner X 看不到 ID 21，其他裝置都在。</li>
+    <li>還沒有做其他檢查。</li>
+  </ul>
+
+  <h2>作答</h2>
+  <div id="finalForm"></div>
+  <div class="finish"><button class="btn" id="finalSubmit">送出，顯示參考解答與評分表</button><span id="finalMsg" style="color:var(--ink-2)"></span></div>
+  <div id="finalReview"></div>
+
+  <h2>之後</h2>
+  <p>負責機構控制的人，建議再做工具站 4F 的「單元四：期末檢核」，它考的是調參與日誌診斷，和這一題互補：<a id="finalToolLink" target="_blank" rel="noopener">打開工具站單元四</a>。</p>
