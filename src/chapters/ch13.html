@@ -126,8 +126,17 @@ slot0.kD = 0.0; // TODO: 單位 V / (rot/s)</code></pre>
 
   <h2>練習：飛輪的速度控制</h2>
   <p>替射球飛輪寫 TalonFX 設定：用 <code>VelocityVoltage</code> 控制，Slot0 放 kS、kV、kP（數值待定），並在 Subsystem 寫 <code>setVelocityGoal(double rps)</code> 和 <code>atSpeed()</code> 兩個方法（誤差小於 2 rps 就算到速）。想一想：飛輪需要 kG 嗎？需要 kA 嗎？</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>先決定這個機構需要哪些前饋：飛輪水平轉動，重力會不會讓它加速或減速？</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用 VelocityVoltage(0.0).withSlot(0)；Slot0 放 kS、kV、kP，飛輪用 Coast。Subsystem 記住目標轉速，在 periodic 送出。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>atSpeed() 回傳 Math.abs(inputs.velocityRps - goalRps) &lt; TOLERANCE_RPS；kG 不需要，kA 只在目標速度一直變化時才有幫助。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>public class FlywheelIOHardware implements FlywheelIO {
     private final TalonFX motor = new TalonFX(0, CANBuses.CANIVORE); // TODO: CAN ID
     private final VelocityVoltage request = new VelocityVoltage(0.0).withSlot(0);
@@ -170,7 +179,8 @@ public boolean atSpeed() {
     return Math.abs(inputs.velocityRps - goalRps) &lt; TOLERANCE_RPS;
 }</code></pre>
     <p>飛輪水平轉動，重力不會讓它加速或減速，所以不需要 kG。kA 只有在「目標速度一直在變」時才有用；飛輪通常是一個固定目標，CTRE 的速度閉迴路範例也只用 kS、kV、kP<a class="ref" href="#src13-7">[7]</a>。滾輪和飛輪用 Coast：停止時讓它自然減速，不要急煞。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

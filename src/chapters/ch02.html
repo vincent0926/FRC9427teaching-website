@@ -89,8 +89,17 @@ public class IntakeSubsystem extends SubsystemBase {
 
   <h2>練習：封裝一支手臂</h2>
   <p>寫一個純 Java 的 <code>Arm</code> 類別：private 欄位 <code>goalDegrees</code>；方法 <code>setGoal(double degrees)</code> 把目標限制在 0 到 110 度；方法 <code>getGoal()</code> 回傳目前目標。上下限寫成 private static final 常數，並加上 TODO 註解提醒要實測。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>「外面不能直接改」的欄位要 private，外面要用的功能才開 public 方法。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>上下限是這個類別自己用的常數：private static final。限制範圍用 Math.max 與 Math.min。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>setGoal 裡寫 goalDegrees = Math.max(MIN_DEGREES, Math.min(MAX_DEGREES, degrees));，初始值可以用 MIN_DEGREES。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>public class Arm {
     private static final double MIN_DEGREES = 0.0;   // TODO: 依機構實測
     private static final double MAX_DEGREES = 110.0; // TODO: 依機構實測
@@ -105,7 +114,8 @@ public class IntakeSubsystem extends SubsystemBase {
         return goalDegrees;
     }
 }</code></pre>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

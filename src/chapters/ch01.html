@@ -129,8 +129,17 @@ public class RollerIOHardware {
 
   <h2>練習：寫一個 Flywheel 類別</h2>
   <p>照著 <code>Roller</code> 的結構，寫一個模擬砲台飛輪的類別：建構子接收名稱；欄位 <code>targetRpm</code> 預設 0；方法 <code>setTargetRpm(double rpm)</code> 把目標限制在 0 到 6000；方法 <code>isAtSpeed(double currentRpm)</code> 在實際轉速與目標相差小於 50 RPM 時回傳 <code>true</code>。上限與容許誤差寫成 static 常數。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>先照 Roller 的樣子寫出類別骨架：欄位、建構子、方法。上限與容許誤差是「所有飛輪共用、不會變」的值。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>共用又不變的值用 public static final；限制範圍可以用 Math.max 與 Math.min；差距用 Math.abs。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>setTargetRpm 的核心是 targetRpm = Math.max(0.0, Math.min(MAX_RPM, rpm));，isAtSpeed 回傳 Math.abs(currentRpm - targetRpm) &lt; TOLERANCE_RPM。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>public class Flywheel {
     public static final double MAX_RPM = 6000.0;
     public static final double TOLERANCE_RPM = 50.0;
@@ -154,7 +163,8 @@ public class RollerIOHardware {
         return targetRpm;
     }
 }</code></pre>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

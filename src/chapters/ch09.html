@@ -102,8 +102,17 @@ new Trigger(limitSwitch::get).debounce(0.1).onTrue(arm.goTo(ArmState.STOW));</co
 
   <h2>練習：設計一組配置</h2>
   <p>操作手（1 號控制器）的需求：按住右扳機吸入、放開停止；按一下 Y 手臂到 SCORE；按一下 A 手臂到 INTAKE；按住左肩鍵吐出，放開後手臂自動回 STOW。寫出 <code>configureBindings()</code>。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>先把每個需求分類：「按住才做」「按一下就做」「放開時做」各對應哪一種綁定。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>按住：whileTrue；按一下：onTrue；放開時：onFalse。扳機用 rightTrigger(0.5) 取得 Trigger。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>左肩鍵要同時做兩件事：operator.leftBumper().whileTrue(吐出指令).onFalse(arm.goTo(ArmState.STOW))。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>private void configureBindings() {
     operator.rightTrigger(0.5).whileTrue(intake.runState(IntakeState.INTAKING));
     operator.y().onTrue(arm.goTo(ArmState.SCORE));
@@ -113,7 +122,8 @@ new Trigger(limitSwitch::get).debounce(0.1).onTrue(arm.goTo(ArmState.STOW));</co
         .onFalse(arm.goTo(ArmState.STOW));
 }</code></pre>
     <p>注意每個 <code>arm.goTo(...)</code>、<code>intake.runState(...)</code> 都是呼叫一次 factory、得到一個新的指令物件。第 10 章會說明為什麼這很重要。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

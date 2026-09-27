@@ -75,6 +75,12 @@ for (const f of readdirSync(src("chapters")).filter(f => f.endsWith(".html"))) {
   }
   const cited = new Set(cites.map(x => x[1]));
   for (const d of defs) if (!cited.has(d)) warn(f, `來源 [${d}] 沒有在內文被引用`);
+  if (/<h2>練習/.test(html)) {
+    const hints = (html.match(/<div class="hint" data-label="提示 \d">/g) || []).length;
+    const sol = (html.match(/<div class="hint solution"/g) || []).length;
+    if (hints !== 3 || sol !== 1) err(f, `練習要有 3 層提示加完整解答（目前提示 ${hints}、解答 ${sol}）`);
+    if (/<summary>看參考答案<\/summary>/.test(html)) err(f, "練習還在用一次看完的參考答案");
+  }
   const labCount = (html.match(/<div class="lab"/g) || []).length;
   const labMeta = (chapters.find(c => c.id === n)?.labs || []).length;
   if (labCount !== labMeta) err(f, `有 ${labCount} 個實驗，但 course.json 描述了 ${labMeta} 個`);

@@ -177,6 +177,13 @@ p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);
 .q-case ul{margin:0 0 2px;padding-left:20px}
 .q-ask{font-weight:700;margin:0 0 10px}
 .qlab{white-space:nowrap}
+/* progressive hints */
+.hints{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 18px 14px;margin:16px 0}
+.hints-intro{color:var(--ink-2);font-size:15px;margin:4px 0 8px}
+.hint{border-top:1px dashed var(--line);padding-top:6px;margin-top:6px}
+.hint-label{font-weight:700;margin:0 0 2px;font-size:14px;color:var(--ink-2)}
+.hint.solution .hint-label{color:var(--ink)}
+.hint-btn{margin-top:10px;font-size:15px;padding:8px 16px}
 /* ch6 parts */
 .partmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:22px 0}
 .pcard{text-align:left;font:inherit;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
@@ -538,10 +545,20 @@ body.on-landing .layout, body.on-landing .menu-btn{display:none}
   <h2>練習：建立第一個專案</h2>
   <p>照著本章完成以下步驟，並回答最後的問題：</p>
   <p>在 <code>C:\frc\</code>（或其他不在 OneDrive 上的資料夾）建立一個 Java 的 Command Robot 專案，隊號填 9427。用 Dependency Manager 加入 CTRE-Phoenix (v6)，然後執行一次 Build Robot Code。完成後，打開 <code>vendordeps</code> 資料夾，數數看裡面有幾個 JSON 檔，分別是什麼？</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>建立專案用 WPILib 指令面板（Ctrl+Shift+P → WPILib: Create a new project），加函式庫用 Dependency Manager。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>Phoenix 6 在 Dependency Manager 裡叫 CTRE-Phoenix (v6)；函式庫的描述檔會放在專案的 vendordeps 資料夾。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>Command-based 範本本來就附一個 JSON，加完 Phoenix 6 後應該多一個。只有一個，就代表沒加成功。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <p>應該會有兩個：一個是 Command-based 範本本來就有的 <code>WPILibNewCommands.json</code>，另一個是剛剛加入的 Phoenix 6 JSON（檔名依版本而定）。如果只有一個，代表 Phoenix 6 沒有加成功；如果 Build 失敗並提到下載錯誤，確認電腦有連上網路再試一次。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -691,8 +708,17 @@ public class RollerIOHardware {
 
   <h2>練習：寫一個 Flywheel 類別</h2>
   <p>照著 <code>Roller</code> 的結構，寫一個模擬砲台飛輪的類別：建構子接收名稱；欄位 <code>targetRpm</code> 預設 0；方法 <code>setTargetRpm(double rpm)</code> 把目標限制在 0 到 6000；方法 <code>isAtSpeed(double currentRpm)</code> 在實際轉速與目標相差小於 50 RPM 時回傳 <code>true</code>。上限與容許誤差寫成 static 常數。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>先照 Roller 的樣子寫出類別骨架：欄位、建構子、方法。上限與容許誤差是「所有飛輪共用、不會變」的值。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>共用又不變的值用 public static final；限制範圍可以用 Math.max 與 Math.min；差距用 Math.abs。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>setTargetRpm 的核心是 targetRpm = Math.max(0.0, Math.min(MAX_RPM, rpm));，isAtSpeed 回傳 Math.abs(currentRpm - targetRpm) &lt; TOLERANCE_RPM。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>public class Flywheel {
     public static final double MAX_RPM = 6000.0;
     public static final double TOLERANCE_RPM = 50.0;
@@ -716,7 +742,8 @@ public class RollerIOHardware {
         return targetRpm;
     }
 }</code></pre>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -821,8 +848,17 @@ public class IntakeSubsystem extends SubsystemBase {
 
   <h2>練習：封裝一支手臂</h2>
   <p>寫一個純 Java 的 <code>Arm</code> 類別：private 欄位 <code>goalDegrees</code>；方法 <code>setGoal(double degrees)</code> 把目標限制在 0 到 110 度；方法 <code>getGoal()</code> 回傳目前目標。上下限寫成 private static final 常數，並加上 TODO 註解提醒要實測。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>「外面不能直接改」的欄位要 private，外面要用的功能才開 public 方法。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>上下限是這個類別自己用的常數：private static final。限制範圍用 Math.max 與 Math.min。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>setGoal 裡寫 goalDegrees = Math.max(MIN_DEGREES, Math.min(MAX_DEGREES, degrees));，初始值可以用 MIN_DEGREES。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>public class Arm {
     private static final double MIN_DEGREES = 0.0;   // TODO: 依機構實測
     private static final double MAX_DEGREES = 110.0; // TODO: 依機構實測
@@ -837,7 +873,8 @@ public class IntakeSubsystem extends SubsystemBase {
         return goalDegrees;
     }
 }</code></pre>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -978,8 +1015,17 @@ io.stop();          // 兩個實作都沒寫 stop()，用的是介面的預設�
 
   <h2>練習：定義一份機構的契約</h2>
   <p>寫一個介面 <code>Mechanism</code>，規定兩件事：<code>void stop()</code> 和 <code>boolean isAtGoal()</code>。再讓第 1 章練習的 <code>Flywheel</code> 實作它：<code>stop()</code> 把目標轉速設為 0；<code>isAtGoal()</code> 需要知道目前轉速，所以先加一個欄位 <code>currentRpm</code> 和方法 <code>updateCurrentRpm(double rpm)</code>。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>介面只寫「要做什麼」，不寫怎麼做；類別用 implements 承諾做到。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>介面裡的方法宣告成 void stop(); 與 boolean isAtGoal();，實作時加 @Override。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>isAtGoal 需要目前轉速：加一個 private double currentRpm 與 updateCurrentRpm(double rpm)，判斷方式和第 1 章的 isAtSpeed 一樣。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>// Mechanism.java
 public interface Mechanism {
     void stop();
@@ -1012,7 +1058,8 @@ public class Flywheel implements Mechanism {
         return Math.abs(currentRpm - targetRpm) &lt; TOLERANCE_RPM;
     }
 }</code></pre>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -1115,14 +1162,24 @@ new Trigger(() -&gt; controller.getRightTriggerAxis() &gt; 0.5)
   <pre><code>double turn = -controller.getRightX();
 controller.b().whileTrue(drive.run(() -&gt; drive.arcadeDrive(0.0, turn)));</code></pre>
   <p>第二題：寫一個 <code>BooleanSupplier</code>，在左、右扳機都按超過一半時回傳 <code>true</code>。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>第一題：想想 turn 這個變數是什麼時候算出來的，之後還會不會變。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>把讀取搖桿的呼叫移進 lambda 裡，每次執行才會重讀。BooleanSupplier 就是「回傳 boolean、沒有參數」的 lambda。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>第一題改成 drive.arcadeDrive(0.0, -controller.getRightX())；第二題是 () -&gt; controller.getLeftTriggerAxis() &gt; 0.5 &amp;&amp; controller.getRightTriggerAxis() &gt; 0.5。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <p>第一題：<code>getRightX()</code> 在綁定按鍵時就被呼叫了，<code>turn</code> 是固定值。要把讀取搬進 lambda：</p>
     <pre><code>controller.b().whileTrue(drive.run(() -&gt; drive.arcadeDrive(0.0, -controller.getRightX())));</code></pre>
     <p>第二題：</p>
     <pre><code>BooleanSupplier bothTriggers = () -&gt;
     controller.getLeftTriggerAxis() &gt; 0.5 &amp;&amp; controller.getRightTriggerAxis() &gt; 0.5;</code></pre>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -1248,8 +1305,17 @@ public class IntakeSubsystem extends SubsystemBase {
 
   <h2>練習：幫手臂整理位置</h2>
   <p>寫一個 enum <code>ArmPosition</code>，有 <code>STOW</code>（0 度）、<code>INTAKE</code>（15 度）、<code>SCORE</code>（95 度）三個值，每個值帶一個 <code>degrees</code> 欄位。再寫一個方法 <code>describe(ArmPosition p)</code>，用 switch 回傳中文說明。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>enum 的每個值可以帶資料：在值後面加括號，並寫一個建構子接收它。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>欄位宣告成 public final double degrees;，建構子 ArmPosition(double degrees) { this.degrees = degrees; }。describe 可以用 switch 運算式。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>STOW(0.0), INTAKE(15.0), SCORE(95.0); 之後接欄位與建構子；describe 寫成 return switch (p) { case STOW -&gt; "收起"; ... };，漏掉任何一個值會編譯失敗。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>public enum ArmPosition {
     STOW(0.0),     // TODO: 實測
     INTAKE(15.0),  // TODO: 實測
@@ -1270,7 +1336,8 @@ public static String describe(ArmPosition p) {
     };
 }</code></pre>
     <p>switch 當成運算式使用時，每個 enum 值都必須處理到，漏了一個就編譯失敗。這正是 enum 比數字安全的地方<a class="ref" href="#src5-2">[2]</a>。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -2056,8 +2123,17 @@ class ArmSubsystemTest {
 
   <h2>練習：為 Intake 滾輪寫 IO</h2>
   <p>照著本章的結構，為 Intake 滾輪寫出 <code>IntakeState</code>（<code>NONE</code>、<code>INTAKING</code>、<code>SCORING</code>，每個帶一個電壓）、<code>RollerIO</code>（輸入物件至少包含 <code>velocityRps</code>、<code>appliedVolts</code>、<code>supplyCurrentAmps</code>，輸出方法 <code>setVoltage</code>），以及 <code>IntakeSubsystem</code> 的 <code>periodic()</code>。滾輪是開迴路電壓控制。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>分三塊寫：狀態（enum）、IO 介面（輸入物件＋輸出方法）、Subsystem 的 periodic。滾輪是開迴路，輸出就是電壓。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>IntakeState 的每個值帶一個 volts；RollerIO 裡放一個 RollerIOInputs 類別，方法都寫成 default 空實作。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>periodic 的順序：io.updateInputs(inputs)；Disabled 時 io.setVoltage(0.0) 並 return；否則 io.setVoltage(state.volts)。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>// IntakeState.java
 public enum IntakeState {
     NONE(0.0),
@@ -2096,7 +2172,8 @@ public void periodic() {
     io.setVoltage(state.volts);
 }</code></pre>
     <p>滾輪不需要閉迴路，所以 IO 的輸出就是 <code>setVoltage</code>。和手臂比較：手臂的閉迴路在 TalonFX 內部，所以輸出是 <code>setPositionGoal</code>；滾輪是開迴路，輸出就直接是電壓。IO 介面長什麼樣子，取決於控制在哪裡執行。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -2305,8 +2382,17 @@ public void periodic() {
 
   <h2>練習：預測呼叫順序</h2>
   <p>機器人剛開機（處於 Disabled），接著依序發生：切到 Autonomous 並跑了兩輪，再切到 Teleop 並跑了一輪。請寫出從開機後第一輪開始，每一輪會被呼叫的方法（不含 Dashboard 更新）。寫完後用上面的模擬器對答案。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>先分清三種方法：init 只在「進入模式的那一輪」，exit 在「離開模式的那一輪」，periodic 每一輪都有。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>每一輪的順序是：（切換時）舊模式的 exit → 新模式的 init → 該模式的 periodic → robotPeriodic。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>第 2 輪（切到 Autonomous）是 disabledExit → autonomousInit → autonomousPeriodic → robotPeriodic；建構子 Robot() 只在程式啟動時一次。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>// 程式啟動
 Robot()                  // 建構子，只有一次
 
@@ -2331,7 +2417,8 @@ teleopInit()
 teleopPeriodic()
 robotPeriodic()</code></pre>
     <p>注意三件事：<code>init</code> 只在切換的那一輪出現；<code>exit</code> 一定在新模式的 <code>init</code> 之前；<code>robotPeriodic()</code> 每一輪都有，而且總是排在模式的 periodic 之後。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -2474,8 +2561,17 @@ drive.setDefaultCommand(
 
   <h2>練習：Intake 的指令</h2>
   <p>替 <code>IntakeSubsystem</code> 寫一個 factory <code>runState(IntakeState state)</code>：執行時把狀態設為 <code>state</code>，結束（包括被打斷）時設回 <code>NONE</code>。再寫出它的預設指令。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>要「開始時做一件事、結束時做另一件事」，Subsystem 有現成的 factory。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用 startEnd(開始動作, 結束動作)，被打斷時也會執行結束動作；預設指令要持續執行，用 run。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>runState 回傳 startEnd(() -&gt; setState(state), () -&gt; setState(IntakeState.NONE))；預設指令是 intake.run(() -&gt; intake.setState(IntakeState.NONE))。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>// IntakeSubsystem 裡
 public Command runState(IntakeState state) {
     return startEnd(() -&gt; setState(state), () -&gt; setState(IntakeState.NONE));
@@ -2484,7 +2580,8 @@ public Command runState(IntakeState state) {
 // RobotContainer 建構子裡
 intake.setDefaultCommand(intake.run(() -&gt; intake.setState(IntakeState.NONE)));</code></pre>
     <p><code>startEnd</code> 在開始時執行第一個動作，結束時執行第二個，不管是正常結束還是被打斷。它本身不會自己結束，要靠按鍵放開或其他指令打斷，這點在第 9、10 章會用到。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -2600,8 +2697,17 @@ new Trigger(limitSwitch::get).debounce(0.1).onTrue(arm.goTo(ArmState.STOW));</co
 
   <h2>練習：設計一組配置</h2>
   <p>操作手（1 號控制器）的需求：按住右扳機吸入、放開停止；按一下 Y 手臂到 SCORE；按一下 A 手臂到 INTAKE；按住左肩鍵吐出，放開後手臂自動回 STOW。寫出 <code>configureBindings()</code>。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>先把每個需求分類：「按住才做」「按一下就做」「放開時做」各對應哪一種綁定。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>按住：whileTrue；按一下：onTrue；放開時：onFalse。扳機用 rightTrigger(0.5) 取得 Trigger。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>左肩鍵要同時做兩件事：operator.leftBumper().whileTrue(吐出指令).onFalse(arm.goTo(ArmState.STOW))。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>private void configureBindings() {
     operator.rightTrigger(0.5).whileTrue(intake.runState(IntakeState.INTAKING));
     operator.y().onTrue(arm.goTo(ArmState.SCORE));
@@ -2611,7 +2717,8 @@ new Trigger(limitSwitch::get).debounce(0.1).onTrue(arm.goTo(ArmState.STOW));</co
         .onFalse(arm.goTo(ArmState.STOW));
 }</code></pre>
     <p>注意每個 <code>arm.goTo(...)</code>、<code>intake.runState(...)</code> 都是呼叫一次 factory、得到一個新的指令物件。第 10 章會說明為什麼這很重要。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -2738,8 +2845,17 @@ operator.y().onTrue(SuperstructureCommands.score(arm, intake));</code></pre>
 
   <h2>練習：取件動作</h2>
   <p>寫一個跨 Subsystem 的指令 <code>intakeCycle(arm, intake)</code>：先讓手臂移到 INTAKE，移動途中滾輪就開始吸入；手臂到位後繼續吸入 1 秒；最後停止吸入並把手臂收回 STOW。整個動作最多 4 秒。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>整個動作是三步依序進行，第一步裡有兩件事同時發生，而且以手臂到位為準。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>sequence 串起三步；第一步用 deadlineFor（主角是手臂）；「吸 1 秒」用 withTimeout(1.0)；整體上限用 withTimeout(4.0)。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>第一步寫成 arm.goTo(ArmState.INTAKE).deadlineFor(intake.runState(IntakeState.INTAKING))；注意兩次 intake.runState(...) 要各自呼叫 factory，產生不同的物件。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>public static Command intakeCycle(ArmSubsystem arm, IntakeSubsystem intake) {
     return Commands.sequence(
             arm.goTo(ArmState.INTAKE).deadlineFor(intake.runState(IntakeState.INTAKING)),
@@ -2749,7 +2865,8 @@ operator.y().onTrue(SuperstructureCommands.score(arm, intake));</code></pre>
         .withName("IntakeCycle");
 }</code></pre>
     <p>第一步用 deadline：手臂是主角，它到位時滾輪指令被打斷，<code>runState</code> 的結束動作把狀態設回 NONE，接著第二步立刻又開始吸入。兩次 <code>intake.runState(...)</code> 是兩個不同的物件，符合規則一。第三步結束時滾輪已經在 NONE。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -2887,8 +3004,17 @@ armLeader.getConfigurator().apply(config);</code></pre>
 
   <h2>練習：幫 Intake 滾輪寫硬體層</h2>
   <p>替第 6 章練習的 <code>RollerIO</code> 寫 <code>RollerIOHardware</code>：滾輪馬達在 CANivore「9427」上、CAN ID 待定；設定為 Coast、開啟供電電流限制（數值待定）；<code>setVoltage</code> 使用重複使用的 <code>VoltageOut</code>；<code>updateInputs</code> 讀取速度、輸出電壓、供電電流。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>照第 6 章 ArmIOHardware 的結構：欄位裡建立 TalonFX、控制請求和要讀的訊號，建構子套用設定。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>CANivore 用 new TalonFX(id, CANBuses.CANIVORE)；請求用 new VoltageOut(0.0) 建一次；訊號用 getVelocity()、getMotorVoltage()、getSupplyCurrent()。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>updateInputs 裡先 BaseStatusSignal.refreshAll(...)，用 .isOK() 填 connected，再用 getValueAsDouble() 取值；setVoltage 寫 motor.setControl(request.withOutput(volts))。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>public class RollerIOHardware implements RollerIO {
     private final TalonFX motor = new TalonFX(0, CANBuses.CANIVORE); // TODO: CAN ID
     private final VoltageOut request = new VoltageOut(0.0);
@@ -2920,7 +3046,8 @@ armLeader.getConfigurator().apply(config);</code></pre>
     }
 }</code></pre>
     <p>滾輪用 Coast：停止時讓滾輪自然停下，不會卡住遊戲物件。手臂則用 Brake（第 6 章），因為手臂要撐住重力。這是隊上依機構決定的，不是固定規則。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -3106,8 +3233,17 @@ public boolean atBottom() {
 
   <h2>練習：升降機構的歸零指令</h2>
   <p>假設升降機構只有 TalonFX 內建編碼器，底部有一個常閉極限開關接在 DIO 0。請在 <code>ElevatorSubsystem</code> 寫一個 <code>home()</code> 指令：以很小的電壓往下，碰到開關就停止，並把位置重設為 0。為了避免開關壞掉時一直往下推，加上 3 秒的逾時。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>先想清楚：常閉開關什麼時候讀到 true？逾時結束時，能不能把位置當成 0？</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>可以用 startEnd（開始給小電壓、結束停止）加 .until(this::atBottom) 與 .withTimeout(3.0)，最後 andThen(runOnce(...)) 重設位置。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>重設位置前再檢查一次 if (atBottom) io.resetPosition(0.0);，逾時結束就不重設；開關讀值可以先過 Debouncer。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>public class ElevatorSubsystem extends SubsystemBase {
     private static final double HOMING_VOLTS = -1.0; // TODO: 實測，越小越安全
     private static final double HOMING_TIMEOUT_S = 3.0; // TODO: 依行程調整
@@ -3146,7 +3282,8 @@ public boolean atBottom() {
 }</code></pre>
     <p>幾個重點。<code>until</code> 與 <code>withTimeout</code> 誰先發生都會結束（第 10 章）；結束後再確認一次 <code>atBottom</code>，逾時結束的情況下就<strong>不</strong>重設位置，否則會把錯的位置當成 0。用常閉開關時，線掉了會讀成「已經到底」，機構會停在原地並被當成 0，所以開機歸零後，還是要目視確認機構真的在底部。</p>
     <p>這個寫法為了簡短，直接在 <code>startEnd</code> 裡呼叫 IO；如果這個 Subsystem 和第 6 章一樣在 periodic 裡送出輸出，就要改成切換 <code>ControlMode</code>，不然會被 periodic 蓋掉。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -3294,8 +3431,17 @@ slot0.kD = 0.0; // TODO: 單位 V / (rot/s)</code></pre>
 
   <h2>練習：飛輪的速度控制</h2>
   <p>替射球飛輪寫 TalonFX 設定：用 <code>VelocityVoltage</code> 控制，Slot0 放 kS、kV、kP（數值待定），並在 Subsystem 寫 <code>setVelocityGoal(double rps)</code> 和 <code>atSpeed()</code> 兩個方法（誤差小於 2 rps 就算到速）。想一想：飛輪需要 kG 嗎？需要 kA 嗎？</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>先決定這個機構需要哪些前饋：飛輪水平轉動，重力會不會讓它加速或減速？</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用 VelocityVoltage(0.0).withSlot(0)；Slot0 放 kS、kV、kP，飛輪用 Coast。Subsystem 記住目標轉速，在 periodic 送出。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>atSpeed() 回傳 Math.abs(inputs.velocityRps - goalRps) &lt; TOLERANCE_RPS；kG 不需要，kA 只在目標速度一直變化時才有幫助。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>public class FlywheelIOHardware implements FlywheelIO {
     private final TalonFX motor = new TalonFX(0, CANBuses.CANIVORE); // TODO: CAN ID
     private final VelocityVoltage request = new VelocityVoltage(0.0).withSlot(0);
@@ -3338,7 +3484,8 @@ public boolean atSpeed() {
     return Math.abs(inputs.velocityRps - goalRps) &lt; TOLERANCE_RPS;
 }</code></pre>
     <p>飛輪水平轉動，重力不會讓它加速或減速，所以不需要 kG。kA 只有在「目標速度一直在變」時才有用；飛輪通常是一個固定目標，CTRE 的速度閉迴路範例也只用 kS、kV、kP<a class="ref" href="#src13-7">[7]</a>。滾輪和飛輪用 Coast：停止時讓它自然減速，不要急煞。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -3461,8 +3608,17 @@ public void setPositionGoal(double positionRot) {
 
   <h2>練習：升降機構的兩種速度</h2>
   <p>升降機構平常用正常速度，但機器人身上夾著遊戲物件時要慢一點，避免甩掉。沒有 Pro 授權，不能用 Dynamic MotionMagic。請想出一個做法，並寫出關鍵程式。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>不能用 Dynamic MotionMagic，就只剩「改設定」這條路。想想設定該在什麼時候改、多久改一次。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>準備兩份 MotionMagicConfigs（快、慢），只在「有沒有夾著物件」改變時用 getConfigurator().apply(...) 套用其中一份。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>用一個 boolean slowMode 記住目前狀態，setSlowMode(slow) 開頭寫 if (slow == slowMode) return;，避免每輪都 apply。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <p>一個做法（單位寫法照 CTRE 的 MotionMagic 範例<a class="ref" href="#src14-5">[5]</a>）：準備兩份 <code>MotionMagicConfigs</code>，只在「有沒有夾著物件」改變時套用一次。</p>
     <pre><code>// 放在 ElevatorIOHardware（硬體層），Subsystem 透過 IO 介面呼叫 setSlowMode
 private final MotionMagicConfigs fastMM = new MotionMagicConfigs()
@@ -3480,7 +3636,8 @@ public void setSlowMode(boolean slow) {
     leader.getConfigurator().apply(slow ? slowMM : fastMM);
 }</code></pre>
     <p>只套用 <code>MotionMagicConfigs</code> 這一組，其他設定不受影響（第 11 章）。在 Subsystem 裡可以用 Trigger 偵測「有沒有物件」的變化來呼叫它（第 9 章）。另一個做法是用 Slot0 / Slot1 準備兩組不同的增益，但巡航速度和加速度不在 Slot 裡，所以還是要改 <code>MotionMagicConfigs</code>。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -3640,8 +3797,17 @@ config.MotionMagic.MotionMagicExpo_kA = 0.0; // TODO</code></pre>
 
   <h2>練習：測試用的按鍵配置</h2>
   <p>比賽時不應該能誤觸 SysId。請改寫上面的綁定：只有在 Test 模式（第 7 章）時，四個按鍵才會執行 SysId 測試。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>要讓兩個條件都成立時才執行，第 9 章學過怎麼組合 Trigger。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用 new Trigger(DriverStation::isTest) 表示「在 Test 模式」，再用 .and(...) 和按鍵組合。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>controller.y().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward)); 其他三個照同樣寫法。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>Trigger testMode = new Trigger(DriverStation::isTest);
 
 controller.y().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -3649,7 +3815,8 @@ controller.a().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Directi
 controller.b().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
 controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));</code></pre>
     <p>用第 9 章的 <code>and</code> 組合條件：兩個條件都成立時 Trigger 才為真。按鍵放開或離開 Test 模式時，<code>whileTrue</code> 會取消指令。第 7 章的 <code>Robot.java</code> 把 <code>CommandScheduler.getInstance().run()</code> 放在 <code>robotPeriodic()</code>，所以 Test 模式下排程器照樣運作；<code>testInit()</code> 的 <code>cancelAll()</code> 則確保進入 Test 時先把其他指令停掉。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -3793,8 +3960,17 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
 
   <h2>練習：兩段式自動程式</h2>
   <p>不用 GUI，只用程式組出一個 Auto：先把手臂移到 SCORE、等手臂到位後跑一條叫 <code>"Leave"</code> 的路徑，同時把手臂收回 STOW。提示：<code>AutoBuilder.followPath(PathPlannerPath.fromPathFile("Leave"))</code> 會回傳跟隨這條路徑的指令，而 <code>fromPathFile</code> 可能丟出例外。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>整個動作分兩段：先手臂到位，再同時「走路徑」和「收手臂」。載入路徑可能失敗，要處理例外。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用 Commands.sequence 與 Commands.parallel；路徑用 PathPlannerPath.fromPathFile("Leave")，再交給 AutoBuilder.followPath(...)。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>把整段包在 try 裡；catch 時用 DriverStation.reportError 回報，並回傳 Commands.none()，讓程式不會當掉。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>private Command buildLeaveAuto() {
     try {
         PathPlannerPath leave = PathPlannerPath.fromPathFile("Leave");
@@ -3814,7 +3990,8 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
 autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
     <p>幾個重點：<code>sequence</code> 等手臂到位才出發；<code>parallel</code> 讓走路徑和收手臂同時進行，兩者都結束才算完成（第 10 章），手臂和底盤是不同的 Subsystem，不會互相打斷。載入失敗時回傳 <code>Commands.none()</code> 並回報錯誤，比讓整支程式當掉好。這個 Auto 在建構子裡就建好，符合「開機時載入」的建議。</p>
     <p>注意這條路徑沒有經過 <code>PathPlannerAuto</code>，所以不會自動重設起始位置；實際使用時要確認里程計在出發前已經設對。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -3959,8 +4136,17 @@ public Command aimWithTx(DoubleSupplier forward, DoubleSupplier strafe) {
 
   <h2>練習：記錄被丟掉的量測</h2>
   <p>在上面的視覺程式裡，加上兩個計數：接受了幾筆量測、因為旋轉太快丟掉幾筆，每輪用 <code>SmartDashboard.putNumber</code> 顯示。想一想：這兩個數字在比賽中能幫你發現什麼問題？</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>要分兩種情況計數：有看到標籤時，接受或因為旋轉太快而丟掉。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>在 if (est != null &amp;&amp; est.tagCount &gt; 0) 裡面再判斷 Math.abs(omegaRps) &lt; 2.0，分別讓兩個欄位加一。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>每輪用 SmartDashboard.putNumber("Vision/Accepted", acceptedCount) 與 Vision/RejectedSpin 顯示；想想 Accepted 一直不增加代表什麼。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>private int acceptedCount = 0;
 private int rejectedSpinCount = 0;
 
@@ -3977,7 +4163,8 @@ if (est != null &amp;&amp; est.tagCount &gt; 0) {
 SmartDashboard.putNumber("Vision/Accepted", acceptedCount);
 SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
     <p>如果整場比賽 Accepted 幾乎沒增加，可能是相機沒連上、名稱打錯、曝光設定不對，或是機器人大部分時間都看不到標籤。如果 RejectedSpin 很多，代表門檻可能太嚴，或是駕駛習慣一直邊轉邊移動。把這些數字記錄下來（第 18 章），賽後就能回頭查。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -4124,8 +4311,17 @@ public Command getAutonomousCommand() {
 
   <h2>練習：賽後找出為什麼沒射球</h2>
   <p>比賽中有一次，操作手按了射球鍵，但機器人沒有射。日誌裡有 <code>Flywheel/VelocityRps</code>（輸入）和 <code>Flywheel/AtSpeed</code>（輸出），但射球的判斷條件是 <code>flywheel.atSpeed() &amp;&amp; arm.atGoal()</code>，<code>Arm/AtGoal</code> 當時沒有記錄（假設這支程式還沒加上第 6 章 E-3 的那幾行 <code>recordOutput</code>）。你會怎麼查？</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>先確定時間點，再一個一個條件檢查：哪個條件有記錄、哪個沒有？</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用 Joysticks 分頁找到按鍵時間，Line Graph 看 Flywheel/AtSpeed。沒記錄的條件，可以用重播補記錄。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>checkout 當時的 GitSHA，在 ArmSubsystem.periodic 加 Logger.recordOutput("Arm/AtGoal", atGoal())，用 REPLAY 執行，在 ReplayOutputs 表看結果。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <ol>
       <li>在 AdvantageScope 的 Joysticks 分頁找到按下射球鍵的時間點。</li>
       <li>在 Line Graph 看那段時間的 <code>Flywheel/AtSpeed</code>。如果它是 false，原因就在飛輪（第 13 章）。</li>
@@ -4133,7 +4329,8 @@ public Command getAutonomousCommand() {
       <li>在 <code>ReplayOutputs</code> 表看 <code>Arm/AtGoal</code>。因為手臂的位置是從日誌讀回來的輸入，重播算出的 <code>atGoal()</code> 就和當時完全一樣。</li>
     </ol>
     <p>這正是重播最擅長的事：補記錄當時忘了記錄的輸出。只要手臂是照第 6 章用 IO 層寫的，重播的結果就是準確的。找到原因後，把這行 <code>recordOutput</code> 留在程式裡，下次就不用重播了。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -4278,8 +4475,17 @@ public Command getAutonomousCommand() {
 
   <h2>練習：讓程式幫你做賽前檢查</h2>
   <p>用第 12 章的 <code>Alert</code>，在 Disabled 時檢查兩件事：電池電壓太低（門檻由隊上決定），以及自動程式選單還是預設值。提示：<code>RobotController.getBatteryVoltage()</code> 回傳電池電壓；<code>AutoBuilder.getAllAutoNames()</code> 回傳專案裡所有 Auto 的名字，可以用它自己建立選單，並記住預設選項。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>兩個檢查都只在 Disabled 時做；電壓會跳動，要避免瞬間掉一下就跳警告。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用兩個 Alert；電壓用 RobotController.getBatteryVoltage() 搭配 Debouncer；選單要能判斷「還是預設值」。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>buildAutoChooser 的預設選項拿不到物件，所以自己建 SendableChooser：setDefaultOption("Do Nothing", doNothing)，再用 AutoBuilder.getAllAutoNames() 加入其他選項，判斷 getSelected() == doNothing。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>// RobotContainer
 private static final double LOW_BATTERY_VOLTS = 12.0; // TODO: 隊上決定門檻
 private final Alert lowBattery = new Alert("電池電壓偏低，上場前請換電池", AlertType.kWarning);
@@ -4303,7 +4509,8 @@ public void updatePreMatchAlerts() {
     noAuto.set(disabled &amp;&amp; autoChooser.getSelected() == doNothing);
 }</code></pre>
     <p>幾個重點：電壓會跳動，用 <code>Debouncer</code> 要求持續 1 秒低於門檻才警告（第 12 章）；只在 Disabled 時檢查，因為比賽中大電流時電壓本來就會掉。<code>buildAutoChooser()</code> 的預設選項是它內部建立的 <code>Commands.none()</code>，程式拿不到那個物件；所以這裡自己建立選單，把自己的 <code>doNothing</code> 當預設選項，就能用 <code>==</code> 判斷有沒有換過。用 AdvantageKit 時，選單換成第 18 章的 <code>LoggedDashboardChooser</code>，判斷方式相同。Alert 會自動被 AdvantageKit 記錄（第 18 章），賽後也查得到。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
@@ -4379,6 +4586,40 @@ function highlight(src){
   return out + esc(src.slice(last));
 }
 
+
+/* ---------- 練習的漸進提示 ----------
+ * 章節裡的 <div class="hints"> 依序放三層提示與完整解答：
+ *   提示 1 方向或觀念 → 提示 2 用到的 API → 提示 3 部分程式或推理 → 完整解答
+ * 一次只揭露一層，先自己試過再看下一層。看到第幾層會記進學習紀錄。
+ */
+function initHints(chapterId){
+  view.querySelectorAll(".hints").forEach(box => {
+    const steps = [...box.querySelectorAll(":scope > .hint")];
+    let shown = 0;
+    steps.forEach(el => { el.hidden = true; });
+    box.insertAdjacentHTML("afterbegin", `<p class="hints-intro">先自己寫寫看。卡住時再一層一層打開提示，每一層只多給一點線索。</p>`);
+    const btn = document.createElement("button");
+    btn.className = "btn ghost hint-btn";
+    box.appendChild(btn);
+    const label = () => {
+      if (shown >= steps.length) { btn.remove(); return; }
+      const next = steps[shown].dataset.label;
+      btn.textContent = shown === steps.length - 1 ? `看${next}` : `看${next}`;
+    };
+    btn.onclick = () => {
+      const el = steps[shown];
+      el.hidden = false;
+      el.insertAdjacentHTML("afterbegin", `<p class="hint-label">${esc(el.dataset.label)}</p>`);
+      shown++;
+      updateProgress(p => {
+        p.hints = p.hints || {};
+        p.hints[chapterId] = Math.max(p.hints[chapterId] || 0, shown);
+      });
+      label();
+    };
+    label();
+  });
+}
 
 /* ---------- 實驗與工具站任務 ----------
  * 站內實驗：依 course.json 的 labs 替每個 .lab 加上標題、目標、固定 id（#chN/lab-id 可以直接跳過來）、
@@ -4553,8 +4794,8 @@ const PROGRESS_KEY = "frc9427-progress";
 function loadProgress(){
   try {
     const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}");
-    return { labs: p.labs || {}, tools: p.tools || {}, quiz: p.quiz || {}, final: p.final || null };
-  } catch(e){ return { labs: {}, tools: {}, quiz: {}, final: null }; }
+    return { labs: p.labs || {}, tools: p.tools || {}, quiz: p.quiz || {}, hints: p.hints || {}, final: p.final || null };
+  } catch(e){ return { labs: {}, tools: {}, quiz: {}, hints: {}, final: null }; }
 }
 function saveProgress(p){ try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); } catch(e){} }
 function updateProgress(fn){ const p = loadProgress(); fn(p); saveProgress(p); return p; }
@@ -5008,6 +5249,7 @@ function showChapter(id){
   if (q && QUIZZES[id]) initQuiz(q, QUIZZES[id], id);
   (LABS[id] || []).forEach(init => init());
   decorateLabs(id);
+  initHints(id);
   insertToolTasks(id);
   view.querySelectorAll("a.ref").forEach(a => a.addEventListener("click", e => {
     e.preventDefault();

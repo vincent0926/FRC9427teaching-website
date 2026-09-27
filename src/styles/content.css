@@ -117,3 +117,10 @@ p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);
 .q-case ul{margin:0 0 2px;padding-left:20px}
 .q-ask{font-weight:700;margin:0 0 10px}
 .qlab{white-space:nowrap}
+/* progressive hints */
+.hints{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 18px 14px;margin:16px 0}
+.hints-intro{color:var(--ink-2);font-size:15px;margin:4px 0 8px}
+.hint{border-top:1px dashed var(--line);padding-top:6px;margin-top:6px}
+.hint-label{font-weight:700;margin:0 0 2px;font-size:14px;color:var(--ink-2)}
+.hint.solution .hint-label{color:var(--ink)}
+.hint-btn{margin-top:10px;font-size:15px;padding:8px 16px}

@@ -122,8 +122,17 @@
 
   <h2>練習：讓程式幫你做賽前檢查</h2>
   <p>用第 12 章的 <code>Alert</code>，在 Disabled 時檢查兩件事：電池電壓太低（門檻由隊上決定），以及自動程式選單還是預設值。提示：<code>RobotController.getBatteryVoltage()</code> 回傳電池電壓；<code>AutoBuilder.getAllAutoNames()</code> 回傳專案裡所有 Auto 的名字，可以用它自己建立選單，並記住預設選項。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>兩個檢查都只在 Disabled 時做；電壓會跳動，要避免瞬間掉一下就跳警告。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用兩個 Alert；電壓用 RobotController.getBatteryVoltage() 搭配 Debouncer；選單要能判斷「還是預設值」。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>buildAutoChooser 的預設選項拿不到物件，所以自己建 SendableChooser：setDefaultOption("Do Nothing", doNothing)，再用 AutoBuilder.getAllAutoNames() 加入其他選項，判斷 getSelected() == doNothing。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>// RobotContainer
 private static final double LOW_BATTERY_VOLTS = 12.0; // TODO: 隊上決定門檻
 private final Alert lowBattery = new Alert("電池電壓偏低，上場前請換電池", AlertType.kWarning);
@@ -147,7 +156,8 @@ public void updatePreMatchAlerts() {
     noAuto.set(disabled &amp;&amp; autoChooser.getSelected() == doNothing);
 }</code></pre>
     <p>幾個重點：電壓會跳動，用 <code>Debouncer</code> 要求持續 1 秒低於門檻才警告（第 12 章）；只在 Disabled 時檢查，因為比賽中大電流時電壓本來就會掉。<code>buildAutoChooser()</code> 的預設選項是它內部建立的 <code>Commands.none()</code>，程式拿不到那個物件；所以這裡自己建立選單，把自己的 <code>doNothing</code> 當預設選項，就能用 <code>==</code> 判斷有沒有換過。用 AdvantageKit 時，選單換成第 18 章的 <code>LoggedDashboardChooser</code>，判斷方式相同。Alert 會自動被 AdvantageKit 記錄（第 18 章），賽後也查得到。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

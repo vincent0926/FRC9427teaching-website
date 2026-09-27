@@ -145,8 +145,17 @@ config.MotionMagic.MotionMagicExpo_kA = 0.0; // TODO</code></pre>
 
   <h2>練習：測試用的按鍵配置</h2>
   <p>比賽時不應該能誤觸 SysId。請改寫上面的綁定：只有在 Test 模式（第 7 章）時，四個按鍵才會執行 SysId 測試。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>要讓兩個條件都成立時才執行，第 9 章學過怎麼組合 Trigger。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用 new Trigger(DriverStation::isTest) 表示「在 Test 模式」，再用 .and(...) 和按鍵組合。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>controller.y().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward)); 其他三個照同樣寫法。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>Trigger testMode = new Trigger(DriverStation::isTest);
 
 controller.y().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -154,7 +163,8 @@ controller.a().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Directi
 controller.b().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
 controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));</code></pre>
     <p>用第 9 章的 <code>and</code> 組合條件：兩個條件都成立時 Trigger 才為真。按鍵放開或離開 Test 模式時，<code>whileTrue</code> 會取消指令。第 7 章的 <code>Robot.java</code> 把 <code>CommandScheduler.getInstance().run()</code> 放在 <code>robotPeriodic()</code>，所以 Test 模式下排程器照樣運作；<code>testInit()</code> 的 <code>cancelAll()</code> 則確保進入 Test 時先把其他指令停掉。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

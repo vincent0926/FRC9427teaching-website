@@ -106,8 +106,17 @@ public void setPositionGoal(double positionRot) {
 
   <h2>練習：升降機構的兩種速度</h2>
   <p>升降機構平常用正常速度，但機器人身上夾著遊戲物件時要慢一點，避免甩掉。沒有 Pro 授權，不能用 Dynamic MotionMagic。請想出一個做法，並寫出關鍵程式。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>不能用 Dynamic MotionMagic，就只剩「改設定」這條路。想想設定該在什麼時候改、多久改一次。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>準備兩份 MotionMagicConfigs（快、慢），只在「有沒有夾著物件」改變時用 getConfigurator().apply(...) 套用其中一份。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>用一個 boolean slowMode 記住目前狀態，setSlowMode(slow) 開頭寫 if (slow == slowMode) return;，避免每輪都 apply。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <p>一個做法（單位寫法照 CTRE 的 MotionMagic 範例<a class="ref" href="#src14-5">[5]</a>）：準備兩份 <code>MotionMagicConfigs</code>，只在「有沒有夾著物件」改變時套用一次。</p>
     <pre><code>// 放在 ElevatorIOHardware（硬體層），Subsystem 透過 IO 介面呼叫 setSlowMode
 private final MotionMagicConfigs fastMM = new MotionMagicConfigs()
@@ -125,7 +134,8 @@ public void setSlowMode(boolean slow) {
     leader.getConfigurator().apply(slow ? slowMM : fastMM);
 }</code></pre>
     <p>只套用 <code>MotionMagicConfigs</code> 這一組，其他設定不受影響（第 11 章）。在 Subsystem 裡可以用 Trigger 偵測「有沒有物件」的變化來呼叫它（第 9 章）。另一個做法是用 Slot0 / Slot1 準備兩組不同的增益，但巡航速度和加速度不在 Slot 裡，所以還是要改 <code>MotionMagicConfigs</code>。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

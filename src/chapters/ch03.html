@@ -127,8 +127,17 @@ io.stop();          // 兩個實作都沒寫 stop()，用的是介面的預設�
 
   <h2>練習：定義一份機構的契約</h2>
   <p>寫一個介面 <code>Mechanism</code>，規定兩件事：<code>void stop()</code> 和 <code>boolean isAtGoal()</code>。再讓第 1 章練習的 <code>Flywheel</code> 實作它：<code>stop()</code> 把目標轉速設為 0；<code>isAtGoal()</code> 需要知道目前轉速，所以先加一個欄位 <code>currentRpm</code> 和方法 <code>updateCurrentRpm(double rpm)</code>。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>介面只寫「要做什麼」，不寫怎麼做；類別用 implements 承諾做到。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>介面裡的方法宣告成 void stop(); 與 boolean isAtGoal();，實作時加 @Override。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>isAtGoal 需要目前轉速：加一個 private double currentRpm 與 updateCurrentRpm(double rpm)，判斷方式和第 1 章的 isAtSpeed 一樣。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>// Mechanism.java
 public interface Mechanism {
     void stop();
@@ -161,7 +170,8 @@ public class Flywheel implements Mechanism {
         return Math.abs(currentRpm - targetRpm) &lt; TOLERANCE_RPM;
     }
 }</code></pre>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

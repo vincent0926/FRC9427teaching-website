@@ -125,8 +125,17 @@ drive.setDefaultCommand(
 
   <h2>練習：Intake 的指令</h2>
   <p>替 <code>IntakeSubsystem</code> 寫一個 factory <code>runState(IntakeState state)</code>：執行時把狀態設為 <code>state</code>，結束（包括被打斷）時設回 <code>NONE</code>。再寫出它的預設指令。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>要「開始時做一件事、結束時做另一件事」，Subsystem 有現成的 factory。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用 startEnd(開始動作, 結束動作)，被打斷時也會執行結束動作；預設指令要持續執行，用 run。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>runState 回傳 startEnd(() -&gt; setState(state), () -&gt; setState(IntakeState.NONE))；預設指令是 intake.run(() -&gt; intake.setState(IntakeState.NONE))。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>// IntakeSubsystem 裡
 public Command runState(IntakeState state) {
     return startEnd(() -&gt; setState(state), () -&gt; setState(IntakeState.NONE));
@@ -135,7 +144,8 @@ public Command runState(IntakeState state) {
 // RobotContainer 建構子裡
 intake.setDefaultCommand(intake.run(() -&gt; intake.setState(IntakeState.NONE)));</code></pre>
     <p><code>startEnd</code> 在開始時執行第一個動作，結束時執行第二個，不管是正常結束還是被打斷。它本身不會自己結束，要靠按鍵放開或其他指令打斷，這點在第 9、10 章會用到。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

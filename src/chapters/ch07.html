@@ -176,8 +176,17 @@
 
   <h2>練習：預測呼叫順序</h2>
   <p>機器人剛開機（處於 Disabled），接著依序發生：切到 Autonomous 並跑了兩輪，再切到 Teleop 並跑了一輪。請寫出從開機後第一輪開始，每一輪會被呼叫的方法（不含 Dashboard 更新）。寫完後用上面的模擬器對答案。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>先分清三種方法：init 只在「進入模式的那一輪」，exit 在「離開模式的那一輪」，periodic 每一輪都有。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>每一輪的順序是：（切換時）舊模式的 exit → 新模式的 init → 該模式的 periodic → robotPeriodic。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>第 2 輪（切到 Autonomous）是 disabledExit → autonomousInit → autonomousPeriodic → robotPeriodic；建構子 Robot() 只在程式啟動時一次。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>// 程式啟動
 Robot()                  // 建構子，只有一次
 
@@ -202,7 +211,8 @@ teleopInit()
 teleopPeriodic()
 robotPeriodic()</code></pre>
     <p>注意三件事：<code>init</code> 只在切換的那一輪出現；<code>exit</code> 一定在新模式的 <code>init</code> 之前；<code>robotPeriodic()</code> 每一輪都有，而且總是排在模式的 periodic 之後。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

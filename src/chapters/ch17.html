@@ -127,8 +127,17 @@ public Command aimWithTx(DoubleSupplier forward, DoubleSupplier strafe) {
 
   <h2>練習：記錄被丟掉的量測</h2>
   <p>在上面的視覺程式裡，加上兩個計數：接受了幾筆量測、因為旋轉太快丟掉幾筆，每輪用 <code>SmartDashboard.putNumber</code> 顯示。想一想：這兩個數字在比賽中能幫你發現什麼問題？</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>要分兩種情況計數：有看到標籤時，接受或因為旋轉太快而丟掉。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>在 if (est != null &amp;&amp; est.tagCount &gt; 0) 裡面再判斷 Math.abs(omegaRps) &lt; 2.0，分別讓兩個欄位加一。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>每輪用 SmartDashboard.putNumber("Vision/Accepted", acceptedCount) 與 Vision/RejectedSpin 顯示；想想 Accepted 一直不增加代表什麼。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>private int acceptedCount = 0;
 private int rejectedSpinCount = 0;
 
@@ -145,7 +154,8 @@ if (est != null &amp;&amp; est.tagCount &gt; 0) {
 SmartDashboard.putNumber("Vision/Accepted", acceptedCount);
 SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
     <p>如果整場比賽 Accepted 幾乎沒增加，可能是相機沒連上、名稱打錯、曝光設定不對，或是機器人大部分時間都看不到標籤。如果 RejectedSpin 很多，代表門檻可能太嚴，或是駕駛習慣一直邊轉邊移動。把這些數字記錄下來（第 18 章），賽後就能回頭查。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">

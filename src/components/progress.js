@@ -6,8 +6,8 @@ const PROGRESS_KEY = "frc9427-progress";
 function loadProgress(){
   try {
     const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}");
-    return { labs: p.labs || {}, tools: p.tools || {}, quiz: p.quiz || {}, final: p.final || null };
-  } catch(e){ return { labs: {}, tools: {}, quiz: {}, final: null }; }
+    return { labs: p.labs || {}, tools: p.tools || {}, quiz: p.quiz || {}, hints: p.hints || {}, final: p.final || null };
+  } catch(e){ return { labs: {}, tools: {}, quiz: {}, hints: {}, final: null }; }
 }
 function saveProgress(p){ try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); } catch(e){} }
 function updateProgress(fn){ const p = loadProgress(); fn(p); saveProgress(p); return p; }

@@ -126,8 +126,17 @@
 
   <h2>練習：兩段式自動程式</h2>
   <p>不用 GUI，只用程式組出一個 Auto：先把手臂移到 SCORE、等手臂到位後跑一條叫 <code>"Leave"</code> 的路徑，同時把手臂收回 STOW。提示：<code>AutoBuilder.followPath(PathPlannerPath.fromPathFile("Leave"))</code> 會回傳跟隨這條路徑的指令，而 <code>fromPathFile</code> 可能丟出例外。</p>
-  <details>
-    <summary>看參考答案</summary>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>整個動作分兩段：先手臂到位，再同時「走路徑」和「收手臂」。載入路徑可能失敗，要處理例外。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用 Commands.sequence 與 Commands.parallel；路徑用 PathPlannerPath.fromPathFile("Leave")，再交給 AutoBuilder.followPath(...)。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>把整段包在 try 裡；catch 時用 DriverStation.reportError 回報，並回傳 Commands.none()，讓程式不會當掉。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
     <pre><code>private Command buildLeaveAuto() {
     try {
         PathPlannerPath leave = PathPlannerPath.fromPathFile("Leave");
@@ -147,7 +156,8 @@
 autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
     <p>幾個重點：<code>sequence</code> 等手臂到位才出發；<code>parallel</code> 讓走路徑和收手臂同時進行，兩者都結束才算完成（第 10 章），手臂和底盤是不同的 Subsystem，不會互相打斷。載入失敗時回傳 <code>Commands.none()</code> 並回報錯誤，比讓整支程式當掉好。這個 Auto 在建構子裡就建好，符合「開機時載入」的建議。</p>
     <p>注意這條路徑沒有經過 <code>PathPlannerAuto</code>，所以不會自動重設起始位置；實際使用時要確認里程計在出發前已經設對。</p>
-  </details>
+    </div>
+  </div>
 
   <h2>資料來源</h2>
   <ol class="refs">
