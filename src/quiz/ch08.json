@@ -54,19 +54,18 @@
   {
     "type": "scenario",
     "s": {
-      "symptom": "預設指令用 runOnce 建立，手臂在其他指令結束後，只保持了一瞬間就沒有再被控制。",
+      "symptom": "程式一啟動就丟出例外，訊息是 Default commands must require their subsystem!",
       "evidence": [
-        "預設指令是 arm.runOnce(() -> arm.hold())",
-        "其他時候手臂慢慢往下滑"
+        "RobotContainer 裡寫 intake.setDefaultCommand(Commands.run(() -> intake.stop()));"
       ]
     },
     "q": "應該怎麼改？",
-    "e": "預設指令結束後會被重新排程，但 runOnce 每次只執行一輪；持續保持應該用 run。預期結果：沒有其他指令時手臂一直被保持。",
+    "e": "WPILib 要求預設指令必須 require 它所屬的 Subsystem；Commands.run 沒有傳入 Subsystem 就沒有 requirements。Subsystem 自己的 run 會自動 require。預期結果：例外消失，沒有其他指令時執行預設指令。",
     "o": [
-      "預設指令用 run（持續執行直到被打斷）",
-      "改成 onTrue 綁定",
-      "在 Robot.java 裡 while 迴圈呼叫 hold",
-      "把預設指令刪掉"
+      "讓預設指令 require intake，例如改成 intake.run(() -> intake.stop())",
+      "改用 onTrue 綁定",
+      "把 intake 改成 static",
+      "把 setDefaultCommand 放進 periodic"
     ],
     "a": 0
   },

@@ -51,16 +51,17 @@
   {
     "type": "scenario",
     "s": {
-      "symptom": "得分序列期間，你以為手臂的預設指令會在 Intake 吐球時接手保持，但手臂在那段時間完全沒被保持。",
+      "symptom": "得分序列執行期間，日誌顯示手臂的預設指令完全沒有執行。",
       "evidence": [
-        "score = sequence(arm.goTo(SCORE), intake.eject().withTimeout(0.5), arm.goTo(STOW))"
+        "score = sequence(arm.goTo(SCORE), intake.eject().withTimeout(0.5), arm.goTo(STOW))",
+        "你原本以為吐球的那 0.5 秒會由手臂的預設指令接手"
       ]
     },
     "q": "正確的解讀是？",
-    "e": "組合指令執行時，手臂的預設指令不會執行。要保持就用 deadline 把吐球和保持手臂並行。預期結果：吐球時手臂停在得分位置。",
+    "e": "組合指令執行時，成員的預設指令不會執行。照第 6 章把目標存在 Subsystem、由 periodic 送出的寫法，手臂仍會停在最後的目標；但預設指令裡的其他動作不會發生，需要的話用 deadline 把它放進組合。預期結果：清楚知道那段時間是誰在控制手臂。",
     "o": [
       "Intake 沒有 require 手臂",
-      "組合在整段期間佔住所有成員的 requirements，預期指令不會插進來；需要保持就在那段加上 arm 的保持動作",
+      "組合在整段期間佔住所有成員的 requirements，所以預設指令不會被排程；那段時間手臂需要做的事要放進組合裡",
       "withTimeout 取消了手臂",
       "預設指令應該自動插入，這是 bug"
     ],

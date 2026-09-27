@@ -36,13 +36,13 @@
       "evidence": [
         "Metadata 的 GitSHA 是上週的 commit",
         "你用的是今天的程式重播",
-        "BuildConstants 顯示 dirty"
+        "BuildConstants 的 dirty 是 true"
       ]
     },
-    "q": "下一步做什麼？",
-    "e": "重播需要當時的程式。Event Deploy 會在部署前自動 commit，所以要保留 event 分支。預期結果：用正確版本重播，輸出和當時一致。",
+    "q": "正確的判斷和下一步是？",
+    "e": "重播需要當時的程式。GitSHA 能找回 commit，但 dirty 的修改沒有被記錄。Event Deploy 會在每次部署前自動 commit，就不會再出現這種情況。預期結果：這次先用最接近的版本重播並註明可能不準，下次賽事用 event 分支。",
     "o": [
-      "git checkout 回日誌裡的 GitSHA；dirty 表示當時有沒 commit 的修改，要從 event 分支找",
+      "要 checkout 回那個 GitSHA；但 dirty 代表當時有沒 commit 的修改，重播可能無法完全還原，以後比賽要用 event 分支讓部署前自動 commit",
       "直接相信重播結果",
       "把 kP 調回去再重播",
       "把日誌刪掉"
