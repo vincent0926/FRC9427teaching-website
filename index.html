@@ -144,6 +144,30 @@ ol.refs li:target{background:var(--surface);outline:2px solid var(--can-h);borde
 p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
 .simtoggle{display:inline-flex;gap:8px;align-items:center;font-size:15px;color:var(--ink-2);cursor:pointer}
 .call.mode[aria-pressed="true"]{border-color:var(--can-l);background:var(--surface);font-weight:600}
+/* learning paths & chapter card */
+.ptag{display:inline-block;font-size:13px;font-weight:700;padding:2px 9px;border-radius:999px;border:2px solid var(--line);margin-right:8px;white-space:nowrap}
+.ptag.core{border-color:var(--can-l)}
+.ptag.controls{border-color:var(--blue)}
+.ptag.competition{border-color:var(--can-h)}
+.lcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:18px 0 26px;font-size:15px}
+.lcard-head{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-bottom:6px}
+.lcard .diff,.lcard .order{color:var(--ink-2);font-size:13.5px}
+.lcard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 22px}
+.lcard h4{margin:10px 0 4px;font-size:14px;color:var(--ink-2)}
+.lcard ul{margin:0;padding-left:18px}
+.lcard li{margin:2px 0;line-height:1.6}
+.lcard li.ok{color:var(--ink-2);list-style:none;margin-left:-18px}
+.lwarn{margin:8px 0 0;padding:8px 12px;border-left:4px solid var(--can-h);background:var(--bg);border-radius:0 6px 6px 0}
+.nextbox{margin:26px 0 8px;padding:14px 18px;border:2px solid var(--can-l);border-radius:10px;background:var(--surface)}
+.nextbox strong{display:block;margin-bottom:2px}
+.nextbox span{color:var(--ink-2);font-size:14.5px}
+.pathsec h3{display:flex;align-items:center;gap:6px;margin:34px 0 4px;font-size:16px;color:var(--ink)}
+.pathsec .pcount{margin-left:auto;font-family:var(--mono);font-size:13.5px;color:var(--ink-2)}
+.pgoal{margin:0;color:var(--ink-2);font-size:15.5px}
+.outline li.done .ttl a{color:var(--ink-2)}
+.outline li.next{background:var(--surface);border-radius:8px}
+.outline .ttl .diff{margin-left:10px;font-size:12px;color:var(--ink-2);letter-spacing:1px;font-weight:400}
+.mastery{margin-top:28px;color:var(--ink-2);font-size:14.5px;border-top:1px dashed var(--line);padding-top:12px}
 /* ch6 parts */
 .partmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:22px 0}
 .pcard{text-align:left;font:inherit;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
@@ -4267,10 +4291,9 @@ public void updatePreMatchAlerts() {
   <p class="headline-code">TalonFX motor = <b>new</b> TalonFX(1);</p>
   <h1>從 new 一個物件，<br>到按下 Enable</h1>
   <p class="lede">這套課程帶你寫出能上場的機器人程式，使用隊上實際的工具：Java、WPILib Command-based 架構、CTRE Phoenix 6 與 Kraken X60。</p>
-  <p>物件導向的部分用「學校與班級」當例子：每個觀念先在教室裡講一次，再換成機器人程式。接著用一章專門講 IO 架構，這是隊上程式碼的骨架。</p>
-  <p>左邊的課程地圖畫成一條 CAN bus，章節編號就是它的 CAN ID。前面的裝置接好，後面的才能動。</p>
+  <p>課程分成三條路徑。<strong>核心路徑</strong>每位程式組成員都要完成，目標是能自己寫出、部署並除錯一個機構的子系統。另外兩條依你負責的工作選：負責機構控制的人走<strong>進階控制路徑</strong>，並搭配電梯／手臂調參工具站實際練習；準備上場的人走<strong>競賽實務路徑</strong>。</p>
+  <p>與其每一章都讀過，不如把核心路徑每一章的「學完要能做到」真的做到。每章開頭的學習卡會列出先備章節、要做到的事，以及哪些東西知道就好。</p>
   <div class="note"><strong>內容依據的版本</strong>WPILib 2026（Java 17）、CTRE Phoenix 6（2026 版文件）、AdvantageKit 2026 文件。每章最後都列出資料來源，查證日期為 2026 年 9 月。Oracle Java Tutorials 是以 JDK 8 撰寫的，但本課程用到的語法在 Java 17 都一樣適用。</div>
-  <p><button class="btn" data-go="0">從第 0 章開始</button></p>
   <div id="outline"></div>
 </template>
 
@@ -4283,7 +4306,7 @@ public void updatePreMatchAlerts() {
 </template>
 
 <script>
-const COURSE_DATA = {"parts":[{"name":"準備","chapters":[0]},{"name":"Java 與物件導向（以學校為例）","chapters":[1,2,3,4,5]},{"name":"架構","chapters":[6]},{"name":"WPILib 基礎","chapters":[7,8,9,10]},{"name":"硬體","chapters":[11,12]},{"name":"控制","chapters":[13,14,15]},{"name":"上場","chapters":[16,17,18,19]}],"chapters":[{"id":0,"title":"開發環境與專案結構","desc":"開學前的準備：要裝哪些軟體、專案裡每個檔案的角色、vendordep、編譯與部署、Driver Station。","part":"準備"},{"id":1,"title":"類別與物件","desc":"學籍資料表與填好的每一份：欄位、方法、建構子、this、static。","part":"Java 與物件導向（以學校為例）"},{"id":2,"title":"封裝與存取修飾詞","desc":"成績簿不能放在講台上：private、public、getter，以及為什麼 Subsystem 不讓外面碰馬達。","part":"Java 與物件導向（以學校為例）"},{"id":3,"title":"繼承與介面","desc":"導師是一種老師，值日生是一份職責：extends、implements、@Override、多型。","part":"Java 與物件導向（以學校為例）"},{"id":4,"title":"Lambda 與方法參考","desc":"給代課老師的字條：() -> 與 ::，傳遞和呼叫的差別。","part":"Java 與物件導向（以學校為例）"},{"id":5,"title":"列舉、常數與套件","desc":"時段、校規和年級班級：enum、Constants、package 與 import。","part":"Java 與物件導向（以學校為例）"},{"id":6,"title":"IO 架構","desc":"導師只看點名表：以手臂為例，分六部分講觀念、簡易版、硬體層、模擬層、AdvantageKit 與測試。","part":"架構"},{"id":7,"title":"機器人程式的生命週期","desc":"學校的一天：程式啟動、四種模式、init / periodic / exit 的呼叫順序、loop overrun。","part":"WPILib 基礎"},{"id":8,"title":"Subsystem 與 Command","desc":"借用體育館：指令的生命週期、requirements、中斷行為、預設指令。","part":"WPILib 基礎"},{"id":9,"title":"Trigger 與按鍵綁定","desc":"門鈴、對講機和電燈開關：onTrue、whileTrue、toggleOnTrue、條件組合與防連按。","part":"WPILib 基礎"},{"id":10,"title":"組合指令","desc":"運動會的節目表：sequence、parallel、race、deadline、結束條件與兩條重要規則。","part":"WPILib 基礎"},{"id":11,"title":"Phoenix 6 與 TalonFX","desc":"班長的工作手冊：CANivore 與 CANBus、完整設定、控制請求、EnableFOC 與 Pro、Tuner X。","part":"硬體"},{"id":12,"title":"感測器與 CAN 除錯","desc":"計步器、刻度尺和廣播線：內建編碼器與 CANcoder、極限開關與歸零、CAN 接法與除錯順序。","part":"硬體"},{"id":13,"title":"PID 與前饋","desc":"推書車上斜坡：P、I、D 各自做什麼，kS、kV、kA、kG 前饋，手動調參的順序。","part":"控制"},{"id":14,"title":"MotionMagic","desc":"校車開到下一站：梯形、三角形與 S-curve 軌跡，巡航速度、加速度與 jerk 怎麼設。","part":"控制"},{"id":15,"title":"SysId 系統鑑別","desc":"體適能檢測：四項測試、SysIdRoutine 搭配 SignalLogger、轉檔分析、把參數填回程式。","part":"控制"},{"id":16,"title":"自動階段與路徑","desc":"校外教學的行程表：座標與里程計、PathPlanner、紅藍翻轉、Named Commands 與自動程式選單。","part":"上場"},{"id":17,"title":"視覺與定位","desc":"看門牌校正位置：AprilTag、融合與標準差、Limelight MegaTag2、兩種瞄準做法。","part":"上場"},{"id":18,"title":"模擬、日誌與重播","desc":"比賽錄影和賽後檢討：取得日誌、AdvantageScope、重播步驟、確定性、版本追蹤。","part":"上場"},{"id":19,"title":"上場檢查與 Pit 除錯","desc":"考試當天：出發前與每場前後的檢查、brownout、DS Log、Pit 分診與改程式的規矩。","part":"上場"}]};
+const COURSE_DATA = {"parts":[{"name":"準備","chapters":[0]},{"name":"Java 與物件導向（以學校為例）","chapters":[1,2,3,4,5]},{"name":"架構","chapters":[6]},{"name":"WPILib 基礎","chapters":[7,8,9,10]},{"name":"硬體","chapters":[11,12]},{"name":"控制","chapters":[13,14,15]},{"name":"上場","chapters":[16,17,18,19]}],"chapters":[{"id":0,"title":"開發環境與專案結構","desc":"開學前的準備：要裝哪些軟體、專案裡每個檔案的角色、vendordep、編譯與部署、Driver Station。","part":"準備","path":"core","difficulty":1,"prereqs":[],"objectives":["建立 WPILib Command-based 專案並部署到機器人","用 Git commit 與 push 保存程式","看懂專案裡 Robot、RobotContainer、Constants、vendordeps 各自的角色"],"awareness":["Driver Station 各分頁的用途","build.gradle 的細節"]},{"id":1,"title":"類別與物件","desc":"學籍資料表與填好的每一份：欄位、方法、建構子、this、static。","part":"Java 與物件導向（以學校為例）","path":"core","difficulty":1,"prereqs":[0],"objectives":["寫出有欄位、建構子和方法的類別","分辨類別和物件，說出 new 做了什麼","看到 NullPointerException 時找出哪個物件沒有 new"],"awareness":["static 欄位的進階用法"]},{"id":2,"title":"封裝與存取修飾詞","desc":"成績簿不能放在講台上：private、public、getter，以及為什麼 Subsystem 不讓外面碰馬達。","part":"Java 與物件導向（以學校為例）","path":"core","difficulty":1,"prereqs":[1],"objectives":["把欄位設成 private，只開放必要的 public 方法","說明為什麼 Subsystem 不讓外面直接碰馬達"],"awareness":["protected 與套件存取的細節"]},{"id":3,"title":"繼承與介面","desc":"導師是一種老師，值日生是一份職責：extends、implements、@Override、多型。","part":"Java 與物件導向（以學校為例）","path":"core","difficulty":2,"prereqs":[2],"objectives":["分辨 extends 和 implements，並寫出實作介面的類別","看懂 Robot extends TimedRobot、XxxSubsystem extends SubsystemBase","正確使用 @Override"],"awareness":["default 方法的進階用法"]},{"id":4,"title":"Lambda 與方法參考","desc":"給代課老師的字條：() -> 與 ::，傳遞和呼叫的差別。","part":"Java 與物件導向（以學校為例）","path":"core","difficulty":2,"prereqs":[3],"objectives":["寫出 lambda 與方法參考","分辨「交出一個做法」和「當場執行」，避開搖桿只讀一次的 bug"],"awareness":["java.util.function 其他介面"]},{"id":5,"title":"列舉、常數與套件","desc":"時段、校規和年級班級：enum、Constants、package 與 import。","part":"Java 與物件導向（以學校為例）","path":"core","difficulty":1,"prereqs":[2],"objectives":["用 enum 表示機構狀態","把魔術數字整理進 Constants","看懂 package 與 import 的錯誤訊息"],"awareness":["enum 帶欄位與方法的進階寫法"]},{"id":6,"title":"IO 架構","desc":"導師只看點名表：以手臂為例，分六部分講觀念、簡易版、硬體層、模擬層、AdvantageKit 與測試。","part":"架構","path":"core","difficulty":3,"prereqs":[8,11],"objectives":["照 IO 架構寫出 Subsystem、IO 介面與硬體實作","說明每一層該做和不該做的事","讓同一個 Subsystem 換成模擬 IO 執行"],"awareness":["AdvantageKit 重播的完整流程（第 18 章）","用假的 IO 寫單元測試"]},{"id":7,"title":"機器人程式的生命週期","desc":"學校的一天：程式啟動、四種模式、init / periodic / exit 的呼叫順序、loop overrun。","part":"WPILib 基礎","path":"core","difficulty":2,"prereqs":[3],"objectives":["說出四種模式與 init／periodic／exit 的呼叫順序","判斷一段程式會不會造成 loop overrun"],"awareness":["LoggedRobot 與 TimedRobot 的細部差異"]},{"id":8,"title":"Subsystem 與 Command","desc":"借用體育館：指令的生命週期、requirements、中斷行為、預設指令。","part":"WPILib 基礎","path":"core","difficulty":2,"prereqs":[4,7],"objectives":["寫出有正確 requirements 的 Command","預測兩個指令搶同一個 Subsystem 時會發生什麼","設定預設指令"],"awareness":["Disabled 時執行指令的細節"]},{"id":9,"title":"Trigger 與按鍵綁定","desc":"門鈴、對講機和電燈開關：onTrue、whileTrue、toggleOnTrue、條件組合與防連按。","part":"WPILib 基礎","path":"core","difficulty":2,"prereqs":[4,8],"objectives":["依需求選擇 onTrue、whileTrue、toggleOnTrue","用感測器或條件建立 Trigger 並組合條件"],"awareness":["防連按（debounce）的參數選擇"]},{"id":10,"title":"組合指令","desc":"運動會的節目表：sequence、parallel、race、deadline、結束條件與兩條重要規則。","part":"WPILib 基礎","path":"core","difficulty":2,"prereqs":[8],"objectives":["用 sequence、parallel、race、deadline 組出完整動作","說明同一個指令物件為什麼不能用兩次"],"awareness":["各種修飾方法的完整清單"]},{"id":11,"title":"Phoenix 6 與 TalonFX","desc":"班長的工作手冊：CANivore 與 CANBus、完整設定、控制請求、EnableFOC 與 Pro、Tuner X。","part":"硬體","path":"core","difficulty":2,"prereqs":[5],"objectives":["在 CANivore 上建立 TalonFX 並寫一份完整設定","選擇合適的控制請求（Voltage 類）","用 Tuner X 設定 ID、確認方向"],"awareness":["EnableFOC 與 Pro 授權的細節","TorqueCurrentFOC"]},{"id":12,"title":"感測器與 CAN 除錯","desc":"計步器、刻度尺和廣播線：內建編碼器與 CANcoder、極限開關與歸零、CAN 接法與除錯順序。","part":"硬體","path":"core","difficulty":2,"prereqs":[6],"objectives":["設定 CANcoder 的零點與方向","選擇極限開關接法並寫出歸零指令","CAN 找不到裝置時照順序除錯"],"awareness":["FusedCANcoder／SyncCANcoder（需要 Pro）"]},{"id":13,"title":"PID 與前饋","desc":"推書車上斜坡：P、I、D 各自做什麼，kS、kV、kA、kG 前饋，手動調參的順序。","part":"控制","path":"controls","difficulty":3,"prereqs":[6,11],"objectives":["說明 P、I、D 與 kS、kV、kA、kG 各自的作用","判斷機構停在目標下方時缺的是 kG 而不是 kI","照 kG → kS → kV → kP → kD 的順序手動調參"],"awareness":["積分防飽和的各種做法"]},{"id":14,"title":"MotionMagic","desc":"校車開到下一站：梯形、三角形與 S-curve 軌跡，巡航速度、加速度與 jerk 怎麼設。","part":"控制","path":"controls","difficulty":2,"prereqs":[13],"objectives":["說明為什麼需要運動軌跡","依機構能力設定巡航速度與加速度","判斷何時需要 jerk（S-curve）"],"awareness":["MotionMagic Expo","Dynamic MotionMagic（需要 Pro）"]},{"id":15,"title":"SysId 系統鑑別","desc":"體適能檢測：四項測試、SysIdRoutine 搭配 SignalLogger、轉檔分析、把參數填回程式。","part":"控制","path":"controls","difficulty":3,"prereqs":[9,13],"objectives":["說明 SysId 在量什麼、四項測試的目的","安全地跑完測試並取出資料","判斷一份 SysId 結果能不能信，再填回程式"],"awareness":["LQR 回饋增益的推導"]},{"id":16,"title":"自動階段與路徑","desc":"校外教學的行程表：座標與里程計、PathPlanner、紅藍翻轉、Named Commands 與自動程式選單。","part":"上場","path":"competition","difficulty":2,"prereqs":[6,10],"objectives":["設定 AutoBuilder 與紅藍翻轉","註冊 Named Commands 並組出自動程式","上場前檢查自動程式"],"awareness":["PathPlanner 的即時路徑產生（pathfinding）"]},{"id":17,"title":"視覺與定位","desc":"看門牌校正位置：AprilTag、融合與標準差、Limelight MegaTag2、兩種瞄準做法。","part":"上場","path":"competition","difficulty":3,"prereqs":[16],"objectives":["用 addVisionMeasurement 融合視覺，並依距離調整標準差","丟掉不可靠的視覺量測","選擇合適的瞄準做法"],"awareness":["PhotonVision 的設定細節"]},{"id":18,"title":"模擬、日誌與重播","desc":"比賽錄影和賽後檢討：取得日誌、AdvantageScope、重播步驟、確定性、版本追蹤。","part":"上場","path":"competition","difficulty":3,"prereqs":[6],"objectives":["從機器人取出日誌並用 AdvantageScope 找問題","完成一次重播並補記錄輸出","避開讓重播失準的寫法"],"awareness":["Replay Watch","AdvantageKit swerve 範本的細節"]},{"id":19,"title":"上場檢查與 Pit 除錯","desc":"考試當天：出發前與每場前後的檢查、brownout、DS Log、Pit 分診與改程式的規矩。","part":"上場","path":"competition","difficulty":1,"prereqs":[12],"objectives":["照清單完成賽前與賽後檢查","從 DS Log 判斷 brownout、roboRIO 重開","在 Pit 依分診順序找問題，並遵守改程式的規矩"],"awareness":["Driver Station 筆電的完整設定"]}],"paths":[{"id":"core","name":"核心路徑","required":true,"goal":"能寫出、部署並除錯一個機構的子系統。每位程式組成員都要完成。","chapters":[0,1,2,3,4,5,7,8,9,10,11,6,12]},{"id":"controls","name":"進階控制路徑","required":false,"goal":"能量出、調好並驗證一個有重力的機構（手臂或升降）。負責機構控制的人必修。","chapters":[13,14,15]},{"id":"competition","name":"競賽實務路徑","required":false,"goal":"能寫自動程式、用日誌找問題，並在比賽中處理狀況。上場前每位程式組成員都要讀第 19 章。","chapters":[16,17,18,19]}],"mastery":"精通標準：學習目標都做得到、小測驗答對 80% 以上、練習先自己寫過再看提示。只需知道的部分，看得懂、需要時查得到就好。"};
 const QUIZ_DATA = {"0":[{"q":"為什麼要用 WPILib VS Code 2026，而不是自己電腦上原本的 VS Code？","o":["原本的 VS Code 不能寫 Java","WPILib 另外安裝一份帶有專用設定和擴充套件的 VS Code，官方要求使用這一份","兩者完全一樣，用哪個都可以","原本的 VS Code 要付費"],"a":1,"e":"WPILib 安裝程式會另裝一份 VS Code，每年一份，官方提醒要打開這一份。"},{"q":"專案加入 Phoenix 6 後，描述這個函式庫的 JSON 檔會放在哪裡？","o":["C:\\Windows","專案的 vendordeps 資料夾","src/main/deploy","roboRIO 的 /home/lvuser"],"a":1,"e":"vendordep JSON 會被複製到專案的 vendordeps 資料夾，就像班級書單跟著班級走。"},{"q":"Command-based 專案裡，哪一個類別新手不應該修改？","o":["RobotContainer","Constants","Main","Robot"],"a":2,"e":"官方文件說明 Main 是程式進入點，新手不應修改，也不要改 main() 方法。"},{"q":"放在 src/main/deploy 裡的檔案會怎樣？","o":["被忽略","部署時一起上傳到 roboRIO 的 /home/lvuser/deploy","被編譯成 Java 類別","只在模擬時使用"],"a":1,"e":"deploy 資料夾的內容會跟著程式一起送上 roboRIO，程式裡用 Filesystem.getDeployDirectory() 取得。"},{"q":"專案附帶的 .gitignore 應該怎麼處理？","o":["刪掉，才能提交所有檔案","不要修改","每次 commit 前清空","改成列出所有 Java 檔"],"a":1,"e":"WPILib 文件特別強調不要修改專案附帶的 .gitignore，它列出了編譯產生的檔案等不需要提交的東西。"},{"q":"commit 之後，隊友在 GitHub 上看得到你的改動嗎？","o":["看得到","看不到，要 push 之後才會上傳","要等部署到機器人才會","要等 merge 之後才會"],"a":1,"e":"commit 只存在自己的電腦上，push 之後 GitHub 上才會有。"},{"q":"Driver Station 可以在 macOS 上執行嗎？","o":["可以","不行，FRC Game Tools 只支援 Windows 10 以上","只有 Intel Mac 可以","要另外買授權"],"a":1,"e":"WPILib 支援 macOS，但 Driver Station 屬於 FRC Game Tools，只能在 Windows 上執行。"}],"1":[{"q":"Roller a = new Roller(\"A\"); Roller b = new Roller(\"B\"); a.run(10.0); 之後，b.getVoltage() 是多少？","o":["10.0","0.0","12.0","編譯錯誤"],"a":1,"e":"a 和 b 是兩張獨立的表格，各有自己的 voltage 欄位。"},{"q":"建構子在什麼時候執行？","o":["每次呼叫方法之前","程式編譯時","用 new 建立物件時","機器人 Enable 時"],"a":2,"e":"new 會配置一個新物件，接著執行建構子來填好欄位，就像新生報到時填表。"},{"q":"建構子裡 this.name = name; 的 this.name 指的是？","o":["傳進來的參數","這個物件自己的 name 欄位","類別的 static 欄位","另一個物件"],"a":1,"e":"this 代表「我自己」。參數和欄位同名時，用 this 指欄位。"},{"q":"宣告 private TalonFX leader; 但忘了 new，會發生什麼事？","o":["編譯失敗","WPILib 自動建立","執行到 leader.setControl(...) 時丟出 NullPointerException","馬達以 0V 運轉"],"a":2,"e":"欄位是 null，就像點名冊上的空座位。編譯器不攔，執行時才崩潰。"},{"q":"下面哪一個最適合寫成 static final 常數？","o":["滾輪目前的電壓","所有滾輪共用的電壓上限 12.0","飛輪目前的轉速","手臂現在的角度"],"a":1,"e":"就像印在表頭的校名：對所有物件都一樣而且不變。其他三個是每個物件各自、會變動的狀態。"}],"2":[{"q":"IntakeSubsystem 的 roller 欄位是 private，下面哪一行寫在 RobotContainer 裡會編譯失敗？","o":["intake.setRollerVoltage(6.0);","intake.getRollerVelocityRps();","intake.roller.setControl(new VoltageOut(6));","new IntakeSubsystem();"],"a":2,"e":"private 欄位只有類別自己能直接存取，外面只能透過公開方法，就像成績簿鎖在抽屜裡。"},{"q":"沒寫任何存取修飾詞的欄位，誰可以存取？","o":["只有類別自己","同一個套件裡的類別","所有地方","只有子類別"],"a":1,"e":"不寫修飾詞是「套件層級」存取，同套件可用，套件外不行。"},{"q":"為什麼 IntakeSubsystem 的 TalonFX 應該是 private？","o":["private 的馬達轉得比較快","讓電壓限制等規則只寫一次，而且外面無法繞過","Java 規定馬達必須是 private","這樣才能用 final"],"a":1,"e":"外面只能透過 setRollerVoltage() 控制，規則集中在一處，Command 系統的保護也不會被繞過。"},{"q":"寫了 private TalonFX roller，又加上 public TalonFX getRoller()，結果是？","o":["封裝完整","封裝被破壞，外面拿到物件後一樣能直接控制","編譯失敗","roller 變成 null"],"a":1,"e":"getter 應該回傳資料，不該回傳可操作的硬體物件。"}],"3":[{"q":"IntakeSubsystem extends SubsystemBase，下面哪個敘述正確？","o":["IntakeSubsystem 還能再 extends 另一個類別","IntakeSubsystem 自動擁有 SubsystemBase 的方法，例如 runOnce()","SubsystemBase 自動擁有 IntakeSubsystem 自己寫的方法","兩者沒有關係"],"a":1,"e":"子類別沿用父類別的方法，反過來不成立。Java 只能 extends 一個父類別。"},{"q":"IntakeSubsystem 的建構子裡沒寫 super()，SubsystemBase 的建構子還會執行嗎？","o":["不會，所以 periodic() 不會被呼叫","會，編譯器自動在第一行插入 super()","只有在模擬時會","要手動呼叫 register() 才會"],"a":1,"e":"沒有明確呼叫時，編譯器會自動插入呼叫父類別無參數建構子的 super()，SubsystemBase 因此完成註冊。"},{"q":"在 Robot 裡把 teleopPeriodic() 打錯成 teleopPeriodc()，但有加 @Override，會怎樣？","o":["執行時才出錯","編譯器報錯","自動改成正確名稱","沒有任何影響"],"a":1,"e":"@Override 讓編譯器檢查父類別真的有這個方法，打錯馬上被抓。沒加的話，機器人在手動階段會什麼都不做。"},{"q":"RollerIO io = new RollerIOSim(); io.setVoltage(8.0); 會執行誰的 setVoltage()？","o":["RollerIO 介面的","RollerIOSim 的","RollerIOHardware 的","編譯錯誤"],"a":1,"e":"變數型別是介面，實際執行的是物件本身的做法，就像衛生股長只看職責、不管今天是誰。"},{"q":"真馬達和模擬器都要能「設定電壓、回報轉速」，最適合用什麼表達？","o":["讓 RollerIOSim extends RollerIOHardware","定義 RollerIO 介面，兩者都 implements","複製貼上兩份程式","用 static 方法"],"a":1,"e":"模擬器不是一種真馬達，只是能做同樣的事，這正是介面的用途，就像掃地機器人能當值日生。"}],"4":[{"q":"Command c = intake.runOnce(() -> intake.setRollerVoltage(-6.0)); 這行執行完，滾輪會轉嗎？","o":["會，立刻以 -6V 轉動","不會，只是建立了一個指令，要等它被排程執行","編譯錯誤","會轉一圈後停止"],"a":1,"e":"這行只是寫好字條交給指令。要等指令被排程器執行時，lambda 裡的程式才會跑。"},{"q":"controller::getLeftY 和 controller.getLeftY() 的差別是？","o":["沒有差別","前者交出方法本身，後者立刻呼叫並得到一個數字","前者比較快","後者不能編譯"],"a":1,"e":":: 是把方法交給別人以後再呼叫；加括號是當場呼叫。"},{"q":"Trigger 的條件參數應該是哪種函式介面？","o":["Runnable","DoubleSupplier","BooleanSupplier","Consumer"],"a":2,"e":"Trigger 要問「現在成立嗎」，不收參數、回傳是或否，就是 BooleanSupplier。"},{"q":"double s = -controller.getLeftY(); drive.run(() -> drive.arcadeDrive(s, 0.0)) 的問題是？","o":["編譯失敗","s 只在綁定時讀一次，之後永遠不變","每次都讀到 0","沒有問題"],"a":1,"e":"讀搖桿要寫在 lambda 裡面，每次執行才會重新讀。"}],"5":[{"q":"用 enum 取代 int 代表時段，最主要的好處是？","o":["執行比較快","只能是清單上的值，寫錯會被編譯器抓到","比較省記憶體","可以不用 switch"],"a":1,"e":"用數字的話寫錯也能編譯；enum 限定只能用定義好的值。"},{"q":"Java 常數的命名慣例是？","o":["maxVolts","MaxVolts","MAX_VOLTS","max-volts"],"a":2,"e":"常數全部大寫，單字間用底線。"},{"q":"IntakeSubsystem.java 放在 frc/robot/subsystems/intake/，第一行 package 應該寫？","o":["package intake;","package frc.robot.subsystems.intake;","package IntakeSubsystem;","不用寫"],"a":1,"e":"套件名要和 src/main/java 底下的資料夾路徑一致。"},{"q":"檔名是 Roller.java，裡面寫 public class RollerIO，會怎樣？","o":["正常編譯","編譯失敗","自動改檔名","執行時才出錯"],"a":1,"e":"public 類別名必須和檔名相同。"}],"6":[{"q":"IO 架構裡，ArmSubsystem 的 IO 欄位型別應該是？","o":["ArmIOHardware","ArmIOSim","ArmIO（介面）","TalonFX"],"a":2,"e":"Subsystem 只認介面，才能在不改程式的情況下換成模擬或重播。"},{"q":"隊上的手臂用 TalonFX 內建的 MotionMagic，ArmIO 的主要輸出方法應該是？","o":["setVoltage(volts)","setPositionGoal(positionRad)","setPID(kP, kI, kD)","getTalonFX()"],"a":1,"e":"閉迴路在控制器內部執行，所以 IO 送的是目標位置；setVoltage 只保留給 SysId 和手動測試。"},{"q":"2026 年的 Phoenix 6，TalonFX 接在名為 9427 的 CANivore 上，應該怎麼寫？","o":["new TalonFX(id, \"9427\")","new TalonFX(id, new CANBus(\"9427\"))","new TalonFX(id)","new TalonFX(\"9427\", id)"],"a":1,"e":"字串版建構子在 2026 年已標為 deprecated，預計 2027 年移除。"},{"q":"Follower 使用 MotorAlignmentValue.Opposed，意思是？","o":["和 follower 自己的 Inverted 相反","和 leader 設定的 Invert 相反","停止跟隨","反向讀取編碼器"],"a":1,"e":"Aligned 和 Opposed 都是相對於 leader 的 Invert 設定。"},{"q":"手臂的 GravityType 應該設成什麼？","o":["預設的 Elevator_Static","Arm_Cosine","不需要設定","Arm_Sine"],"a":1,"e":"手臂的重力補償隨角度變化，要選 Arm_Cosine，而且 0 度必須是水平。"},{"q":"Command 在 initialize() 裡呼叫 arm.setGoal(SCORE)，新目標什麼時候送到 TalonFX？","o":["同一行立刻送出","下一個週期的 ArmSubsystem.periodic()","Command 結束時","下次部署時"],"a":1,"e":"排程器先跑 Subsystem 的 periodic，再執行指令，所以新目標在下一輪的 periodic 才送出。"},{"q":"為什麼 ArmIOSim 推薦用 Phoenix 的 TalonFXSimState？","o":["比較快","模擬時跑的是同一份 MotionMagic 和 kG 設定","不需要齒輪比","可以用多條 CAN bus"],"a":1,"e":"這樣模擬驗證的就是實機會用的設定。注意模擬時所有 CAN bus 會合併，ID 必須唯一。"}],"7":[{"q":"autonomousInit() 什麼時候被呼叫？","o":["程式啟動時一次","自動階段中每 20 毫秒一次","每次從其他模式進入 Autonomous 時一次","只有連上 FMS 時"],"a":2,"e":"init 在每次進入該模式時呼叫一次，就像每次進入新時段班長喊一次起立。"},{"q":"robotPeriodic() 在哪些模式會執行？","o":["只有 Teleop","只有 Enable 時","所有模式，而且排在該模式的 periodic 之後","所有模式，而且排在該模式的 periodic 之前"],"a":2,"e":"警衛每一輪都巡，而且總是在老師巡完之後。"},{"q":"Command-based 專案的 robotPeriodic() 裡沒有 CommandScheduler.getInstance().run()，會怎樣？","o":["沒有影響","只有自動階段不能動","排程器不會執行任何指令，Subsystem 的 periodic 也不會被呼叫","編譯失敗"],"a":2,"e":"官方強調這一行是必要的。Subsystem 的 periodic 也是由排程器的 run() 呼叫的。"},{"q":"在 teleopPeriodic() 裡寫 while (!sensor.get()) {} 等感測器觸發，會發生什麼事？","o":["等到觸發後正常繼續","主迴圈卡住，其他 Subsystem、按鍵、指令都停止更新，並出現 overrun 警告","編譯器會報錯","WPILib 會自動跳過"],"a":1,"e":"所有 periodic 在同一條執行緒上依序執行，一個卡住就全部卡住。"},{"q":"使用 AdvantageKit 時，Robot 建構子裡 Logger 的設定應該放在哪裡？","o":["建立 RobotContainer 之後","建構子最前面，任何其他初始化之前","robotPeriodic() 裡","autonomousInit() 裡"],"a":1,"e":"AdvantageKit 文件要求 Logger 在任何其他初始化之前設定並啟動，Logger.start() 之後就不能再加接收端。"},{"q":"Robot 的建構子會執行幾次？","o":["每次 Enable 一次","每 20 毫秒一次","程式啟動時一次","每次切換模式一次"],"a":2,"e":"建構子只在程式啟動時執行一次，就像工友每天早上開門一次。"}],"8":[{"q":"指令的 initialize() 什麼時候被呼叫？","o":["每輪一次","指令被排程時一次","指令結束時","機器人開機時"],"a":1,"e":"initialize 在排程時呼叫一次，就像活動開始時集合。"},{"q":"手臂正在執行指令 A（預設中斷行為），此時排程了同樣 require 手臂的指令 B，會怎樣？","o":["B 排程失敗","A 被取消，B 開始執行","兩個同時執行","A 結束後 B 才執行"],"a":1,"e":"預設是 kCancelSelf：正在執行的指令被取消，新指令排程成功。"},{"q":"A 被 B 打斷時，A 的 end(interrupted) 收到什麼？","o":["不會呼叫 end","interrupted = false","interrupted = true","會丟出例外"],"a":2,"e":"被打斷或取消時一樣會呼叫 end，參數為 true。"},{"q":"Commands.runOnce(() -> arm.setGoal(ArmState.STOW)) 少了什麼？","o":["什麼都不少","requirements：沒有傳入 arm","isFinished","withTimeout"],"a":1,"e":"Commands 工具類別的 factory 要自己把 Subsystem 傳進去；Subsystem 自己的 factory 才會自動 require。"},{"q":"預設指令最適合用哪個 factory 建立？","o":["runOnce","run","waitSeconds","none"],"a":1,"e":"預設指令不應自己結束，run 會一直執行直到被打斷，並自動 require 該 Subsystem。"}],"9":[{"q":"按住才吸入、放開就停，應該用哪種綁定？","o":["onTrue","whileTrue","toggleOnTrue","onFalse"],"a":1,"e":"whileTrue 在變成 true 時排程，變成 false 時取消。"},{"q":"不會自己結束的指令綁在 onTrue，放開按鍵後會怎樣？","o":["立刻停止","繼續執行，直到被別的指令打斷","重新開始","編譯失敗"],"a":1,"e":"onTrue 在放開時什麼都不做。"},{"q":"toggleOnTrue 在指令正在執行時被按下，會怎樣？","o":["再排程一次","取消指令","什麼都不做","暫停指令"],"a":1,"e":"像電燈開關：沒在執行就排程，正在執行就取消。"},{"q":"按鍵綁定應該寫在哪裡？","o":["robotPeriodic()","Subsystem 的 periodic()","RobotContainer 建構時（configureBindings）","每個指令的 execute()"],"a":2,"e":"綁定是宣告式的，初始化時宣告一次。寫在 periodic 裡會每輪新增綁定。"},{"q":"new Trigger(arm::atGoal).and(operator.rightTrigger(0.5)) 什麼時候為 true？","o":["任一個成立","兩個都成立","都不成立","arm 到位後 0.5 秒"],"a":1,"e":"and 代表兩個條件都要成立。"}],"10":[{"q":"Commands.parallel(a, b) 什麼時候結束？","o":["a 結束時","任一個結束時","兩個都結束時","永遠不會"],"a":2,"e":"parallel 像大掃除，全部完成才結束。"},{"q":"Commands.deadline(arm.goTo(INTAKE), intake.runState(INTAKING)) 什麼時候結束？","o":["滾輪停止時","手臂到達 INTAKE 時","兩個都結束時","永遠不會"],"a":1,"e":"第一個參數是主角，它結束時其他成員被打斷。"},{"q":"同一個指令物件放進兩個不同的組合，會怎樣？","o":["正常執行兩次","執行時丟出例外","只執行第一個","自動複製一份"],"a":1,"e":"傳進組合的指令物件不能再用於第二個組合或單獨排程。要用 factory 取得新物件。"},{"q":"2025 年起，deadlineWith 改名為？","o":["deadlineFor","withDeadline","raceWith","alongWith"],"a":0,"e":"WPILib 2025 更新說明：Rename deadlineWith to deadlineFor。"},{"q":"score 序列需要手臂和 Intake。在它吐出的那段時間，手臂的預設指令會執行嗎？","o":["會","不會，組合在整段期間都佔住所有成員的 requirements","只有 0.5 秒後會","看手臂有沒有在動"],"a":1,"e":"組合的 requirements 是聯集，整段執行期間都有效。"}],"11":[{"q":"2026 年在 CANivore「9427」上建立 TalonFX，建議的寫法是？","o":["new TalonFX(21, \"9427\")","new TalonFX(21, new CANBus(\"9427\"))","new TalonFX(21)","new CANBus(21, \"9427\")"],"a":1,"e":"字串版建構子已標為 deprecated，預計 2027 年移除。只給 ID 的版本會用 roboRIO 內建 CAN。"},{"q":"套用一份修改過的完整 TalonFXConfiguration 之前，需要先恢復出廠設定嗎？","o":["需要，否則舊設定會留著","不需要，完整設定中沒改的項目會自動回到預設","只有第一次需要","只有換韌體時需要"],"a":1,"e":"新建立的設定物件本身就包含所有預設值。"},{"q":"沒有 Phoenix Pro 授權，MotionMagicVoltage 的 EnableFOC 維持預設的 true，會怎樣？","o":["馬達不動","程式丟出例外","自動退回一般換相，正常運作","只有模擬能跑"],"a":2,"e":"CTRE 文件：未授權裝置會自動退回非 FOC 換相。"},{"q":"為什麼本課程用 VoltageOut 而不是 DutyCycleOut？","o":["VoltageOut 比較快","輸出不受電池電壓變化影響，結果較穩定、容易重現","DutyCycleOut 需要 Pro","DutyCycleOut 已被移除"],"a":1,"e":"DutyCycle 的實際電壓會隨電池電壓變化，調好的參數容易失準。"},{"q":"config 的 apply() 應該放在哪裡？","o":["periodic()","建構子裡，只執行一次","每個指令的 execute()","robotPeriodic()"],"a":1,"e":"apply 是會等待裝置回應的阻塞呼叫，放在 periodic 會拖慢主迴圈。"}],"12":[{"q":"升降機構只有 TalonFX 內建編碼器，開機時讀到位置 0，代表什麼？","o":["機構一定在底部","CANcoder 壞了","只代表計數從 0 開始，不知道機構實際在哪","CAN 斷線"],"a":2,"e":"內建編碼器是相對位置，開機從 0 算起，所以需要歸零或絕對編碼器。"},{"q":"roboRIO 的 DigitalInput 什麼都沒接時，get() 回傳什麼？","o":["true","false","丟出例外","隨機"],"a":0,"e":"內部上拉電阻讓未接的輸入讀到 high，也就是 true。"},{"q":"用常閉開關接地，線被撞掉時程式會讀到什麼狀態？","o":["沒碰到","讀不到值","看開關型號","碰到（true）"],"a":3,"e":"線掉了等於電路斷開，讀到 true，和「碰到」一樣，所以壞掉時機構會停。"},{"q":"沒有 Pro 授權卻把 FeedbackSensorSource 設為 FusedCANcoder，會怎樣？","o":["馬達不動","退回 RemoteCANcoder，並觸發 UsingFusedCANcoderWhileUnlicensed 故障","程式編譯失敗","改用內建編碼器且不報錯"],"a":1,"e":"CTRE 文件：未授權時退回 RemoteCANcoder 並觸發該故障。"},{"q":"斷電後量 CAN-H 與 CAN-L 之間的電阻，量到 120 Ω 代表？","o":["一切正常","黃綠線接反","只有一端有終端電阻","有 ID 重複"],"a":2,"e":"兩顆 120 Ω 並聯約 60 Ω；量到 120 Ω 表示少了一端的終端。"},{"q":"Tuner X 顯示 TalonFX 21、22 正常，但之後的 CANcoder 23 和 Pigeon 2 都不見了。最可能的問題在哪？","o":["TalonFX 22 到 CANcoder 23 之間的線","TalonFX 21 的 ID","CANivore 的名稱","roboRIO 的 DIO"],"a":0,"e":"daisy-chain 斷在哪裡，後面的裝置就全部消失，問題在最後一個還在與第一個不見的之間。"}],"13":[{"q":"手臂只用 P 控制，最後停在目標下方一點點不動。最根本的原因是？","o":["kP 太大","感測器壞了","kD 太小","手臂在目標處仍需要輸出撐住重力，純 P 要有誤差才有輸出"],"a":3,"e":"誤差為 0 時 P 的輸出也是 0，撐不住重力。補上 kG 前饋才是正解。"},{"q":"D 項在 WPILib 文件裡被比喻成什麼？","o":["彈簧","門上的緩衝器（阻尼）","油門","計步器"],"a":1,"e":"P 像軟體彈簧，D 像軟體阻尼，速度越快阻力越大。"},{"q":"手臂的 kG 為什麼要乘 cos(θ)？","o":["重力對手臂的影響隨角度改變，水平最大、垂直趨近 0","為了讓單位正確","Phoenix 6 規定的","為了減少雜訊"],"a":0,"e":"所以 θ 必須以水平為 0，Phoenix 6 要選 Arm_Cosine。"},{"q":"積分飽和（windup）的處理方法，WPILib 文件第一個建議的是？","o":["把 kI 調大","把 kP 設 0","降低 kI，能降到 0 最好","改用 DutyCycleOut"],"a":2,"e":"其次才是 IZone 與限制積分範圍。"},{"q":"Phoenix 6 手動調參時，kP 和 kD 的調整順序是？","o":["先 kD 再 kP","兩個同時加","只調 kI","先把 kP 加到開始振盪，再盡量加 kD 但不產生抖動"],"a":3,"e":"CTRE 流程：kG → kS → kV → kP → kD。"},{"q":"機構有 100:1 減速，Phoenix 6 的 kP = 1 代表？","o":["馬達誤差 1 圈輸出 1 V","機構誤差 1 圈輸出 1 V","機構誤差 1 度輸出 1 V","輸出 1% duty cycle"],"a":1,"e":"Phoenix 6 的增益是機構單位，等於馬達誤差 100 圈才 1 V。"}],"14":[{"q":"移動距離很短，還沒加速到巡航速度就得減速，這時的速度曲線是？","o":["梯形","S-curve","三角形","水平線"],"a":2,"e":"CTRE 文件稱為 triangle profile。"},{"q":"MotionMagicJerk 設為 0 代表？","o":["不限制 jerk，軌跡是梯形","機構不會動","最圓滑的 S-curve","使用預設 jerk"],"a":0,"e":"jerk 非 0 才是 S-curve；數值越小越圓滑、越慢。"},{"q":"沒有 Pro 授權的 TalonFX 使用 DynamicMotionMagicVoltage，會怎樣？","o":["自動退回一般 MotionMagic","正常運作","只能在模擬中用","關閉輸出並觸發 UnlicensedFeatureInUse 故障"],"a":3,"e":"這點和 EnableFOC 不同，EnableFOC 會自動退回。"},{"q":"使用 MotionMagic 時，roboRIO 需要做什麼？","o":["每 1 ms 算一個軌跡點送出","定期送出目標位置即可","等軌跡跑完才能送下一個目標","什麼都不用，連目標都不用給"],"a":1,"e":"軌跡由 TalonFX 產生；也沒有必須等軌跡跑完的規定。"},{"q":"設了 SensorToMechanismRatio 之後，MotionMagicCruiseVelocity 的單位是？","o":["馬達端 rot/s","m/s","機構端 rot/s","RPM"],"a":2,"e":"所有讀值與設定都變成機構端單位。"}],"15":[{"q":"SysId 的 Quasistatic 測試在量什麼？","o":["電壓緩慢上升，量維持速度所需的電壓（加速度可忽略）","加速時的行為","最高速度","電池內阻"],"a":0,"e":"Dynamic 測試才是突然給固定電壓，量加速行為。"},{"q":"標準的 SysId 流程總共幾項測試？","o":["2","4","6","8"],"a":1,"e":"Quasistatic、Dynamic 各往前、往後一次。"},{"q":"測完手臂後接著測升降，沒有分開日誌，會怎樣？","o":["SysId 自動分開","分析會失敗","結果比較準","只會用到最後一次"],"a":1,"e":"WPILib 文件：只有單一 routine 的日誌能分析。"},{"q":"為什麼 CTRE 建議用 SignalLogger 記錄 SysId 資料？","o":["自動擷取訊號、帶 CAN 時間戳，不受主迴圈時間與 GC 影響","因為免費","檔案可以直接給 SysId 讀，不用轉","它會自動停止測試"],"a":0,"e":"hoot 檔仍需用 Tuner X 轉成 wpilog。"},{"q":"SysId 給出的 kP、kD 應該怎麼看待？","o":["最終答案，直接用","沒有用，忽略","有根據的起點，還要上機微調","只適用於模擬"],"a":2,"e":"WPILib 文件稱它們是 educated guesses。"}],"16":[{"q":"WPILib 的場地座標中，角度正方向是？","o":["順時針","看陀螺儀","看聯盟顏色","逆時針"],"a":3,"e":"NWU 慣例：逆時針為正，有些陀螺儀順時針為正要注意。"},{"q":"只用編碼器和陀螺儀的里程計有什麼限制？","o":["完全不能用在自動階段","會隨時間漂移，碰撞時特別明顯","只能用在差速底盤","每秒只能更新一次"],"a":1,"e":"WPILib 文件：自動階段通常很準，但會漂移。"},{"q":"紅方時 PathPlanner 翻轉路徑，場地座標原點在哪？","o":["紅方","場地中央","藍方","機器人起始位置"],"a":2,"e":"原點永遠在藍方。"},{"q":"Named Commands 應該什麼時候註冊？","o":["建立任何 Auto 或 Path 之前","autonomousInit 裡","路徑跑完之後","哪時都可以"],"a":0,"e":"之後才註冊的，已建立的 Auto 用不到。"},{"q":"Auto 裡放了一個不會自己結束的指令，會怎樣？","o":["自動跳過","15 秒後才繼續","PathPlanner 報錯停止","後面的步驟永遠不會開始"],"a":3,"e":"Auto 是 sequential 群組，前一步結束才進下一步。"}],"17":[{"q":"看到 AprilTag 算出的位置，最好的用法是？","o":["直接 resetPose 成這個位置","用 addVisionMeasurement 融合進位置估計","只用在自動階段","只在 Disabled 時使用"],"a":1,"e":"視覺量測偶爾會跳，融合才能兼顧準確與穩定。"},{"q":"WPILib 對 AprilTag 視覺量測的朝向標準差建議怎麼設？","o":["非常小","和 x、y 一樣","設為 0","非常大，把朝向交給陀螺儀"],"a":3,"e":"陀螺儀的朝向標準差小、視覺的朝向標準差大。"},{"q":"視覺 x、y 的標準差應該怎麼隨距離變化？","o":["距離越遠越小","固定不變","距離越遠越大","看到越多標籤越大"],"a":2,"e":"遠的標籤看不清楚，量測越不可信。"},{"q":"呼叫 getBotPoseEstimate_wpiBlue_MegaTag2 之前要先做什麼？","o":["呼叫 SetRobotOrientation 提供機器人朝向","重設里程計","關閉 LED","切換到 Test 模式"],"a":0,"e":"LimelightHelpers 的註解寫明 MegaTag2 需要先提供朝向。"},{"q":"CTRE 範例在什麼情況下丟掉視覺量測？","o":["電池電壓低","機器人旋轉速度超過每秒 2 圈或沒看到標籤","自動階段","紅方時"],"a":1,"e":"快速旋轉時影像與時間對應容易出錯。"}],"18":[{"q":"重播時修改了手臂的 kP，日誌裡的手臂位置會怎樣？","o":["跟著改變","變成 0","不變，因為位置是從日誌讀回的輸入","無法重播"],"a":2,"e":"修改的輸出不能影響重播的輸入（replay bubble）。"},{"q":"下列哪一個會讓 AdvantageKit 重播失準？","o":["用 SmartDashboard.getNumber 讀調參數值","用 Timer.getTimestamp()","用 Logger.recordOutput 記錄 Pose2d","在 Subsystem periodic 裡讀 inputs"],"a":0,"e":"NetworkTables 的值沒有被記錄，要用 AdvantageKit 的儀表板類別。"},{"q":"RobotContainer 應該在 Robot 建構子的哪裡建立？","o":["Logger 設定之前","robotPeriodic 裡","autonomousInit 裡","Logger.start() 之後"],"a":3,"e":"Logger.start() 之前讀到的時間與 DS 資料不是確定的。"},{"q":"重播時 setUseTiming(false) 會？","o":["讓重播結果不準","讓重播盡快跑完，不影響準確度","關閉日誌","只重播前 15 秒"],"a":1,"e":"AdvantageKit 文件明確說明不影響準確度。"},{"q":"Event Deploy 的作用是？","o":["部署前自動把修改 commit 到 event 分支","自動上傳日誌","自動選擇自動程式","加快部署速度"],"a":0,"e":"讓每一場的程式版本都找得回來，方便重播。"}],"19":[{"q":"roboRIO 1.0 在電壓低於多少時進入 brownout 保護（第 2 階段）？","o":["7.5 V","6.8 V","6.3 V","4.5 V"],"a":2,"e":"6.8 V 是第 1 階段，4.5 V 以下可能斷電；roboRIO 2.0 預設 6.75 V。"},{"q":"發生 brownout 後，哪裡可以看到次數？","o":["Tuner X","PathPlanner","VS Code 終端機","Driver Station CAN/Power 分頁的 12V fault 計數"],"a":3,"e":"DS 日誌也會記錄 brownout 事件。"},{"q":"Driver Station 顯示「No robot code is currently running」代表？","o":["roboRIO 有連上，但程式沒在執行","DS 和機器人完全沒連上","搖桿沒插","電池沒電"],"a":0,"e":"可能是程式當掉、還在開機或部署失敗。"},{"q":"在 Pit 搖線測試時，應該怎麼連接機器人？","o":["USB 線","網路線","無線","都可以"],"a":1,"e":"用 USB 測不到機器人上真正的通訊路徑。"},{"q":"兩場比賽之間發現 bug，時間只夠改但來不及測，最好的做法是？","o":["改了直接上場","同時改好幾個地方碰運氣","用已知可以動的版本上場","關掉自動程式"],"a":2,"e":"沒測過的修改風險通常比原本的問題更大。"}]};
 
 /* ---------- 課程資料與共用工具 ----------
@@ -4291,9 +4314,9 @@ const QUIZ_DATA = {"0":[{"q":"為什麼要用 WPILib VS Code 2026，而不是自
  */
 const CHAPTERS = COURSE_DATA.chapters;
 const chapterById = id => CHAPTERS.find(c => c.id === id);
-// 舊版的 [id, title, desc, ready] 形式，給課程地圖與大綱用
-const COURSE = COURSE_DATA.parts.map(p => ({
-  part: p.name,
+// 課程地圖依學習路徑排列（[id, title, desc, ready] 形式）
+const COURSE = COURSE_DATA.paths.map(p => ({
+  part: p.name + (p.required ? "（必修）" : "（選修）"),
   items: p.chapters.map(id => { const c = chapterById(id); return [c.id, c.title, c.desc, c.ready !== false]; })
 }));
 const ALL = COURSE.flatMap(p => p.items);
@@ -4328,6 +4351,78 @@ function highlight(src){
   return out + esc(src.slice(last));
 }
 
+
+/* ---------- 學習路徑與章節學習卡 ----------
+ * 資料來自 course.json 的 paths 與每章的 path、prereqs、objectives、awareness、difficulty。
+ */
+const PATHS = COURSE_DATA.paths;
+const pathOf = id => PATHS.find(p => p.chapters.includes(id));
+const PATH_ORDER = PATHS.flatMap(p => p.chapters);          // 核心 → 進階控制 → 競賽實務
+const stars = n => "●".repeat(n) + "○".repeat(3 - n);
+const DIFF_NAME = ["", "入門", "中等", "進階"];
+
+function missingPrereqs(id, done){ return (chapterById(id).prereqs || []).filter(p => !done.includes(p)); }
+
+/** 下一步學什麼：依路徑順序，找第一個還沒完成、而且先備章節都完成的章節。 */
+function recommendNext(done){
+  for (const id of PATH_ORDER){
+    if (done.includes(id)) continue;
+    if (missingPrereqs(id, done).length === 0) return id;
+  }
+  return null;
+}
+
+/** 同一條路徑裡的前後章節；路徑最後一章的「下一章」交給 recommendNext。 */
+function pathNeighbors(id){
+  const p = pathOf(id), i = p.chapters.indexOf(id);
+  return { path: p, prev: p.chapters[i - 1], next: p.chapters[i + 1] };
+}
+
+const chLink = id => `<a href="#ch${id}">第 ${id} 章 ${chapterById(id).title}</a>`;
+
+function learningCardHTML(id){
+  const c = chapterById(id), p = pathOf(id), done = loadDone();
+  const miss = missingPrereqs(id, done);
+  const pre = (c.prereqs || []).length
+    ? c.prereqs.map(x => `<li class="${done.includes(x) ? "ok" : ""}">${done.includes(x) ? "✓ " : ""}${chLink(x)}</li>`).join("")
+    : "<li>沒有，從這裡開始</li>";
+  return `<aside class="lcard" aria-label="本章學習卡">
+    <div class="lcard-head">
+      <span class="ptag ${p.id}">${esc(p.name)}${p.required ? "（必修）" : "（選修）"}</span>
+      <span class="diff" title="難度">${stars(c.difficulty)} ${DIFF_NAME[c.difficulty]}</span>
+      <span class="order">路徑第 ${p.chapters.indexOf(id) + 1} / ${p.chapters.length} 章</span>
+    </div>
+    ${miss.length ? `<p class="lwarn">建議先完成：${miss.map(chLink).join("、")}。這一章會用到那裡的觀念。</p>` : ""}
+    <div class="lcard-grid">
+      <div><h4>先備章節</h4><ul>${pre}</ul></div>
+      <div><h4>學完要能做到</h4><ul>${c.objectives.map(o => `<li>${esc(o)}</li>`).join("")}</ul></div>
+      <div><h4>知道就好，不必精通</h4><ul>${(c.awareness || []).map(o => `<li>${esc(o)}</li>`).join("") || "<li>無</li>"}</ul></div>
+    </div>
+  </aside>`;
+}
+
+function insertLearningCard(id){
+  const anchor = view.querySelector(".lede");
+  if (anchor) anchor.insertAdjacentHTML("afterend", learningCardHTML(id));
+}
+
+function pathsHTML(){
+  const done = loadDone(), next = recommendNext(done);
+  const nextBox = next === null
+    ? `<div class="nextbox"><strong>三條路徑都完成了</strong>接著到最終評量檢查自己能不能獨立除錯。</div>`
+    : `<div class="nextbox"><strong>下一步</strong>${chLink(next)}<span>（${esc(pathOf(next).name)}，先備章節都已完成）</span></div>`;
+  return nextBox + PATHS.map(p => {
+    const n = p.chapters.filter(x => done.includes(x)).length;
+    return `<section class="pathsec">
+      <h3><span class="ptag ${p.id}">${esc(p.name)}</span>${p.required ? "必修" : "選修"}<span class="pcount">${n} / ${p.chapters.length}</span></h3>
+      <p class="pgoal">${esc(p.goal)}</p>
+      <ol class="outline">${p.chapters.map(id => { const c = chapterById(id); return `
+        <li class="${done.includes(id) ? "done" : ""}${id === next ? " next" : ""}"><span class="cid">${pad(id)}</span>
+          <span class="ttl"><a href="#ch${id}">${esc(c.title)}</a>${done.includes(id) ? "（已完成）" : id === next ? "（下一步）" : ""}<span class="diff">${stars(c.difficulty)}</span></span>
+          <span class="desc">${esc(c.desc)}</span></li>`; }).join("")}</ol>
+    </section>`;
+  }).join("") + `<p class="mastery">${esc(COURSE_DATA.mastery)}</p>`;
+}
 
 /* 共用的折線圖（第 13、14 章實驗） */
 function plotColors(){
@@ -4768,10 +4863,7 @@ function mount(id){ view.innerHTML = ""; view.appendChild(document.getElementByI
 function showHome(){
   mount("tpl-home");
   const done = loadDone();
-  document.getElementById("outline").innerHTML = COURSE.map(p => `
-    <h3>${p.part}</h3><ul class="outline">${p.items.map(([id,title,desc,ready]) => `
-      <li><span class="cid">${pad(id)}</span><span class="ttl">${ready ? `<a href="#ch${id}">${title}</a>` : title}${done.includes(id) ? "（已完成）" : ""}</span><span class="desc">${desc}</span></li>`).join("")}
-    </ul>`).join("");
+  document.getElementById("outline").innerHTML = pathsHTML();
   renderMap(null);
 }
 
@@ -4786,6 +4878,7 @@ function showSoon(id){
 
 function showChapter(id){
   mount("tpl-ch" + id);
+  insertLearningCard(id);
   view.querySelectorAll("pre code").forEach(el => { el.innerHTML = highlight(el.textContent); });
   const q = view.querySelector(".quiz");
   if (q && QUIZZES[id]) initQuiz(q, QUIZZES[id]);
@@ -4800,9 +4893,7 @@ function showChapter(id){
 }
 
 function appendFooter(id){
-  const idx = READY.indexOf(id);
-  const next = READY[idx + 1];
-  const prev = READY[idx - 1];
+  const { path, prev, next: nextInPath } = pathNeighbors(id);
   const wrap = document.createElement("div");
   wrap.innerHTML = `
     <div class="finish">
@@ -4810,12 +4901,23 @@ function appendFooter(id){
       <span id="doneMsg" style="color:var(--ink-2)"></span>
     </div>
     <div class="pager">
-      ${prev !== undefined ? `<button class="btn ghost" data-go="${prev}">上一章</button>` : `<button class="btn ghost" data-go="home">回課程大綱</button>`}
-      ${next !== undefined ? `<button class="btn" data-go="${next}">下一章：${ALL.find(x => x[0] === next)[1]}</button>` : `<button class="btn ghost" data-go="home">回課程大綱</button>`}
+      ${prev !== undefined ? `<button class="btn ghost" data-go="${prev}">上一章：${esc(chapterById(prev).title)}</button>` : `<button class="btn ghost" data-go="home">回學習路徑</button>`}
+      <span id="nextSlot"></span>
     </div>`;
   view.appendChild(wrap);
   const btn = document.getElementById("markDone"), msg = document.getElementById("doneMsg");
+  const renderNext = () => {
+    // 路徑內有下一章就去下一章；路徑走完了，依完成狀況推薦下一步
+    const doneNow = [...new Set([...loadDone(), id])];
+    const target = nextInPath !== undefined ? nextInPath : recommendNext(doneNow);
+    const pathDone = path.chapters.every(x => doneNow.includes(x));
+    const label = nextInPath !== undefined ? `下一章：${esc(chapterById(target).title)}`
+      : target !== null ? `${pathDone ? esc(path.name) + "完成，" : ""}下一步：第 ${target} 章 ${esc(chapterById(target).title)}` : "";
+    document.getElementById("nextSlot").innerHTML = target !== null && target !== undefined
+      ? `<button class="btn" data-go="${target}">${label}</button>` : `<button class="btn ghost" data-go="home">回學習路徑</button>`;
+  };
   const refresh = () => {
+    renderNext();
     const d = loadDone().includes(id);
     btn.textContent = d ? "取消完成標記" : "標記本章完成";
     msg.textContent = d ? `第 ${id} 章已完成。` : "";

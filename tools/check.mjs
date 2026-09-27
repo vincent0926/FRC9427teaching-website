@@ -25,6 +25,20 @@ for (const c of chapters) {
   if (!existsSync(src(`chapters/ch${pad(c.id)}.html`))) err("course.json", `第 ${c.id} 章沒有 chapters/ch${pad(c.id)}.html`);
 }
 
+// ---- 學習路徑：每章剛好屬於一條路徑，先備章節要排在前面（核心 → 進階控制 → 競賽實務）
+const order = (course.paths || []).flatMap(p => p.chapters);
+for (const c of chapters) {
+  const inPaths = (course.paths || []).filter(p => p.chapters.includes(c.id));
+  if (inPaths.length !== 1) err("course.json", `第 ${c.id} 章屬於 ${inPaths.length} 條路徑（應該剛好 1 條）`);
+  else if (inPaths[0].id !== c.path) err("course.json", `第 ${c.id} 章的 path 是 ${c.path}，但被放在 ${inPaths[0].id}`);
+  for (const pre of c.prereqs || []) {
+    if (!ids.includes(pre)) err("course.json", `第 ${c.id} 章的先備章節 ${pre} 不存在`);
+    else if (order.indexOf(pre) > order.indexOf(c.id)) err("course.json", `第 ${c.id} 章的先備章節 ${pre} 排在它後面`);
+  }
+  if (!c.objectives?.length) err("course.json", `第 ${c.id} 章沒有學習目標`);
+  if (![1, 2, 3].includes(c.difficulty)) err("course.json", `第 ${c.id} 章的難度要是 1～3`);
+}
+
 // ---- 章節 HTML：標籤成對、引用都有來源、來源都有被引用、引用編號與來源一致
 for (const f of readdirSync(src("chapters")).filter(f => f.endsWith(".html"))) {
   const html = read(src("chapters/" + f));

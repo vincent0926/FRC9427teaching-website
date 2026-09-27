@@ -84,3 +84,27 @@ ol.refs li:target{background:var(--surface);outline:2px solid var(--can-h);borde
 p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:12px}
 .simtoggle{display:inline-flex;gap:8px;align-items:center;font-size:15px;color:var(--ink-2);cursor:pointer}
 .call.mode[aria-pressed="true"]{border-color:var(--can-l);background:var(--surface);font-weight:600}
+/* learning paths & chapter card */
+.ptag{display:inline-block;font-size:13px;font-weight:700;padding:2px 9px;border-radius:999px;border:2px solid var(--line);margin-right:8px;white-space:nowrap}
+.ptag.core{border-color:var(--can-l)}
+.ptag.controls{border-color:var(--blue)}
+.ptag.competition{border-color:var(--can-h)}
+.lcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:18px 0 26px;font-size:15px}
+.lcard-head{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-bottom:6px}
+.lcard .diff,.lcard .order{color:var(--ink-2);font-size:13.5px}
+.lcard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 22px}
+.lcard h4{margin:10px 0 4px;font-size:14px;color:var(--ink-2)}
+.lcard ul{margin:0;padding-left:18px}
+.lcard li{margin:2px 0;line-height:1.6}
+.lcard li.ok{color:var(--ink-2);list-style:none;margin-left:-18px}
+.lwarn{margin:8px 0 0;padding:8px 12px;border-left:4px solid var(--can-h);background:var(--bg);border-radius:0 6px 6px 0}
+.nextbox{margin:26px 0 8px;padding:14px 18px;border:2px solid var(--can-l);border-radius:10px;background:var(--surface)}
+.nextbox strong{display:block;margin-bottom:2px}
+.nextbox span{color:var(--ink-2);font-size:14.5px}
+.pathsec h3{display:flex;align-items:center;gap:6px;margin:34px 0 4px;font-size:16px;color:var(--ink)}
+.pathsec .pcount{margin-left:auto;font-family:var(--mono);font-size:13.5px;color:var(--ink-2)}
+.pgoal{margin:0;color:var(--ink-2);font-size:15.5px}
+.outline li.done .ttl a{color:var(--ink-2)}
+.outline li.next{background:var(--surface);border-radius:8px}
+.outline .ttl .diff{margin-left:10px;font-size:12px;color:var(--ink-2);letter-spacing:1px;font-weight:400}
+.mastery{margin-top:28px;color:var(--ink-2);font-size:14.5px;border-top:1px dashed var(--line);padding-top:12px}

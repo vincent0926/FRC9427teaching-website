@@ -17,10 +17,7 @@ function mount(id){ view.innerHTML = ""; view.appendChild(document.getElementByI
 function showHome(){
   mount("tpl-home");
   const done = loadDone();
-  document.getElementById("outline").innerHTML = COURSE.map(p => `
-    <h3>${p.part}</h3><ul class="outline">${p.items.map(([id,title,desc,ready]) => `
-      <li><span class="cid">${pad(id)}</span><span class="ttl">${ready ? `<a href="#ch${id}">${title}</a>` : title}${done.includes(id) ? "（已完成）" : ""}</span><span class="desc">${desc}</span></li>`).join("")}
-    </ul>`).join("");
+  document.getElementById("outline").innerHTML = pathsHTML();
   renderMap(null);
 }
 
@@ -35,6 +32,7 @@ function showSoon(id){
 
 function showChapter(id){
   mount("tpl-ch" + id);
+  insertLearningCard(id);
   view.querySelectorAll("pre code").forEach(el => { el.innerHTML = highlight(el.textContent); });
   const q = view.querySelector(".quiz");
   if (q && QUIZZES[id]) initQuiz(q, QUIZZES[id]);
@@ -49,9 +47,7 @@ function showChapter(id){
 }
 
 function appendFooter(id){
-  const idx = READY.indexOf(id);
-  const next = READY[idx + 1];
-  const prev = READY[idx - 1];
+  const { path, prev, next: nextInPath } = pathNeighbors(id);
   const wrap = document.createElement("div");
   wrap.innerHTML = `
     <div class="finish">
@@ -59,12 +55,23 @@ function appendFooter(id){
       <span id="doneMsg" style="color:var(--ink-2)"></span>
     </div>
     <div class="pager">
-      ${prev !== undefined ? `<button class="btn ghost" data-go="${prev}">上一章</button>` : `<button class="btn ghost" data-go="home">回課程大綱</button>`}
-      ${next !== undefined ? `<button class="btn" data-go="${next}">下一章：${ALL.find(x => x[0] === next)[1]}</button>` : `<button class="btn ghost" data-go="home">回課程大綱</button>`}
+      ${prev !== undefined ? `<button class="btn ghost" data-go="${prev}">上一章：${esc(chapterById(prev).title)}</button>` : `<button class="btn ghost" data-go="home">回學習路徑</button>`}
+      <span id="nextSlot"></span>
     </div>`;
   view.appendChild(wrap);
   const btn = document.getElementById("markDone"), msg = document.getElementById("doneMsg");
+  const renderNext = () => {
+    // 路徑內有下一章就去下一章；路徑走完了，依完成狀況推薦下一步
+    const doneNow = [...new Set([...loadDone(), id])];
+    const target = nextInPath !== undefined ? nextInPath : recommendNext(doneNow);
+    const pathDone = path.chapters.every(x => doneNow.includes(x));
+    const label = nextInPath !== undefined ? `下一章：${esc(chapterById(target).title)}`
+      : target !== null ? `${pathDone ? esc(path.name) + "完成，" : ""}下一步：第 ${target} 章 ${esc(chapterById(target).title)}` : "";
+    document.getElementById("nextSlot").innerHTML = target !== null && target !== undefined
+      ? `<button class="btn" data-go="${target}">${label}</button>` : `<button class="btn ghost" data-go="home">回學習路徑</button>`;
+  };
   const refresh = () => {
+    renderNext();
     const d = loadDone().includes(id);
     btn.textContent = d ? "取消完成標記" : "標記本章完成";
     msg.textContent = d ? `第 ${id} 章已完成。` : "";

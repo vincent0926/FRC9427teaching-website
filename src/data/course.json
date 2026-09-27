@@ -61,121 +61,432 @@
       "id": 0,
       "title": "開發環境與專案結構",
       "desc": "開學前的準備：要裝哪些軟體、專案裡每個檔案的角色、vendordep、編譯與部署、Driver Station。",
-      "part": "準備"
+      "part": "準備",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [],
+      "objectives": [
+        "建立 WPILib Command-based 專案並部署到機器人",
+        "用 Git commit 與 push 保存程式",
+        "看懂專案裡 Robot、RobotContainer、Constants、vendordeps 各自的角色"
+      ],
+      "awareness": [
+        "Driver Station 各分頁的用途",
+        "build.gradle 的細節"
+      ]
     },
     {
       "id": 1,
       "title": "類別與物件",
       "desc": "學籍資料表與填好的每一份：欄位、方法、建構子、this、static。",
-      "part": "Java 與物件導向（以學校為例）"
+      "part": "Java 與物件導向（以學校為例）",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [
+        0
+      ],
+      "objectives": [
+        "寫出有欄位、建構子和方法的類別",
+        "分辨類別和物件，說出 new 做了什麼",
+        "看到 NullPointerException 時找出哪個物件沒有 new"
+      ],
+      "awareness": [
+        "static 欄位的進階用法"
+      ]
     },
     {
       "id": 2,
       "title": "封裝與存取修飾詞",
       "desc": "成績簿不能放在講台上：private、public、getter，以及為什麼 Subsystem 不讓外面碰馬達。",
-      "part": "Java 與物件導向（以學校為例）"
+      "part": "Java 與物件導向（以學校為例）",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [
+        1
+      ],
+      "objectives": [
+        "把欄位設成 private，只開放必要的 public 方法",
+        "說明為什麼 Subsystem 不讓外面直接碰馬達"
+      ],
+      "awareness": [
+        "protected 與套件存取的細節"
+      ]
     },
     {
       "id": 3,
       "title": "繼承與介面",
       "desc": "導師是一種老師，值日生是一份職責：extends、implements、@Override、多型。",
-      "part": "Java 與物件導向（以學校為例）"
+      "part": "Java 與物件導向（以學校為例）",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        2
+      ],
+      "objectives": [
+        "分辨 extends 和 implements，並寫出實作介面的類別",
+        "看懂 Robot extends TimedRobot、XxxSubsystem extends SubsystemBase",
+        "正確使用 @Override"
+      ],
+      "awareness": [
+        "default 方法的進階用法"
+      ]
     },
     {
       "id": 4,
       "title": "Lambda 與方法參考",
       "desc": "給代課老師的字條：() -> 與 ::，傳遞和呼叫的差別。",
-      "part": "Java 與物件導向（以學校為例）"
+      "part": "Java 與物件導向（以學校為例）",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        3
+      ],
+      "objectives": [
+        "寫出 lambda 與方法參考",
+        "分辨「交出一個做法」和「當場執行」，避開搖桿只讀一次的 bug"
+      ],
+      "awareness": [
+        "java.util.function 其他介面"
+      ]
     },
     {
       "id": 5,
       "title": "列舉、常數與套件",
       "desc": "時段、校規和年級班級：enum、Constants、package 與 import。",
-      "part": "Java 與物件導向（以學校為例）"
+      "part": "Java 與物件導向（以學校為例）",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [
+        2
+      ],
+      "objectives": [
+        "用 enum 表示機構狀態",
+        "把魔術數字整理進 Constants",
+        "看懂 package 與 import 的錯誤訊息"
+      ],
+      "awareness": [
+        "enum 帶欄位與方法的進階寫法"
+      ]
     },
     {
       "id": 6,
       "title": "IO 架構",
       "desc": "導師只看點名表：以手臂為例，分六部分講觀念、簡易版、硬體層、模擬層、AdvantageKit 與測試。",
-      "part": "架構"
+      "part": "架構",
+      "path": "core",
+      "difficulty": 3,
+      "prereqs": [
+        8,
+        11
+      ],
+      "objectives": [
+        "照 IO 架構寫出 Subsystem、IO 介面與硬體實作",
+        "說明每一層該做和不該做的事",
+        "讓同一個 Subsystem 換成模擬 IO 執行"
+      ],
+      "awareness": [
+        "AdvantageKit 重播的完整流程（第 18 章）",
+        "用假的 IO 寫單元測試"
+      ]
     },
     {
       "id": 7,
       "title": "機器人程式的生命週期",
       "desc": "學校的一天：程式啟動、四種模式、init / periodic / exit 的呼叫順序、loop overrun。",
-      "part": "WPILib 基礎"
+      "part": "WPILib 基礎",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        3
+      ],
+      "objectives": [
+        "說出四種模式與 init／periodic／exit 的呼叫順序",
+        "判斷一段程式會不會造成 loop overrun"
+      ],
+      "awareness": [
+        "LoggedRobot 與 TimedRobot 的細部差異"
+      ]
     },
     {
       "id": 8,
       "title": "Subsystem 與 Command",
       "desc": "借用體育館：指令的生命週期、requirements、中斷行為、預設指令。",
-      "part": "WPILib 基礎"
+      "part": "WPILib 基礎",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        4,
+        7
+      ],
+      "objectives": [
+        "寫出有正確 requirements 的 Command",
+        "預測兩個指令搶同一個 Subsystem 時會發生什麼",
+        "設定預設指令"
+      ],
+      "awareness": [
+        "Disabled 時執行指令的細節"
+      ]
     },
     {
       "id": 9,
       "title": "Trigger 與按鍵綁定",
       "desc": "門鈴、對講機和電燈開關：onTrue、whileTrue、toggleOnTrue、條件組合與防連按。",
-      "part": "WPILib 基礎"
+      "part": "WPILib 基礎",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        4,
+        8
+      ],
+      "objectives": [
+        "依需求選擇 onTrue、whileTrue、toggleOnTrue",
+        "用感測器或條件建立 Trigger 並組合條件"
+      ],
+      "awareness": [
+        "防連按（debounce）的參數選擇"
+      ]
     },
     {
       "id": 10,
       "title": "組合指令",
       "desc": "運動會的節目表：sequence、parallel、race、deadline、結束條件與兩條重要規則。",
-      "part": "WPILib 基礎"
+      "part": "WPILib 基礎",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        8
+      ],
+      "objectives": [
+        "用 sequence、parallel、race、deadline 組出完整動作",
+        "說明同一個指令物件為什麼不能用兩次"
+      ],
+      "awareness": [
+        "各種修飾方法的完整清單"
+      ]
     },
     {
       "id": 11,
       "title": "Phoenix 6 與 TalonFX",
       "desc": "班長的工作手冊：CANivore 與 CANBus、完整設定、控制請求、EnableFOC 與 Pro、Tuner X。",
-      "part": "硬體"
+      "part": "硬體",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        5
+      ],
+      "objectives": [
+        "在 CANivore 上建立 TalonFX 並寫一份完整設定",
+        "選擇合適的控制請求（Voltage 類）",
+        "用 Tuner X 設定 ID、確認方向"
+      ],
+      "awareness": [
+        "EnableFOC 與 Pro 授權的細節",
+        "TorqueCurrentFOC"
+      ]
     },
     {
       "id": 12,
       "title": "感測器與 CAN 除錯",
       "desc": "計步器、刻度尺和廣播線：內建編碼器與 CANcoder、極限開關與歸零、CAN 接法與除錯順序。",
-      "part": "硬體"
+      "part": "硬體",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        6
+      ],
+      "objectives": [
+        "設定 CANcoder 的零點與方向",
+        "選擇極限開關接法並寫出歸零指令",
+        "CAN 找不到裝置時照順序除錯"
+      ],
+      "awareness": [
+        "FusedCANcoder／SyncCANcoder（需要 Pro）"
+      ]
     },
     {
       "id": 13,
       "title": "PID 與前饋",
       "desc": "推書車上斜坡：P、I、D 各自做什麼，kS、kV、kA、kG 前饋，手動調參的順序。",
-      "part": "控制"
+      "part": "控制",
+      "path": "controls",
+      "difficulty": 3,
+      "prereqs": [
+        6,
+        11
+      ],
+      "objectives": [
+        "說明 P、I、D 與 kS、kV、kA、kG 各自的作用",
+        "判斷機構停在目標下方時缺的是 kG 而不是 kI",
+        "照 kG → kS → kV → kP → kD 的順序手動調參"
+      ],
+      "awareness": [
+        "積分防飽和的各種做法"
+      ]
     },
     {
       "id": 14,
       "title": "MotionMagic",
       "desc": "校車開到下一站：梯形、三角形與 S-curve 軌跡，巡航速度、加速度與 jerk 怎麼設。",
-      "part": "控制"
+      "part": "控制",
+      "path": "controls",
+      "difficulty": 2,
+      "prereqs": [
+        13
+      ],
+      "objectives": [
+        "說明為什麼需要運動軌跡",
+        "依機構能力設定巡航速度與加速度",
+        "判斷何時需要 jerk（S-curve）"
+      ],
+      "awareness": [
+        "MotionMagic Expo",
+        "Dynamic MotionMagic（需要 Pro）"
+      ]
     },
     {
       "id": 15,
       "title": "SysId 系統鑑別",
       "desc": "體適能檢測：四項測試、SysIdRoutine 搭配 SignalLogger、轉檔分析、把參數填回程式。",
-      "part": "控制"
+      "part": "控制",
+      "path": "controls",
+      "difficulty": 3,
+      "prereqs": [
+        9,
+        13
+      ],
+      "objectives": [
+        "說明 SysId 在量什麼、四項測試的目的",
+        "安全地跑完測試並取出資料",
+        "判斷一份 SysId 結果能不能信，再填回程式"
+      ],
+      "awareness": [
+        "LQR 回饋增益的推導"
+      ]
     },
     {
       "id": 16,
       "title": "自動階段與路徑",
       "desc": "校外教學的行程表：座標與里程計、PathPlanner、紅藍翻轉、Named Commands 與自動程式選單。",
-      "part": "上場"
+      "part": "上場",
+      "path": "competition",
+      "difficulty": 2,
+      "prereqs": [
+        6,
+        10
+      ],
+      "objectives": [
+        "設定 AutoBuilder 與紅藍翻轉",
+        "註冊 Named Commands 並組出自動程式",
+        "上場前檢查自動程式"
+      ],
+      "awareness": [
+        "PathPlanner 的即時路徑產生（pathfinding）"
+      ]
     },
     {
       "id": 17,
       "title": "視覺與定位",
       "desc": "看門牌校正位置：AprilTag、融合與標準差、Limelight MegaTag2、兩種瞄準做法。",
-      "part": "上場"
+      "part": "上場",
+      "path": "competition",
+      "difficulty": 3,
+      "prereqs": [
+        16
+      ],
+      "objectives": [
+        "用 addVisionMeasurement 融合視覺，並依距離調整標準差",
+        "丟掉不可靠的視覺量測",
+        "選擇合適的瞄準做法"
+      ],
+      "awareness": [
+        "PhotonVision 的設定細節"
+      ]
     },
     {
       "id": 18,
       "title": "模擬、日誌與重播",
       "desc": "比賽錄影和賽後檢討：取得日誌、AdvantageScope、重播步驟、確定性、版本追蹤。",
-      "part": "上場"
+      "part": "上場",
+      "path": "competition",
+      "difficulty": 3,
+      "prereqs": [
+        6
+      ],
+      "objectives": [
+        "從機器人取出日誌並用 AdvantageScope 找問題",
+        "完成一次重播並補記錄輸出",
+        "避開讓重播失準的寫法"
+      ],
+      "awareness": [
+        "Replay Watch",
+        "AdvantageKit swerve 範本的細節"
+      ]
     },
     {
       "id": 19,
       "title": "上場檢查與 Pit 除錯",
       "desc": "考試當天：出發前與每場前後的檢查、brownout、DS Log、Pit 分診與改程式的規矩。",
-      "part": "上場"
+      "part": "上場",
+      "path": "competition",
+      "difficulty": 1,
+      "prereqs": [
+        12
+      ],
+      "objectives": [
+        "照清單完成賽前與賽後檢查",
+        "從 DS Log 判斷 brownout、roboRIO 重開",
+        "在 Pit 依分診順序找問題，並遵守改程式的規矩"
+      ],
+      "awareness": [
+        "Driver Station 筆電的完整設定"
+      ]
     }
-  ]
+  ],
+  "paths": [
+    {
+      "id": "core",
+      "name": "核心路徑",
+      "required": true,
+      "goal": "能寫出、部署並除錯一個機構的子系統。每位程式組成員都要完成。",
+      "chapters": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        6,
+        12
+      ]
+    },
+    {
+      "id": "controls",
+      "name": "進階控制路徑",
+      "required": false,
+      "goal": "能量出、調好並驗證一個有重力的機構（手臂或升降）。負責機構控制的人必修。",
+      "chapters": [
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "competition",
+      "name": "競賽實務路徑",
+      "required": false,
+      "goal": "能寫自動程式、用日誌找問題，並在比賽中處理狀況。上場前每位程式組成員都要讀第 19 章。",
+      "chapters": [
+        16,
+        17,
+        18,
+        19
+      ]
+    }
+  ],
+  "mastery": "精通標準：學習目標都做得到、小測驗答對 80% 以上、練習先自己寫過再看提示。只需知道的部分，看得懂、需要時查得到就好。"
 }
