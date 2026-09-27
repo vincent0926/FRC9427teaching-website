@@ -170,6 +170,15 @@ p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);
 .nodeinfo{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px 16px;font-size:15.5px;min-height:90px}
 .nodeinfo h4{margin:0 0 6px;font-size:16px}
 .nodeinfo p{margin:0 0 6px}
+/* ch12 CAN lab */
+.canchain{display:flex;flex-wrap:wrap;align-items:center;gap:0;row-gap:10px;margin-bottom:14px}
+.cnode{font-family:var(--mono);font-size:13px;padding:6px 10px;border-radius:8px;border:2px solid var(--can-l);background:var(--bg);line-height:1.4}
+.cnode small{display:block;font-family:var(--sans);font-size:11.5px;color:var(--ink-2)}
+.cnode.off{border-style:dashed;border-color:var(--line);opacity:.6}
+.clink{width:34px;height:22px;padding:0;border:0;cursor:pointer;font-size:14px;color:var(--red);background:linear-gradient(var(--can-h),var(--can-h)) 0 7px/100% 3px no-repeat,linear-gradient(var(--can-l),var(--can-l)) 0 12px/100% 3px no-repeat}
+.clink.cut{background:linear-gradient(var(--can-h),var(--can-h)) 0 7px/35% 3px no-repeat,linear-gradient(var(--can-l),var(--can-l)) 0 12px/35% 3px no-repeat,linear-gradient(var(--can-h),var(--can-h)) 100% 7px/35% 3px no-repeat,linear-gradient(var(--can-l),var(--can-l)) 100% 12px/35% 3px no-repeat}
+.clink:hover{outline:1px dashed var(--ink);outline-offset:2px}
+.call[id^="can"][aria-pressed="true"]{border-color:var(--red);background:var(--surface);font-weight:600}
 /* ---------- landing ---------- */
 body.on-landing .layout, body.on-landing .menu-btn{display:none}
 .landing{position:relative;min-height:100vh;min-height:100dvh;overflow:hidden;background:#0D1720;color:#EEF2F5;display:flex;flex-direction:column;justify-content:center}
@@ -2885,6 +2894,233 @@ armLeader.getConfigurator().apply(config);</code></pre>
   </ol>
 </template>
 
+<template id="tpl-ch12">
+  <p class="headline-code">CAN ID 12｜硬體</p>
+  <h1>感測器與 CAN 除錯：計步器、刻度尺和廣播線</h1>
+  <p class="lede">讀完這章，你會知道 TalonFX 內建編碼器和 CANcoder 的差別、怎麼設定 CANcoder 的零點、怎麼接極限開關並用它歸零，以及 CAN 上找不到裝置時，照什麼順序把問題找出來。</p>
+  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 與 Phoenix 6 的 2026 版（26.x）文件。2025 年起 CANcoder 的 <code>AbsoluteSensorRange</code> 已改成 <code>AbsoluteSensorDiscontinuityPoint</code>，網路上舊的範例還看得到舊名稱。</div>
+
+  <h2>生活比喻：班長的計步器、牆上的刻度尺</h2>
+  <div class="story">
+    <p><strong>班長身上有一個計步器。</strong>班長每走一步，計步器就加一，非常靈敏、反應很快。但它只知道「從早上戴上到現在走了幾步」，每天早上都從 0 開始算。如果昨天放學時班長停在走廊中間，今天早上計步器還是從 0 開始，它不知道自己在哪裡。</p>
+    <p><strong>走廊牆上有一把刻度尺。</strong>刻度尺不管什麼時候看，都能直接讀出「現在在第幾公尺」，一大早看也是對的。只是刻度尺裝上去的時候，0 不一定剛好對準走廊起點，所以要記下一個「校正值」，讀到的數字加上校正值，才是真正的位置。</p>
+    <p><strong>走廊盡頭有一個門擋。</strong>門擋只會告訴你一件事：「碰到了」或「還沒碰到」。它不能告訴你距離多遠，但很適合用來確認「已經到底了」，也可以用來重新對準計步器：碰到門擋時，就知道現在一定在走廊盡頭。</p>
+    <p><strong>廣播線是一條串起來的線。</strong>學校的廣播線從廣播室出發，依序經過每一間教室，最後接到走廊盡頭。線的兩端各要裝一個吸音墊，不然聲音跑到盡頭會反彈回來，跟新的廣播疊在一起，聽起來全是回音。中間某一段線被剪斷，斷點後面的教室就全部聽不到。</p>
+    <p><strong>點名點不到，要照順序找。</strong>某班點名沒人回應，先確定是不是兩個班長用了同一個代號，再沿著廣播線一段一段查，看是從哪一間教室開始聽不到的。</p>
+  </div>
+  <table class="map">
+    <thead><tr><th>比喻</th><th>程式與硬體</th></tr></thead>
+    <tbody>
+      <tr><td>班長身上的計步器</td><td>TalonFX 內建的 rotor 編碼器（相對位置）</td></tr>
+      <tr><td>每天早上從 0 開始</td><td>開機時位置從 0 開始算，不知道機構實際在哪</td></tr>
+      <tr><td>牆上的刻度尺</td><td>CANcoder（絕對位置，開機就知道角度）</td></tr>
+      <tr><td>校正值</td><td><code>MagnetOffset</code></td></tr>
+      <tr><td>門擋</td><td>極限開關（limit switch）</td></tr>
+      <tr><td>碰到門擋時重新對準計步器</td><td>歸零（homing）：碰到極限開關時 <code>setPosition</code></td></tr>
+      <tr><td>依序經過每間教室的廣播線</td><td>CAN 的 daisy-chain 接法</td></tr>
+      <tr><td>兩端的吸音墊</td><td>兩端各一顆 120 Ω 終端電阻</td></tr>
+      <tr><td>兩個班長同一個代號</td><td>同型號裝置 CAN ID 重複</td></tr>
+    </tbody>
+  </table>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>刻度尺是直線的，CANcoder 量的是旋轉，轉滿一圈又會回到同一個讀數。所以 CANcoder 只能在「一圈以內」告訴你絕對角度；如果它和機構之間還有減速，機構轉不到一圈時 CANcoder 可能已經轉了好幾圈，這時它也不知道自己在第幾圈。把 CANcoder 裝在「機構整個行程不超過一圈」的軸上，才能發揮絕對位置的好處。</div>
+
+  <h2>三種感測器，各自適合做什麼</h2>
+  <table class="map">
+    <thead><tr><th>感測器</th><th>告訴你什麼</th><th>開機時</th><th>適合</th></tr></thead>
+    <tbody>
+      <tr><td>TalonFX 內建編碼器</td><td>馬達轉了幾圈、轉多快</td><td>從 0 開始</td><td>滾輪、飛輪速度；搭配歸零的升降機構</td></tr>
+      <tr><td>CANcoder</td><td>一圈內的絕對角度</td><td>直接知道角度</td><td>手臂、swerve 的轉向</td></tr>
+      <tr><td>極限開關</td><td>有沒有碰到</td><td>直接知道有沒有碰到</td><td>安全停止、歸零</td></tr>
+    </tbody>
+  </table>
+  <p>WPILib 文件也是這樣建議：極限開關只能感測單一位置，適合確保動作不超過極限，但不適合在接近極限時控制速度；手臂的旋轉關節最好用絕對編碼器這類感測器控制，極限開關則當作後備，在編碼器失效時防止機構跑過頭<a class="ref" href="#src12-1">[1]</a>。</p>
+
+  <h2>CANcoder：設定零點與方向</h2>
+  <p>CANcoder 是一顆接在 CAN 上的磁性旋轉編碼器<a class="ref" href="#src12-2">[2]</a>。CTRE 官方範例的設定寫法如下<a class="ref" href="#src12-3">[3]</a>：</p>
+  <pre><code>CANcoder armEncoder = new CANcoder(23, CANBuses.CANIVORE); // TODO: 依接線
+
+CANcoderConfiguration ccConfig = new CANcoderConfiguration();
+// 讀數範圍的「斷點」：0.5 代表讀數在 -0.5 到 0.5 圈之間
+ccConfig.MagnetSensor.withAbsoluteSensorDiscontinuityPoint(Rotations.of(0.5));
+ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive; // TODO: 上機確認
+ccConfig.MagnetSensor.withMagnetOffset(Rotations.of(0.0)); // TODO: 依下面的步驟量測
+armEncoder.getConfigurator().apply(ccConfig);</code></pre>
+  <p>三個設定的意思：</p>
+  <ul>
+    <li><strong>SensorDirection</strong>：哪個方向轉算正。要和 TalonFX 的 <code>Inverted</code> 一致，也就是手臂往上時，兩邊的讀數都要變大。</li>
+    <li><strong>AbsoluteSensorDiscontinuityPoint</strong>：讀數在哪裡從最大跳回最小。設 0.5 時讀數在 -0.5 到 0.5 圈之間。要把這個斷點放在手臂<strong>永遠到不了</strong>的角度，不然手臂經過那裡時讀數會突然跳一圈。</li>
+    <li><strong>MagnetOffset</strong>：校正值。量測方法：先把 offset 設成 0、套用設定，把手臂擺到你定義為 0 度的位置（例如水平），讀出 CANcoder 的絕對位置 <var>x</var>，offset 就填 <var>−x</var>。</li>
+  </ul>
+  <div class="note coach"><strong>教練提醒：offset 記錄在程式裡</strong>每次重裝磁鐵、拆裝 CANcoder，零點都會變。把 offset 寫在 Constants 裡並註明量測日期，比只存在 Tuner X 裡可靠，第 11 章說過：程式裡套用的完整設定會蓋掉 Tuner X 手動改的值。</div>
+
+  <h2>讓 TalonFX 直接讀 CANcoder</h2>
+  <p>第 6 章的手臂用 TalonFX 內建編碼器，<code>SensorToMechanismRatio</code> 填馬達到手臂的齒輪比。加上 CANcoder 後，可以讓 TalonFX 直接用 CANcoder 當回授來源，閉迴路仍然在控制器內執行<a class="ref" href="#src12-4">[4]</a>：</p>
+  <pre><code>TalonFXConfiguration config = new TalonFXConfiguration();
+config.Feedback.FeedbackRemoteSensorID = armEncoder.getDeviceID();
+config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+config.Feedback.SensorToMechanismRatio = 1.0; // TODO: CANcoder 轉數 / 手臂轉數
+// ...其他設定同第 6 章
+armLeader.getConfigurator().apply(config);</code></pre>
+  <p>注意「sensor」換人了：用遠端 CANcoder 時，<code>SensorToMechanismRatio</code> 是 <strong>CANcoder 到手臂</strong>的比例。CANcoder 直接裝在手臂轉軸上時就是 1.0，不再是馬達的齒輪比。</p>
+  <table class="map">
+    <thead><tr><th>FeedbackSensorSource</th><th>做什麼</th><th>需要 Pro</th></tr></thead>
+    <tbody>
+      <tr><td><code>RemoteCANcoder</code></td><td>CANcoder 在 CAN 上發布資料時，TalonFX 就更新位置與速度</td><td>不需要</td></tr>
+      <tr><td><code>FusedCANcoder</code></td><td>把 CANcoder 和馬達內建編碼器融合，兼顧準確與反應速度</td><td>需要</td></tr>
+      <tr><td><code>SyncCANcoder</code></td><td>開機時用 CANcoder 對齊內建編碼器，之後用內建編碼器控制，並持續監看兩者是否差太多</td><td>需要</td></tr>
+    </tbody>
+  </table>
+  <p>CTRE 文件寫明，沒有 Pro 授權時，<code>FusedCANcoder</code> 和 <code>SyncCANcoder</code> 會退回 <code>RemoteCANcoder</code>，並觸發 <code>UsingFusedCANcoderWhileUnlicensed</code> 故障<a class="ref" href="#src12-4">[4]</a>。這兩種模式還需要設定 <code>RotorToSensorRatio</code>（馬達轉數 / CANcoder 轉數）。</p>
+
+  <h2>極限開關</h2>
+  <h3>接在 roboRIO 的 DIO</h3>
+  <p>WPILib 文件說明，roboRIO 內建的數位輸入因為有內部上拉電阻，預設會讀到 high<a class="ref" href="#src12-5">[5]</a>。也就是說，<code>DigitalInput.get()</code> 在<strong>什麼都沒接</strong>時回傳 <code>true</code>。開關接到地線時，接通讀 <code>false</code>、斷開讀 <code>true</code>。</p>
+  <p>所以要先想清楚：「線掉了」會被讀成什麼？</p>
+  <table class="map">
+    <thead><tr><th>開關種類</th><th>沒碰到</th><th>碰到</th><th>線掉了</th></tr></thead>
+    <tbody>
+      <tr><td>常開（NO），接地</td><td><code>true</code></td><td><code>false</code></td><td><code>true</code>（看起來像沒碰到）</td></tr>
+      <tr><td>常閉（NC），接地</td><td><code>false</code></td><td><code>true</code></td><td><code>true</code>（看起來像碰到）</td></tr>
+    </tbody>
+  </table>
+  <p>用常開開關時，線掉了程式會以為「還沒到底」，繼續往下推；用常閉開關時，線掉了程式會以為「已經到底」，機構停下來。後者比較安全，因為壞掉時是停，不是撞。這是隊上選擇接法的依據，不是唯一答案，但一定要把這張表寫在程式註解裡。</p>
+  <pre><code>/** 常閉開關接 DIO 0：碰到或線掉了都回傳 true。 */
+private final DigitalInput bottomLimit = new DigitalInput(0); // TODO: 依接線
+
+public boolean atBottom() {
+    return bottomLimit.get();
+}</code></pre>
+  <p>要讓 TalonFX 在碰到開關時停止往那個方向輸出，可以把開關狀態直接帶進控制請求<a class="ref" href="#src12-6">[6]</a>：</p>
+  <pre><code>motor.setControl(request.withOutput(volts)
+    .withLimitReverseMotion(atBottom()));</code></pre>
+
+  <h3>接在 TalonFX 上</h3>
+  <p>開關也可以直接接在 TalonFX 的極限開關接腳上，由控制器自己停止輸出，不經過 roboRIO。讀取狀態用 <code>getForwardLimit()</code> / <code>getReverseLimit()</code>，值為 <code>ClosedToGround</code> 代表開關接通<a class="ref" href="#src12-6">[6]</a>。Phoenix 6 還可以設定碰到開關時，自動把位置設成指定的值（<code>*LimitAutosetPositionValue</code>）<a class="ref" href="#src12-7">[7]</a>，等於控制器自己幫你歸零。</p>
+
+  <h3>歸零（homing）</h3>
+  <p>只有內建編碼器的升降機構，開機時不知道自己在哪。標準做法是開機後先慢慢往下，碰到底部開關就把位置設成 0。第 6 章的 <code>ArmIO</code> 已經留好 <code>resetPosition</code>，這章的練習會把它串成一個指令。</p>
+  <div class="note warn"><strong>開關抖動</strong>機械開關在接觸的瞬間會快速通斷好幾次。如果「碰到」會觸發一次性的動作，例如重設位置，可以用 WPILib 的 <code>Debouncer</code>：輸入必須持續改變一段時間，輸出才會跟著變<a class="ref" href="#src12-8">[8]</a>。</div>
+
+  <h2>CAN 的接法</h2>
+  <p>WPILib 文件建議 CAN 採 daisy-chain 接法：從 roboRIO 出發，依序進出每個裝置，最後接到 PDP；黃線是 CAN-High、綠線是 CAN-Low<a class="ref" href="#src12-9">[9]</a>。CAN 網路兩端必須各有一顆 120 Ω 終端電阻，roboRIO 和 PDP 都內建了，所以建議從 roboRIO 開始、以 PDP 結束<a class="ref" href="#src12-9">[9]</a>。CTRE 文件補充：CANivore 也內建終端電阻，用 CANivore 時就是「CANivore ↔ 裝置 ↔ 120 Ω 電阻」<a class="ref" href="#src12-10">[10]</a>。</p>
+  <p>檢查接線有一個很好用的方法：<strong>斷電</strong>後用電錶量 CAN-H 和 CAN-L 之間的電阻，應該約 60 Ω（兩顆 120 Ω 並聯）。如果量到 120 Ω，代表只有一端有終端<a class="ref" href="#src12-10">[10]</a>。</p>
+
+  <h2>找不到裝置時的除錯順序</h2>
+  <p>CTRE 文件指出，CAN 問題通常只有兩種：同型號裝置用了相同 ID（出廠預設都是 0），或 CAN 接線不正確、不牢靠；最麻煩的是兩種同時發生<a class="ref" href="#src12-10">[10]</a>。依照 CTRE 的建議，按這個順序查：</p>
+  <ol>
+    <li><strong>看 Tuner X。</strong>同型號、同 ID 的裝置會顯示成紅色卡片並標示衝突<a class="ref" href="#src12-10">[10]</a>。注意是「同型號」：TalonFX 21 和 CANcoder 21 不會衝突，但兩顆 TalonFX 21 會。</li>
+    <li><strong>看哪些裝置消失。</strong>daisy-chain 上某一段斷了，斷點之後的裝置全部消失。找到「最後一個還在的」和「第一個不見的」，問題就在兩者之間。</li>
+    <li><strong>逐條拉拉看。</strong>有用接頭的地方，一條一條輕拉每一根壓接的線；壓接不良是時好時壞最常見的原因<a class="ref" href="#src12-10">[10]</a>。</li>
+    <li><strong>檢查顏色。</strong>每個接點都要黃接黃、綠接綠，黃綠接反是新機器人最常見的錯誤之一<a class="ref" href="#src12-10">[10]</a>。</li>
+    <li><strong>斷電量電阻。</strong>約 60 Ω 才對。</li>
+    <li><strong>還是找不到，就縮小範圍。</strong>只接一個裝置，確認它出現、設好 ID、貼上標籤，再一個一個接回去，直到問題出現<a class="ref" href="#src12-10">[10]</a>。</li>
+  </ol>
+  <p>燈號也有幫助：CTRE 文件提到，TalonFX 和 Pigeon 2 健康但沒有被控制時通常閃橘燈，CANcoder 則是快速亮閃；LED 偶爾閃紅，通常是接點鬆動，可以搖一搖線看能不能重現<a class="ref" href="#src12-10">[10]</a>。</p>
+
+  <h2>動手試：CAN bus 除錯台</h2>
+  <p>下面是一條接在 CANivore「9427」上的 CAN bus。點裝置之間的線可以剪斷或接回，也可以拿掉末端的終端電阻、故意設錯 ID。每改一次，就「斷電量電阻」和「Tuner X 掃描」看看結果。</p>
+  <div class="lab">
+    <div class="canchain" id="canChain"></div>
+    <div class="calls">
+      <button class="call" id="canTerm" aria-pressed="false">拿掉末端終端電阻</button>
+      <button class="call" id="canDupFx" aria-pressed="false">把 TalonFX 22 改成 ID 21</button>
+      <button class="call" id="canDupCc" aria-pressed="false">把 CANcoder 23 改成 ID 21</button>
+    </div>
+    <div class="calls">
+      <button class="btn" id="canOhm">斷電量電阻</button>
+      <button class="btn" id="canScan">Tuner X 掃描</button>
+      <button class="btn ghost" id="canReset">全部接好</button>
+    </div>
+    <div class="console" id="canConsole" aria-live="polite"></div>
+  </div>
+
+  <h2>在程式裡發現斷線</h2>
+  <p>第 6 章的 <code>ArmIOHardware</code> 已經用 <code>refreshAll(...).isOK()</code> 把 <code>leaderConnected</code> 填進點名表。光是記錄還不夠，要讓操作手在比賽中看得到。WPILib 的 <code>Alert</code> 類別可以發布持續性的警告，儀表板會依嚴重程度與時間排序顯示；文件建議在 periodic 裡呼叫 <code>set</code>，由它內建的變化偵測決定何時啟動<a class="ref" href="#src12-11">[11]</a>。</p>
+  <pre><code>public class ArmSubsystem extends SubsystemBase {
+    private final Alert leaderDisconnected =
+        new Alert("手臂主馬達（ID 21）斷線", AlertType.kError);
+    private final Debouncer leaderDebounce = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+        // 連續 0.5 秒讀不到才算斷線，避免偶爾掉一個封包就跳警告
+        leaderDisconnected.set(!leaderDebounce.calculate(inputs.leaderConnected));
+        // ...其餘同第 6 章
+    }
+}</code></pre>
+  <p><code>kFalling</code> 只延遲「從 true 變 false」的變化：恢復連線時立刻清除警告，斷線要持續 0.5 秒才顯示<a class="ref" href="#src12-8">[8]</a>。0.5 秒是示範值，隊上可以依需求調整。</p>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>以為內建編碼器知道位置</strong>沒有歸零的升降機構，開機時讀到 0，不代表它在底部。如果關機時機構停在半空中，開機後「回到 0」的指令會讓它往下撞。</div>
+  <div class="note warn"><strong>CANcoder 的斷點放在行程中間</strong>手臂經過斷點時讀數跳一整圈，閉迴路會以為誤差突然變得很大，手臂猛然甩動。把斷點放在手臂到不了的角度。</div>
+  <div class="note warn"><strong>SensorDirection 和 Inverted 不一致</strong>馬達往上推，CANcoder 卻說在往下，閉迴路越修越錯，手臂衝到底。上機時先用低電壓手動轉，確認兩邊讀數同方向增加。</div>
+  <div class="note warn"><strong>用常開開關卻沒想過線會掉</strong>比賽中線被撞掉，程式以為還沒到底，機構持續往下推。先想清楚「線掉了讀成什麼」。</div>
+  <div class="note warn"><strong>量電阻時沒斷電</strong>通電時量到的數字不準，還可能傷到電錶。一定要斷電再量。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：升降機構的歸零指令</h2>
+  <p>假設升降機構只有 TalonFX 內建編碼器，底部有一個常閉極限開關接在 DIO 0。請在 <code>ElevatorSubsystem</code> 寫一個 <code>home()</code> 指令：以很小的電壓往下，碰到開關就停止，並把位置重設為 0。為了避免開關壞掉時一直往下推，加上 3 秒的逾時。</p>
+  <details>
+    <summary>看參考答案</summary>
+    <pre><code>public class ElevatorSubsystem extends SubsystemBase {
+    private static final double HOMING_VOLTS = -1.0; // TODO: 實測，越小越安全
+    private static final double HOMING_TIMEOUT_S = 3.0; // TODO: 依行程調整
+
+    /** 常閉開關：碰到或線掉了都回傳 true。 */
+    private final DigitalInput bottomLimit = new DigitalInput(0); // TODO: 依接線
+    private final Debouncer bottomDebounce = new Debouncer(0.05, Debouncer.DebounceType.kRising);
+    private boolean atBottom = false;
+
+    private final ElevatorIO io;
+    // ...inputs、其他欄位與第 6 章手臂相同
+
+    @Override
+    public void periodic() {
+        atBottom = bottomDebounce.calculate(bottomLimit.get()); // 每輪只讀一次
+        // ...
+    }
+
+    public boolean atBottom() {
+        return atBottom;
+    }
+
+    public Command home() {
+        return startEnd(
+                () -&gt; io.setVoltage(HOMING_VOLTS),
+                () -&gt; io.stop())
+            .until(this::atBottom)
+            .withTimeout(HOMING_TIMEOUT_S)
+            .andThen(runOnce(() -&gt; {
+                if (atBottom) {
+                    io.resetPosition(0.0);
+                }
+            }))
+            .withName("Elevator.home");
+    }
+}</code></pre>
+    <p>幾個重點。<code>until</code> 與 <code>withTimeout</code> 誰先發生都會結束（第 10 章）；結束後再確認一次 <code>atBottom</code>，逾時結束的情況下就<strong>不</strong>重設位置，否則會把錯的位置當成 0。用常閉開關時，線掉了會讀成「已經到底」，機構會停在原地並被當成 0，所以開機歸零後，還是要目視確認機構真的在底部。</p>
+    <p>這個寫法為了簡短，直接在 <code>startEnd</code> 裡呼叫 IO；如果這個 Subsystem 和第 6 章一樣在 periodic 裡送出輸出，就要改成切換 <code>ControlMode</code>，不然會被 periodic 蓋掉。</p>
+  </details>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src12-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/limit-switch.html" target="_blank" rel="noopener">Programming Limit Switches</a>（極限開關只感測單一位置、手臂關節建議用絕對編碼器）</li>
+    <li id="src12-2">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/hardware-reference/cancoder/index.html" target="_blank" rel="noopener">CANcoder 硬體參考</a></li>
+    <li id="src12-3">CTR Electronics. <a href="https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/main/java/FusedCANcoder/src/main/java/frc/robot/Robot.java" target="_blank" rel="noopener">Phoenix6-Examples：FusedCANcoder</a>（CANcoderConfiguration、AbsoluteSensorDiscontinuityPoint、MagnetOffset）</li>
+    <li id="src12-4">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/remote-sensors.html" target="_blank" rel="noopener">Phoenix 6: Remote Sensors</a>（RemoteCANcoder、FusedCANcoder、SyncCANcoder 與 Pro 授權）</li>
+    <li id="src12-5">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/digital-inputs-software.html" target="_blank" rel="noopener">Digital Inputs - Software</a>（內部上拉電阻，預設讀到 high）</li>
+    <li id="src12-6">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/api-usage/actuator-limits.html" target="_blank" rel="noopener">Phoenix 6: Actuator Limits</a>（getForwardLimit、withLimitForwardMotion / withLimitReverseMotion）</li>
+    <li id="src12-7">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/migration/migration-guide/feature-replacements-guide.html" target="_blank" rel="noopener">Phoenix 6: Feature Replacements</a>（LimitAutosetPositionValue）</li>
+    <li id="src12-8">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/filters/debouncer.html" target="_blank" rel="noopener">Debouncer</a>（三種模式與用法）</li>
+    <li id="src12-9">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/hardware/hardware-basics/can-wiring-basics.html" target="_blank" rel="noopener">CAN Wiring Basics</a>（daisy-chain、黃綠線、120 Ω 終端）</li>
+    <li id="src12-10">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/troubleshooting/canbus-troubleshooting.html" target="_blank" rel="noopener">CAN Bus Troubleshooting</a>（兩種失敗模式、60 Ω 量測、逐一接回、燈號）</li>
+    <li id="src12-11">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/telemetry/persistent-alerts.html" target="_blank" rel="noopener">Recording Faults with Persistent Alerts</a></li>
+  </ol>
+</template>
+
 <template id="tpl-soon">
   <p class="headline-code" id="soonId"></p>
   <h1 id="soonTitle"></h1>
@@ -2916,7 +3152,7 @@ const COURSE = [
   ]},
   { part: "硬體", items: [
     [11, "Phoenix 6 與 TalonFX", "班長的工作手冊：CANivore 與 CANBus、完整設定、控制請求、EnableFOC 與 Pro、Tuner X。", true],
-    [12, "感測器與 CAN 除錯", "編碼器、極限開關、CANcoder，以及 CAN 斷線時怎麼找問題。"]
+    [12, "感測器與 CAN 除錯", "計步器、刻度尺和廣播線：內建編碼器與 CANcoder、極限開關與歸零、CAN 接法與除錯順序。", true]
   ]},
   { part: "控制", items: [
     [13, "PID 與前饋", "P、I、D 各自做什麼，kS、kV、kG 前饋，以及手臂為什麼一定要 kG。"],
@@ -2935,6 +3171,14 @@ const READY = ALL.filter(x => x[3]).map(x => x[0]);
 const pad = n => String(n).padStart(2, "0");
 
 const QUIZZES = {
+  12: [
+    { q: "升降機構只有 TalonFX 內建編碼器，開機時讀到位置 0，代表什麼？", o: ["機構一定在底部", "只代表計數從 0 開始，不知道機構實際在哪", "CANcoder 壞了", "CAN 斷線"], a: 1, e: "內建編碼器是相對位置，開機從 0 算起，所以需要歸零或絕對編碼器。" },
+    { q: "roboRIO 的 DigitalInput 什麼都沒接時，get() 回傳什麼？", o: ["true", "false", "丟出例外", "隨機"], a: 0, e: "內部上拉電阻讓未接的輸入讀到 high，也就是 true。" },
+    { q: "用常閉開關接地，線被撞掉時程式會讀到什麼狀態？", o: ["沒碰到", "碰到（true）", "讀不到值", "看開關型號"], a: 1, e: "線掉了等於電路斷開，讀到 true，和「碰到」一樣，所以壞掉時機構會停。" },
+    { q: "沒有 Pro 授權卻把 FeedbackSensorSource 設為 FusedCANcoder，會怎樣？", o: ["馬達不動", "退回 RemoteCANcoder，並觸發 UsingFusedCANcoderWhileUnlicensed 故障", "程式編譯失敗", "改用內建編碼器且不報錯"], a: 1, e: "CTRE 文件：未授權時退回 RemoteCANcoder 並觸發該故障。" },
+    { q: "斷電後量 CAN-H 與 CAN-L 之間的電阻，量到 120 Ω 代表？", o: ["一切正常", "只有一端有終端電阻", "黃綠線接反", "有 ID 重複"], a: 1, e: "兩顆 120 Ω 並聯約 60 Ω；量到 120 Ω 表示少了一端的終端。" },
+    { q: "Tuner X 顯示 TalonFX 21、22 正常，但之後的 CANcoder 23 和 Pigeon 2 都不見了。最可能的問題在哪？", o: ["TalonFX 21 的 ID", "TalonFX 22 到 CANcoder 23 之間的線", "CANivore 的名稱", "roboRIO 的 DIO"], a: 1, e: "daisy-chain 斷在哪裡，後面的裝置就全部消失，問題在最後一個還在與第一個不見的之間。" }
+  ],
   11: [
     { q: "2026 年在 CANivore「9427」上建立 TalonFX，建議的寫法是？", o: ["new TalonFX(21, \"9427\")", "new TalonFX(21, new CANBus(\"9427\"))", "new TalonFX(21)", "new CANBus(21, \"9427\")"], a: 1, e: "字串版建構子已標為 deprecated，預計 2027 年移除。只給 ID 的版本會用 roboRIO 內建 CAN。" },
     { q: "套用一份修改過的完整 TalonFXConfiguration 之前，需要先恢復出廠設定嗎？", o: ["需要，否則舊設定會留著", "不需要，完整設定中沒改的項目會自動回到預設", "只有第一次需要", "只有換韌體時需要"], a: 1, e: "新建立的設定物件本身就包含所有預設值。" },
@@ -3088,6 +3332,7 @@ function showChapter(id){
   if (id === 7) initLoopLab();
   if (id === 8) initSchedLab();
   if (id === 9) initBindLab();
+  if (id === 12) initCanLab();
   view.querySelectorAll("a.ref").forEach(a => a.addEventListener("click", e => {
     e.preventDefault();
     const t = document.getElementById(a.getAttribute("href").slice(1));
@@ -3315,6 +3560,71 @@ function initBindLab(){
     paint();
   };
   document.getElementById("btnReset").onclick = reset;
+  reset();
+}
+
+/* ---------- ch12 lab ---------- */
+function initCanLab(){
+  const devs = [
+    { name: "CANivore", sub: "9427・內建終端" },
+    { name: "TalonFX 21", sub: "手臂主馬達", model: "fx", id: 21 },
+    { name: "TalonFX 22", sub: "手臂從馬達", model: "fx", id: 22 },
+    { name: "CANcoder 23", sub: "手臂角度", model: "cc", id: 23 },
+    { name: "Pigeon 2 · 30", sub: "陀螺儀", model: "pg", id: 30 },
+    { name: "120 Ω", sub: "末端終端電阻", term: true }
+  ];
+  let cut, noTerm, dupFx, dupCc;
+  const box = document.getElementById("canChain"), con = document.getElementById("canConsole");
+  const log = h => { con.innerHTML += h + "\n"; con.scrollTop = con.scrollHeight; };
+  const c = t => `<span class="c">${esc(t)}</span>`;
+  const firstCut = () => cut.findIndex(Boolean); // 第 i 段 = 裝置 i 與 i+1 之間
+  const idOf = i => (i === 2 && dupFx) || (i === 3 && dupCc) ? 21 : devs[i].id;
+  const paint = () => {
+    box.innerHTML = devs.map((d, i) => {
+      const off = d.term && noTerm;
+      const node = `<div class="cnode${off ? " off" : ""}"><b>${esc(d.id ? d.name.replace(/\d+$/, idOf(i)) : d.name)}</b><small>${esc(off ? "（已拿掉）" : d.sub)}</small></div>`;
+      if (i === devs.length - 1) return node;
+      return node + `<button class="clink${cut[i] ? " cut" : ""}" data-seg="${i}" aria-pressed="${cut[i]}" aria-label="${esc(d.name)} 與 ${esc(devs[i + 1].name)} 之間的線，${cut[i] ? "已剪斷，點一下接回" : "點一下剪斷"}">${cut[i] ? "✂" : ""}</button>`;
+    }).join("");
+    box.querySelectorAll(".clink").forEach(b => b.onclick = () => {
+      const i = +b.dataset.seg; cut[i] = !cut[i];
+      log(c(`// ${devs[i].name} ↔ ${devs[i + 1].name}：${cut[i] ? "剪斷" : "接回"}`)); paint();
+    });
+    document.getElementById("canTerm").setAttribute("aria-pressed", String(noTerm));
+    document.getElementById("canDupFx").setAttribute("aria-pressed", String(dupFx));
+    document.getElementById("canDupCc").setAttribute("aria-pressed", String(dupCc));
+  };
+  const reset = () => {
+    cut = devs.slice(1).map(() => false); noTerm = dupFx = dupCc = false;
+    con.innerHTML = c("// 點裝置之間的線可以剪斷或接回，再用下面的按鈕檢查") + "\n"; paint();
+  };
+  document.getElementById("canTerm").onclick = () => { noTerm = !noTerm; log(c(noTerm ? "// 拿掉末端 120 Ω" : "// 裝回末端 120 Ω")); paint(); };
+  document.getElementById("canDupFx").onclick = () => { dupFx = !dupFx; log(c(dupFx ? "// TalonFX 22 的 ID 改成 21" : "// TalonFX 的 ID 改回 22")); paint(); };
+  document.getElementById("canDupCc").onclick = () => { dupCc = !dupCc; log(c(dupCc ? "// CANcoder 23 的 ID 改成 21" : "// CANcoder 的 ID 改回 23")); paint(); };
+  document.getElementById("canOhm").onclick = () => {
+    // 從 CANivore 端量：看得到的終端 = CANivore 自己 + 末端電阻（中間沒斷、也沒拿掉）
+    const both = firstCut() === -1 && !noTerm;
+    log(highlight("電錶（斷電）：CAN-H ↔ CAN-L = " + (both ? "60 Ω" : "120 Ω")));
+    log(c(both ? "// 兩顆 120 Ω 並聯，正常" : firstCut() !== -1 ? "// 從這裡只看得到一顆終端：線在某處斷了" : "// 只有一端有終端：末端電阻不見了"));
+  };
+  document.getElementById("canScan").onclick = () => {
+    const fc = firstCut();
+    const reach = fc === -1 ? devs.length - 1 : fc; // 能通訊的最後一個裝置索引
+    const oneTerm = fc !== -1 || noTerm;
+    log(highlight("Tuner X：掃描 CANivore 9427"));
+    devs.forEach((d, i) => {
+      if (!d.model) return;
+      const id = idOf(i);
+      if (i > reach){ log(`<span class="err">  ✗ ${esc(d.name.replace(/\d+$/, id))}：找不到</span>`); return; }
+      const clash = devs.some((o, j) => j !== i && j <= reach && o.model === d.model && idOf(j) === id);
+      if (clash) log(`<span class="err">  ✗ ${esc(d.name.replace(/\d+$/, id))}：同型號 ID 重複（紅色卡片）</span>`);
+      else log(`  ✓ ${esc(d.name.replace(/\d+$/, id))}` + (oneTerm ? c("　// 看得到，但只有一端終端，長線上可能時好時壞") : ""));
+    });
+    const label = i => devs[i].id ? devs[i].name.replace(/\d+$/, idOf(i)) : devs[i].name;
+    if (fc !== -1) log(c(`// 最後一個還在：${label(fc)}；第一個不見：${label(fc + 1)}。問題在這兩者之間`));
+    if (dupCc && !dupFx) log(c("// CANcoder 21 和 TalonFX 21 型號不同，不算衝突"));
+  };
+  document.getElementById("canReset").onclick = reset;
   reset();
 }
 
