@@ -3,4 +3,4 @@
 
 ## 未來他會和另外一個網站連動
 ## FRC9427teaching-website
-此為連結https://claude.ai/artifact/AUgfRjv7KjFLAhLnnbMyuv
+此為連結https://claude.ai/artifact/5vDrdLNpnXXiv5ULvZwPvR
