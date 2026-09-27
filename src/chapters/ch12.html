@@ -102,7 +102,7 @@ public boolean atBottom() {
   <p>開關也可以直接接在 TalonFX 的極限開關接腳上，由控制器自己停止輸出，不經過 roboRIO。讀取狀態用 <code>getForwardLimit()</code> / <code>getReverseLimit()</code>，值為 <code>ClosedToGround</code> 代表開關接通<a class="ref" href="#src12-7">[7]</a>。Phoenix 6 還可以設定碰到開關時，自動把位置設成指定的值（<code>*LimitAutosetPositionValue</code>）<a class="ref" href="#src12-8">[8]</a>，等於控制器自己幫你歸零。</p>
 
   <h3>歸零（homing）</h3>
-  <p>只有內建編碼器的升降機構，開機時不知道自己在哪。標準做法是開機後先慢慢往下，碰到底部開關就把位置設成 0。第 6 章的 <code>ArmIO</code> 已經留好 <code>resetPosition</code>，這章的練習會把它串成一個指令。</p>
+  <p>只有內建編碼器的升降機構，開機時不知道自己在哪。常見的做法是開機後先慢慢往下，碰到底部開關就把位置設成 0。第 6 章的 <code>ArmIO</code> 已經留好 <code>resetPosition</code>，這章的練習會把它串成一個指令。</p>
   <div class="note warn"><strong>開關抖動</strong>機械開關在接觸的瞬間會快速通斷好幾次。如果「碰到」會觸發一次性的動作，例如重設位置，可以用 WPILib 的 <code>Debouncer</code>：輸入必須持續改變一段時間，輸出才會跟著變<a class="ref" href="#src12-9">[9]</a>。</div>
 
   <h2>CAN 的接法</h2>

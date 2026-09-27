@@ -111,11 +111,11 @@ p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);
 /* quiz types */
 .qtype{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-right:8px;border:1px solid var(--line);color:var(--ink-2);vertical-align:2px}
 .q.scenario .qtype{border-color:var(--can-h);color:var(--ink)}
-.q-case{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:0 0 10px;font-size:15.5px}
+.q-case{overflow-wrap:anywhere;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:0 0 10px;font-size:15.5px}
 .q-case p{margin:0 0 4px}
 .q-case b{margin-right:8px}
 .q-case ul{margin:0 0 2px;padding-left:20px}
-.q-ask{font-weight:700;margin:0 0 10px}
+.q-ask{overflow-wrap:anywhere;font-weight:700;margin:0 0 10px}
 .qlab{white-space:nowrap}
 /* progressive hints */
 .hints{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 18px 14px;margin:16px 0}
@@ -132,7 +132,7 @@ p.further{font-size:14.5px;color:var(--ink-2);border-top:1px dashed var(--line);
 .fq textarea{width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);resize:vertical}
 .frev{border-top:1px solid var(--line);padding:12px 0}
 .frev p{margin:4px 0}
-.fmine{color:var(--ink-2);white-space:pre-wrap}
+.fmine{color:var(--ink-2);white-space:pre-wrap;overflow-wrap:anywhere}
 .fref{background:var(--surface);border-left:4px solid var(--can-l);padding:6px 12px;border-radius:0 6px 6px 0}
 .rubric{list-style:none;padding-left:0;margin:6px 0 0}
 .rubric li{margin:4px 0}
@@ -159,3 +159,5 @@ pre .prov[data-prov="SIM"]{color:#C4A8F5}
 .btn.small{font-size:13.5px;padding:5px 12px;border-width:1px;vertical-align:1px}
 table.coach{font-size:14px}
 table.coach td,table.coach th{white-space:nowrap}
+
+.explain,.fref,.tasklist p,.lcard li{overflow-wrap:anywhere}
