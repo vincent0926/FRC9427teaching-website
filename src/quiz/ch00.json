@@ -1,0 +1,79 @@
+[
+  {
+    "q": "為什麼要用 WPILib VS Code 2026，而不是自己電腦上原本的 VS Code？",
+    "o": [
+      "原本的 VS Code 不能寫 Java",
+      "WPILib 另外安裝一份帶有專用設定和擴充套件的 VS Code，官方要求使用這一份",
+      "兩者完全一樣，用哪個都可以",
+      "原本的 VS Code 要付費"
+    ],
+    "a": 1,
+    "e": "WPILib 安裝程式會另裝一份 VS Code，每年一份，官方提醒要打開這一份。"
+  },
+  {
+    "q": "專案加入 Phoenix 6 後，描述這個函式庫的 JSON 檔會放在哪裡？",
+    "o": [
+      "C:\\Windows",
+      "專案的 vendordeps 資料夾",
+      "src/main/deploy",
+      "roboRIO 的 /home/lvuser"
+    ],
+    "a": 1,
+    "e": "vendordep JSON 會被複製到專案的 vendordeps 資料夾，就像班級書單跟著班級走。"
+  },
+  {
+    "q": "Command-based 專案裡，哪一個類別新手不應該修改？",
+    "o": [
+      "RobotContainer",
+      "Constants",
+      "Main",
+      "Robot"
+    ],
+    "a": 2,
+    "e": "官方文件說明 Main 是程式進入點，新手不應修改，也不要改 main() 方法。"
+  },
+  {
+    "q": "放在 src/main/deploy 裡的檔案會怎樣？",
+    "o": [
+      "被忽略",
+      "部署時一起上傳到 roboRIO 的 /home/lvuser/deploy",
+      "被編譯成 Java 類別",
+      "只在模擬時使用"
+    ],
+    "a": 1,
+    "e": "deploy 資料夾的內容會跟著程式一起送上 roboRIO，程式裡用 Filesystem.getDeployDirectory() 取得。"
+  },
+  {
+    "q": "專案附帶的 .gitignore 應該怎麼處理？",
+    "o": [
+      "刪掉，才能提交所有檔案",
+      "不要修改",
+      "每次 commit 前清空",
+      "改成列出所有 Java 檔"
+    ],
+    "a": 1,
+    "e": "WPILib 文件特別強調不要修改專案附帶的 .gitignore，它列出了編譯產生的檔案等不需要提交的東西。"
+  },
+  {
+    "q": "commit 之後，隊友在 GitHub 上看得到你的改動嗎？",
+    "o": [
+      "看得到",
+      "看不到，要 push 之後才會上傳",
+      "要等部署到機器人才會",
+      "要等 merge 之後才會"
+    ],
+    "a": 1,
+    "e": "commit 只存在自己的電腦上，push 之後 GitHub 上才會有。"
+  },
+  {
+    "q": "Driver Station 可以在 macOS 上執行嗎？",
+    "o": [
+      "可以",
+      "不行，FRC Game Tools 只支援 Windows 10 以上",
+      "只有 Intel Mac 可以",
+      "要另外買授權"
+    ],
+    "a": 1,
+    "e": "WPILib 支援 macOS，但 Driver Station 屬於 FRC Game Tools，只能在 Windows 上執行。"
+  }
+]

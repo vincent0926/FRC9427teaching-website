@@ -1,0 +1,57 @@
+[
+  {
+    "q": "重播時修改了手臂的 kP，日誌裡的手臂位置會怎樣？",
+    "o": [
+      "跟著改變",
+      "變成 0",
+      "不變，因為位置是從日誌讀回的輸入",
+      "無法重播"
+    ],
+    "a": 2,
+    "e": "修改的輸出不能影響重播的輸入（replay bubble）。"
+  },
+  {
+    "q": "下列哪一個會讓 AdvantageKit 重播失準？",
+    "o": [
+      "用 SmartDashboard.getNumber 讀調參數值",
+      "用 Timer.getTimestamp()",
+      "用 Logger.recordOutput 記錄 Pose2d",
+      "在 Subsystem periodic 裡讀 inputs"
+    ],
+    "a": 0,
+    "e": "NetworkTables 的值沒有被記錄，要用 AdvantageKit 的儀表板類別。"
+  },
+  {
+    "q": "RobotContainer 應該在 Robot 建構子的哪裡建立？",
+    "o": [
+      "Logger 設定之前",
+      "robotPeriodic 裡",
+      "autonomousInit 裡",
+      "Logger.start() 之後"
+    ],
+    "a": 3,
+    "e": "Logger.start() 之前讀到的時間與 DS 資料不是確定的。"
+  },
+  {
+    "q": "重播時 setUseTiming(false) 會？",
+    "o": [
+      "讓重播結果不準",
+      "讓重播盡快跑完，不影響準確度",
+      "關閉日誌",
+      "只重播前 15 秒"
+    ],
+    "a": 1,
+    "e": "AdvantageKit 文件明確說明不影響準確度。"
+  },
+  {
+    "q": "Event Deploy 的作用是？",
+    "o": [
+      "部署前自動把修改 commit 到 event 分支",
+      "自動上傳日誌",
+      "自動選擇自動程式",
+      "加快部署速度"
+    ],
+    "a": 0,
+    "e": "讓每一場的程式版本都找得回來，方便重播。"
+  }
+]

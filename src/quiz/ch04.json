@@ -1,0 +1,46 @@
+[
+  {
+    "q": "Command c = intake.runOnce(() -> intake.setRollerVoltage(-6.0)); 這行執行完，滾輪會轉嗎？",
+    "o": [
+      "會，立刻以 -6V 轉動",
+      "不會，只是建立了一個指令，要等它被排程執行",
+      "編譯錯誤",
+      "會轉一圈後停止"
+    ],
+    "a": 1,
+    "e": "這行只是寫好字條交給指令。要等指令被排程器執行時，lambda 裡的程式才會跑。"
+  },
+  {
+    "q": "controller::getLeftY 和 controller.getLeftY() 的差別是？",
+    "o": [
+      "沒有差別",
+      "前者交出方法本身，後者立刻呼叫並得到一個數字",
+      "前者比較快",
+      "後者不能編譯"
+    ],
+    "a": 1,
+    "e": ":: 是把方法交給別人以後再呼叫；加括號是當場呼叫。"
+  },
+  {
+    "q": "Trigger 的條件參數應該是哪種函式介面？",
+    "o": [
+      "Runnable",
+      "DoubleSupplier",
+      "BooleanSupplier",
+      "Consumer"
+    ],
+    "a": 2,
+    "e": "Trigger 要問「現在成立嗎」，不收參數、回傳是或否，就是 BooleanSupplier。"
+  },
+  {
+    "q": "double s = -controller.getLeftY(); drive.run(() -> drive.arcadeDrive(s, 0.0)) 的問題是？",
+    "o": [
+      "編譯失敗",
+      "s 只在綁定時讀一次，之後永遠不變",
+      "每次都讀到 0",
+      "沒有問題"
+    ],
+    "a": 1,
+    "e": "讀搖桿要寫在 lambda 裡面，每次執行才會重新讀。"
+  }
+]

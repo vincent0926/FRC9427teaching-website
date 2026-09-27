@@ -1,0 +1,46 @@
+[
+  {
+    "q": "IntakeSubsystem 的 roller 欄位是 private，下面哪一行寫在 RobotContainer 裡會編譯失敗？",
+    "o": [
+      "intake.setRollerVoltage(6.0);",
+      "intake.getRollerVelocityRps();",
+      "intake.roller.setControl(new VoltageOut(6));",
+      "new IntakeSubsystem();"
+    ],
+    "a": 2,
+    "e": "private 欄位只有類別自己能直接存取，外面只能透過公開方法，就像成績簿鎖在抽屜裡。"
+  },
+  {
+    "q": "沒寫任何存取修飾詞的欄位，誰可以存取？",
+    "o": [
+      "只有類別自己",
+      "同一個套件裡的類別",
+      "所有地方",
+      "只有子類別"
+    ],
+    "a": 1,
+    "e": "不寫修飾詞是「套件層級」存取，同套件可用，套件外不行。"
+  },
+  {
+    "q": "為什麼 IntakeSubsystem 的 TalonFX 應該是 private？",
+    "o": [
+      "private 的馬達轉得比較快",
+      "讓電壓限制等規則只寫一次，而且外面無法繞過",
+      "Java 規定馬達必須是 private",
+      "這樣才能用 final"
+    ],
+    "a": 1,
+    "e": "外面只能透過 setRollerVoltage() 控制，規則集中在一處，Command 系統的保護也不會被繞過。"
+  },
+  {
+    "q": "寫了 private TalonFX roller，又加上 public TalonFX getRoller()，結果是？",
+    "o": [
+      "封裝完整",
+      "封裝被破壞，外面拿到物件後一樣能直接控制",
+      "編譯失敗",
+      "roller 變成 null"
+    ],
+    "a": 1,
+    "e": "getter 應該回傳資料，不該回傳可操作的硬體物件。"
+  }
+]

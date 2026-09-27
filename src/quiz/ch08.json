@@ -1,0 +1,57 @@
+[
+  {
+    "q": "指令的 initialize() 什麼時候被呼叫？",
+    "o": [
+      "每輪一次",
+      "指令被排程時一次",
+      "指令結束時",
+      "機器人開機時"
+    ],
+    "a": 1,
+    "e": "initialize 在排程時呼叫一次，就像活動開始時集合。"
+  },
+  {
+    "q": "手臂正在執行指令 A（預設中斷行為），此時排程了同樣 require 手臂的指令 B，會怎樣？",
+    "o": [
+      "B 排程失敗",
+      "A 被取消，B 開始執行",
+      "兩個同時執行",
+      "A 結束後 B 才執行"
+    ],
+    "a": 1,
+    "e": "預設是 kCancelSelf：正在執行的指令被取消，新指令排程成功。"
+  },
+  {
+    "q": "A 被 B 打斷時，A 的 end(interrupted) 收到什麼？",
+    "o": [
+      "不會呼叫 end",
+      "interrupted = false",
+      "interrupted = true",
+      "會丟出例外"
+    ],
+    "a": 2,
+    "e": "被打斷或取消時一樣會呼叫 end，參數為 true。"
+  },
+  {
+    "q": "Commands.runOnce(() -> arm.setGoal(ArmState.STOW)) 少了什麼？",
+    "o": [
+      "什麼都不少",
+      "requirements：沒有傳入 arm",
+      "isFinished",
+      "withTimeout"
+    ],
+    "a": 1,
+    "e": "Commands 工具類別的 factory 要自己把 Subsystem 傳進去；Subsystem 自己的 factory 才會自動 require。"
+  },
+  {
+    "q": "預設指令最適合用哪個 factory 建立？",
+    "o": [
+      "runOnce",
+      "run",
+      "waitSeconds",
+      "none"
+    ],
+    "a": 1,
+    "e": "預設指令不應自己結束，run 會一直執行直到被打斷，並自動 require 該 Subsystem。"
+  }
+]

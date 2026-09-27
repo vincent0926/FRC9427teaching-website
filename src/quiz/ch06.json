@@ -1,0 +1,79 @@
+[
+  {
+    "q": "IO 架構裡，ArmSubsystem 的 IO 欄位型別應該是？",
+    "o": [
+      "ArmIOHardware",
+      "ArmIOSim",
+      "ArmIO（介面）",
+      "TalonFX"
+    ],
+    "a": 2,
+    "e": "Subsystem 只認介面，才能在不改程式的情況下換成模擬或重播。"
+  },
+  {
+    "q": "隊上的手臂用 TalonFX 內建的 MotionMagic，ArmIO 的主要輸出方法應該是？",
+    "o": [
+      "setVoltage(volts)",
+      "setPositionGoal(positionRad)",
+      "setPID(kP, kI, kD)",
+      "getTalonFX()"
+    ],
+    "a": 1,
+    "e": "閉迴路在控制器內部執行，所以 IO 送的是目標位置；setVoltage 只保留給 SysId 和手動測試。"
+  },
+  {
+    "q": "2026 年的 Phoenix 6，TalonFX 接在名為 9427 的 CANivore 上，應該怎麼寫？",
+    "o": [
+      "new TalonFX(id, \"9427\")",
+      "new TalonFX(id, new CANBus(\"9427\"))",
+      "new TalonFX(id)",
+      "new TalonFX(\"9427\", id)"
+    ],
+    "a": 1,
+    "e": "字串版建構子在 2026 年已標為 deprecated，預計 2027 年移除。"
+  },
+  {
+    "q": "Follower 使用 MotorAlignmentValue.Opposed，意思是？",
+    "o": [
+      "和 follower 自己的 Inverted 相反",
+      "和 leader 設定的 Invert 相反",
+      "停止跟隨",
+      "反向讀取編碼器"
+    ],
+    "a": 1,
+    "e": "Aligned 和 Opposed 都是相對於 leader 的 Invert 設定。"
+  },
+  {
+    "q": "手臂的 GravityType 應該設成什麼？",
+    "o": [
+      "預設的 Elevator_Static",
+      "Arm_Cosine",
+      "不需要設定",
+      "Arm_Sine"
+    ],
+    "a": 1,
+    "e": "手臂的重力補償隨角度變化，要選 Arm_Cosine，而且 0 度必須是水平。"
+  },
+  {
+    "q": "Command 在 initialize() 裡呼叫 arm.setGoal(SCORE)，新目標什麼時候送到 TalonFX？",
+    "o": [
+      "同一行立刻送出",
+      "下一個週期的 ArmSubsystem.periodic()",
+      "Command 結束時",
+      "下次部署時"
+    ],
+    "a": 1,
+    "e": "排程器先跑 Subsystem 的 periodic，再執行指令，所以新目標在下一輪的 periodic 才送出。"
+  },
+  {
+    "q": "為什麼 ArmIOSim 推薦用 Phoenix 的 TalonFXSimState？",
+    "o": [
+      "比較快",
+      "模擬時跑的是同一份 MotionMagic 和 kG 設定",
+      "不需要齒輪比",
+      "可以用多條 CAN bus"
+    ],
+    "a": 1,
+    "e": "這樣模擬驗證的就是實機會用的設定。注意模擬時所有 CAN bus 會合併，ID 必須唯一。"
+  }
+]

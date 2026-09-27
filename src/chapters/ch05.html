@@ -1,0 +1,145 @@
+  <p class="headline-code">CAN ID 05｜Java 與物件導向</p>
+  <h1>列舉、常數與套件：鐘聲、校規和年級班級</h1>
+  <p class="lede">讀完這章，你會用 enum 表示機構狀態、把魔術數字整理進 Constants，並看懂為什麼檔案放錯資料夾會編譯失敗。</p>
+
+  <h2>生活比喻一：學校的鐘聲只有幾種</h2>
+  <div class="story">
+    <p><strong>廣播系統只有固定幾種鈴聲。</strong>學校的鐘聲系統只設定了四種：上課鐘、下課鐘、午休鐘、放學鐘。值班老師按按鈕時，只能從這四個裡面選。</p>
+    <p><strong>如果改成用數字。</strong>假設系統改成輸入數字：1 是上課、2 是下課、3 是午休、4 是放學。有一天新來的老師輸入了 5，系統照樣接受，但沒有人知道 5 是什麼鈴聲，全校愣在原地。更糟的是，有人記錯把 2 當上課，學生在上課時間衝去福利社。</p>
+    <p><strong>每種鈴聲可以帶附加資訊。</strong>上課鐘後面接的是 50 分鐘，下課鐘後面是 10 分鐘。這個長度跟著鈴聲走，不用另外查表。</p>
+  </div>
+  <p>這就是<strong>列舉</strong>（enum）：一份固定的清單，變數只能是清單上的值，寫錯了編譯器直接抓到。Java 的 enum 還是一種特別的類別，可以帶欄位、建構子和方法<a class="ref" href="#src5-1">[1]</a>。</p>
+
+  <h2>生活比喻二：貼在公布欄的校規</h2>
+  <div class="story">
+    <p><strong>數字散落在各處。</strong>「每節課 50 分鐘」這件事，如果每位老師在自己的教案裡各寫一次 50，哪天改成 45 分鐘，就得一本一本找出來改，漏一本那位老師就會多上 5 分鐘。</p>
+    <p><strong>集中到公布欄。</strong>學校的做法是把它寫成一條校規，貼在公布欄，所有人都參照這一條。要改只改一個地方，而且大家一看就知道這個 50 是什麼意思。</p>
+  </div>
+  <p>程式裡直接寫在中間、看不出意義的數字叫「魔術數字」。把它們集中成有名字的常數，要改只改一處。Java 的命名慣例是常數全部大寫、單字用底線隔開<a class="ref" href="#src5-3">[3]</a>。</p>
+
+  <h2>生活比喻三：三年二班的王小明</h2>
+  <div class="story">
+    <p><strong>同名同姓。</strong>全校有兩個王小明，一個在三年二班，一個在一年五班。廣播只喊「王小明到學務處」，兩個人都會跑來。</p>
+    <p><strong>加上班級就不會錯。</strong>喊「三年二班王小明」，就只有一個人。班級就是名字前面的「地址」。</p>
+    <p><strong>座位要和名冊一致。</strong>名冊上寫小明是三年二班，他就必須坐在三年二班的教室。人在一年五班、名冊卻寫三年二班，點名時兩邊都對不上。</p>
+    <p><strong>跨班找人要先登記。</strong>三年二班要請一年五班的同學來幫忙，要先在登記簿寫下「今天借用一年五班王小明」，之後在班上直接叫「小明」就知道是誰。沒登記的話，每次都得喊全名。</p>
+  </div>
+  <p>這就是<strong>套件</strong>（package）與 <code>import</code>。套件讓同名的類別可以並存，也讓大專案容易整理<a class="ref" href="#src5-5">[5]</a>。</p>
+
+  <table class="map">
+    <thead><tr><th>比喻</th><th>Java</th><th>在機器人上</th></tr></thead>
+    <tbody>
+      <tr><td>四種固定鈴聲</td><td><code>enum</code></td><td><code>IntakeState</code>：NONE、INTAKING、SCORING</td></tr>
+      <tr><td>輸入 5 沒人知道是什麼</td><td>用 int 代表狀態的風險</td><td>寫錯狀態編號也能編譯</td></tr>
+      <tr><td>鈴聲附帶時間長度</td><td>enum 的欄位</td><td>每個狀態附帶滾輪電壓</td></tr>
+      <tr><td>公布欄上的校規</td><td><code>static final</code> 常數</td><td><code>Constants.java</code></td></tr>
+      <tr><td>三年二班王小明</td><td>完整類別名稱</td><td><code>frc.robot.subsystems.intake.IntakeSubsystem</code></td></tr>
+      <tr><td>座位要和名冊一致</td><td>package 宣告要和資料夾一致</td><td>放錯資料夾就編譯失敗</td></tr>
+      <tr><td>跨班借人先登記</td><td><code>import</code></td><td><code>import com.ctre.phoenix6.hardware.TalonFX;</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>學校的年級和班級有上下層級，三年級「包含」三年二班。但 Java 的套件看起來有層級，其實沒有：<code>frc.robot</code> 和 <code>frc.robot.subsystems</code> 是兩個完全獨立的套件，彼此之間沒有任何特殊的存取權限<a class="ref" href="#src5-5">[5]</a>。這一點會直接影響第 2 章講的 package-private：在 <code>frc.robot</code> 裡不加修飾詞的東西，<code>frc.robot.subsystems</code> 裡的類別看不到。</div>
+
+  <h2>換成機器人：enum</h2>
+  <p>隊上的 Intake 用 enum 表示狀態：<code>NONE</code>、<code>INTAKING</code>、<code>SCORING</code>。用 switch 依狀態決定動作：</p>
+  <pre><code>public enum IntakeState {
+    NONE, INTAKING, SCORING
+}
+
+// IntakeSubsystem 裡
+private IntakeState state = IntakeState.NONE;
+
+@Override
+public void periodic() {
+    switch (state) {
+        case NONE -&gt; setRollerVoltage(0.0);
+        case INTAKING -&gt; setRollerVoltage(8.0);  // TODO: 實測調整
+        case SCORING -&gt; setRollerVoltage(-6.0);  // TODO: 實測調整
+    }
+}</code></pre>
+  <p>這種 <code>case X -&gt;</code> 的 switch 寫法從 Java 14 開始是正式語法，WPILib 使用 Java 17，可以放心用<a class="ref" href="#src5-2">[2]</a>。</p>
+  <p>enum 也可以把資料帶在身上，就像鈴聲附帶時間長度。下面只是示範語法，不代表隊上的 <code>IntakeState</code> 要改成這樣：</p>
+  <pre><code>public enum IntakeState {
+    NONE(0.0),
+    INTAKING(8.0),  // TODO: 實測調整
+    SCORING(-6.0);  // TODO: 實測調整
+
+    public final double rollerVolts;
+
+    IntakeState(double rollerVolts) {
+        this.rollerVolts = rollerVolts;
+    }
+}
+
+// 使用時，switch 整個可以省掉
+setRollerVoltage(state.rollerVolts);</code></pre>
+
+  <h2>換成機器人：Constants</h2>
+  <p>WPILib 的 Command-based 範本專案附有一個 <code>Constants</code> 類別，用來放整個機器人共用的常數<a class="ref" href="#src5-4">[4]</a>。常見的組織方式是每個機構一個巢狀類別：</p>
+  <pre><code>public final class Constants {
+    private Constants() {} // 不讓別人 new 這個類別
+
+    public static final class IntakeConstants {
+        public static final String CAN_BUS = "9427";
+        public static final int ROLLER_LEADER_ID = 21;   // TODO: 依接線確認
+        public static final int ROLLER_FOLLOWER_ID = 22; // TODO: 依接線確認
+    }
+}
+
+// 使用時
+new TalonFX(IntakeConstants.ROLLER_LEADER_ID);</code></pre>
+
+  <h2>換成機器人：套件與 import</h2>
+  <pre><code>// 檔案位置：src/main/java/frc/robot/subsystems/intake/IntakeSubsystem.java
+package frc.robot.subsystems.intake;
+
+import com.ctre.phoenix6.hardware.TalonFX;            // 向 CTRE 借
+import edu.wpi.first.wpilibj2.command.SubsystemBase;  // 向 WPILib 借
+import frc.robot.Constants.IntakeConstants;           // 向自己專案的 Constants 借
+
+public class IntakeSubsystem extends SubsystemBase {
+    // ...
+}</code></pre>
+  <p><code>package</code> 那行說「我在哪一班」，<code>import</code> 那幾行是「跨班借人的登記」。沒有 import 也能用，只是每次都要寫全名，例如 <code>com.ctre.phoenix6.hardware.TalonFX</code>。</p>
+
+  <div class="note warn"><strong>檔名、類別名、套件名要對上</strong>public 類別的名字必須和檔名相同（<code>IntakeSubsystem.java</code> 裡是 <code>public class IntakeSubsystem</code>），<code>package</code> 宣告要和檔案所在的資料夾一致。任何一個對不上，javac 都會編譯失敗。在 VS Code 裡搬移或改名檔案後，第一件事就是檢查這兩行。</div>
+  <div class="note coach"><strong>教練提醒</strong>在 Code review 裡看到程式中間出現 <code>21</code>、<code>0.35</code>、<code>8.0</code> 這種沒名字的數字，我都會要求搬進 Constants 並加上單位。比賽當天在 pit 要改參數時，你會感謝自己。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：幫手臂整理位置</h2>
+  <p>寫一個 enum <code>ArmPosition</code>，有 <code>STOW</code>（0 度）、<code>INTAKE</code>（15 度）、<code>SCORE</code>（95 度）三個值，每個值帶一個 <code>degrees</code> 欄位。再寫一個方法 <code>describe(ArmPosition p)</code>，用 switch 回傳中文說明。</p>
+  <details>
+    <summary>看參考答案</summary>
+    <pre><code>public enum ArmPosition {
+    STOW(0.0),     // TODO: 實測
+    INTAKE(15.0),  // TODO: 實測
+    SCORE(95.0);   // TODO: 實測
+
+    public final double degrees;
+
+    ArmPosition(double degrees) {
+        this.degrees = degrees;
+    }
+}
+
+public static String describe(ArmPosition p) {
+    return switch (p) {
+        case STOW -&gt; "收起";
+        case INTAKE -&gt; "取件";
+        case SCORE -&gt; "得分";
+    };
+}</code></pre>
+    <p>switch 當成運算式使用時，每個 enum 值都必須處理到，漏了一個就編譯失敗。這正是 enum 比數字安全的地方<a class="ref" href="#src5-2">[2]</a>。</p>
+  </details>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src5-1">Oracle. <a href="https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html" target="_blank" rel="noopener">The Java Tutorials: Enum Types</a></li>
+    <li id="src5-2">WPILib. <a href="https://docs.wpilib.org/en/2025/docs/yearly-overview/yearly-changelog.html" target="_blank" rel="noopener">New for 2025</a>（Java 17 為原始碼與目標版本）；Oracle. <a href="https://docs.oracle.com/en/java/javase/17/language/switch-expressions.html" target="_blank" rel="noopener">Java 17: Switch Expressions</a></li>
+    <li id="src5-3">Oracle. <a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html" target="_blank" rel="noopener">The Java Tutorials: Variables</a>（命名慣例）</li>
+    <li id="src5-4">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html" target="_blank" rel="noopener">Structuring a Command-Based Robot Project</a></li>
+    <li id="src5-5">Oracle. <a href="https://docs.oracle.com/javase/tutorial/java/package/index.html" target="_blank" rel="noopener">The Java Tutorials: Packages</a>（含「套件看似有層級，其實沒有」的說明）</li>
+  </ol>

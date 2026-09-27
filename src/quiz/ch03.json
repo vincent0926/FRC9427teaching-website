@@ -1,0 +1,57 @@
+[
+  {
+    "q": "IntakeSubsystem extends SubsystemBase，下面哪個敘述正確？",
+    "o": [
+      "IntakeSubsystem 還能再 extends 另一個類別",
+      "IntakeSubsystem 自動擁有 SubsystemBase 的方法，例如 runOnce()",
+      "SubsystemBase 自動擁有 IntakeSubsystem 自己寫的方法",
+      "兩者沒有關係"
+    ],
+    "a": 1,
+    "e": "子類別沿用父類別的方法，反過來不成立。Java 只能 extends 一個父類別。"
+  },
+  {
+    "q": "IntakeSubsystem 的建構子裡沒寫 super()，SubsystemBase 的建構子還會執行嗎？",
+    "o": [
+      "不會，所以 periodic() 不會被呼叫",
+      "會，編譯器自動在第一行插入 super()",
+      "只有在模擬時會",
+      "要手動呼叫 register() 才會"
+    ],
+    "a": 1,
+    "e": "沒有明確呼叫時，編譯器會自動插入呼叫父類別無參數建構子的 super()，SubsystemBase 因此完成註冊。"
+  },
+  {
+    "q": "在 Robot 裡把 teleopPeriodic() 打錯成 teleopPeriodc()，但有加 @Override，會怎樣？",
+    "o": [
+      "執行時才出錯",
+      "編譯器報錯",
+      "自動改成正確名稱",
+      "沒有任何影響"
+    ],
+    "a": 1,
+    "e": "@Override 讓編譯器檢查父類別真的有這個方法，打錯馬上被抓。沒加的話，機器人在手動階段會什麼都不做。"
+  },
+  {
+    "q": "RollerIO io = new RollerIOSim(); io.setVoltage(8.0); 會執行誰的 setVoltage()？",
+    "o": [
+      "RollerIO 介面的",
+      "RollerIOSim 的",
+      "RollerIOHardware 的",
+      "編譯錯誤"
+    ],
+    "a": 1,
+    "e": "變數型別是介面，實際執行的是物件本身的做法，就像衛生股長只看職責、不管今天是誰。"
+  },
+  {
+    "q": "真馬達和模擬器都要能「設定電壓、回報轉速」，最適合用什麼表達？",
+    "o": [
+      "讓 RollerIOSim extends RollerIOHardware",
+      "定義 RollerIO 介面，兩者都 implements",
+      "複製貼上兩份程式",
+      "用 static 方法"
+    ],
+    "a": 1,
+    "e": "模擬器不是一種真馬達，只是能做同樣的事，這正是介面的用途，就像掃地機器人能當值日生。"
+  }
+]

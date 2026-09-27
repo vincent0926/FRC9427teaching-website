@@ -1,0 +1,217 @@
+  <p class="headline-code">CAN ID 07｜WPILib 基礎</p>
+  <h1>機器人程式的生命週期：學校的一天</h1>
+  <p class="lede">讀完這章，你會知道機器人程式怎麼啟動、四種模式怎麼切換、每 20 毫秒裡哪些方法依什麼順序被呼叫、<code>TimedRobot</code> 和 AdvantageKit 的 <code>LoggedRobot</code> 有什麼不同，以及為什麼在 periodic 裡寫一個 while 迴圈會讓整台機器人當機。</p>
+
+  <h2>生活比喻：學校的一天</h2>
+  <div class="story">
+    <p><strong>早上工友先開門整理。</strong>每天早上學校開門前，工友會先把教室的燈打開、桌椅排好、設備檢查一遍。這件事一天只做一次，而且是在任何人進教室之前。</p>
+    <p><strong>一天分成幾種時段。</strong>早自習的時候，學生都到了，但還不能開始活動，只能安靜坐好。第一節是自主學習時間，老師不在教室，學生照著前一天寫好的計畫自己做事。之後是一般上課，老師站在台上，學生聽老師的指令行動。偶爾還有實驗課，拿來檢查器材能不能正常運作。</p>
+    <p><strong>現在是哪個時段，由廣播決定。</strong>學生不能自己宣布「現在開始上課」。平常練習時由導護老師廣播，正式考試時則由考場統一廣播。</p>
+    <p><strong>每個時段有開始、進行中、結束三個階段。</strong>每次進入一個新時段，班長會喊一次「起立、敬禮」，這個動作只在時段開始時做一次。時段進行中，老師每隔固定時間巡一下教室。時段結束前，大家把東西收好，這也只做一次。只要重新進入同一個時段，例如下午又回到上課，班長就會再喊一次。</p>
+    <p><strong>不管什麼時段，警衛都照常巡邏。</strong>老師巡完教室後，警衛會接著巡一次整棟大樓。這件事不管是早自習、自主學習還是上課，每一輪都會做，而且總是排在老師巡完之後。</p>
+    <p><strong>巡邏的時間是固定的。</strong>學校規定每 20 分鐘巡一輪。老師和警衛是同一個人輪流扮演的：先以老師的身分巡教室，再以警衛的身分巡大樓，然後處理公布欄。如果有一位老師在某間教室停下來講了半小時，這一輪就超時了，後面的警衛巡邏和公布欄更新全部跟著延後，整棟大樓這段時間都沒人照看。</p>
+    <p><strong>模擬考日有額外的流程。</strong>只有模擬考的日子，每一輪最後還會多一個步驟：模擬閱卷。平常上課日不會做這件事。</p>
+  </div>
+
+  <table class="map">
+    <thead><tr><th>比喻</th><th>WPILib</th></tr></thead>
+    <tbody>
+      <tr><td>工友早上開門整理，一天一次</td><td><code>Robot</code> 的建構子，程式啟動時執行一次</td></tr>
+      <tr><td>早自習：人到了但不能活動</td><td>Disabled 模式</td></tr>
+      <tr><td>自主學習：照事先寫好的計畫</td><td>Autonomous 模式</td></tr>
+      <tr><td>一般上課：聽老師指令</td><td>Teleop（Teleoperated）模式</td></tr>
+      <tr><td>實驗課：檢查器材</td><td>Test 模式</td></tr>
+      <tr><td>導護老師或考場廣播</td><td>Driver Station，比賽中由 FMS 控制</td></tr>
+      <tr><td>進入時段時喊「起立、敬禮」</td><td><code>xxxInit()</code></td></tr>
+      <tr><td>時段中每隔固定時間巡一次</td><td><code>xxxPeriodic()</code></td></tr>
+      <tr><td>時段結束前收拾</td><td><code>xxxExit()</code></td></tr>
+      <tr><td>警衛每一輪都巡，排在老師之後</td><td><code>robotPeriodic()</code></td></tr>
+      <tr><td>每 20 分鐘巡一輪</td><td>每 20 毫秒執行一輪（預設）</td></tr>
+      <tr><td>老師講太久，整輪延後</td><td>Loop overrun</td></tr>
+      <tr><td>模擬考日的模擬閱卷</td><td><code>simulationPeriodic()</code>，只在模擬時執行</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>學校的鐘聲一定準時響，但 20 毫秒只是「設定的週期」，不是保證。程式如果跑超過 20 毫秒，那一輪就是 overrun，控制就延遲了。另外，故事裡特別強調老師和警衛是同一個人輪流扮演，這一點很重要：在 <code>TimedRobot</code> 的主迴圈裡，所有 periodic 方法是在同一條執行緒上「依序」執行，不是同時進行。所以只要其中一個方法卡住，後面的全部都會被拖住。</div>
+
+  <h2>程式怎麼啟動</h2>
+  <p>roboRIO 啟動程式時，先執行 <code>Main.java</code>，它會把 <code>Robot</code> 類別交給 WPILib 啟動。接著 <code>Robot</code> 的建構子執行一次。從 2025 年起，WPILib 範本在建構子寫著「機器人第一次啟動時執行，用來放初始化程式」<a class="ref" href="#src7-1">[1]</a>，而不是舊範本常用的 <code>robotInit()</code>。</p>
+  <p>在 Command-based 專案裡，WPILib 文件說明 <code>RobotContainer</code> 應該在 <code>Robot</code> 的建構子裡建立，因為大部分的宣告式設定都寫在 <code>RobotContainer</code> 的建構子裡<a class="ref" href="#src7-3">[3]</a>。所以「工友開門整理」這一步，實際上就是把所有 Subsystem 建好、把按鍵綁好。</p>
+
+  <h2>四種模式與誰來切換</h2>
+  <p>Driver Station 的 Operation 分頁可以選 Teleoperated、Autonomous、Practice、Test。Practice 模式會在按下 Enable 後，依照 Setup 分頁設定的時間，自動走一遍和正式比賽相同的模式切換<a class="ref" href="#src7-5">[5]</a>。正式比賽中則由場地系統（FMS）控制模式。</p>
+  <p>自動階段和手動階段各有多長，是每年的比賽規則決定的，請以當年的 Game Manual 為準。</p>
+
+  <h2>init、periodic、exit</h2>
+  <p><code>TimedRobot</code> 透過一組 <code>init()</code>、<code>periodic()</code>、<code>exit()</code> 方法控制程式，這些方法由 WPILib 在對應的狀態下呼叫<a class="ref" href="#src7-1">[1]</a>。WPILib 的 API 文件對它們的定義是<a class="ref" href="#src7-2">[2]</a>：</p>
+  <table class="map">
+    <thead><tr><th>方法</th><th>什麼時候被呼叫</th></tr></thead>
+    <tbody>
+      <tr><td><code>disabledInit()</code>、<code>autonomousInit()</code>、<code>teleopInit()</code>、<code>testInit()</code></td><td>每次從其他模式進入該模式時，呼叫一次</td></tr>
+      <tr><td><code>disabledPeriodic()</code> 等</td><td>在該模式中，每個週期呼叫一次</td></tr>
+      <tr><td><code>disabledExit()</code> 等</td><td>每次離開該模式時，呼叫一次</td></tr>
+      <tr><td><code>robotPeriodic()</code></td><td>不論哪個模式，每個週期都呼叫</td></tr>
+    </tbody>
+  </table>
+  <p>週期預設是 20 毫秒，也就是每秒 50 次。可以在建構子用 <code>super(0.03)</code> 改成 30 毫秒，但官方用「Danger」等級警告，更改週期可能造成非預期的行為（loop overrun）<a class="ref" href="#src7-1">[1]</a>。</p>
+
+  <h2>每 20 毫秒裡的順序</h2>
+  <p>根據 WPILib 原始碼中的 <code>IterativeRobotBase</code>，每一輪的執行順序是<a class="ref" href="#src7-4">[4]</a>：</p>
+  <table class="map">
+    <thead><tr><th>順序</th><th>做什麼</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>如果模式改變了：先呼叫舊模式的 <code>exit()</code>，再呼叫新模式的 <code>init()</code></td></tr>
+      <tr><td>2</td><td>呼叫目前模式的 <code>periodic()</code></td></tr>
+      <tr><td>3</td><td>呼叫 <code>robotPeriodic()</code></td></tr>
+      <tr><td>4</td><td>更新 SmartDashboard、LiveWindow、Shuffleboard</td></tr>
+      <tr><td>5</td><td>只在模擬時：呼叫 <code>simulationPeriodic()</code></td></tr>
+      <tr><td>6</td><td>檢查這一輪有沒有超時，超時就印出警告</td></tr>
+    </tbody>
+  </table>
+
+  <h2>動手試：一步一步跑 20 毫秒</h2>
+  <p>用下面的模擬器扮演 Driver Station：先選模式，再按「執行下一輪」，看每一輪有哪些方法被呼叫。試試看從 Disabled 切到 Autonomous，再切到 Teleop。</p>
+  <div class="lab">
+    <div class="calls" role="group" aria-label="選擇模式">
+      <button class="call mode" data-mode="disabled" aria-pressed="true">Disabled</button>
+      <button class="call mode" data-mode="autonomous" aria-pressed="false">Autonomous</button>
+      <button class="call mode" data-mode="teleop" aria-pressed="false">Teleop</button>
+      <button class="call mode" data-mode="test" aria-pressed="false">Test</button>
+    </div>
+    <div class="calls">
+      <label class="simtoggle"><input type="checkbox" id="simToggle"> 在電腦上模擬執行</label>
+    </div>
+    <div class="calls">
+      <button class="btn" id="stepLoop">執行下一輪</button>
+      <button class="btn ghost" id="resetLoop">重新開機</button>
+    </div>
+    <div class="console" id="loopConsole" aria-live="polite" style="max-height:260px"></div>
+  </div>
+
+  <h2>Command-based 的 Robot.java</h2>
+  <p>WPILib 文件說明，Command-based 是宣告式的寫法，所以 <code>Robot</code> 類別應該幾乎是空的<a class="ref" href="#src7-3">[3]</a>。以下是 2026 年 Command-based 範本的重點部分：</p>
+  <pre><code>public class Robot extends TimedRobot {
+    private Command m_autonomousCommand;
+    private final RobotContainer m_robotContainer;
+
+    public Robot() {
+        m_robotContainer = new RobotContainer(); // 工友開門：建好所有 Subsystem、綁好按鍵
+    }
+
+    @Override
+    public void robotPeriodic() {
+        CommandScheduler.getInstance().run();   // 警衛巡邏：每一輪都要跑
+    }
+
+    @Override
+    public void autonomousInit() {
+        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+        if (m_autonomousCommand != null) {
+            CommandScheduler.getInstance().schedule(m_autonomousCommand);
+        }
+    }
+
+    @Override
+    public void teleopInit() {
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.cancel();       // 手動開始時，停掉還沒跑完的自動指令
+        }
+    }
+
+    @Override
+    public void testInit() {
+        CommandScheduler.getInstance().cancelAll();
+    }
+}</code></pre>
+  <p>最重要的是 <code>robotPeriodic()</code> 裡那一行。官方文件強調，<code>CommandScheduler.getInstance().run()</code> 一定要放在 <code>robotPeriodic()</code>；沒有這一行，排程器就不會執行任何指令<a class="ref" href="#src7-3">[3]</a>。排程器每次 <code>run()</code> 時，會先呼叫所有已註冊 Subsystem 的 <code>periodic()</code>，接著檢查按鍵觸發，再執行目前排程中的指令<a class="ref" href="#src7-6">[6]</a>。所以第 6 章 IO 架構裡寫在 Subsystem <code>periodic()</code> 的 <code>updateInputs</code>，其實就是被這一行帶動的。</p>
+  <p><code>teleopInit()</code> 取消自動指令的理由也很實際：如果自動程式在自動階段結束前沒跑完，進入手動後它還會繼續佔用機構，駕駛就搶不到控制權。</p>
+
+  <h2>如果 Robot 繼承的是 LoggedRobot</h2>
+  <p>使用 AdvantageKit 的專案（第 6 章後半），<code>Robot</code> 繼承的不是 <code>TimedRobot</code>，而是 <code>LoggedRobot</code>。AdvantageKit 文件規定主要的 <code>Robot</code> 類別<strong>必須</strong>繼承 <code>LoggedRobot</code><a class="ref" href="#src7-7">[7]</a>。</p>
+  <p>好消息是，本章的生命週期規則完全適用。<code>LoggedRobot</code> 和 <code>TimedRobot</code> 一樣繼承自 <code>IterativeRobotBase</code>，同樣的 init、periodic、exit 方法由固定週期呼叫<a class="ref" href="#src7-8">[8]</a>，上面的模擬器對兩者都成立。差別在於：</p>
+  <table class="map">
+    <thead><tr><th></th><th><code>TimedRobot</code></th><th><code>LoggedRobot</code></th></tr></thead>
+    <tbody>
+      <tr><td>生命週期方法</td><td colspan="2">相同，都來自 <code>IterativeRobotBase</code></td></tr>
+      <tr><td>額外的週期函式（<code>addPeriodic</code>）</td><td>支援</td><td>不支援<a class="ref" href="#src7-7">[7]</a></td></tr>
+      <tr><td>建構子最前面</td><td>建立 <code>RobotContainer</code></td><td>先設定並啟動 <code>Logger</code>，<strong>然後</strong>才建立 <code>RobotContainer</code><a class="ref" href="#src7-7">[7]</a></td></tr>
+      <tr><td>重播時</td><td>不適用</td><td>可用 <code>setUseTiming(false)</code> 讓每輪盡快執行，但讀到的時間戳仍與真機器人相同<a class="ref" href="#src7-7">[7]</a></td></tr>
+    </tbody>
+  </table>
+  <pre><code>public class Robot extends LoggedRobot {
+    private final RobotContainer m_robotContainer;
+
+    public Robot() {
+        // 一定要放在建構子最前面，在任何其他初始化之前
+        Logger.recordMetadata("ProjectName", "FRC9427");
+        if (isReal()) {
+            Logger.addDataReceiver(new WPILOGWriter()); // 寫入 roboRIO 上的 USB 隨身碟
+            Logger.addDataReceiver(new NT4Publisher()); // 即時發布到 NetworkTables
+        }
+        // 模擬與重播的設定見第 18 章
+        Logger.start(); // 之後就不能再新增接收端或 metadata
+
+        m_robotContainer = new RobotContainer();
+    }
+
+    @Override
+    public void robotPeriodic() {
+        CommandScheduler.getInstance().run(); // 和 TimedRobot 版本一樣，不能少
+    }
+}</code></pre>
+  <p>順序很重要。AdvantageKit 文件要求 Logger 的設定放在 <code>Robot</code> 建構子裡、任何其他初始化之前，並且在 <code>Logger.start()</code> 之後就不能再加入資料接收端、重播來源或 metadata<a class="ref" href="#src7-7">[7]</a>。如果先建立 <code>RobotContainer</code>，Subsystem 可能在記錄框架還沒準備好時就開始讀取輸入。文件也提醒，<code>WPILOGWriter</code> 預設寫入 USB 隨身碟，roboRIO 上必須插著一支 FAT32 格式的隨身碟<a class="ref" href="#src7-7">[7]</a>。</p>
+  <div class="note coach"><strong>教練提醒</strong>用 AdvantageKit 的隊伍，比賽前的檢查清單要多一項：roboRIO 上的 USB 隨身碟有插好、格式是 FAT32、還有空間。沒有日誌，出問題時就沒有東西可以重播。</div>
+
+  <h2>Loop overrun：老師講太久</h2>
+  <p>如果某一輪超過 20 毫秒，主控台會出現 <code>Loop time of 0.02s overrun</code> 的警告，後面還會列出這一輪中每個階段花了多少時間。Command 排程器也有自己的計時，超時會印出 <code>CommandScheduler loop overrun</code>，同樣附上每個 Subsystem 和指令的耗時<a class="ref" href="#src7-4">[4]</a><a class="ref" href="#src7-6">[6]</a>。看到這些警告時，找出列表中時間最長的那一項，通常就是元兇。</p>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>在 periodic 裡等待</strong>在 <code>teleopPeriodic()</code> 或 Subsystem 的 <code>periodic()</code> 裡寫 <code>while (!sensor.get()) {}</code> 或 <code>Thread.sleep(500)</code>，整個主迴圈就停在那裡，其他 Subsystem、按鍵、指令全部不會更新，機器人看起來像當機。periodic 方法要「做完這一輪該做的事就立刻結束」，需要等待的邏輯交給 Command 處理（第 8、9 章）。</div>
+  <div class="note warn"><strong>在 periodic 裡建立物件</strong>把 <code>new TalonFX(21)</code> 或 <code>new VoltageOut(0)</code> 寫在 periodic 裡，每秒就會建立 50 次。硬體物件和控制請求都應該在建構子或欄位宣告時建立一次（第 1 章）。</div>
+  <div class="note warn"><strong>太早讀取 Driver Station 資料</strong>聯盟顏色這類資料來自 Driver Station，建構子執行時可能還沒連上，讀到的值不可靠。WPILib 的 <code>IterativeRobotBase</code> 提供 <code>driverStationConnected()</code> 方法，官方說明「需要知道 Driver Station 狀態的程式碼應該放在這裡」<a class="ref" href="#src7-2">[2]</a>，或者等到 <code>autonomousInit()</code> 再讀取。</div>
+  <div class="note coach"><strong>教練提醒</strong>每次部署後，先看 RioLog 有沒有 overrun 警告，再 Enable。練習時養成習慣：新加的程式碼只要讓 overrun 出現，就先找出原因再繼續。比賽中 overrun 不會讓你輸，但它會讓自動路徑跑偏、PID 抖動，而且很難在 pit 裡現場查出來。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：預測呼叫順序</h2>
+  <p>機器人剛開機（處於 Disabled），接著依序發生：切到 Autonomous 並跑了兩輪，再切到 Teleop 並跑了一輪。請寫出從開機後第一輪開始，每一輪會被呼叫的方法（不含 Dashboard 更新）。寫完後用上面的模擬器對答案。</p>
+  <details>
+    <summary>看參考答案</summary>
+    <pre><code>// 程式啟動
+Robot()                  // 建構子，只有一次
+
+// 第 1 輪（Disabled）
+disabledInit()           // 從「沒有模式」進入 Disabled
+disabledPeriodic()
+robotPeriodic()
+
+// 第 2 輪（切到 Autonomous）
+disabledExit()
+autonomousInit()
+autonomousPeriodic()
+robotPeriodic()
+
+// 第 3 輪（Autonomous）
+autonomousPeriodic()
+robotPeriodic()
+
+// 第 4 輪（切到 Teleop）
+autonomousExit()
+teleopInit()
+teleopPeriodic()
+robotPeriodic()</code></pre>
+    <p>注意三件事：<code>init</code> 只在切換的那一輪出現；<code>exit</code> 一定在新模式的 <code>init</code> 之前；<code>robotPeriodic()</code> 每一輪都有，而且總是排在模式的 periodic 之後。</p>
+  </details>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src7-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/vscode-overview/creating-robot-program.html" target="_blank" rel="noopener">Creating a Robot Program</a>（TimedRobot 的 init、periodic、exit，20 ms 預設週期，更改週期的警告，建構子初始化）</li>
+    <li id="src7-2">WPILib. <a href="https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj/IterativeRobotBase.html" target="_blank" rel="noopener">IterativeRobotBase API 文件（2026）</a>（各 init、exit 的呼叫時機，driverStationConnected）</li>
+    <li id="src7-3">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html" target="_blank" rel="noopener">Structuring a Command-Based Robot Project</a>（Robot 應幾乎是空的、在建構子建立 RobotContainer、CommandScheduler.run() 必須放在 robotPeriodic）</li>
+    <li id="src7-4">WPILib. <a href="https://github.com/wpilibsuite/allwpilib/blob/main/wpilibc/src/main/native/cpp/IterativeRobotBase.cpp" target="_blank" rel="noopener">IterativeRobotBase 原始碼</a>（每一輪的呼叫順序與超時檢查；Java 版結構相同）</li>
+    <li id="src7-5">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station.html" target="_blank" rel="noopener">FRC Driver Station Powered by NI LabVIEW</a>（模式與 Practice 模式）</li>
+    <li id="src7-6">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html" target="_blank" rel="noopener">The Command Scheduler</a>（run() 的執行順序）</li>
+    <li id="src7-7">Littleton Robotics. <a href="https://docs.advantagekit.org/getting-started/installation/existing-projects" target="_blank" rel="noopener">AdvantageKit: Existing Projects</a>（Robot 必須繼承 LoggedRobot、與 TimedRobot 的差異、Logger 設定順序、USB 隨身碟需求）</li>
+    <li id="src7-8">Littleton Robotics. <a href="https://docs.advantagekit.org/javadoc/org/littletonrobotics/junction/LoggedRobot.html" target="_blank" rel="noopener">LoggedRobot API 文件</a>（繼承 IterativeRobotBase，週期方法由 Notifier 依週期呼叫）</li>
+  </ol>

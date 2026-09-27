@@ -1,0 +1,184 @@
+  <p class="headline-code">CAN ID 13｜控制</p>
+  <h1>PID 與前饋：推書車上斜坡</h1>
+  <p class="lede">讀完這章，你會知道 P、I、D 各自在做什麼，kS、kV、kA、kG 這些前饋項代表什麼，為什麼手臂只用 PID 會「差一點點到不了」，以及怎麼照順序手動調出第一組能用的參數。</p>
+  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 與 Phoenix 6 的 2026 版（26.x）文件。本章所有增益數值都只是示範，你的機構一定要自己調。</div>
+
+  <h2>生活比喻：推書車上斜坡</h2>
+  <div class="story">
+    <p><strong>圖書股長要把書車推到坡道中間的一個記號。</strong>坡道通往圖書館，記號畫在半路上。書車很重，一放手就會滑下來。</p>
+    <p><strong>離記號越遠，推得越用力。</strong>這是最直覺的做法：還差很遠就用力推，快到了就輕輕推。問題是，到了記號附近「差距很小」，他就只輕輕推，但坡道一直把車往下拉。結果書車停在記號下面一點點的地方：推的力剛好等於下滑的力，永遠差那一點。</p>
+    <p><strong>速度太快就踩煞車。</strong>如果他推得太猛，書車衝過記號，再被拉回來，來回晃好幾次。聰明的做法是看書車現在跑多快：跑得快就先收一點力，像門上的緩衝器一樣，讓車子平穩地停下來。</p>
+    <p><strong>一直差一點，就慢慢加力。</strong>另一個辦法是：只要書車一直停在記號下面，就每秒多加一點力，直到真的推到記號。這個辦法有效，但反應慢，而且如果一開始就差很多，累積的力會太大，衝過頭之後要很久才收得回來。</p>
+    <p><strong>最好的辦法是事先知道要多少力。</strong>有經驗的股長知道：在這個坡道上，光是「讓書車不滑下來」就要一定的力，坡越陡要越多。起步時要先多用一點力，克服輪子卡住的那一下。想維持某個速度，就要對應的力。這些力不必等看到誤差才出，一開始就先給；剩下的一點點誤差，再靠「看距離」和「看速度」修正。</p>
+  </div>
+  <table class="map">
+    <thead><tr><th>比喻</th><th>控制</th></tr></thead>
+    <tbody>
+      <tr><td>坡道上的記號</td><td>目標（setpoint）</td></tr>
+      <tr><td>記號減掉書車現在的位置</td><td>誤差 <var>e</var> = 目標 − 量測</td></tr>
+      <tr><td>離記號越遠推得越用力</td><td>P：<code>kP × 誤差</code></td></tr>
+      <tr><td>看速度踩煞車，像門的緩衝器</td><td>D：<code>kD × 誤差的變化率</code></td></tr>
+      <tr><td>一直差一點就慢慢加力</td><td>I：<code>kI × 誤差的累積</code></td></tr>
+      <tr><td>累積的力太大，衝過頭收不回來</td><td>積分飽和（integral windup）</td></tr>
+      <tr><td>停在記號下面一點點</td><td>穩態誤差</td></tr>
+      <tr><td>「讓書車不滑下來」要的力</td><td>kG（重力前饋）</td></tr>
+      <tr><td>起步時克服輪子卡住的那一下</td><td>kS（靜摩擦前饋）</td></tr>
+      <tr><td>維持某個速度要的力</td><td>kV（速度前饋）</td></tr>
+      <tr><td>加速要多出的力</td><td>kA（加速度前饋）</td></tr>
+    </tbody>
+  </table>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>斜坡的坡度是固定的，所以推書車的重力前饋是一個定值，這跟升降機構一樣。手臂不同：手臂水平時重力的影響最大，垂直時幾乎是零，所以手臂的 kG 要乘上 cos(角度)。另外，PID 輸出的單位是伏特（或 duty cycle、安培），不是真的「力」，只是在馬達上電壓大致對應力矩和速度。</div>
+
+  <h2>回饋與前饋</h2>
+  <p>控制分成兩種思路：</p>
+  <ul>
+    <li><strong>回饋（feedback）</strong>：看誤差修正，看到差多少才出力。PID 就是回饋控制器。</li>
+    <li><strong>前饋（feedforward）</strong>：依照機構的物理特性，事先算出「要達到目標狀態大概需要多少輸出」，不用等誤差出現。</li>
+  </ul>
+  <p>WPILib 文件用垂直手臂示範了三種策略：只用前饋，手臂能追上緩慢平順的移動，但離目標遠時表現不好，也無法修正干擾；只用 PID，「沒有好的調法」，因為手臂即使到了目標也需要持續的輸出來撐住，純回饋會停在目標以外的平衡點；兩者合用才是正解<a class="ref" href="#src13-1">[1]</a>。</p>
+
+  <h2>P、I、D 各自做什麼</h2>
+  <p>WPILib 文件的說法：P 讓位置誤差趨近 0，D 讓速度誤差趨近 0，I 讓累積的誤差趨近 0，三項加起來就是控制輸出<a class="ref" href="#src13-2">[2]</a>。</p>
+  <table class="map">
+    <thead><tr><th>項</th><th>輸出</th><th>像什麼</th><th>太大會怎樣</th></tr></thead>
+    <tbody>
+      <tr><td>P</td><td><code>kP × e</code></td><td>軟體彈簧：把機構拉向目標</td><td>衝過頭、來回振盪</td></tr>
+      <tr><td>D</td><td><code>kD × de/dt</code></td><td>軟體阻尼：像門上的緩衝器，速度越快阻力越大</td><td>輸出抖動（對雜訊很敏感）</td></tr>
+      <tr><td>I</td><td><code>kI × ∫e dt</code></td><td>「一直差一點就慢慢加力」</td><td>積分飽和，衝過頭很久才回來</td></tr>
+    </tbody>
+  </table>
+  <p>「軟體彈簧」和「軟體阻尼」都是 WPILib 文件的比喻：P 就像彈簧的 F = −kx，D 就像門的緩衝器，阻力隨速度線性增加<a class="ref" href="#src13-2">[2]</a>。</p>
+  <p>關於 I：WPILib 文件提醒，kI 太大會造成積分飽和。處理方法依序是：把 kI 降低，能降到 0 最好；誤差太大時把積分歸零（<code>setIZone</code>）；限制積分的上下限（<code>setIntegratorRange</code>）<a class="ref" href="#src13-3">[3]</a>。實務上，前饋做好之後通常就不需要 I。</p>
+
+  <h2>前饋：kS、kV、kA、kG</h2>
+  <p>WPILib 用永磁直流馬達的「電壓平衡方程式」描述前饋<a class="ref" href="#src13-4">[4]</a>：</p>
+  <pre><code>簡單馬達：V = kS·sgn(v) + kV·v + kA·a
+升降機構：V = kG + kS·sgn(v) + kV·v + kA·a
+手臂：    V = kG·cos(θ) + kS·sgn(ω) + kV·ω + kA·α</code></pre>
+  <ul>
+    <li><strong>kS</strong>：克服靜摩擦、讓機構剛好開始動的電壓，不管速度多少都一樣。</li>
+    <li><strong>kV</strong>：維持某個固定速度需要的電壓（主要是抵銷馬達的反電動勢）。電壓和速度的關係對 FRC 零件來說幾乎是線性的。</li>
+    <li><strong>kA</strong>：產生某個加速度需要的電壓。</li>
+    <li><strong>kG</strong>：抵銷重力。升降是定值，手臂要乘 cos(θ)，因為重力不是直接作用在馬達上。</li>
+  </ul>
+  <p>以上說明都來自 WPILib 文件<a class="ref" href="#src13-4">[4]</a>。注意 cos(θ) 的 θ 是「和水平的夾角」，這就是第 6 章和第 12 章一直強調「0 度必須是水平」的原因。</p>
+
+  <h2>在 TalonFX 上設定</h2>
+  <p>第 6 章的手臂已經在 TalonFX 的 Slot0 裡放了這些增益。CTRE 文件說明，控制器內的閉迴路沒有感測延遲，而且以 1 kHz 更新，比在 roboRIO 上跑反應更快<a class="ref" href="#src13-5">[5]</a>。</p>
+  <pre><code>Slot0Configs slot0 = config.Slot0;
+slot0.GravityType = GravityTypeValue.Arm_Cosine; // 預設是 Elevator_Static
+slot0.kG = 0.0; // TODO: 讓手臂水平停住的電壓
+slot0.kS = 0.0; // TODO
+slot0.kV = 0.0; // TODO: 單位 V / (rot/s)
+slot0.kA = 0.0; // TODO: 單位 V / (rot/s²)
+slot0.kP = 0.0; // TODO: 單位 V / rot
+slot0.kI = 0.0;
+slot0.kD = 0.0; // TODO: 單位 V / (rot/s)</code></pre>
+  <p>單位要特別注意。Phoenix 6 的增益是「機構單位」：CTRE 文件舉例，100:1 減速時 kP = 1 代表機構誤差 1 圈輸出 1 V，也就是馬達誤差 100 圈才輸出 1 V<a class="ref" href="#src13-6">[6]</a>。WPILib 的 <code>ArmFeedforward</code>、<code>PIDController</code> 則是你餵什麼單位就用什麼單位，第 6 章 D-3 用的是弧度。同一組數字不能直接在兩邊互換。</p>
+  <p>CTRE 文件也提供一個估算 kP 起始值的方法：手臂離目標 0.1 圈時，如果 1 V 就足以讓它慢慢移動，那麼 kP = 1 V ÷ 0.1 rot = 10 V/rot，是一個安全的起點<a class="ref" href="#src13-6">[6]</a>。</p>
+
+  <h3>kS 的正負號</h3>
+  <p>摩擦永遠和運動方向相反，所以 kS 的正負號要看方向。Phoenix 6 的 <code>StaticFeedforwardSign</code> 有兩種：預設的 <code>UseVelocitySign</code> 依速度目標的正負決定，速度閉迴路一定用它，也建議用在 MotionMagic；<code>UseClosedLoopSign</code> 依誤差的正負決定，用在沒有速度目標的單純位置閉迴路，但 kS 不能太大，否則在目標附近會抖動<a class="ref" href="#src13-5">[5]</a>。</p>
+
+  <h2>動手試：調一支手臂</h2>
+  <p>下面的模擬手臂在 0 度（水平）靜止，目標是往上 72 度（0.2 圈）。模擬裡的手臂有重力、摩擦和 10 ms 的量測延遲。調整三個增益，按「執行」看 2 秒內的角度變化。</p>
+  <div class="lab">
+    <div class="pidgrid">
+      <label>kP <output id="pidPv"></output><input type="range" id="pidP" min="0" max="300" step="5" value="20"></label>
+      <label>kD <output id="pidDv"></output><input type="range" id="pidD" min="0" max="8" step="0.25" value="0"></label>
+      <label>kG <output id="pidGv"></output><input type="range" id="pidG" min="0" max="1.2" step="0.05" value="0"></label>
+    </div>
+    <canvas id="pidCanvas" class="pidplot" width="640" height="240" role="img" aria-label="手臂角度對時間的圖"></canvas>
+    <div class="calls">
+      <button class="btn" id="pidRun">執行</button>
+      <button class="call" data-pid="20,0,0">只有 P</button>
+      <button class="call" data-pid="20,0,0.6">P + kG</button>
+      <button class="call" data-pid="250,0,0.6">kP 太大</button>
+      <button class="call" data-pid="150,3,0.6">P + D + kG</button>
+    </div>
+    <div class="console" id="pidConsole" aria-live="polite"></div>
+  </div>
+  <p>試試看這幾件事：只有 P 時，手臂停在目標下方；加上 kG 之後誤差變小很多；kP 調很大時會衝過頭；加一點 kD 就能把過衝壓小。模擬的真實 kG 是 0.6 V，你把 kG 調過頭會發生什麼事？</p>
+
+  <h2>手動調參的順序</h2>
+  <p>CTRE 文件建議的手動調參流程<a class="ref" href="#src13-5">[5]</a>：</p>
+  <ol>
+    <li>所有增益設為 0。</li>
+    <li>升降或手臂機構先找 kG。</li>
+    <li>選好 kS 的正負號模式。</li>
+    <li>增加 kS，直到馬達「差一點就要動」。</li>
+    <li>如果有速度目標，增加 kV，直到實際速度貼近目標速度。</li>
+    <li>增加 kP，直到開始在目標附近振盪。</li>
+    <li>在不產生抖動的前提下，盡量增加 kD。</li>
+  </ol>
+  <p>找 kG 的方法：升降機構是用開迴路找出「剛好能停在某個高度」的輸出；手臂是找出「剛好能水平向前停住」的輸出<a class="ref" href="#src13-5">[5]</a>。WPILib 的手臂教學提醒，kG 要調得相當精確<a class="ref" href="#src13-1">[1]</a>。</p>
+  <p>飛輪這類速度機構，CTRE 另外建議在低速（約最大速度 10%）調 kS、在高速（約 80%）調 kV，兩者交替調到不再變化，最後才加 kP<a class="ref" href="#src13-6">[6]</a>。手動調出來的數字可以用，但第 15 章的 SysId 能用量測資料直接算出 kS、kV、kA、kG，比猜的準。</p>
+  <div class="note coach"><strong>教練提醒：調參時的安全</strong>每次改完增益都先用小目標測試，手指放在 Enter（Disable）或空白鍵（緊急停止）上（第 0 章）。手臂 kG 的正負號錯了，手臂會被往下推而不是撐住。電流限制和軟體極限（第 6 章）在調參時一定要開著。</div>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>用 I 來補重力</strong>手臂停在目標下方，第一個反應常常是加 kI。它確實會慢慢推上去，但反應慢又容易飽和。缺的其實是 kG。</div>
+  <div class="note warn"><strong>忘了改 GravityType</strong>Phoenix 6 預設是 <code>Elevator_Static</code>，手臂忘了改成 <code>Arm_Cosine</code>，kG 在任何角度都是定值，手臂抬高時反而會被推過頭。</div>
+  <div class="note warn"><strong>增益單位搞錯</strong>把網路上別隊用弧度調出來的 kP 直接填進 Phoenix 的 Slot0（單位是圈），差了 2π 倍；或是忘了 Phoenix 的增益已經是機構端單位。</div>
+  <div class="note warn"><strong>kD 加太多</strong>D 對雜訊很敏感，太大時馬達會嗡嗡作響或抖動，發熱也會增加。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：飛輪的速度控制</h2>
+  <p>替射球飛輪寫 TalonFX 設定：用 <code>VelocityVoltage</code> 控制，Slot0 放 kS、kV、kP（數值待定），並在 Subsystem 寫 <code>setVelocityGoal(double rps)</code> 和 <code>atSpeed()</code> 兩個方法（誤差小於 2 rps 就算到速）。想一想：飛輪需要 kG 嗎？需要 kA 嗎？</p>
+  <details>
+    <summary>看參考答案</summary>
+    <pre><code>public class FlywheelIOHardware implements FlywheelIO {
+    private final TalonFX motor = new TalonFX(0, CANBuses.CANIVORE); // TODO: CAN ID
+    private final VelocityVoltage request = new VelocityVoltage(0.0).withSlot(0);
+
+    public FlywheelIOHardware() {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        config.Feedback.SensorToMechanismRatio = 1.0; // TODO: 齒輪比
+        config.Slot0.kS = 0.0; // TODO: 低速時調
+        config.Slot0.kV = 0.0; // TODO: 高速時調，單位 V/(rot/s)
+        config.Slot0.kP = 0.0; // TODO: 最後才加
+        config.CurrentLimits.SupplyCurrentLimit = 0.0; // TODO
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        motor.getConfigurator().apply(config);
+    }
+
+    // updateInputs 寫法同第 11 章的練習
+
+    @Override
+    public void setVelocity(double rps) {
+        motor.setControl(request.withVelocity(rps));
+    }
+}
+
+// FlywheelSubsystem 裡
+private static final double TOLERANCE_RPS = 2.0; // TODO: 依射球需求調整
+private double goalRps = 0.0;
+
+@Override
+public void periodic() {
+    io.updateInputs(inputs);
+    io.setVelocity(goalRps); // 和第 6 章一樣，只在 periodic 裡送輸出
+}
+
+public void setVelocityGoal(double rps) {
+    goalRps = rps;
+}
+
+public boolean atSpeed() {
+    return Math.abs(inputs.velocityRps - goalRps) &lt; TOLERANCE_RPS;
+}</code></pre>
+    <p>飛輪水平轉動，重力不會讓它加速或減速，所以不需要 kG。kA 只有在「目標速度一直在變」時才有用；飛輪通常是一個固定目標，CTRE 的速度閉迴路範例也只用 kS、kV、kP<a class="ref" href="#src13-7">[7]</a>。滾輪和飛輪用 Coast：停止時讓它自然減速，不要急煞。</p>
+  </details>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src13-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/tuning-vertical-arm.html" target="_blank" rel="noopener">Tuning a Vertical Arm Position Controller</a>（只用前饋、只用回饋、兩者合用的比較）</li>
+    <li id="src13-2">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/introduction-to-pid.html" target="_blank" rel="noopener">Introduction to PID</a>（P 如彈簧、D 如阻尼）</li>
+    <li id="src13-3">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/common-control-issues.html" target="_blank" rel="noopener">Common Control Loop Tuning Issues</a>（積分飽和、電壓下降、致動器飽和）</li>
+    <li id="src13-4">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/introduction-to-feedforward.html" target="_blank" rel="noopener">Introduction to DC Motor Feedforward</a>（kS、kV、kA、kG 與三種方程式）</li>
+    <li id="src13-5">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/closed-loop-requests.html" target="_blank" rel="noopener">Phoenix 6: Closed-Loop Overview</a>（1 kHz、手動調參流程、GravityType、StaticFeedforwardSign）</li>
+    <li id="src13-6">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/manual-pid-tuning.html" target="_blank" rel="noopener">Manually Tuning PID</a>（增益為機構單位、kP 起始值估算、飛輪調參步驟）</li>
+    <li id="src13-7">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html" target="_blank" rel="noopener">Basic PID and Profiling</a>（PositionVoltage、VelocityVoltage 與各增益的意義）</li>
+  </ol>

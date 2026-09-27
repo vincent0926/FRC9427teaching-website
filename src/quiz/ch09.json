@@ -1,0 +1,57 @@
+[
+  {
+    "q": "按住才吸入、放開就停，應該用哪種綁定？",
+    "o": [
+      "onTrue",
+      "whileTrue",
+      "toggleOnTrue",
+      "onFalse"
+    ],
+    "a": 1,
+    "e": "whileTrue 在變成 true 時排程，變成 false 時取消。"
+  },
+  {
+    "q": "不會自己結束的指令綁在 onTrue，放開按鍵後會怎樣？",
+    "o": [
+      "立刻停止",
+      "繼續執行，直到被別的指令打斷",
+      "重新開始",
+      "編譯失敗"
+    ],
+    "a": 1,
+    "e": "onTrue 在放開時什麼都不做。"
+  },
+  {
+    "q": "toggleOnTrue 在指令正在執行時被按下，會怎樣？",
+    "o": [
+      "再排程一次",
+      "取消指令",
+      "什麼都不做",
+      "暫停指令"
+    ],
+    "a": 1,
+    "e": "像電燈開關：沒在執行就排程，正在執行就取消。"
+  },
+  {
+    "q": "按鍵綁定應該寫在哪裡？",
+    "o": [
+      "robotPeriodic()",
+      "Subsystem 的 periodic()",
+      "RobotContainer 建構時（configureBindings）",
+      "每個指令的 execute()"
+    ],
+    "a": 2,
+    "e": "綁定是宣告式的，初始化時宣告一次。寫在 periodic 裡會每輪新增綁定。"
+  },
+  {
+    "q": "new Trigger(arm::atGoal).and(operator.rightTrigger(0.5)) 什麼時候為 true？",
+    "o": [
+      "任一個成立",
+      "兩個都成立",
+      "都不成立",
+      "arm 到位後 0.5 秒"
+    ],
+    "a": 1,
+    "e": "and 代表兩個條件都要成立。"
+  }
+]

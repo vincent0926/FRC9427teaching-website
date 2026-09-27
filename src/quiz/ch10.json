@@ -1,0 +1,57 @@
+[
+  {
+    "q": "Commands.parallel(a, b) 什麼時候結束？",
+    "o": [
+      "a 結束時",
+      "任一個結束時",
+      "兩個都結束時",
+      "永遠不會"
+    ],
+    "a": 2,
+    "e": "parallel 像大掃除，全部完成才結束。"
+  },
+  {
+    "q": "Commands.deadline(arm.goTo(INTAKE), intake.runState(INTAKING)) 什麼時候結束？",
+    "o": [
+      "滾輪停止時",
+      "手臂到達 INTAKE 時",
+      "兩個都結束時",
+      "永遠不會"
+    ],
+    "a": 1,
+    "e": "第一個參數是主角，它結束時其他成員被打斷。"
+  },
+  {
+    "q": "同一個指令物件放進兩個不同的組合，會怎樣？",
+    "o": [
+      "正常執行兩次",
+      "執行時丟出例外",
+      "只執行第一個",
+      "自動複製一份"
+    ],
+    "a": 1,
+    "e": "傳進組合的指令物件不能再用於第二個組合或單獨排程。要用 factory 取得新物件。"
+  },
+  {
+    "q": "2025 年起，deadlineWith 改名為？",
+    "o": [
+      "deadlineFor",
+      "withDeadline",
+      "raceWith",
+      "alongWith"
+    ],
+    "a": 0,
+    "e": "WPILib 2025 更新說明：Rename deadlineWith to deadlineFor。"
+  },
+  {
+    "q": "score 序列需要手臂和 Intake。在它吐出的那段時間，手臂的預設指令會執行嗎？",
+    "o": [
+      "會",
+      "不會，組合在整段期間都佔住所有成員的 requirements",
+      "只有 0.5 秒後會",
+      "看手臂有沒有在動"
+    ],
+    "a": 1,
+    "e": "組合的 requirements 是聯集，整段執行期間都有效。"
+  }
+]

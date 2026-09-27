@@ -1,0 +1,20 @@
+/* ---------- CAN bus course map ---------- */
+nav.bus{position:sticky;top:0;height:100vh;overflow-y:auto;padding:28px 18px 40px 22px;border-right:1px solid var(--line);background:var(--surface)}
+.brand{font-weight:900;font-size:20px;letter-spacing:.02em;margin:0 0 4px}
+.brand-sub{font-size:13px;color:var(--ink-2);margin:0 0 22px}
+.part{font-size:13px;font-weight:700;color:var(--ink-2);margin:18px 0 6px 36px}
+.nodes{list-style:none;margin:0;padding:0;position:relative}
+.nodes::before,.nodes::after{content:"";position:absolute;top:0;bottom:0;width:3px;border-radius:2px}
+.nodes::before{left:11px;background:var(--can-h)}
+.nodes::after{left:16px;background:var(--can-l)}
+.node{position:relative;display:flex;align-items:center;gap:12px;padding:5px 6px 5px 0;background:none;border:0;width:100%;text-align:left;font:inherit;font-size:15px;color:var(--ink-2);cursor:default;border-radius:6px}
+.node .id{position:relative;z-index:1;flex:0 0 30px;height:24px;display:grid;place-items:center;border-radius:5px;background:var(--surface);border:2px solid var(--line);font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink-2)}
+.node.ready{color:var(--ink);cursor:pointer}
+.node.ready .id{border-color:var(--ink);color:var(--ink)}
+.node.ready:hover{background:var(--bg)}
+.node.done .id{background:var(--can-l);border-color:var(--can-l);color:#fff}
+.node.active{font-weight:700}
+.node.active .id{background:var(--can-h);border-color:var(--can-h);color:#1C2730}
+.node .soon{margin-left:auto;font-size:11px;color:var(--ink-2);opacity:.7}
+.menu-btn{display:none}
+

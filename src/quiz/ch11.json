@@ -1,0 +1,57 @@
+[
+  {
+    "q": "2026 年在 CANivore「9427」上建立 TalonFX，建議的寫法是？",
+    "o": [
+      "new TalonFX(21, \"9427\")",
+      "new TalonFX(21, new CANBus(\"9427\"))",
+      "new TalonFX(21)",
+      "new CANBus(21, \"9427\")"
+    ],
+    "a": 1,
+    "e": "字串版建構子已標為 deprecated，預計 2027 年移除。只給 ID 的版本會用 roboRIO 內建 CAN。"
+  },
+  {
+    "q": "套用一份修改過的完整 TalonFXConfiguration 之前，需要先恢復出廠設定嗎？",
+    "o": [
+      "需要，否則舊設定會留著",
+      "不需要，完整設定中沒改的項目會自動回到預設",
+      "只有第一次需要",
+      "只有換韌體時需要"
+    ],
+    "a": 1,
+    "e": "新建立的設定物件本身就包含所有預設值。"
+  },
+  {
+    "q": "沒有 Phoenix Pro 授權，MotionMagicVoltage 的 EnableFOC 維持預設的 true，會怎樣？",
+    "o": [
+      "馬達不動",
+      "程式丟出例外",
+      "自動退回一般換相，正常運作",
+      "只有模擬能跑"
+    ],
+    "a": 2,
+    "e": "CTRE 文件：未授權裝置會自動退回非 FOC 換相。"
+  },
+  {
+    "q": "為什麼本課程用 VoltageOut 而不是 DutyCycleOut？",
+    "o": [
+      "VoltageOut 比較快",
+      "輸出不受電池電壓變化影響，結果較穩定、容易重現",
+      "DutyCycleOut 需要 Pro",
+      "DutyCycleOut 已被移除"
+    ],
+    "a": 1,
+    "e": "DutyCycle 的實際電壓會隨電池電壓變化，調好的參數容易失準。"
+  },
+  {
+    "q": "config 的 apply() 應該放在哪裡？",
+    "o": [
+      "periodic()",
+      "建構子裡，只執行一次",
+      "每個指令的 execute()",
+      "robotPeriodic()"
+    ],
+    "a": 1,
+    "e": "apply 是會等待裝置回應的阻塞呼叫，放在 periodic 會拖慢主迴圈。"
+  }
+]

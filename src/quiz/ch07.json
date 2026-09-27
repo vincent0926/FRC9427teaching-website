@@ -1,0 +1,68 @@
+[
+  {
+    "q": "autonomousInit() 什麼時候被呼叫？",
+    "o": [
+      "程式啟動時一次",
+      "自動階段中每 20 毫秒一次",
+      "每次從其他模式進入 Autonomous 時一次",
+      "只有連上 FMS 時"
+    ],
+    "a": 2,
+    "e": "init 在每次進入該模式時呼叫一次，就像每次進入新時段班長喊一次起立。"
+  },
+  {
+    "q": "robotPeriodic() 在哪些模式會執行？",
+    "o": [
+      "只有 Teleop",
+      "只有 Enable 時",
+      "所有模式，而且排在該模式的 periodic 之後",
+      "所有模式，而且排在該模式的 periodic 之前"
+    ],
+    "a": 2,
+    "e": "警衛每一輪都巡，而且總是在老師巡完之後。"
+  },
+  {
+    "q": "Command-based 專案的 robotPeriodic() 裡沒有 CommandScheduler.getInstance().run()，會怎樣？",
+    "o": [
+      "沒有影響",
+      "只有自動階段不能動",
+      "排程器不會執行任何指令，Subsystem 的 periodic 也不會被呼叫",
+      "編譯失敗"
+    ],
+    "a": 2,
+    "e": "官方強調這一行是必要的。Subsystem 的 periodic 也是由排程器的 run() 呼叫的。"
+  },
+  {
+    "q": "在 teleopPeriodic() 裡寫 while (!sensor.get()) {} 等感測器觸發，會發生什麼事？",
+    "o": [
+      "等到觸發後正常繼續",
+      "主迴圈卡住，其他 Subsystem、按鍵、指令都停止更新，並出現 overrun 警告",
+      "編譯器會報錯",
+      "WPILib 會自動跳過"
+    ],
+    "a": 1,
+    "e": "所有 periodic 在同一條執行緒上依序執行，一個卡住就全部卡住。"
+  },
+  {
+    "q": "使用 AdvantageKit 時，Robot 建構子裡 Logger 的設定應該放在哪裡？",
+    "o": [
+      "建立 RobotContainer 之後",
+      "建構子最前面，任何其他初始化之前",
+      "robotPeriodic() 裡",
+      "autonomousInit() 裡"
+    ],
+    "a": 1,
+    "e": "AdvantageKit 文件要求 Logger 在任何其他初始化之前設定並啟動，Logger.start() 之後就不能再加接收端。"
+  },
+  {
+    "q": "Robot 的建構子會執行幾次？",
+    "o": [
+      "每次 Enable 一次",
+      "每 20 毫秒一次",
+      "程式啟動時一次",
+      "每次切換模式一次"
+    ],
+    "a": 2,
+    "e": "建構子只在程式啟動時執行一次，就像工友每天早上開門一次。"
+  }
+]

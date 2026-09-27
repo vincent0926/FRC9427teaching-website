@@ -1,0 +1,46 @@
+[
+  {
+    "q": "用 enum 取代 int 代表時段，最主要的好處是？",
+    "o": [
+      "執行比較快",
+      "只能是清單上的值，寫錯會被編譯器抓到",
+      "比較省記憶體",
+      "可以不用 switch"
+    ],
+    "a": 1,
+    "e": "用數字的話寫錯也能編譯；enum 限定只能用定義好的值。"
+  },
+  {
+    "q": "Java 常數的命名慣例是？",
+    "o": [
+      "maxVolts",
+      "MaxVolts",
+      "MAX_VOLTS",
+      "max-volts"
+    ],
+    "a": 2,
+    "e": "常數全部大寫，單字間用底線。"
+  },
+  {
+    "q": "IntakeSubsystem.java 放在 frc/robot/subsystems/intake/，第一行 package 應該寫？",
+    "o": [
+      "package intake;",
+      "package frc.robot.subsystems.intake;",
+      "package IntakeSubsystem;",
+      "不用寫"
+    ],
+    "a": 1,
+    "e": "套件名要和 src/main/java 底下的資料夾路徑一致。"
+  },
+  {
+    "q": "檔名是 Roller.java，裡面寫 public class RollerIO，會怎樣？",
+    "o": [
+      "正常編譯",
+      "編譯失敗",
+      "自動改檔名",
+      "執行時才出錯"
+    ],
+    "a": 1,
+    "e": "public 類別名必須和檔名相同。"
+  }
+]

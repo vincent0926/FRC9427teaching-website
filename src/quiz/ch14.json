@@ -1,0 +1,57 @@
+[
+  {
+    "q": "移動距離很短，還沒加速到巡航速度就得減速，這時的速度曲線是？",
+    "o": [
+      "梯形",
+      "S-curve",
+      "三角形",
+      "水平線"
+    ],
+    "a": 2,
+    "e": "CTRE 文件稱為 triangle profile。"
+  },
+  {
+    "q": "MotionMagicJerk 設為 0 代表？",
+    "o": [
+      "不限制 jerk，軌跡是梯形",
+      "機構不會動",
+      "最圓滑的 S-curve",
+      "使用預設 jerk"
+    ],
+    "a": 0,
+    "e": "jerk 非 0 才是 S-curve；數值越小越圓滑、越慢。"
+  },
+  {
+    "q": "沒有 Pro 授權的 TalonFX 使用 DynamicMotionMagicVoltage，會怎樣？",
+    "o": [
+      "自動退回一般 MotionMagic",
+      "正常運作",
+      "只能在模擬中用",
+      "關閉輸出並觸發 UnlicensedFeatureInUse 故障"
+    ],
+    "a": 3,
+    "e": "這點和 EnableFOC 不同，EnableFOC 會自動退回。"
+  },
+  {
+    "q": "使用 MotionMagic 時，roboRIO 需要做什麼？",
+    "o": [
+      "每 1 ms 算一個軌跡點送出",
+      "定期送出目標位置即可",
+      "等軌跡跑完才能送下一個目標",
+      "什麼都不用，連目標都不用給"
+    ],
+    "a": 1,
+    "e": "軌跡由 TalonFX 產生；也沒有必須等軌跡跑完的規定。"
+  },
+  {
+    "q": "設了 SensorToMechanismRatio 之後，MotionMagicCruiseVelocity 的單位是？",
+    "o": [
+      "馬達端 rot/s",
+      "m/s",
+      "機構端 rot/s",
+      "RPM"
+    ],
+    "a": 2,
+    "e": "所有讀值與設定都變成機構端單位。"
+  }
+]

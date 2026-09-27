@@ -1,0 +1,137 @@
+  <p class="headline-code">CAN ID 10｜WPILib 基礎</p>
+  <h1>組合指令：運動會的節目表</h1>
+  <p class="lede">讀完這章，你會用 sequence、parallel、race、deadline 把小動作組成完整動作，知道各種結束條件的寫法，並理解為什麼同一個指令物件不能用兩次。</p>
+
+  <h2>生活比喻：運動會的節目表</h2>
+  <div class="story">
+    <p><strong>接力賽：一棒接一棒。</strong>第一棒跑完，第二棒才出發。最後一棒跑到終點，整場接力才結束。</p>
+    <p><strong>大掃除：全部完成才下課。</strong>各組同時打掃不同區域，快的組掃完就休息，但要等最後一組也完成，才算大掃除結束。</p>
+    <p><strong>搶答：第一個答完，全部停。</strong>幾個人同時作答，只要有一個人先答完，搶答就結束，其他人立刻停筆。</p>
+    <p><strong>國歌播完前就定位。</strong>國歌開始播放時，各班同時走向自己的位置、整理隊伍。國歌一播完，這個節目就結束，不管隊伍整理好了沒。這裡有一件事是主角（國歌），它結束就是全部結束。</p>
+    <p><strong>節目有時間限制。</strong>「這個表演最多 5 分鐘」、「直到裁判吹哨為止」、「如果下雨就跳過這個節目」、「這支舞重複跳三次」。</p>
+    <p><strong>節目本身也能組成更大的節目。</strong>「開幕式」是一個節目，它裡面又包含升旗、致詞、表演。節目表可以一層包一層。</p>
+    <p><strong>一個人不能同時排在兩個節目裡。</strong>小明被排進接力賽之後，就不能再被排進同時段的大隊舞。要兩個節目都有人，就得找兩個人。</p>
+    <p><strong>整個節目期間，場地都被預約。</strong>開幕式要用操場和司令台，這兩個場地在開幕式整段時間都保留給它，就算某一段只用到司令台。</p>
+  </div>
+  <table class="map">
+    <thead><tr><th>比喻</th><th>WPILib</th><th>什麼時候結束</th></tr></thead>
+    <tbody>
+      <tr><td>接力賽</td><td><code>Commands.sequence(...)</code> / <code>andThen</code></td><td>最後一個指令結束時</td></tr>
+      <tr><td>大掃除</td><td><code>Commands.parallel(...)</code> / <code>alongWith</code></td><td>全部都結束時</td></tr>
+      <tr><td>搶答</td><td><code>Commands.race(...)</code> / <code>raceWith</code></td><td>任何一個結束時，其他被打斷</td></tr>
+      <tr><td>國歌播完前就定位</td><td><code>Commands.deadline(主角, 其他...)</code> / <code>deadlineFor</code></td><td>主角結束時，其他被打斷</td></tr>
+      <tr><td>最多 5 分鐘</td><td><code>withTimeout(秒)</code></td><td>時間到或指令本身結束</td></tr>
+      <tr><td>直到裁判吹哨</td><td><code>until(條件)</code></td><td>條件成立或指令本身結束</td></tr>
+      <tr><td>下雨就跳過</td><td><code>unless(條件)</code> / <code>onlyIf(條件)</code></td><td>條件不符時直接不執行</td></tr>
+      <tr><td>重複跳三次</td><td><code>repeatedly()</code></td><td>不會自己結束，要靠外部打斷</td></tr>
+      <tr><td>一個人不能排兩個節目</td><td>指令物件不能重複使用</td><td></td></tr>
+      <tr><td>整段預約所有場地</td><td>組合的 requirements 是所有成員的聯集</td><td></td></tr>
+    </tbody>
+  </table>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>大掃除時，各組是真的同時在動。但 parallel 裡的指令是在同一條執行緒上、每輪依序各執行一次 <code>execute()</code>，只是在同一個 20 毫秒週期內都跑到，所以看起來是同時。任何一個成員卡住，其他成員也會跟著停。</div>
+
+  <h2>組合本身也是指令</h2>
+  <p>WPILib 文件說明，組合指令本身就是指令，實作了 <code>Command</code> 介面，所以組合可以再被組合，一層包一層<a class="ref" href="#src10-1">[1]</a>。例如 <code>fooCommand.andThen(barCommand.raceWith(bazCommand))</code><a class="ref" href="#src10-1">[1]</a>。</p>
+
+  <h2>四種組合，用手臂和 Intake 示範</h2>
+  <p>以下的 <code>arm.goTo(...)</code> 來自第 6 章，會在到達目標時結束；<code>intake.runState(...)</code> 來自第 8 章練習，不會自己結束，結束時設回 <code>NONE</code>。</p>
+  <pre><code>// 接力：手臂到得分位置 → 吐出 0.5 秒 → 手臂收回
+Command score = Commands.sequence(
+    arm.goTo(ArmState.SCORE),
+    intake.runState(IntakeState.SCORING).withTimeout(0.5), // TODO: 實測時間
+    arm.goTo(ArmState.STOW));
+
+// 國歌播完前就定位：手臂往下移到取件位置，途中滾輪先轉起來；手臂到位就結束
+Command prepareIntake = Commands.deadline(
+    arm.goTo(ArmState.INTAKE),                     // 主角
+    intake.runState(IntakeState.INTAKING));        // 被主角的結束打斷
+
+// 大掃除：兩件事都完成才結束
+Command stowAndWait = Commands.parallel(
+    arm.goTo(ArmState.STOW),
+    Commands.waitSeconds(0.3));
+
+// 搶答：吸入，最多 3 秒
+Command intakeAtMost3s = intake.runState(IntakeState.INTAKING)
+    .raceWith(Commands.waitSeconds(3.0));          // 等同 .withTimeout(3.0)</code></pre>
+  <div class="note warn"><strong>parallel 裡放了永遠不會結束的指令</strong>把 <code>intake.runState(...)</code> 放進 <code>Commands.parallel</code>，整個組合就永遠不會結束，因為 parallel 要等全部成員結束。這時應該改用 deadline 或 race，讓某個會結束的指令決定何時停止。</div>
+
+  <h2>2025 年的改名：deadlineFor</h2>
+  <p>中置寫法 <code>a.deadlineWith(b)</code> 在 2025 年改名為 <code>deadlineFor</code><a class="ref" href="#src10-3">[3]</a>，意思是「a 是主角，b 陪跑」：</p>
+  <pre><code>Command prepareIntake2 = arm.goTo(ArmState.INTAKE)
+    .deadlineFor(intake.runState(IntakeState.INTAKING));</code></pre>
+  <p>網路上較舊的範例還會出現 <code>deadlineWith</code>，看到時記得是同一件事。</p>
+
+  <h2>結束條件與修飾</h2>
+  <pre><code>arm.goTo(ArmState.SCORE).withTimeout(2.0);               // 最多 2 秒，避免卡住
+intake.runState(IntakeState.INTAKING).until(arm::atGoal); // 條件成立就結束
+arm.goTo(ArmState.SCORE).onlyIf(DriverStation::isTeleop); // 條件成立才執行（示意）
+score.withName("Score");                                  // 在儀表板和記錄中顯示的名字</code></pre>
+  <p>第三行只是示範語法：<code>onlyIf</code> 在條件不成立時直接不執行，<code>unless</code> 則相反。實際上條件通常是「有沒有拿到遊戲物件」這類狀態。</p>
+
+  <h2>兩條一定要知道的規則</h2>
+  <h3>規則一：指令物件不能重複使用</h3>
+  <p>WPILib 文件明確規定：已經傳進組合的指令物件，不能再被單獨排程，也不能再傳進第二個組合；呼叫過修飾方法（decorator）之後，原本的指令物件也不能再用<a class="ref" href="#src10-1">[1]</a>。</p>
+  <pre><code>// 錯：同一個物件用了兩次，執行時會丟出例外
+Command toStow = arm.goTo(ArmState.STOW);
+Command a = Commands.sequence(arm.goTo(ArmState.SCORE), toStow);
+Command b = Commands.sequence(arm.goTo(ArmState.INTAKE), toStow);
+
+// 對：每次都呼叫 factory，拿一個新的物件
+Command a2 = Commands.sequence(arm.goTo(ArmState.SCORE), arm.goTo(ArmState.STOW));
+Command b2 = Commands.sequence(arm.goTo(ArmState.INTAKE), arm.goTo(ArmState.STOW));</code></pre>
+  <p>這就是為什麼第 6、8 章一直用「方法回傳新指令」的 factory：每呼叫一次，就是一個新的人，可以排進不同的節目。</p>
+
+  <h3>規則二：整段預約所有場地</h3>
+  <p>組合的 requirements 是所有成員 requirements 的聯集，而且在整個組合執行期間都有效<a class="ref" href="#src10-1">[1]</a>。上面的 <code>score</code> 需要手臂和 Intake；在它吐出的那 0.5 秒，手臂雖然沒動，仍然被 <code>score</code> 佔住，所以手臂的預設指令不會執行，其他需要手臂的指令也會打斷整個 <code>score</code>。中斷行為方面，WPILib 文件說明：只有當所有成員都是 <code>kCancelIncoming</code> 時，組合才是 <code>kCancelIncoming</code><a class="ref" href="#src10-2">[2]</a>。</p>
+
+  <h2>跨 Subsystem 的指令放在哪</h2>
+  <p>只用到一個 Subsystem 的指令，放在那個 Subsystem 裡當 factory。<code>score</code> 這種同時用到手臂和 Intake 的，WPILib 的 Organizing Command-Based Robot Projects 文件指出放在任何一個 Subsystem 裡都不合理，應該放在外部<a class="ref" href="#src10-4">[4]</a>，例如：</p>
+  <pre><code>package frc.robot.commands;
+
+public final class SuperstructureCommands {
+    private SuperstructureCommands() {}
+
+    public static Command score(ArmSubsystem arm, IntakeSubsystem intake) {
+        return Commands.sequence(
+                arm.goTo(ArmState.SCORE),
+                intake.runState(IntakeState.SCORING).withTimeout(0.5), // TODO: 實測
+                arm.goTo(ArmState.STOW))
+            .withName("Score");
+    }
+}
+
+// RobotContainer
+operator.y().onTrue(SuperstructureCommands.score(arm, intake));</code></pre>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>把指令存成欄位再重複使用</strong>在 <code>RobotContainer</code> 裡把 <code>arm.goTo(STOW)</code> 存成一個欄位，再放進好幾個組合，執行時會丟出例外。需要多次使用時，存 factory（方法），不要存指令物件。</div>
+  <div class="note warn"><strong>沒有 timeout 的等待</strong>序列裡的 <code>arm.goTo(...)</code> 如果因為機構卡住永遠到不了，整個序列就停在那裡。自動階段和重要動作加上 <code>withTimeout</code> 作為保險。</div>
+  <div class="note coach"><strong>教練提醒</strong>組合寫好後，先用 <code>withName</code> 取名，再在儀表板或 AdvantageScope 看它的執行狀況。「按了沒反應」時，第一件事是確認是不是有別的指令佔住了同一個 Subsystem。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：取件動作</h2>
+  <p>寫一個跨 Subsystem 的指令 <code>intakeCycle(arm, intake)</code>：先讓手臂移到 INTAKE，移動途中滾輪就開始吸入；手臂到位後繼續吸入 1 秒；最後停止吸入並把手臂收回 STOW。整個動作最多 4 秒。</p>
+  <details>
+    <summary>看參考答案</summary>
+    <pre><code>public static Command intakeCycle(ArmSubsystem arm, IntakeSubsystem intake) {
+    return Commands.sequence(
+            arm.goTo(ArmState.INTAKE).deadlineFor(intake.runState(IntakeState.INTAKING)),
+            intake.runState(IntakeState.INTAKING).withTimeout(1.0), // TODO: 實測
+            arm.goTo(ArmState.STOW))
+        .withTimeout(4.0)                                          // TODO: 實測
+        .withName("IntakeCycle");
+}</code></pre>
+    <p>第一步用 deadline：手臂是主角，它到位時滾輪指令被打斷，<code>runState</code> 的結束動作把狀態設回 NONE，接著第二步立刻又開始吸入。兩次 <code>intake.runState(...)</code> 是兩個不同的物件，符合規則一。第三步結束時滾輪已經在 NONE。</p>
+  </details>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src10-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html" target="_blank" rel="noopener">Command Compositions</a>（組合即指令、遞迴組合、各類組合、指令物件不可重複使用）</li>
+    <li id="src10-2">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/commands.html" target="_blank" rel="noopener">Commands</a>（組合的中斷行為規則）</li>
+    <li id="src10-3">WPILib. <a href="https://docs.wpilib.org/en/2025/docs/yearly-overview/yearly-changelog.html" target="_blank" rel="noopener">New for 2025</a>（deadlineWith 改名為 deadlineFor）</li>
+    <li id="src10-4">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html" target="_blank" rel="noopener">Organizing Command-Based Robot Projects</a>（跨 Subsystem 指令的放置）</li>
+    <li id="src10-5">WPILib. <a href="https://github.wpilib.org/allwpilib/docs/release/java/edu/wpi/first/wpilibj2/command/ParallelRaceGroup.html" target="_blank" rel="noopener">ParallelRaceGroup API 文件</a>（第一個結束的成員結束整個組合，其他被打斷）</li>
+  </ol>
