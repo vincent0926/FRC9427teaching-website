@@ -1,0 +1,182 @@
+  <p class="headline-code">CAN ID 00｜準備</p>
+  <h1>開發環境與專案結構：開學前的準備</h1>
+  <p class="lede">讀完這章，你會知道要裝哪些軟體、為什麼要用 WPILib 專屬的 VS Code、一個機器人專案裡每個檔案在做什麼、怎麼用 Git 和 GitHub 保存程式，以及怎麼把程式送上機器人。</p>
+  <div class="note"><strong>版本說明</strong>本章依據 2026 賽季的官方文件（WPILib 2026.2.1、Phoenix 6 2026 版）。WPILib 文件已說明團隊正全力開發 2027 年的 Systemcore 控制系統<a class="ref" href="#src0-9">[9]</a>，2027 年的安裝流程和套件名稱可能會改變，屆時請以當年文件為準。</div>
+
+  <h2>生活比喻：開學前的準備</h2>
+  <div class="story">
+    <p><strong>學校每年配一間專用教室。</strong>程式組每年都會分到一間專用教室，門牌上寫著年份，例如「2026 程式教室」。上課一定要進這間教室，不能在自己家的書桌上課。家裡的書桌也許擺了很多別的東西，習慣也不一樣，拿來上這門課反而容易出錯。去年的教室也不用拆掉，新舊兩間可以同時存在。</p>
+    <p><strong>教室裡的設備學校都配好了。</strong>課本、字典、計算機、印表機，全部由學校一次配齊，而且和你家裡原本的東西分開放。你不需要自己去買，也不會因為學校發了一本新字典，就把你家裡那本換掉。</p>
+    <p><strong>課外參考書要列在班級書單上。</strong>課本以外的參考書，例如某家出版社的馬達專書，不是放在你的書包裡就算數，而是要寫進班級的書單。書單跟著班級走：誰拿到這個班的書單，就知道要準備哪幾本、哪個版本。升上新學年，書單也要重新確認一次版本。</p>
+    <p><strong>教室有固定的配置。</strong>門口有警衛室，負責開門讓大家進來，但學生不需要、也不應該進去改東西。黑板旁邊貼著課表和鐘聲時間，決定每節課什麼時候開始、什麼時候結束。講桌上放著座位表和幹部名單，寫清楚誰坐哪裡、誰負責什麼。後面有公布欄，貼著全班都要遵守的規定。教室角落還有一個置物櫃，裡面的東西會跟著全班一起帶到校外教學。</p>
+    <p><strong>寫完作業要交到學校。</strong>作業在家寫好後，要先自己檢查一遍有沒有錯字，再交到學校。檢查不通過的作業，學校不收。</p>
+    <p><strong>上下課由導護老師控制。</strong>什麼時候開始上課、什麼時候下課，由導護老師用廣播控制，學生不能自己決定。遇到緊急狀況，導護老師會按下緊急鈴，所有活動立刻停止，而且要等學校重新檢查過才能恢復。</p>
+    <p><strong>不要把教室設在會自動搬家的倉庫。</strong>有些倉庫會自動把東西同步搬來搬去，你正在用的時候，東西可能突然被移走。教室不能設在這種地方。</p>
+  </div>
+
+  <table class="map">
+    <thead><tr><th>比喻</th><th>實際上是</th></tr></thead>
+    <tbody>
+      <tr><td>每年一間、門牌有年份的專用教室</td><td>WPILib 安裝的 <code>WPILib VS Code 2026</code>，和你電腦上原有的 VS Code 分開</td></tr>
+      <tr><td>學校配好、和家裡分開放的設備</td><td>安裝程式附帶的 JDK、Gradle、各種工具，不會覆蓋你原本的 Java 設定</td></tr>
+      <tr><td>班級書單上的參考書</td><td>專案 <code>vendordeps</code> 資料夾裡的 JSON 檔，例如 Phoenix 6</td></tr>
+      <tr><td>警衛室</td><td><code>Main.java</code></td></tr>
+      <tr><td>課表和鐘聲</td><td><code>Robot.java</code></td></tr>
+      <tr><td>座位表和幹部名單</td><td><code>RobotContainer.java</code></td></tr>
+      <tr><td>公布欄</td><td><code>Constants.java</code></td></tr>
+      <tr><td>會跟著去校外教學的置物櫃</td><td><code>src/main/deploy</code> 資料夾</td></tr>
+      <tr><td>先檢查再交作業</td><td>Build（編譯）與 Deploy（部署）</td></tr>
+      <tr><td>導護老師的廣播與緊急鈴</td><td>Driver Station 的 Enable、Disable 與緊急停止</td></tr>
+      <tr><td>會自動搬家的倉庫</td><td>OneDrive 等雲端同步資料夾</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>故事裡，寫作業的地方和上課的地方是同一間教室。實際上，你在筆電上寫程式，但程式是在機器人上的 roboRIO 執行。部署完成後，程式就存在 roboRIO 上，就算筆電關機或拔掉網路線，機器人重新開機後仍會執行最後一次部署的程式。筆電上的 Driver Station 只負責下達 Enable、Disable 這些指令和傳送搖桿資料。</div>
+
+  <h2>要裝哪些軟體</h2>
+  <table class="map">
+    <thead><tr><th>軟體</th><th>用途</th><th>支援平台</th></tr></thead>
+    <tbody>
+      <tr><td>WPILib 安裝程式</td><td>VS Code、JDK、Gradle、WPILib 函式庫與工具（AdvantageScope、Elastic、SysId 等）<a class="ref" href="#src0-1">[1]</a></td><td>Windows 10、11（64 位元）；Ubuntu 22.04、24.04；macOS 13.3 以上<a class="ref" href="#src0-1">[1]</a></td></tr>
+      <tr><td>FRC Game Tools（NI）</td><td>Driver Station、roboRIO 映像工具與映像檔<a class="ref" href="#src0-2">[2]</a></td><td>只支援 Windows 10 以上<a class="ref" href="#src0-2">[2]</a></td></tr>
+      <tr><td>Phoenix 6（vendordep）</td><td>控制 TalonFX、Kraken 等 CTRE 裝置的函式庫，每個專案各自加入<a class="ref" href="#src0-6">[6]</a></td><td>透過 WPILib VS Code 安裝</td></tr>
+      <tr><td>Phoenix Tuner X</td><td>設定 CAN ID、更新韌體、測試馬達</td><td>第 11 章詳述</td></tr>
+    </tbody>
+  </table>
+  <p>2026 賽季的 WPILib 版本是 2026.2.1（2026 年 1 月 16 日發布）。官方說明也提醒，2026 年的 roboRIO 需要新的映像檔，要從 2026 版的 FRC Game Tools 取得<a class="ref" href="#src0-1">[1]</a>。</p>
+
+  <h3>安裝時要注意的事</h3>
+  <p>第一，WPILib 會另外安裝一份 VS Code，並不會使用你電腦上原有的那一份。每年各有一份，名稱會帶年份，例如 <code>WPILib VS Code 2026</code>。官方特別提醒要打開這一份，而不是系統原本的 VS Code<a class="ref" href="#src0-1">[1]</a>。</p>
+  <p>第二，附帶的 JDK 會和你電腦上其他 JDK 並存，不會覆蓋 <code>JAVA_HOME</code> 環境變數<a class="ref" href="#src0-1">[1]</a>。</p>
+  <p>第三，官方不建議用 VS Code 的設定同步功能，在一般 VS Code 和 WPILib VS Code 之間同步設定，這可能讓其中一邊壞掉<a class="ref" href="#src0-1">[1]</a>。</p>
+  <p>第四，WPILib 每年安裝在不同資料夾，不需要先解除安裝去年的版本<a class="ref" href="#src0-1">[1]</a>。但去年的專案要透過匯入功能轉成今年的專案，而且 vendor 函式庫也要重新加入，因為去年的版本和今年的專案不相容<a class="ref" href="#src0-1">[1]</a>。</p>
+
+  <h2>建立一個新專案</h2>
+  <p>在 WPILib VS Code 按 <code>Ctrl+Shift+P</code>，輸入 WPILib，選擇 Create a new project<a class="ref" href="#src0-3">[3]</a>。專案類型選 Template、語言選 Java、範本選 Command Robot。官方說明 Command-based 範本建立在 <code>TimedRobot</code> 上，並大力推薦新隊伍使用<a class="ref" href="#src0-3">[3]</a>。</p>
+  <p>建立時要填入隊號。隊號會用在專案的套件名稱，也會用來在部署時找到機器人<a class="ref" href="#src0-3">[3]</a>，存放在專案的 <code>.wpilib/wpilib_preferences.json</code> 裡。</p>
+  <div class="note warn"><strong>不要把專案放在 OneDrive</strong>官方文件明確指出，不支援在 OneDrive 上建立專案，因為 OneDrive 的快取會干擾建置系統；而有些 Windows 會預設把「文件」和「桌面」放在 OneDrive 上<a class="ref" href="#src0-3">[3]</a>。建議建立一個像 <code>C:\frc\</code> 這樣的資料夾專門放機器人專案。</div>
+
+  <h2>專案結構</h2>
+  <p>一個 Command-based 專案建好後，大致長這樣（這裡只列出你需要知道的部分）：</p>
+  <pre><code>MyRobot/
+├── build.gradle                  // 建置設定（GradleRIO），一般不需要改
+├── .wpilib/
+│   └── wpilib_preferences.json   // 隊號、年份等專案設定
+├── vendordeps/
+│   ├── WPILibNewCommands.json    // Command-based 函式庫
+│   └── Phoenix6-(版本).json       // 加入 Phoenix 6 後才會出現
+└── src/main/
+    ├── deploy/                   // 會一起上傳到 roboRIO 的檔案
+    └── java/frc/robot/
+        ├── Main.java             // 程式進入點，不要改
+        ├── Robot.java            // 控制流程，第 7 章的主角
+        ├── RobotContainer.java   // 建立 Subsystem、綁定按鍵
+        ├── Constants.java        // 全機共用的常數
+        ├── commands/             // 自己寫的 Command
+        └── subsystems/           // 自己寫的 Subsystem</code></pre>
+
+  <h3>四個主要類別</h3>
+  <p>WPILib 文件說明 Command-based 範本由這幾個類別組成<a class="ref" href="#src0-4">[4]</a>：</p>
+  <table class="map">
+    <thead><tr><th>類別</th><th>官方定位</th><th>比喻</th></tr></thead>
+    <tbody>
+      <tr><td><code>Main</code></td><td>程式的主應用程式（只有 Java 有）。新手不應該修改</td><td>警衛室</td></tr>
+      <tr><td><code>Robot</code></td><td>負責程式的主要控制流程。在 Command-based 專案裡應該幾乎是空的</td><td>課表和鐘聲</td></tr>
+      <tr><td><code>RobotContainer</code></td><td>放置 Subsystem 和 Command，大部分的設定（例如按鍵綁定）都在這裡</td><td>座位表和幹部名單</td></tr>
+      <tr><td><code>Constants</code></td><td>放整個機器人都能使用的常數</td><td>公布欄</td></tr>
+    </tbody>
+  </table>
+  <p>WPILib 的 <code>Creating a Robot Program</code> 文件也警告：除非非常確定自己在做什麼，否則不要修改 <code>main()</code> 方法<a class="ref" href="#src0-3">[3]</a>。</p>
+
+  <h3>vendordeps：班級書單</h3>
+  <p>第三方函式庫（例如 CTRE 的 Phoenix 6）是用一個 JSON 檔描述的。加入專案時，這個 JSON 會被複製到專案的 <code>vendordeps</code> 資料夾，專案就會把這個函式庫當成依賴<a class="ref" href="#src0-5">[5]</a>。WPILib 自己的新版 Command 函式庫也被拆成 vendor 函式庫，所以 Command-based 專案本來就有一個 <code>WPILibNewCommands.json</code><a class="ref" href="#src0-5">[5]</a>。</p>
+  <p>2026 版的 CTRE 文件說明，加入 Phoenix 6 的方式是：點 WPILib VS Code 左側邊欄的 WPILib 圖示，在 Available Dependencies 找到 CTRE-Phoenix (v6)，按 Install；之後也可以在同一頁按 To Latest 更新<a class="ref" href="#src0-6">[6]</a>。</p>
+  <p>因為書單跟著專案走，隊友從 Git 拉下專案時，<code>vendordeps</code> 也會一起下來，大家用的版本自然一致。這也是為什麼 vendor 函式庫要每個專案各自加入。</p>
+
+  <h3>deploy 資料夾：跟著去校外教學的置物櫃</h3>
+  <p>放在 <code>src/main/deploy</code> 的檔案會在部署時一起上傳到 roboRIO 的 <code>/home/lvuser/deploy</code><a class="ref" href="#src0-8">[8]</a>。之後自動路徑的檔案（第 16 章）就是放在這裡。程式裡用 <code>Filesystem.getDeployDirectory()</code> 取得這個資料夾的位置，不要自己寫死路徑<a class="ref" href="#src0-8">[8]</a>。</p>
+
+  <h2>編譯與部署</h2>
+  <p>部署的方式是在 WPILib 選單選 Deploy Robot Code，或按 <code>Shift+F5</code>。它會先在需要時編譯，再把程式送到 roboRIO；成功的話會看到 Build Successful，並開啟 RioLog 顯示機器人程式的輸出<a class="ref" href="#src0-7">[7]</a>。官方也提醒，部署中不要關掉機器人電源<a class="ref" href="#src0-7">[7]</a>。</p>
+  <p>WPILib 最新版文件進一步說明兩者的差別：Build Robot Code 會從網路下載依賴並執行單元測試，Deploy Robot Code 則不會<a class="ref" href="#src0-7">[7]</a>。所以新增或更新 vendordep 之後，要在有網路的地方先 Build 一次。</p>
+  <div class="note coach"><strong>教練提醒：比賽前一定要在家 Build 一次</strong>比賽場館的網路不可靠，而且機器人連的是場地的無線網路。出發前在有網路的地方把專案完整 Build 過一次，確認所有依賴都已經下載到筆電上，到了場館才部署得上去。</div>
+
+  <h2>用 Git 與 GitHub 管理程式</h2>
+  <p>隊上的程式放在 GitHub 上。在學寫程式之前，先學會怎麼安全地保存和分享程式。</p>
+  <div class="story">
+    <p><strong>全班共用一本作業本。</strong>班上有一本共用的作業本，正本放在導師辦公室的櫃子裡。每個同學可以借一份影本回家寫。</p>
+    <p><strong>每次改動都寫一行日誌。</strong>作業本最後有一頁日誌。每寫完一段，就在日誌記下日期、誰寫的、改了什麼，例如「修正手臂角度上限」。以後發現哪裡寫錯，可以翻日誌找出是哪一次改壞的，必要時把那一段恢復成改之前的樣子。</p>
+    <p><strong>寫完要交回正本。</strong>在家寫完、記好日誌後，要把改動交回辦公室，併進正本，其他人才看得到。開始寫之前，也要先去辦公室拿最新的版本，免得在舊的影本上寫。</p>
+    <p><strong>分組先寫草稿。</strong>兩組同學同時改作業本的不同章節時，各自先在草稿上寫，寫好、檢查過，再合併進正本。這樣一組寫到一半的東西，不會弄亂另一組。</p>
+    <p><strong>有些東西不收進作業本。</strong>草稿紙、計算用的便條紙，這些是每個人自己產生的，不需要收進正本。學校給了一張清單，列出哪些東西不收，這張清單不要自己改。</p>
+  </div>
+  <table class="map">
+    <thead><tr><th>比喻</th><th>Git</th><th>指令</th></tr></thead>
+    <tbody>
+      <tr><td>辦公室裡的正本</td><td>GitHub 上的遠端儲存庫（remote）</td><td></td></tr>
+      <tr><td>借一份影本回家</td><td>複製（clone）</td><td><code>git clone 網址</code></td></tr>
+      <tr><td>寫一行日誌</td><td>提交（commit）</td><td><code>git add .</code> 再 <code>git commit -m "說明"</code></td></tr>
+      <tr><td>交回正本</td><td>推送（push）</td><td><code>git push</code></td></tr>
+      <tr><td>拿最新版本</td><td>拉取（pull）</td><td><code>git pull</code></td></tr>
+      <tr><td>分組寫草稿</td><td>分支（branch）</td><td><code>git branch 名稱</code>、<code>git checkout 名稱</code></td></tr>
+      <tr><td>草稿合併進正本</td><td>合併（merge）</td><td><code>git merge 名稱</code></td></tr>
+      <tr><td>不收進作業本的清單</td><td><code>.gitignore</code></td><td></td></tr>
+    </tbody>
+  </table>
+  <p>WPILib 建立的機器人專案本身就附有 <code>.gitignore</code>，列出不需要提交的檔案（例如編譯產生的檔案）。官方文件特別強調，隊伍<strong>絕對不要修改</strong>專案附帶的 <code>.gitignore</code><a class="ref" href="#src0-11">[11]</a>。上表的指令也都來自 WPILib 的 Git 入門文件<a class="ref" href="#src0-11">[11]</a>。WPILib VS Code 左側的「原始檔控制」面板可以用按鈕完成大部分操作，但先理解指令在做什麼，出問題時才知道怎麼處理。</p>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>作業本的日誌只是記錄，但 Git 的每一次 commit 都保存了當時「所有檔案的完整狀態」，所以可以整個回到任何一次 commit 的樣子。另外，commit 只存在你自己的電腦上，要 push 之後 GitHub 上才會有。電腦壞掉時，沒有 push 的 commit 就跟著不見了。</div>
+  <div class="note coach"><strong>教練提醒：部署前先 commit</strong>每次部署到機器人之前先 commit，而且 commit 訊息要寫清楚改了什麼。比賽中機器人突然出問題時，你才能確定現在機器人上跑的是哪一版，必要時馬上退回上一個能動的版本。每天練習結束前一定要 push，不要讓唯一的一份程式只存在某台筆電裡。</div>
+
+  <h2>Driver Station：導護老師</h2>
+  <p>Driver Station 是 FRC Game Tools 的一部分，只能在 Windows 上執行<a class="ref" href="#src0-2">[2]</a>。它負責選擇模式、Enable 和 Disable 機器人，以及傳送搖桿資料。第 7 章會詳細說明模式。現在先記住幾個官方列出的快捷鍵<a class="ref" href="#src0-10">[10]</a>：</p>
+  <table class="map">
+    <thead><tr><th>按鍵</th><th>功能</th></tr></thead>
+    <tbody>
+      <tr><td><code>[</code> <code>]</code> <code>\</code> 同時按</td><td>Enable 機器人</td></tr>
+      <tr><td><code>Enter</code></td><td>Disable 機器人</td></tr>
+      <tr><td>空白鍵</td><td>緊急停止（E-Stop）。觸發後必須重新啟動 roboRIO 才能再次 Enable</td></tr>
+    </tbody>
+  </table>
+  <p>官方也說明，比賽中連上 FMS 時，這些 Enable、Disable 和 E-Stop 快捷鍵都會被忽略，必須按場地操作台上的 E-Stop 按鈕<a class="ref" href="#src0-10">[10]</a>。</p>
+  <div class="note coach"><strong>教練提醒：Enable 前一定要喊</strong>每次 Enable 前大聲喊「Enable！」，確認機器人周圍沒有人、沒有手在機構裡。手指隨時放在空白鍵或 Enter 上。這是隊上的安全規定，沒有例外。</div>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>用錯 VS Code</strong>在系統原本的 VS Code 打開機器人專案，找不到 WPILib 選單或無法建置。確認標題列或開始選單上是 <code>WPILib VS Code 2026</code>。</div>
+  <div class="note warn"><strong>忘了加 vendordep</strong><code>import com.ctre.phoenix6...</code> 出現紅色底線、編譯失敗，通常是這個專案還沒加入 Phoenix 6。檢查 <code>vendordeps</code> 資料夾裡有沒有對應的 JSON 檔。</div>
+  <div class="note warn"><strong>隊號錯誤</strong>部署時找不到機器人，先檢查 <code>.wpilib/wpilib_preferences.json</code> 裡的隊號是不是 9427。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：建立第一個專案</h2>
+  <p>照著本章完成以下步驟，並回答最後的問題：</p>
+  <p>在 <code>C:\frc\</code>（或其他不在 OneDrive 上的資料夾）建立一個 Java 的 Command Robot 專案，隊號填 9427。用 Dependency Manager 加入 CTRE-Phoenix (v6)，然後執行一次 Build Robot Code。完成後，打開 <code>vendordeps</code> 資料夾，數數看裡面有幾個 JSON 檔，分別是什麼？</p>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>建立專案用 WPILib 指令面板（Ctrl+Shift+P → WPILib: Create a new project），加函式庫用 Dependency Manager。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>Phoenix 6 在 Dependency Manager 裡叫 CTRE-Phoenix (v6)；函式庫的描述檔會放在專案的 vendordeps 資料夾。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>Command-based 範本本來就附一個 JSON，加完 Phoenix 6 後應該多一個。只有一個，就代表沒加成功。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
+    <p>應該會有兩個：一個是 Command-based 範本本來就有的 <code>WPILibNewCommands.json</code>，另一個是剛剛加入的 Phoenix 6 JSON（檔名依版本而定）。如果只有一個，代表 Phoenix 6 沒有加成功；如果 Build 失敗並提到下載錯誤，確認電腦有連上網路再試一次。</p>
+    </div>
+  </div>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src0-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html" target="_blank" rel="noopener">WPILib Installation Guide</a>（支援平台、2026.2.1 版、另裝 VS Code、JDK 並存、不同年份資料夾、匯入去年專案）</li>
+    <li id="src0-2">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/frc-game-tools.html" target="_blank" rel="noopener">Installing the FRC Game Tools</a>（Driver Station、roboRIO 映像工具、僅支援 Windows 10 以上）</li>
+    <li id="src0-3">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/vscode-overview/creating-robot-program.html" target="_blank" rel="noopener">Creating a Robot Program</a>（建立專案、隊號、不支援 OneDrive、不要修改 main()）</li>
+    <li id="src0-4">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html" target="_blank" rel="noopener">Structuring a Command-Based Robot Project</a>（Main、Robot、RobotContainer、Constants 的角色）</li>
+    <li id="src0-5">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/vscode-overview/3rd-party-libraries.html" target="_blank" rel="noopener">3rd Party Libraries</a>（vendordep JSON、vendordeps 資料夾、Command 函式庫為 vendor 函式庫）</li>
+    <li id="src0-6">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/installation/installation-frc.html" target="_blank" rel="noopener">Installing Phoenix 6 (FRC)</a>（以 Dependency Manager 安裝 CTRE-Phoenix (v6)）</li>
+    <li id="src0-7">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/vscode-overview/deploying-robot-code.html" target="_blank" rel="noopener">Building and Deploying Robot Code</a>；Build 與 Deploy 差異見 <a href="https://docs.wpilib.org/en/latest/docs/software/vscode-overview/deploying-robot-code.html" target="_blank" rel="noopener">最新版文件</a></li>
+    <li id="src0-8">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/basic-programming/deploy-directory.html" target="_blank" rel="noopener">Robot Project Deploy Directory</a></li>
+    <li id="src0-9">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/yearly-overview/yearly-changelog.html" target="_blank" rel="noopener">New for 2026</a>（2027 Systemcore 開發說明）</li>
+    <li id="src0-10">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station.html" target="_blank" rel="noopener">FRC Driver Station Powered by NI LabVIEW</a>（模式、快捷鍵、E-Stop、連上 FMS 時的限制）</li>
+    <li id="src0-11">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/basic-programming/git-getting-started.html" target="_blank" rel="noopener">Git Version Control Introduction</a>（基本指令、分支與合併、不要修改專案附帶的 .gitignore）</li>
+  </ol>

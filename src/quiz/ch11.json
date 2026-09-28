@@ -1,0 +1,87 @@
+[
+  {
+    "type": "recall",
+    "q": "config 的 apply() 應該放在哪裡？",
+    "e": "apply 是會等待裝置回應的阻塞呼叫。",
+    "o": [
+      "periodic()",
+      "每個指令的 execute()",
+      "robotPeriodic()",
+      "建構子裡，只執行一次"
+    ],
+    "a": 3
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "程式部署後，CANivore 上所有 TalonFX 都沒反應，roboRIO CAN 上的裝置正常。",
+      "evidence": [
+        "Tuner X 看得到 CANivore「9427」上的所有裝置",
+        "程式裡寫 new CANBus(\"9247\")"
+      ]
+    },
+    "q": "問題在哪？",
+    "e": "名稱錯不會編譯失敗，但所有讀值都失敗、馬達不動。預期結果：改名後裝置有反應。把名稱集中在一個常數可以避免。",
+    "o": [
+      "TalonFX 沒有 Pro 授權",
+      "CAN ID 重複",
+      "CAN bus 名稱打錯，程式找不到裝置；改成和 Tuner X 一致的「9427」",
+      "CANivore 韌體太舊"
+    ],
+    "a": 2
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "同一組 PID 在充飽的電池上調得很好，電池用到一半後機構變慢、到不了位。",
+      "evidence": [
+        "控制請求是 DutyCycleOut 為基礎的閉迴路"
+      ]
+    },
+    "q": "最根本的改法是？",
+    "e": "DutyCycle 是供電電壓的比例，電池電壓一掉輸出就變小。Voltage 類請求會補償（上限仍受電池限制）。預期結果：不同電量下行為一致。",
+    "o": [
+      "把 kP 加大",
+      "電池充更飽",
+      "改成 Coast",
+      "改用 Voltage 類的控制請求，輸出不受電池電壓變化影響"
+    ],
+    "a": 3
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "每一輪都在 periodic 裡 apply 一次完整設定之後，Console 出現 loop overrun，機構反應變慢。",
+      "evidence": [
+        "apply 是等待裝置回應的呼叫"
+      ]
+    },
+    "q": "應該怎麼改？",
+    "e": "阻塞呼叫放在 periodic 會拖慢每一輪。預期結果：overrun 消失。",
+    "o": [
+      "把 periodic 改成 100 ms",
+      "只在建構子套用一次；執行中需要切換的設定只在狀態改變時套用一次",
+      "改用 Tuner X 設定就不用程式",
+      "把 timeout 設成 0"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "隊上沒有 Phoenix Pro，程式用 MotionMagicVoltage，EnableFOC 維持預設 true。有人擔心馬達不會動。",
+      "evidence": [
+        "Tuner X 顯示裝置未授權"
+      ]
+    },
+    "q": "正確的判斷是？",
+    "e": "CTRE 文件寫明未授權裝置會自動退回非 FOC 換相。只有 TorqueCurrentFOC 這類本身依賴 FOC 的請求才需要 Pro。預期結果：馬達正常運作。",
+    "o": [
+      "要改用 TorqueCurrentFOC",
+      "不用改：未授權時會自動退回一般換相，正常運作，只是沒有 FOC 的效能提升",
+      "要買 Pro 才能用 MotionMagic",
+      "一定要把 EnableFOC 設成 false，不然馬達不動"
+    ],
+    "a": 1
+  }
+]

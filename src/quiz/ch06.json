@@ -1,0 +1,91 @@
+[
+  {
+    "type": "recall",
+    "q": "IO 架構裡，ArmSubsystem 的 IO 欄位型別應該是？",
+    "e": "Subsystem 只認介面，才能換實作。",
+    "o": [
+      "TalonFX",
+      "Object",
+      "ArmIOHardware",
+      "ArmIO（介面）"
+    ],
+    "a": 3
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "Command 在 initialize() 裡呼叫 arm.setGoal(SCORE)，你懷疑新目標晚了一輪才送到 TalonFX。",
+      "evidence": [
+        "排程器每一輪先跑所有 Subsystem 的 periodic，再執行指令",
+        "setGoal 只改欄位，periodic 才呼叫 io.setPositionGoal"
+      ]
+    },
+    "q": "這個延遲的正確解讀是？",
+    "e": "只在 periodic 呼叫 IO，確保每輪只有一個地方決定輸出；代價是最多一輪的延遲。預期結果：行為可預測，模擬與重播也一致。",
+    "lab": "arch",
+    "o": [
+      "新目標在下一輪 periodic 才送出，最多晚 20 ms，這是設計上可接受的",
+      "要改用 while 迴圈等待",
+      "要把 periodic 移到 Command 裡",
+      "這是 bug，要在 setGoal 裡直接呼叫 IO"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "模擬時手臂動作正常，實機上手臂一動就往下掉。",
+      "evidence": [
+        "實機的 GravityType 沒設定（預設 Elevator_Static）",
+        "模擬用的是 roboRIO 上的 ArmFeedforward"
+      ]
+    },
+    "q": "最可能的原因與修正是？",
+    "e": "模擬和實機用了不同的控制器設定，所以結果不同。這也是為什麼推薦模擬時用 TalonFXSimState 跑同一份設定。預期結果：手臂在各角度都撐得住。",
+    "o": [
+      "把 kP 調大十倍",
+      "實機的 TalonFX 用了錯的重力模型；GravityType 設成 Arm_Cosine，並確認 0 度是水平",
+      "模擬器壞了",
+      "實機要用 DutyCycleOut"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "兩顆手臂馬達互相對抗、發熱，手臂幾乎不動。",
+      "evidence": [
+        "follower 用 Follower(leaderId, MotorAlignmentValue.Aligned)",
+        "兩顆馬達在機構上是面對面裝的"
+      ]
+    },
+    "q": "下一步怎麼修正？",
+    "e": "Aligned／Opposed 是相對於 leader 的 Invert 設定，不看 follower 自己的 Inverted。面對面裝通常要 Opposed。預期結果：兩顆同向出力，電流下降。",
+    "o": [
+      "把 follower 的 Inverted 設反就好",
+      "改成 MotorAlignmentValue.Opposed，並先用低電壓確認方向",
+      "把兩顆都設成 leader",
+      "提高電流限制"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "一個 Command 直接呼叫 io.setVoltage(3)，結果手臂抖一下就回到原本的目標。",
+      "evidence": [
+        "ArmSubsystem.periodic 每一輪都呼叫 io.setPositionGoal(goal)"
+      ]
+    },
+    "q": "應該怎麼改？",
+    "e": "IO 只該在 periodic 呼叫，否則會被下一輪蓋掉，重播也無法重現。預期結果：模式切換後 periodic 穩定送出 3 V。",
+    "lab": "arch",
+    "o": [
+      "讓 Command 也每輪呼叫 IO",
+      "Command 只呼叫 Subsystem 的公開方法（例如切換成電壓模式），讓 periodic 送出輸出",
+      "把 periodic 刪掉",
+      "把 IO 改成 public static"
+    ],
+    "a": 1
+  }
+]

@@ -1,0 +1,91 @@
+[
+  {
+    "type": "recall",
+    "q": "A 被 B 打斷時，A 的 end(interrupted) 收到什麼？",
+    "e": "被打斷或取消時一樣會呼叫 end，參數為 true。",
+    "lab": "scheduler",
+    "o": [
+      "不會呼叫 end",
+      "會丟出例外",
+      "interrupted = false",
+      "interrupted = true"
+    ],
+    "a": 3
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "按下得分鍵後手臂開始動，操作手接著按了收回鍵，手臂立刻改去收回位置，得分動作沒做完。",
+      "evidence": [
+        "兩個指令都 require arm",
+        "得分指令使用預設的中斷行為"
+      ]
+    },
+    "q": "這個結果是？",
+    "e": "預設是 kCancelSelf。如果得分動作不應被打斷，可以用 withInterruptBehavior(kCancelIncoming)。預期結果：依需求選擇誰優先。",
+    "lab": "scheduler",
+    "o": [
+      "預期行為：新指令排程時，正在執行、require 同一個 Subsystem 的指令會被取消",
+      "bug：兩個指令應該同時執行",
+      "CAN 延遲造成",
+      "bug：新指令應該排隊等待"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "一個 Command 把手臂設到 STOW，但同時執行的另一個手臂指令沒有被取消，兩個一起改目標。",
+      "evidence": [
+        "第一個指令寫成 Commands.runOnce(() -> arm.setGoal(ArmState.STOW))"
+      ]
+    },
+    "q": "少了什麼？",
+    "e": "Commands 工具類別的 factory 要自己傳 Subsystem；Subsystem 自己的 runOnce 才會自動 require。預期結果：排程時正確取消衝突的指令。",
+    "lab": "scheduler",
+    "o": [
+      "isFinished",
+      "withTimeout",
+      "requirements：沒有把 arm 傳進 Commands.runOnce",
+      "defaultCommand"
+    ],
+    "a": 2
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "程式一啟動就丟出例外，訊息是 Default commands must require their subsystem!",
+      "evidence": [
+        "RobotContainer 裡寫 intake.setDefaultCommand(Commands.run(() -> intake.stop()));"
+      ]
+    },
+    "q": "應該怎麼改？",
+    "e": "WPILib 要求預設指令必須 require 它所屬的 Subsystem；Commands.run 沒有傳入 Subsystem 就沒有 requirements。Subsystem 自己的 run 會自動 require。預期結果：例外消失，沒有其他指令時執行預設指令。",
+    "o": [
+      "讓預設指令 require intake，例如改成 intake.run(() -> intake.stop())",
+      "改用 onTrue 綁定",
+      "把 intake 改成 static",
+      "把 setDefaultCommand 放進 periodic"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "機器人 Disable 再 Enable 之後，手臂立刻衝向上一次的目標，差點打到人。",
+      "evidence": [
+        "ArmSubsystem 在 Disabled 時停止輸出，但保留 goal",
+        "沒有人在 Enable 前檢查目標"
+      ]
+    },
+    "q": "比較安全的改法是？",
+    "e": "保留目標本身不是錯，但要決定 Enable 那一刻機構會做什麼。預期結果：重新 Enable 時手臂停在安全位置或慢慢回去。",
+    "o": [
+      "在 Disabled 時把目標設回安全位置（例如 STOW），並且 Enable 前喊出來",
+      "把 kP 調小",
+      "把 Brake 改成 Coast",
+      "在 Enable 後等 5 秒"
+    ],
+    "a": 0
+  }
+]

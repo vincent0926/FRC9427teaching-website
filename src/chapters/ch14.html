@@ -1,0 +1,147 @@
+  <p class="headline-code">CAN ID 14｜控制</p>
+  <h1>MotionMagic：校車司機怎麼開到下一站</h1>
+  <p class="lede">讀完這章，你會知道為什麼不能直接把目標丟給 PID、梯形和 S-curve 軌跡長什麼樣子、MotionMagic 的巡航速度、加速度和 jerk 怎麼設，以及 MotionMagic Expo 和 Dynamic MotionMagic 的差別。</p>
+  <div class="note"><strong>版本說明</strong>本章依據 Phoenix 6 的 2026 版（26.x）文件。第 6 章已經用過 <code>MotionMagicVoltage</code>，本章解釋它背後在做什麼、參數怎麼選。</div>
+
+  <h2>生活比喻：校車開到下一站</h2>
+  <div class="story">
+    <p><strong>新手司機只看距離。</strong>下一站還很遠，他就把油門踩到底；快到了才猛踩煞車。車上的同學一下往後倒、一下往前撲，書包掉滿地。這就是第 13 章只用 P 的樣子：一開始誤差很大，輸出直接衝到最大。</p>
+    <p><strong>老司機有一張行車計畫。</strong>老司機出發前就想好了：先用固定的加速度慢慢起步，到了速限就維持巡航，算好距離提早開始減速，剛好停在站牌前。每一秒車子該在哪裡、該開多快，都在計畫裡。</p>
+    <p><strong>站很近時，來不及開到速限。</strong>如果下一站就在隔壁，車子還沒加速到速限，就得開始減速了。這時候的速度圖不是梯形，而是一個尖尖的三角形。</p>
+    <p><strong>更好的司機連「踩油門的動作」都很溫和。</strong>加速度本身也不是一瞬間從 0 跳到最大，而是慢慢踩下去、慢慢放開。同學幾乎感覺不到頓挫。代價是到站時間稍微久一點，但可以用稍大的加速度補回來。</p>
+    <p><strong>司機自己照計畫開，老師只要說下一站是哪裡。</strong>老師不用每秒告訴司機該踩多少油門，只要說「開到圖書館」。中途想改去體育館，說一聲就好，司機會從目前的位置和速度重新規劃。</p>
+  </div>
+  <table class="map">
+    <thead><tr><th>比喻</th><th>MotionMagic</th></tr></thead>
+    <tbody>
+      <tr><td>油門踩到底、猛煞車</td><td>把遠方的目標直接丟給 PID</td></tr>
+      <tr><td>行車計畫</td><td>運動軌跡（motion profile）</td></tr>
+      <tr><td>速限</td><td>巡航速度 <code>MotionMagicCruiseVelocity</code></td></tr>
+      <tr><td>起步和減速的快慢</td><td>加速度 <code>MotionMagicAcceleration</code></td></tr>
+      <tr><td>加速—巡航—減速的速度圖</td><td>梯形軌跡</td></tr>
+      <tr><td>站太近，來不及開到速限</td><td>三角形軌跡</td></tr>
+      <tr><td>油門慢慢踩、慢慢放</td><td>jerk 限制 → S-curve</td></tr>
+      <tr><td>司機自己照計畫開</td><td>軌跡在 TalonFX 內產生並追蹤</td></tr>
+      <tr><td>中途改目的地</td><td>隨時用 <code>withPosition</code> 換目標</td></tr>
+    </tbody>
+  </table>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>司機會看路況臨時變通，MotionMagic 不會：它只照你設定的速度、加速度上限規劃，不知道機構實際上做不做得到。設得比機構能力還快，馬達輸出飽和，機構就跟不上計畫，誤差越來越大。</div>
+
+  <h2>為什麼需要軌跡</h2>
+  <p>WPILib 文件說明，直接命令機構到達目標狀態雖然可能可行，但通常不是最好的做法；比較好的方式是讓目標平順地變化，也就是運動軌跡<a class="ref" href="#src14-1">[1]</a>。第 13 章也提過，前饋的 kV、kA 需要「目標速度」和「目標加速度」，軌跡剛好提供這兩個值。</p>
+  <p>CTRE 文件列出 MotionMagic 相對於單純位置 PID 的好處：整段運動都在控制之下，而不是一路衝向目標；控制機構的慣性，讓目標之間的轉換平順；電池負載和馬達負載改變時，重現性更好<a class="ref" href="#src14-2">[2]</a>。</p>
+
+  <h2>梯形、三角形與 S-curve</h2>
+  <p>MotionMagic 會自動產生不超過巡航速度、加速度與 jerk 限制的梯形或 S-curve 速度曲線<a class="ref" href="#src14-2">[2]</a>。</p>
+  <ul>
+    <li><strong>梯形</strong>：加速 → 以巡航速度等速 → 減速。</li>
+    <li><strong>三角形</strong>：距離太短，來不及達到巡航速度就要開始減速<a class="ref" href="#src14-2">[2]</a>。</li>
+    <li><strong>S-curve</strong>：jerk 設成非 0 時，曲線的轉角被磨圓，變成連續的 S 形。CTRE 說明它能減少機構振盪、動作更穩定可重現；但 jerk 限制本身會讓動作花更多時間，可以用較大的加速度補償<a class="ref" href="#src14-2">[2]</a>。</li>
+  </ul>
+
+  <h2>動手試：畫出速度曲線</h2>
+  <p>調整移動距離、巡航速度和加速度，看看速度曲線什麼時候是梯形、什麼時候變成三角形，以及總共要花多少時間。單位是手臂端的圈數（rot）。</p>
+  <div class="lab">
+    <div class="pidgrid">
+      <label>距離 <output id="mmDv"></output><input type="range" id="mmD" min="0.02" max="0.5" step="0.01" value="0.25"></label>
+      <label>巡航速度 <output id="mmVv"></output><input type="range" id="mmV" min="0.1" max="2" step="0.05" value="0.8"></label>
+      <label>加速度 <output id="mmAv"></output><input type="range" id="mmA" min="0.5" max="10" step="0.25" value="3"></label>
+    </div>
+    <canvas id="mmCanvas" class="pidplot" width="640" height="240" role="img" aria-label="速度對時間的軌跡圖"></canvas>
+    <div class="console" id="mmConsole" aria-live="polite"></div>
+  </div>
+
+  <h2>設定 MotionMagic</h2>
+  <p>CTRE 文件寫明，MotionMagic 必須設定巡航速度與加速度，jerk 可選<a class="ref" href="#src14-2">[2]</a>。用第 6 章手臂的設定為例：</p>
+  <pre><code>MotionMagicConfigs mm = config.MotionMagic;
+mm.MotionMagicCruiseVelocity = 0.0; // [CONSTRAINT] TODO: rot/s（手臂端）
+mm.MotionMagicAcceleration = 0.0;   // [CONSTRAINT] TODO: rot/s²
+mm.MotionMagicJerk = 0.0;           // [CONSTRAINT] TODO: rot/s³，0 = 梯形，非 0 = S-curve
+
+// 在 MotionMagic 裡，Slot0 的每一項這樣用：
+// kG 重力、kS 靜摩擦、kV × 軌跡速度、kA × 軌跡加速度、
+// kP × 位置誤差、kD × 速度誤差</code></pre>
+  <p>最後那段註解是 CTRE 文件對 MotionMagic 增益的說明<a class="ref" href="#src14-2">[2]</a>：軌跡在每個瞬間都有目標速度和加速度，kV、kA 會用上它們；PID 只負責修正剩下的誤差。這也是為什麼 CTRE 建議 MotionMagic 用速度正負號決定 kS 的方向（第 13 章）。</p>
+  <p>送出目標和第 6 章一樣，建立一次、重複使用：</p>
+  <pre><code>private final MotionMagicVoltage request = new MotionMagicVoltage(0.0);
+
+public void setPositionGoal(double positionRot) {
+    leader.setControl(request.withPosition(positionRot));
+}</code></pre>
+  <p>CTRE 文件說明，設定好之後 roboRIO 只需要定期送出目標位置，沒有「必須等軌跡跑完」的規定；需要知道是否到位時，自己讀位置判斷即可<a class="ref" href="#src14-2">[2]</a>。第 6 章的 <code>atGoal()</code> 就是這樣做的。</p>
+
+  <h3>參數怎麼選</h3>
+  <ol>
+    <li><strong>先估機構最快能多快。</strong>[MODEL] 第 13 章的前饋告訴我們，維持速度 <var>v</var> 大約要 kV × <var>v</var> 伏特。所以 12 V 左右能達到的速度上限大約是 12 ÷ kV（還要扣掉 kS、kG）。巡航速度設在這個上限以下，留一些餘裕給 PID 修正和電池電壓下降。</li>
+    <li><strong>加速度從保守開始。</strong>[CONSTRAINT] 先設「約 0.5 秒加速到巡航速度」，也就是加速度 = 巡航速度 × 2，確認平順後再往上加。CTRE 的範例正是巡航 80 rps、加速度 160 rps/s（0.5 秒）<a class="ref" href="#src14-2">[2]</a>。</li>
+    <li><strong>機構會晃，再加 jerk。</strong>CTRE 的範例 jerk 1600 rot/s³，代表約 0.1 秒從 0 加到 160 rot/s² 的最大加速度<a class="ref" href="#src14-2">[2]</a>。</li>
+    <li><strong>看圖調整。</strong>把目標位置、實際位置畫在同一張圖（AdvantageScope 或 Tuner X 的 Plot），實際位置應該貼著軌跡走。跟不上 → 巡航速度或加速度太大，或 kV、kA 不準。</li>
+  </ol>
+  <div class="note"><strong>可以即時修改</strong>CTRE 文件提到，韌體 24.0.6.0 以後，巡航速度、加速度與 jerk 都可以在執行中修改<a class="ref" href="#src14-2">[2]</a>。不過修改設定仍然是會等待回應的 <code>apply</code>（第 11 章），只能在狀態改變時做一次，不要放在 periodic。</div>
+
+  <h2>MotionMagic 的其他版本</h2>
+  <table class="map">
+    <thead><tr><th>請求</th><th>做什麼</th><th>需要</th></tr></thead>
+    <tbody>
+      <tr><td><code>MotionMagicVoltage</code></td><td>梯形或 S-curve 位置軌跡</td><td>無</td></tr>
+      <tr><td><code>MotionMagicVelocityVoltage</code></td><td>以加速度（與 jerk）限制平順地改變速度</td><td>無</td></tr>
+      <tr><td><code>MotionMagicExpoVoltage</code></td><td>用系統的 kV、kA 產生指數型軌跡</td><td>無</td></tr>
+      <tr><td><code>DynamicMotionMagicVoltage</code></td><td>在請求中直接指定速度、加速度、jerk，可隨時更換</td><td>Pro 授權 + CANivore</td></tr>
+    </tbody>
+  </table>
+  <p><strong>MotionMagic Expo</strong>：CTRE 說明它產生指數型軌跡，最貼近系統本身的動態，相較於梯形能同時減少過衝與到位時間。它使用獨立的 <code>MotionMagicExpo_kV</code> 與 <code>MotionMagicExpo_kA</code>（單位固定是伏特），供電電壓除以 kV 就是軌跡的最高速度；巡航速度設為 0 時，會朝系統的最高速度加速<a class="ref" href="#src14-2">[2]</a>。這兩個值可以直接用第 15 章 SysId 算出的 kV、kA 當起點。</p>
+  <div class="note warn"><strong>Dynamic MotionMagic 沒有 Pro 會停止輸出</strong>和 EnableFOC 不同（第 11 章），CTRE 文件寫明：未授權的 TalonFX 使用 Dynamic MotionMagic 時，會<strong>關閉輸出</strong>並觸發 <code>UnlicensedFeatureInUse</code> 故障<a class="ref" href="#src14-2">[2]</a>。沒有 Pro 就不要用它。</div>
+
+  <h2>在 roboRIO 上做同樣的事</h2>
+  <p>如果馬達控制器沒有內建軌跡功能，或像第 6 章 D-3 一樣在模擬中自己算，WPILib 提供 <code>TrapezoidProfile</code> 產生軌跡，<code>ProfiledPIDController</code> 則把軌跡和 PID 結合在一起<a class="ref" href="#src14-1">[1]</a><a class="ref" href="#src14-3">[3]</a>。CTRE 文件也示範了用 <code>TrapezoidProfile</code> 每 20 ms 算一個點，再把位置和速度交給 <code>PositionVoltage</code> 的做法<a class="ref" href="#src14-4">[4]</a>。能用 MotionMagic 時，讓控制器自己跑（1 kHz）比較簡單，也比較不受 roboRIO 迴圈延遲影響。</p>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>單位用錯</strong>設了 <code>SensorToMechanismRatio</code> 之後，巡航速度和加速度都是<strong>機構端</strong>的 rot/s、rot/s²。把馬達端的數字填進去，手臂會快上幾十倍。</div>
+  <div class="note warn"><strong>巡航速度超過機構能力</strong>軌跡跑得比馬達能給的還快，輸出飽和，實際位置越落越後，到終點附近很容易衝過頭。先用 12 ÷ kV 估算上限。</div>
+  <div class="note warn"><strong>每一輪都重新建立請求物件</strong><code>new MotionMagicVoltage(...)</code> 放在 periodic 裡會一直產生垃圾物件。建立一次，用 <code>withPosition</code> 改目標。</div>
+  <div class="note warn"><strong>以為 jerk 越大越好</strong>jerk 是 S-curve 的「圓滑程度」，數值<strong>越小</strong>越圓滑、越慢；設 0 則完全不限制（梯形）。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：升降機構的兩種速度</h2>
+  <p>升降機構平常用正常速度，但機器人身上夾著遊戲物件時要慢一點，避免甩掉。沒有 Pro 授權，不能用 Dynamic MotionMagic。請想出一個做法，並寫出關鍵程式。</p>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>不能用 Dynamic MotionMagic，就只剩「改設定」這條路。想想設定該在什麼時候改、多久改一次。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>準備兩份 MotionMagicConfigs（快、慢），只在「有沒有夾著物件」改變時用 getConfigurator().apply(...) 套用其中一份。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>用一個 boolean slowMode 記住目前狀態，setSlowMode(slow) 開頭寫 if (slow == slowMode) return;，避免每輪都 apply。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
+    <p>一個做法（單位寫法照 CTRE 的 MotionMagic 範例<a class="ref" href="#src14-5">[5]</a>）：準備兩份 <code>MotionMagicConfigs</code>，只在「有沒有夾著物件」改變時套用一次。</p>
+    <pre><code>// 放在 ElevatorIOHardware（硬體層），Subsystem 透過 IO 介面呼叫 setSlowMode
+private final MotionMagicConfigs fastMM = new MotionMagicConfigs()
+    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.0))        // TODO
+    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(0.0)); // TODO
+private final MotionMagicConfigs slowMM = new MotionMagicConfigs()
+    .withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.0))        // TODO: 比 fast 小
+    .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(0.0)); // TODO: 比 fast 小
+private boolean slowMode = false;
+
+/** 只在狀態改變時套用：apply 會等待回應，不要每輪呼叫。 */
+public void setSlowMode(boolean slow) {
+    if (slow == slowMode) return;
+    slowMode = slow;
+    leader.getConfigurator().apply(slow ? slowMM : fastMM);
+}</code></pre>
+    <p>只套用 <code>MotionMagicConfigs</code> 這一組，其他設定不受影響（第 11 章）。在 Subsystem 裡可以用 Trigger 偵測「有沒有物件」的變化來呼叫它（第 9 章）。另一個做法是用 Slot0 / Slot1 準備兩組不同的增益，但巡航速度和加速度不在 Slot 裡，所以還是要改 <code>MotionMagicConfigs</code>。</p>
+    </div>
+  </div>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src14-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/trapezoidal-profiles.html" target="_blank" rel="noopener">Trapezoidal Motion Profiles in WPILib</a></li>
+    <li id="src14-2">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/motion-magic.html" target="_blank" rel="noopener">Phoenix 6: Motion Magic® Controls</a>（好處、梯形與三角形、S-curve、增益用法、即時修改、Expo、Dynamic 需 Pro 與 CANivore）</li>
+    <li id="src14-3">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/controllers/profiled-pidcontroller.html" target="_blank" rel="noopener">Combining Motion Profiling and PID Control with ProfiledPIDController</a></li>
+    <li id="src14-4">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html" target="_blank" rel="noopener">Basic PID and Profiling</a>（TrapezoidProfile 搭配 PositionVoltage）</li>
+    <li id="src14-5">CTR Electronics. <a href="https://github.com/CrossTheRoadElec/Phoenix6-Examples/blob/main/java/MotionMagic/src/main/java/frc/robot/Robot.java" target="_blank" rel="noopener">Phoenix6-Examples：MotionMagic</a></li>
+  </ol>

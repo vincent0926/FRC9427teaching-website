@@ -1,0 +1,239 @@
+  <p class="headline-code">CAN ID 15｜控制</p>
+  <h1>SysId 系統鑑別：體適能檢測</h1>
+  <p class="lede">讀完這章，你會知道 SysId 在量什麼、四項測試是什麼、怎麼在手臂上用 <code>SysIdRoutine</code> 搭配 Phoenix 的 SignalLogger 收資料、怎麼把 hoot 檔轉成 SysId 讀得懂的格式，以及怎麼把算出來的 kS、kV、kA、kG 填回程式。</p>
+  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 與 Phoenix 6 的 2026 版（26.x）文件。SysId 隨 WPILib 安裝程式一起安裝。</div>
+
+  <h2>生活比喻：體適能檢測</h2>
+  <div class="story">
+    <p><strong>體育老師不猜，而是量。</strong>要幫每位同學排訓練課表，老師可以憑感覺猜「他大概跑多快」，但更好的做法是做體適能檢測，用數據說話。第 13 章的手動調參就像憑感覺猜，這一章要做的是檢測。</p>
+    <p><strong>檢測有兩種項目。</strong>第一種是「漸速跑」：跑步機的速度一點一點慢慢調高，這時候同學幾乎沒有在「加速」，量到的主要是「維持某個速度要花多少力」。第二種是「起跑衝刺」：槍聲一響就全力起跑，量到的是「身體要加速有多吃力」。</p>
+    <p><strong>往前、往回各做一次。</strong>兩種項目都要往前做一次、往回做一次，總共四項。做完往前立刻做往回，剛好也回到起點。</p>
+    <p><strong>檢測時老師要在旁邊看著。</strong>跑步機不會自己停，跑到快撞牆了，老師要喊停。檢測本身只負責出題，安全要自己顧。</p>
+    <p><strong>成績單交給分析軟體。</strong>檢測記錄交給電腦，電腦用一套公式去配合數據，算出這位同學的各項數值。算出來的數字是很好的起點，但不是保證完美，實際上課還要再微調。</p>
+  </div>
+  <table class="map">
+    <thead><tr><th>比喻</th><th>SysId</th></tr></thead>
+    <tbody>
+      <tr><td>憑感覺猜 vs. 做檢測</td><td>手動調參 vs. 系統鑑別</td></tr>
+      <tr><td>漸速跑</td><td>Quasistatic 測試：電壓緩慢上升</td></tr>
+      <tr><td>起跑衝刺</td><td>Dynamic 測試：突然給一個固定電壓</td></tr>
+      <tr><td>往前、往回，共四項</td><td>kForward / kReverse × 兩種測試</td></tr>
+      <tr><td>老師在旁邊喊停</td><td>SysIdRoutine 不會替你設極限，要自己放開按鍵</td></tr>
+      <tr><td>檢測記錄</td><td>日誌檔（WPILog，或 Phoenix 的 hoot 轉檔）</td></tr>
+      <tr><td>分析軟體用公式配合數據</td><td>SysId 應用程式做最小平方法擬合</td></tr>
+      <tr><td>算出的各項數值</td><td>kS、kV、kA、kG</td></tr>
+    </tbody>
+  </table>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>同學會累，檢測結果每天不同；馬達不會累，但會變熱，電池電壓也會下降。所以測試要用電量充足的電池，而且每項測試時間不長。另外，SysId 用的公式是固定的物理模型（第 13 章的電壓平衡方程式），機構如果有模型沒描述到的東西，例如很大的背隙或會卡住的地方，結果就會不準。</div>
+
+  <h2>SysId 在量什麼</h2>
+  <p>WPILib 文件說明，系統鑑別是透過分析輸入與輸出的統計資料，找出描述系統行為的數學模型；SysId 會用最小平方法等曲線擬合技術，從實際量測中找出模型係數<a class="ref" href="#src15-1">[1]</a>。它支援三種模型<a class="ref" href="#src15-1">[1]</a>：</p>
+  <table class="map">
+    <thead><tr><th>分析類型</th><th>模型</th><th>適合</th></tr></thead>
+    <tbody>
+      <tr><td>Simple Motor</td><td>V = kS·sgn(v) + kV·v + kA·a</td><td>飛輪、轉塔、水平滑軌</td></tr>
+      <tr><td>Elevator</td><td>V = kG + kS·sgn(v) + kV·v + kA·a</td><td>升降機構</td></tr>
+      <tr><td>Arm</td><td>V = kG·cos(θ) + kS·sgn(ω) + kV·ω + kA·α</td><td>手臂</td></tr>
+    </tbody>
+  </table>
+  <p>這三個式子就是第 13 章的前饋方程式。SysId 做的事，就是替你的機構找出式子裡的係數。</p>
+
+  <h2>四項測試</h2>
+  <p>WPILib 文件說明，標準的鑑別流程有兩種測試<a class="ref" href="#src15-2">[2]</a>：</p>
+  <ul>
+    <li><strong>Quasistatic</strong>：機構被非常緩慢地加速，所以和加速度有關的電壓可以忽略（「近乎靜態」）。</li>
+    <li><strong>Dynamic</strong>：給機構一個固定的「步階電壓」，用來量加速時的行為。</li>
+  </ul>
+  <p>兩種測試都要往前、往後各做一次，共四項。順序不拘，但建議做完往前立刻做往後，機構大致會回到原位<a class="ref" href="#src15-2">[2]</a>。</p>
+
+  <h2>收了哪些資料</h2>
+  <p>每一個取樣點記下三樣東西：馬達的<strong>電壓</strong>、機構的<strong>位置</strong>與<strong>速度</strong>，再加上現在跑的是哪一項測試（SysId 用「state」字串分段）<a class="ref" href="#src15-7">[7]</a>。加速度沒有直接量，是從速度變化算出來的，所以雜訊特別多。</p>
+  <p>每一個點都代入同一條式子。以升降機構為例：</p>
+  <pre><code>V = kS·sgn(v) + kG + kV·v + kA·a</code></pre>
+  <p>一次測試有幾百個點，就有幾百條這樣的式子，但未知數只有 kS、kG、kV、kA 四個。每個點都有量測誤差，不可能每條式子都剛好成立。</p>
+
+  <h2>回歸：從資料找出係數</h2>
+  <p>SysId 做的是最小平方法之類的曲線擬合：找一組 kS、kG、kV、kA，讓所有點的「預測電壓」和「實際電壓」差距的平方加起來最小<a class="ref" href="#src15-1">[1]</a>。四項測試各自負責讓某些係數能被分辨出來：</p>
+  <table class="map">
+    <thead><tr><th>測試</th><th>資料的特性</th><th>主要幫忙分辨</th></tr></thead>
+    <tbody>
+      <tr><td>Quasistatic</td><td>加速度幾乎是 0，電壓和速度幾乎是一條直線</td><td>斜率 ≈ kV；截距裡有 kS 與 kG</td></tr>
+      <tr><td>Dynamic</td><td>突然給固定電壓，加速度很大</td><td>kA</td></tr>
+      <tr><td>正向＋反向</td><td>摩擦方向相反，重力方向不變</td><td>把 kS 和 kG 分開</td></tr>
+    </tbody>
+  </table>
+  <p>最後一列是為什麼一定要做正反兩個方向。升降機構往上時截距是 kG + kS，往下時是 kG − kS（摩擦反過來，重力不變）。只有一個方向，就只看得到兩者的和，分不開。手臂的 kG 還乘上 cos θ，會隨角度變化，所以也分得開，但一樣需要兩個方向來判斷摩擦。</p>
+
+  <h2>動手試：用資料擬合 kS、kG、kV</h2>
+  <p>下面是一台模擬升降機構的 quasistatic 資料（正向、反向）。擬合只用 quasistatic，所以只估 kS、kG、kV。先看乾淨資料的結果，再一個一個打開壞資料，看擬合出來的參數怎麼偏掉。</p>
+  <div class="lab">
+    <div class="calls" role="group" aria-label="資料狀況">
+      <button class="call sid" data-sid="tail" aria-pressed="false">速度門檻太低（包含還沒動的點）</button>
+      <button class="call sid" data-sid="limit" aria-pressed="false">撞到機械極限</button>
+      <button class="call sid" data-sid="noise" aria-pressed="false">速度訊號雜訊大</button>
+      <button class="call sid" data-sid="oneway" aria-pressed="false">只做正向</button>
+    </div>
+    <canvas id="sidCanvas" class="pidplot" width="640" height="260" role="img" aria-label="電壓對速度的散佈圖與擬合線"></canvas>
+    <div class="console" id="sidConsole" aria-live="polite"></div>
+  </div>
+
+  <h2>怎麼判斷資料能不能信</h2>
+  <p>WPILib 的 SysId 在 Diagnostics 區塊提供三個擬合指標<a class="ref" href="#src15-9">[9]</a>：</p>
+  <ul>
+    <li><strong>模擬速度 r²</strong>：用擬合出的參數，從實際電壓模擬出速度，和量到的速度比較。文件說大於 0.9 代表擬合良好。</li>
+    <li><strong>加速度 r²</strong>：機構振動讓加速度很吵，即使很好的資料也很少超過 0.5；低於約 0.2 時，kA 的可信度就很有疑問。</li>
+    <li><strong>模擬速度 RMSE</strong>：模擬速度誤差的標準差，可以當作測試過程雜訊大小的估計。</li>
+  </ul>
+  <p>也要看圖。文件說明，好的 quasistatic 速度對時間圖幾乎是直線，dynamic 則是指數形狀地接近穩定速度；偏離這些形狀就代表機構設定、分析設定或測試過程有問題。常見的壞資料<a class="ref" href="#src15-9">[9]</a>：</p>
+  <table class="map">
+    <thead><tr><th>狀況</th><th>圖上看起來</th><th>怎麼處理</th></tr></thead>
+    <tbody>
+      <tr><td>速度門檻太低</td><td>quasistatic 圖前面有一段「尾巴」：還沒開始動的點被算進去</td><td>調高 Velocity Threshold 重新分析</td></tr>
+      <tr><td>速度門檻太高</td><td>加速度對速度的圖中間有一大段空白</td><td>調低門檻重新分析</td></tr>
+      <tr><td>速度訊號雜訊大</td><td>圖上的點上下亂跳</td><td>檢查編碼器安裝（軸心、磁鐵位置）；可以加大 Window Size，但根本原因還是要修</td></tr>
+      <tr><td>撞到機械極限</td><td>速度突然掉到 0，電壓卻還在升</td><td>丟掉那段資料，下次提早放開</td></tr>
+    </tbody>
+  </table>
+  <p>文件也提到：機構相對馬達很輕時，kA 會趨近 0，前饋可以忽略它；但 kA 量不準時，算出的回饋增益也會不準，需要手動調<a class="ref" href="#src15-9">[9]</a>。</p>
+
+  <h3>為什麼和理論值不一樣</h3>
+  <p>第 13 章的 kG、kV、kA 可以從質量、齒輪比和馬達常數估計 [MODEL]，但 SysId [SYSID] 量到的幾乎一定不同。常見原因：</p>
+  <ul>
+    <li><strong>模型沒算到的東西</strong>：齒輪箱與鏈條的效率損失、軸承摩擦、線材的拉力、螺絲和電線的質量。</li>
+    <li><strong>模型假設的誤差</strong>：質量、力臂或重心估錯；每顆馬達的常數也有個體差異。</li>
+    <li><strong>機構資料填錯</strong>：差很多（例如差好幾倍）時，通常不是摩擦，而是齒輪比、鼓輪半徑或單位填錯。工具站 4F 單元二會把 SysId 結果和理論值比較，推測可能填錯的資料（見本章的工具站任務）。</li>
+  </ul>
+  <p>差一點是正常的，這就是為什麼要量：理論值告訴你數量級對不對，SysId 告訴你真實機構是多少。</p>
+
+  <h2>寫 SysIdRoutine</h2>
+  <p>WPILib 提供 <code>SysIdRoutine</code>：<code>Config</code> 描述測試設定（quasistatic 的電壓上升速率、dynamic 的步階電壓、安全用的最長時間、記錄測試狀態的回呼），<code>Mechanism</code> 描述怎麼驅動馬達和記錄資料<a class="ref" href="#src15-2">[2]</a>。文件建議把 routine 和回呼都寫在 Subsystem 裡<a class="ref" href="#src15-2">[2]</a>。</p>
+  <p>用 TalonFX 時，CTRE 建議不用 <code>SysIdRoutine</code> 自己記錄，而是用 Phoenix 的 <code>SignalLogger</code><a class="ref" href="#src15-2">[2]</a>。它的好處是自動擷取所有狀態訊號、帶著 CAN 上的時間戳，而且不受主迴圈時間和 Java GC 影響，能明顯提高系統鑑別的準確度<a class="ref" href="#src15-3">[3]</a>。下面依照 CTRE 官方 SysId 範例的寫法<a class="ref" href="#src15-4">[4]</a>，加到第 6 章的 <code>ArmSubsystem</code>：</p>
+  <pre><code>import static edu.wpi.first.units.Units.*;
+
+import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
+public class ArmSubsystem extends SubsystemBase {
+    // ...第 6 章的欄位
+
+    private final SysIdRoutine sysId = new SysIdRoutine(
+        new SysIdRoutine.Config(
+            Volts.of(0.5).per(Second), // TODO: quasistatic 上升速率，手臂行程短，比預設 1 V/s 慢
+            Volts.of(2.0),             // TODO: dynamic 步階電壓，比預設小，避免手臂甩太快
+            Seconds.of(5.0),           // TODO: 最長時間
+            state -&gt; SignalLogger.writeString("state", state.toString())),
+        new SysIdRoutine.Mechanism(
+            volts -&gt; { mode = ControlMode.VOLTAGE; manualVolts = volts.in(Volts); },
+            null, // 由 SignalLogger 記錄，不用 WPILib 的記錄
+            this));
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sysId.quasistatic(direction);
+    }
+
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sysId.dynamic(direction);
+    }
+}</code></pre>
+  <p>重點：</p>
+  <ul>
+    <li>電壓回呼沒有直接呼叫 IO，而是切換成第 6 章的 <code>ControlMode.VOLTAGE</code>，讓 periodic 送出電壓。這樣才不會被下一輪的 <code>setPositionGoal</code> 蓋掉。</li>
+    <li>測試指令結束後，<code>mode</code> 仍然是 <code>VOLTAGE</code>，手臂不會自己回到位置控制；下一次呼叫 <code>setGoal</code> 才會切回。測完記得先讓手臂回到安全位置。</li>
+    <li>CTRE 範例把 dynamic 電壓降到 4 V 以避免電壓驟降（brownout）<a class="ref" href="#src15-4">[4]</a>。手臂行程很短，這裡示範更小的值；數值要依機構調整。</li>
+    <li>CTRE 範例也把要用到的 Position、Velocity、MotorVoltage 訊號提高到 250 Hz，讓資料更密<a class="ref" href="#src15-4">[4]</a>。</li>
+  </ul>
+  <p>在 <code>RobotContainer</code> 裡把四項測試綁到按鍵上，按住才執行，放開立刻停止（第 9 章的 <code>whileTrue</code>）。CTRE 範例也用兩個按鍵手動開始、停止記錄<a class="ref" href="#src15-4">[4]</a>：</p>
+  <pre><code>// 只在測試用的配置裡綁定，比賽用的配置不要有
+controller.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+controller.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+
+controller.y().whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+controller.a().whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+controller.b().whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
+controller.x().whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));</code></pre>
+
+  <h2>跑測試</h2>
+  <ol>
+    <li>換上充飽的電池，確認機構周圍沒有人。</li>
+    <li>把手臂放在行程中間，Enable（Teleop）。</li>
+    <li>按開始記錄。</li>
+    <li>按住 Y（quasistatic 往前），手臂接近上限前放開；接著按住 A（往後），接近下限前放開。</li>
+    <li>同樣做 B、X（dynamic）。dynamic 動得很快，要更早放開。</li>
+    <li>按停止記錄，再 Disable。</li>
+  </ol>
+  <div class="note warn"><strong>SysIdRoutine 不會替你停</strong>WPILib 文件警告：routine 只會產生電壓命令，超過安全範圍時要自己提早停止，軟硬體極限也要自己設好<a class="ref" href="#src15-5">[5]</a>。第 6 章的軟體極限（SoftwareLimitSwitch）在測試時一定要開著。</div>
+  <div class="note warn"><strong>一份日誌只能有一個 routine</strong>WPILib 文件警告：只有「裡面只有一個 routine」的日誌檔能拿來分析。多顆馬達可以放在同一個 routine 裡同時跑，但如果先測一個機構、再測另一個，中間沒有取出日誌或重開 roboRIO，分析會失敗<a class="ref" href="#src15-5">[5]</a>。用 SignalLogger 時，每次測完一個機構就 stop，再 start 開新檔。</div>
+  <p>補充：CTRE 文件說明，在 roboRIO 2（或插著 USB 隨身碟的 roboRIO 1）上，SignalLogger 預設會在開機後、機器人被 Enable 或 Driver Station 連上時自動開始記錄<a class="ref" href="#src15-3">[3]</a>。手動 start / stop 可以讓一個檔案裡只有這次的測試，比較好找。</p>
+
+  <h2>取出資料並分析</h2>
+  <ol>
+    <li><strong>取出 hoot 檔。</strong>用 Tuner X 左側的檔案總管下載 hoot 日誌，下載後會自動放進右邊的轉檔佇列<a class="ref" href="#src15-6">[6]</a>。</li>
+    <li><strong>轉成 WPILog。</strong>在 Convert 分頁選 wpilog 格式轉檔。可以用篩選只留下要的訊號，例如某顆 TalonFX 的 MotorVoltage、Position、Velocity<a class="ref" href="#src15-6">[6]</a>。沒有 Pro 授權的裝置只能匯出一部分免費訊號，但 TalonFX 的 Position、Velocity、MotorVoltage 都在免費清單裡<a class="ref" href="#src15-3">[3]</a>。</li>
+    <li><strong>載入 SysId。</strong>在 Log Loader 開啟檔案，把名稱含 "state" 的字串項目拖到 Test State；再把 Position、Velocity、Voltage 拖到對應欄位<a class="ref" href="#src15-7">[7]</a>。</li>
+    <li><strong>檢查單位與分析類型。</strong>手臂選 Arm。資料單位如果不對，用 Data Selector 的 Units 修正<a class="ref" href="#src15-7">[7]</a>。設了 <code>SensorToMechanismRatio</code> 的 TalonFX，Position、Velocity 已經是手臂端的 rotations、rot/s。</li>
+    <li><strong>看 Feedforward 結果。</strong>畫面會顯示算出的 kS、kV、kA、kG。</li>
+  </ol>
+  <p>Feedback 區塊也會用 LQR 算出建議的 kP、kD，但 WPILib 文件強調這些只是「有根據的猜測」，不保證完美，應該當成進一步調整的起點<a class="ref" href="#src15-8">[8]</a>。要讓建議值符合 TalonFX 的控制器，需要選對 Gain Settings Preset 與 Controller Type<a class="ref" href="#src15-8">[8]</a>。</p>
+
+  <h2>把結果填回程式</h2>
+  <p>SysId 的單位和 Phoenix 6 Slot0 的單位要一致：如果載入的資料是手臂端 rotations，得到的 kV 就是 V/(rot/s)、kA 是 V/(rot/s²)，可以直接填進 Slot0。</p>
+  <pre><code>// 量測日期：YYYY-MM-DD，電池編號：__，SysId 資料檔：__
+config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+config.Slot0.kS = 0.0; // [SYSID] TODO: SysId
+config.Slot0.kG = 0.0; // [SYSID] TODO: SysId
+config.Slot0.kV = 0.0; // [SYSID] TODO: SysId，V/(rot/s)
+config.Slot0.kA = 0.0; // [SYSID] TODO: SysId，V/(rot/s²)
+config.Slot0.kP = 0.0; // [TUNED] TODO: 從 SysId 建議值開始，再上機微調
+config.Slot0.kD = 0.0; // [TUNED] TODO
+
+// 用 MotionMagic Expo 時（第 14 章），也可以用 kV、kA 當起點
+config.MotionMagic.MotionMagicExpo_kV = 0.0; // [SYSID] TODO
+config.MotionMagic.MotionMagicExpo_kA = 0.0; // [SYSID] TODO</code></pre>
+  <p>把量測日期、電池和資料檔寫在註解裡。機構改過（換馬達、改齒輪比、加重量）就要重測。</p>
+  <p>另外，WPILib 文件提到，SysId 算出的前饋不只能用在軌跡追蹤，也能讓開迴路控制更好操作，因為搖桿輸入會更接近機構的實際反應<a class="ref" href="#src15-1">[1]</a>。</p>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>手臂的 0 度不是水平</strong>Arm 模型用 cos(θ)，θ 是和水平的夾角。0 度不是水平時算出的 kG 會錯，手臂在某些角度撐不住（第 12 章的 MagnetOffset）。</div>
+  <div class="note warn"><strong>一個日誌裡混了好幾次測試</strong>先測手臂、再測升降，沒有分開記錄，SysId 會分析失敗或給出奇怪的結果。</div>
+  <div class="note warn"><strong>測試時撞到極限</strong>撞到機械極限的那段資料會讓擬合失準，還可能損壞機構。每項測試都在接近極限前放開。</div>
+  <div class="note warn"><strong>拿低電量電池測</strong>dynamic 測試時電壓驟降，資料品質變差，嚴重時 roboRIO brownout。</div>
+  <div class="note warn"><strong>把 SysId 的 kP 當最終答案</strong>回饋增益只是起點，還是要上機確認沒有振盪或抖動。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：測試用的按鍵配置</h2>
+  <p>比賽時不應該能誤觸 SysId。請改寫上面的綁定：只有在 Test 模式（第 7 章）時，四個按鍵才會執行 SysId 測試。</p>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>要讓兩個條件都成立時才執行，第 9 章學過怎麼組合 Trigger。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用 new Trigger(DriverStation::isTest) 表示「在 Test 模式」，再用 .and(...) 和按鍵組合。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>controller.y().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward)); 其他三個照同樣寫法。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
+    <pre><code>Trigger testMode = new Trigger(DriverStation::isTest);
+
+controller.y().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+controller.a().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+controller.b().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
+controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));</code></pre>
+    <p>用第 9 章的 <code>and</code> 組合條件：兩個條件都成立時 Trigger 才為真。按鍵放開或離開 Test 模式時，<code>whileTrue</code> 會取消指令。第 7 章的 <code>Robot.java</code> 把 <code>CommandScheduler.getInstance().run()</code> 放在 <code>robotPeriodic()</code>，所以 Test 模式下排程器照樣運作；<code>testInit()</code> 的 <code>cancelAll()</code> 則確保進入 Test 時先把其他指令停掉。</p>
+    </div>
+  </div>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src15-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/introduction.html" target="_blank" rel="noopener">Introduction to System Identification</a>（定義、三種模型、開迴路也受益）</li>
+    <li id="src15-2">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/creating-routine.html" target="_blank" rel="noopener">Creating an Identification Routine</a>（quasistatic 與 dynamic、Config 與 Mechanism、CTRE 建議用 SignalLogger）</li>
+    <li id="src15-3">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/api-usage/signal-logging.html" target="_blank" rel="noopener">Phoenix 6: Signal Logging</a>（自動擷取、不受 GC 影響、自動開始條件、免費訊號）</li>
+    <li id="src15-4">CTR Electronics. <a href="https://github.com/CrossTheRoadElec/Phoenix6-Examples/tree/main/java/PhoenixSysId" target="_blank" rel="noopener">Phoenix6-Examples：PhoenixSysId</a>（SysIdRoutine 搭配 SignalLogger、4 V 步階、250 Hz）</li>
+    <li id="src15-5">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/running-routine.html" target="_blank" rel="noopener">Running the Identification Routine</a>（安全與單一 routine 的警告）</li>
+    <li id="src15-6">CTR Electronics. <a href="https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tools/log-extractor.html" target="_blank" rel="noopener">Extracting Signal Logs</a>（Tuner X 下載與轉檔）</li>
+    <li id="src15-7">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/loading-data.html" target="_blank" rel="noopener">Loading Data</a></li>
+    <li id="src15-8">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/analyzing-gains.html" target="_blank" rel="noopener">Analyzing Data</a>（回饋增益只是起點、控制器設定）</li>
+    <li id="src15-9">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/system-identification/viewing-diagnostics.html" target="_blank" rel="noopener">Viewing Diagnostics</a>（三個擬合指標、診斷圖、常見失敗型態）</li>
+  </ol>

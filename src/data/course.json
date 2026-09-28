@@ -1,0 +1,1015 @@
+{
+  "parts": [
+    {
+      "name": "準備",
+      "chapters": [
+        0
+      ]
+    },
+    {
+      "name": "Java 與物件導向（以學校為例）",
+      "chapters": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "name": "架構",
+      "chapters": [
+        6
+      ]
+    },
+    {
+      "name": "WPILib 基礎",
+      "chapters": [
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "name": "硬體",
+      "chapters": [
+        11,
+        12
+      ]
+    },
+    {
+      "name": "控制",
+      "chapters": [
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "name": "上場",
+      "chapters": [
+        16,
+        17,
+        18,
+        19
+      ]
+    }
+  ],
+  "chapters": [
+    {
+      "id": 0,
+      "title": "開發環境與專案結構",
+      "desc": "開學前的準備：要裝哪些軟體、專案裡每個檔案的角色、vendordep、編譯與部署、Driver Station。",
+      "part": "準備",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [],
+      "objectives": [
+        "建立 WPILib Command-based 專案並部署到機器人",
+        "用 Git commit 與 push 保存程式",
+        "看懂專案裡 Robot、RobotContainer、Constants、vendordeps 各自的角色"
+      ],
+      "awareness": [
+        "Driver Station 各分頁的用途",
+        "build.gradle 的細節"
+      ],
+      "tools": [],
+      "labs": [],
+      "stack": [
+        "wpilib",
+        "java"
+      ],
+      "verified": "2026-09",
+      "legacy": []
+    },
+    {
+      "id": 1,
+      "title": "類別與物件",
+      "desc": "學籍資料表與填好的每一份：欄位、方法、建構子、this、static。",
+      "part": "Java 與物件導向（以學校為例）",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [
+        0
+      ],
+      "objectives": [
+        "寫出有欄位、建構子和方法的類別",
+        "分辨類別和物件，說出 new 做了什麼",
+        "看到 NullPointerException 時找出哪個物件沒有 new"
+      ],
+      "awareness": [
+        "static 欄位的進階用法"
+      ],
+      "tools": [],
+      "labs": [
+        {
+          "id": "roller",
+          "title": "兩個物件，各自的狀態",
+          "objective": "看出兩個物件的欄位各自獨立，以及沒有 new 的變數會發生什麼。",
+          "kind": "logic"
+        }
+      ],
+      "stack": [
+        "java"
+      ],
+      "verified": "2026-09",
+      "legacy": []
+    },
+    {
+      "id": 2,
+      "title": "封裝與存取修飾詞",
+      "desc": "成績簿不能放在講台上：private、public、getter，以及為什麼 Subsystem 不讓外面碰馬達。",
+      "part": "Java 與物件導向（以學校為例）",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [
+        1
+      ],
+      "objectives": [
+        "把欄位設成 private，只開放必要的 public 方法",
+        "說明為什麼 Subsystem 不讓外面直接碰馬達"
+      ],
+      "awareness": [
+        "protected 與套件存取的細節"
+      ],
+      "tools": [],
+      "labs": [],
+      "stack": [
+        "java"
+      ],
+      "verified": "2026-09",
+      "legacy": []
+    },
+    {
+      "id": 3,
+      "title": "繼承與介面",
+      "desc": "導師是一種老師，值日生是一份職責：extends、implements、@Override、多型。",
+      "part": "Java 與物件導向（以學校為例）",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        2
+      ],
+      "objectives": [
+        "分辨 extends 和 implements，並寫出實作介面的類別",
+        "看懂 Robot extends TimedRobot、XxxSubsystem extends SubsystemBase",
+        "正確使用 @Override"
+      ],
+      "awareness": [
+        "default 方法的進階用法"
+      ],
+      "tools": [],
+      "labs": [],
+      "stack": [
+        "java",
+        "wpilib"
+      ],
+      "verified": "2026-09",
+      "legacy": []
+    },
+    {
+      "id": 4,
+      "title": "Lambda 與方法參考",
+      "desc": "給代課老師的字條：() -> 與 ::，傳遞和呼叫的差別。",
+      "part": "Java 與物件導向（以學校為例）",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        3
+      ],
+      "objectives": [
+        "寫出 lambda 與方法參考",
+        "分辨「交出一個做法」和「當場執行」，避開搖桿只讀一次的 bug"
+      ],
+      "awareness": [
+        "java.util.function 其他介面"
+      ],
+      "tools": [],
+      "labs": [],
+      "stack": [
+        "java",
+        "wpilib"
+      ],
+      "verified": "2026-09",
+      "legacy": []
+    },
+    {
+      "id": 5,
+      "title": "列舉、常數與套件",
+      "desc": "時段、校規和年級班級：enum、Constants、package 與 import。",
+      "part": "Java 與物件導向（以學校為例）",
+      "path": "core",
+      "difficulty": 1,
+      "prereqs": [
+        2
+      ],
+      "objectives": [
+        "用 enum 表示機構狀態",
+        "把魔術數字整理進 Constants",
+        "看懂 package 與 import 的錯誤訊息"
+      ],
+      "awareness": [
+        "enum 帶欄位與方法的進階寫法"
+      ],
+      "tools": [],
+      "labs": [],
+      "stack": [
+        "java"
+      ],
+      "verified": "2026-09",
+      "legacy": []
+    },
+    {
+      "id": 6,
+      "title": "IO 架構",
+      "desc": "導師只看點名表：以手臂為例，分六部分講觀念、簡易版、硬體層、模擬層、AdvantageKit 與測試。",
+      "part": "架構",
+      "path": "core",
+      "difficulty": 3,
+      "prereqs": [
+        8,
+        11
+      ],
+      "objectives": [
+        "照 IO 架構寫出 Subsystem、IO 介面與硬體實作",
+        "說明每一層該做和不該做的事",
+        "讓同一個 Subsystem 換成模擬 IO 執行"
+      ],
+      "awareness": [
+        "AdvantageKit 重播的完整流程（第 18 章）",
+        "用假的 IO 寫單元測試"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "calc",
+          "title": "下載一份完整的電梯子系統",
+          "do": "在 1F 按「下載完整子系統 .zip」，對照本章的 IO 架構找出 IO 介面、硬體實作和 Subsystem 各在哪個檔案。",
+          "check": "哪一層負責換算單位？哪一層決定目標？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "arch",
+          "title": "分層全貌",
+          "objective": "點每一層，說出它該做和不該做的事。",
+          "kind": "logic"
+        },
+        {
+          "id": "env",
+          "title": "換一個人點名",
+          "objective": "確認 Subsystem 不變、只換 IO 實作，就能在實機、模擬、重播之間切換。",
+          "kind": "logic"
+        }
+      ],
+      "stack": [
+        "wpilib-exact",
+        "phoenix6-exact",
+        "akit"
+      ],
+      "verified": "2026-09",
+      "legacy": [
+        "Phoenix 6 的 Follower 原本的 boolean 參數已改用 MotorAlignmentValue（Aligned／Opposed）。"
+      ]
+    },
+    {
+      "id": 7,
+      "title": "機器人程式的生命週期",
+      "desc": "學校的一天：程式啟動、四種模式、init / periodic / exit 的呼叫順序、loop overrun。",
+      "part": "WPILib 基礎",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        3
+      ],
+      "objectives": [
+        "說出四種模式與 init／periodic／exit 的呼叫順序",
+        "判斷一段程式會不會造成 loop overrun"
+      ],
+      "awareness": [
+        "LoggedRobot 與 TimedRobot 的細部差異"
+      ],
+      "tools": [],
+      "labs": [
+        {
+          "id": "loop",
+          "title": "一步一步跑 20 毫秒",
+          "objective": "預測每一輪哪些方法依什麼順序被呼叫。",
+          "kind": "logic"
+        }
+      ],
+      "stack": [
+        "wpilib",
+        "akit"
+      ],
+      "verified": "2026-09",
+      "legacy": []
+    },
+    {
+      "id": 8,
+      "title": "Subsystem 與 Command",
+      "desc": "借用體育館：指令的生命週期、requirements、中斷行為、預設指令。",
+      "part": "WPILib 基礎",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        4,
+        7
+      ],
+      "objectives": [
+        "寫出有正確 requirements 的 Command",
+        "預測兩個指令搶同一個 Subsystem 時會發生什麼",
+        "設定預設指令"
+      ],
+      "awareness": [
+        "Disabled 時執行指令的細節"
+      ],
+      "tools": [],
+      "labs": [
+        {
+          "id": "scheduler",
+          "title": "搶體育館",
+          "objective": "預測兩個指令搶同一個 Subsystem 時誰會被取消。",
+          "kind": "logic"
+        }
+      ],
+      "stack": [
+        "wpilib"
+      ],
+      "verified": "2026-09",
+      "legacy": []
+    },
+    {
+      "id": 9,
+      "title": "Trigger 與按鍵綁定",
+      "desc": "門鈴、對講機和電燈開關：onTrue、whileTrue、toggleOnTrue、條件組合與防連按。",
+      "part": "WPILib 基礎",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        4,
+        8
+      ],
+      "objectives": [
+        "依需求選擇 onTrue、whileTrue、toggleOnTrue",
+        "用感測器或條件建立 Trigger 並組合條件"
+      ],
+      "awareness": [
+        "防連按（debounce）的參數選擇"
+      ],
+      "tools": [],
+      "labs": [
+        {
+          "id": "bindings",
+          "title": "三種按鈕",
+          "objective": "分辨 onTrue、whileTrue、toggleOnTrue 在按下與放開時的差別。",
+          "kind": "logic"
+        }
+      ],
+      "stack": [
+        "wpilib"
+      ],
+      "verified": "2026-09",
+      "legacy": []
+    },
+    {
+      "id": 10,
+      "title": "組合指令",
+      "desc": "運動會的節目表：sequence、parallel、race、deadline、結束條件與兩條重要規則。",
+      "part": "WPILib 基礎",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        8
+      ],
+      "objectives": [
+        "用 sequence、parallel、race、deadline 組出完整動作",
+        "說明同一個指令物件為什麼不能用兩次"
+      ],
+      "awareness": [
+        "各種修飾方法的完整清單"
+      ],
+      "tools": [],
+      "labs": [],
+      "stack": [
+        "wpilib"
+      ],
+      "verified": "2026-09",
+      "legacy": [
+        "deadlineWith 在 2025 年改名為 deadlineFor。"
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Phoenix 6 與 TalonFX",
+      "desc": "班長的工作手冊：CANivore 與 CANBus、完整設定、控制請求、EnableFOC 與 Pro、Tuner X。",
+      "part": "硬體",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        5
+      ],
+      "objectives": [
+        "在 CANivore 上建立 TalonFX 並寫一份完整設定",
+        "選擇合適的控制請求（Voltage 類）",
+        "用 Tuner X 設定 ID、確認方向"
+      ],
+      "awareness": [
+        "EnableFOC 與 Pro 授權的細節",
+        "TorqueCurrentFOC"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "currentLimit",
+          "title": "3F 情境：超過電流限制",
+          "do": "看電流被限制時，電梯為什麼跟不上軌跡。",
+          "check": "本章的 StatorCurrentLimit 設太低會出現什麼症狀？"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "supplyLimit",
+          "title": "3F 情境：Supply 電流限制設太低",
+          "do": "比較 Stator 與 Supply 電流限制造成的差別。",
+          "check": "Supply 限制太低時，高速段和起步段哪個先受影響？"
+        }
+      ],
+      "labs": [],
+      "stack": [
+        "phoenix6"
+      ],
+      "verified": "2026-09",
+      "legacy": [
+        "用字串指定 CAN bus 的建構子已標為 deprecated，預計 2027 年移除，改用 CANBus 物件。",
+        "CTRE 網站標示 latest 的文件已是 2027 版，查資料請看 stable。"
+      ]
+    },
+    {
+      "id": 12,
+      "title": "感測器與 CAN 除錯",
+      "desc": "計步器、刻度尺和廣播線：內建編碼器與 CANcoder、極限開關與歸零、CAN 接法與除錯順序。",
+      "part": "硬體",
+      "path": "core",
+      "difficulty": 2,
+      "prereqs": [
+        6
+      ],
+      "objectives": [
+        "設定 CANcoder 的零點與方向",
+        "選擇極限開關接法並寫出歸零指令",
+        "CAN 找不到裝置時照順序除錯"
+      ],
+      "awareness": [
+        "FusedCANcoder／SyncCANcoder（需要 Pro）"
+      ],
+      "tools": [
+        {
+          "track": "arm",
+          "page": "sim",
+          "scenario": "wrongZero",
+          "title": "手臂 3F 情境：編碼器零點不在水平",
+          "do": "看零點偏掉時 kG·cos θ 算錯的樣子，對照本章 MagnetOffset 的量法。",
+          "check": "零點偏了 10 度，手臂在哪個角度最撐不住？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "can",
+          "title": "CAN bus 除錯台",
+          "objective": "從掃描結果和電阻值推斷是斷線、少終端還是 ID 重複。",
+          "kind": "model",
+          "modeled": [
+            "daisy-chain 斷點之後的裝置消失",
+            "兩端終端電阻並聯約 60 Ω",
+            "同型號同 ID 衝突、不同型號不衝突"
+          ],
+          "approximated": [
+            "少一端終端時「可能時好時壞」只是文字提示"
+          ],
+          "omitted": [
+            "訊號反射與波形",
+            "匯流排負載與錯誤訊框",
+            "接觸不良造成的間歇斷線"
+          ]
+        }
+      ],
+      "stack": [
+        "wpilib",
+        "phoenix6"
+      ],
+      "verified": "2026-09-27",
+      "legacy": [
+        "CANcoder 的 AbsoluteSensorRange 在 2025 年改成 AbsoluteSensorDiscontinuityPoint。"
+      ]
+    },
+    {
+      "id": 13,
+      "title": "PID 與前饋",
+      "desc": "推書車上斜坡：P、I、D 各自做什麼，kS、kV、kA、kG 前饋，手動調參的順序。",
+      "part": "控制",
+      "path": "controls",
+      "difficulty": 3,
+      "prereqs": [
+        6,
+        11
+      ],
+      "objectives": [
+        "說明 P、I、D 與 kS、kV、kA、kG 各自的作用",
+        "判斷機構停在目標下方時缺的是 kG 而不是 kI",
+        "照 kG → kS → kV → kP → kD 的順序手動調參"
+      ],
+      "awareness": [
+        "積分防飽和的各種做法"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "calc",
+          "title": "1F 教學關卡",
+          "do": "用隊上機構的資料算出 kG、kV、kA，完成五個教學關卡（含純 PID 對前饋＋PID）。",
+          "check": "哪些參數可以算、哪些一定要量？"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "noKg",
+          "title": "3F 情境：沒有 kG",
+          "do": "看電梯停在目標下方，再把 kP 加倍、把 kG 填回，比較誤差變化。",
+          "check": "為什麼加大 kP 只能讓誤差變小，不會變成 0？"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "whyNoKi",
+          "title": "3F 情境：為什麼不用 kI",
+          "do": "用 kI 補重力，觀察反應速度與過衝。",
+          "check": "本章說前饋做好後通常不需要 I，這個情境的證據是什麼？"
+        },
+        {
+          "track": "arm",
+          "page": "sim",
+          "scenario": "armAsElevator",
+          "title": "手臂 3F 情境：把手臂當電梯",
+          "do": "kG 沒乘 cos θ 時，手臂在不同角度的表現。",
+          "check": "為什麼手臂要選 Arm_Cosine？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "pid",
+          "title": "調一支手臂",
+          "objective": "用證據判斷缺的是 kG、kP 還是 kD，而不是亂猜參數。",
+          "kind": "model",
+          "modeled": [
+            "重力（kG·cos θ，真實值 0.6 V）",
+            "庫侖摩擦（kS 0.1 V）",
+            "反電動勢（kV）與慣性（kA）",
+            "±12 V 輸出飽和",
+            "10 ms 量測延遲",
+            "1 kHz 控制週期"
+          ],
+          "approximated": [
+            "手臂的動態直接用 WPILib ArmFeedforward 的電壓平衡式代替",
+            "摩擦只有固定大小，靜止時小於 kS 的輸出不會動"
+          ],
+          "omitted": [
+            "電流限制與電池壓降",
+            "感測器雜訊與量化",
+            "齒輪背隙與彈性",
+            "TalonFX 韌體的實際演算法細節"
+          ]
+        }
+      ],
+      "stack": [
+        "wpilib",
+        "phoenix6"
+      ],
+      "verified": "2026-09-27",
+      "legacy": []
+    },
+    {
+      "id": 14,
+      "title": "MotionMagic",
+      "desc": "校車開到下一站：梯形、三角形與 S-curve 軌跡，巡航速度、加速度與 jerk 怎麼設。",
+      "part": "控制",
+      "path": "controls",
+      "difficulty": 2,
+      "prereqs": [
+        13
+      ],
+      "objectives": [
+        "說明為什麼需要運動軌跡",
+        "依機構能力設定巡航速度與加速度",
+        "判斷何時需要 jerk（S-curve）"
+      ],
+      "awareness": [
+        "MotionMagic Expo",
+        "Dynamic MotionMagic（需要 Pro）"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "calc",
+          "title": "1F Motion Magic 參數",
+          "do": "看工具站怎麼從馬達能力算出巡航速度與加速度的上限（扣掉 kG、kS）。",
+          "check": "工具站算出的巡航速度上限，和本章「12 ÷ kV」的粗估差在哪裡？"
+        },
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "controlPeriod",
+          "title": "3F 情境：控制週期 TalonFX 對 roboRIO",
+          "do": "比較 1 kHz 與 50 Hz 控制同一組參數的結果。",
+          "check": "為什麼本章建議讓 MotionMagic 在控制器內跑？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "profile",
+          "title": "畫出速度曲線",
+          "objective": "看出距離、巡航速度、加速度如何決定梯形或三角形軌跡與總時間。",
+          "kind": "model",
+          "modeled": [
+            "理想梯形與三角形速度曲線"
+          ],
+          "approximated": [],
+          "omitted": [
+            "jerk（S-curve）",
+            "機構實際的跟隨誤差",
+            "馬達飽和時跟不上軌跡"
+          ]
+        }
+      ],
+      "stack": [
+        "phoenix6",
+        "wpilib"
+      ],
+      "verified": "2026-09-27",
+      "legacy": []
+    },
+    {
+      "id": 15,
+      "title": "SysId 系統鑑別",
+      "desc": "體適能檢測：四項測試、SysIdRoutine 搭配 SignalLogger、轉檔分析、把參數填回程式。",
+      "part": "控制",
+      "path": "controls",
+      "difficulty": 3,
+      "prereqs": [
+        9,
+        13
+      ],
+      "objectives": [
+        "說明 SysId 在量什麼、四項測試的目的",
+        "安全地跑完測試並取出資料",
+        "判斷一份 SysId 結果能不能信，再填回程式"
+      ],
+      "awareness": [
+        "LQR 回饋增益的推導"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "learn",
+          "section": "unit2",
+          "title": "4F 單元二：用 SysId 量測參數",
+          "do": "照單元二跑一次（或用範例資料），把結果和 1F 理論值比較。",
+          "check": "SysId 的 kV 比理論值大很多，可能是哪個機構資料填錯？"
+        },
+        {
+          "track": "elevator",
+          "page": "learn",
+          "section": "measure-ks",
+          "title": "4F 兩點法量 kS、kG",
+          "do": "用兩個定速量出 kS 與 kG，填回 1F。",
+          "check": "兩點法和 SysId 各自需要哪些假設？"
+        },
+        {
+          "track": "arm",
+          "page": "learn",
+          "section": "unit2",
+          "title": "手臂 4F 單元二：用 SysId 量手臂",
+          "do": "看手臂的 SysId 和升降機構差在哪裡（kG 乘 cos θ、0 度必須水平）。",
+          "check": "手臂的 kG 為什麼一定要在水平附近量？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "fit",
+          "title": "用資料擬合 kS、kG、kV",
+          "objective": "看出正反向資料怎麼分開 kS 與 kG，以及壞資料怎麼讓擬合結果偏掉。",
+          "kind": "model",
+          "modeled": [
+            "升降機構 quasistatic 測試的電壓與速度（真實值 kS 0.15 V、kG 0.45 V、kV 2.0 V/(m/s)，只在模擬中有意義）",
+            "速度量測雜訊",
+            "速度門檻太低、撞到極限、只做正向四種狀況"
+          ],
+          "approximated": [
+            "加速度當作 0（只擬合 quasistatic）",
+            "擬合品質用電壓的 r² 與 RMSE，不是 SysId 實際使用的模擬速度 r²"
+          ],
+          "omitted": [
+            "dynamic 測試與 kA",
+            "SysId 的資料濾波與切段",
+            "手臂的 cos θ 項"
+          ]
+        }
+      ],
+      "stack": [
+        "wpilib",
+        "phoenix6"
+      ],
+      "verified": "2026-09-27",
+      "legacy": []
+    },
+    {
+      "id": 16,
+      "title": "自動階段與路徑",
+      "desc": "校外教學的行程表：座標與里程計、PathPlanner、紅藍翻轉、Named Commands 與自動程式選單。",
+      "part": "上場",
+      "path": "competition",
+      "difficulty": 2,
+      "prereqs": [
+        6,
+        10
+      ],
+      "objectives": [
+        "設定 AutoBuilder 與紅藍翻轉",
+        "註冊 Named Commands 並組出自動程式",
+        "上場前檢查自動程式"
+      ],
+      "awareness": [
+        "PathPlanner 的即時路徑產生（pathfinding）"
+      ],
+      "tools": [],
+      "labs": [],
+      "stack": [
+        "wpilib",
+        "pathplanner",
+        "phoenix6"
+      ],
+      "verified": "2026-09-27",
+      "legacy": [
+        "2024 年以前的 HolonomicPathFollowerConfig 已不能用，改用 RobotConfig 與 PPHolonomicDriveController。"
+      ]
+    },
+    {
+      "id": 17,
+      "title": "視覺與定位",
+      "desc": "看門牌校正位置：AprilTag、融合與標準差、Limelight MegaTag2、兩種瞄準做法。",
+      "part": "上場",
+      "path": "competition",
+      "difficulty": 3,
+      "prereqs": [
+        16
+      ],
+      "objectives": [
+        "用 addVisionMeasurement 融合視覺，並依距離調整標準差",
+        "丟掉不可靠的視覺量測",
+        "選擇合適的瞄準做法"
+      ],
+      "awareness": [
+        "PhotonVision 的設定細節"
+      ],
+      "tools": [],
+      "labs": [
+        {
+          "id": "fusion",
+          "title": "信誰多一點",
+          "objective": "看出標準差如何決定融合時信誰比較多。",
+          "kind": "model",
+          "modeled": [
+            "一維的變異數倒數加權"
+          ],
+          "approximated": [
+            "視覺標準差用「0.05 m × 距離² ÷ 標籤數」的示範經驗式"
+          ],
+          "omitted": [
+            "卡爾曼濾波的時間推進",
+            "量測延遲與時間戳",
+            "朝向與二維位置"
+          ]
+        }
+      ],
+      "stack": [
+        "wpilib",
+        "limelight",
+        "phoenix6"
+      ],
+      "verified": "2026-09-27",
+      "legacy": []
+    },
+    {
+      "id": 18,
+      "title": "模擬、日誌與重播",
+      "desc": "比賽錄影和賽後檢討：取得日誌、AdvantageScope、重播步驟、確定性、版本追蹤。",
+      "part": "上場",
+      "path": "competition",
+      "difficulty": 3,
+      "prereqs": [
+        6
+      ],
+      "objectives": [
+        "從機器人取出日誌並用 AdvantageScope 找問題",
+        "完成一次重播並補記錄輸出",
+        "避開讓重播失準的寫法"
+      ],
+      "awareness": [
+        "Replay Watch",
+        "AdvantageKit swerve 範本的細節"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "learn",
+          "section": "unit1",
+          "title": "4F 單元一：用 AdvantageKit 錄日誌",
+          "do": "對照單元一的欄位與記錄頻率，檢查隊上的 Logger.recordOutput 有沒有漏。",
+          "check": "調參需要哪些欄位是輸入、哪些是輸出？"
+        },
+        {
+          "track": "elevator",
+          "page": "tune",
+          "title": "2F 用範例日誌練習診斷",
+          "do": "載入一份範例日誌，照步驟 0 到步驟 3 找第一優先問題。",
+          "check": "為什麼一次只改一個參數？"
+        },
+        {
+          "track": "arm",
+          "page": "tune",
+          "title": "手臂 2F：用範例日誌練習診斷",
+          "do": "載入手臂的範例日誌，看工具站怎麼從日誌偵測 GravityType 設錯。",
+          "check": "日誌裡哪個現象代表 kG 沒有乘 cos θ？"
+        }
+      ],
+      "labs": [],
+      "stack": [
+        "akit"
+      ],
+      "verified": "2026-09-27",
+      "legacy": [
+        "AdvantageKit 網站與 main 分支已出現 2027 版內容（例如 LoggedDashboardChooser 改名），查資料請看 v26。"
+      ]
+    },
+    {
+      "id": 19,
+      "title": "上場檢查與 Pit 除錯",
+      "desc": "考試當天：出發前與每場前後的檢查、brownout、DS Log、Pit 分診與改程式的規矩。",
+      "part": "上場",
+      "path": "competition",
+      "difficulty": 1,
+      "prereqs": [
+        12
+      ],
+      "objectives": [
+        "照清單完成賽前與賽後檢查",
+        "從 DS Log 判斷 brownout、roboRIO 重開",
+        "在 Pit 依分診順序找問題，並遵守改程式的規矩"
+      ],
+      "awareness": [
+        "Driver Station 筆電的完整設定"
+      ],
+      "tools": [
+        {
+          "track": "elevator",
+          "page": "sim",
+          "scenario": "lowBattery",
+          "title": "3F 情境：電池電壓太低",
+          "do": "看電壓不足時機構的反應，對照本章 brownout 的症狀。",
+          "check": "比賽中看到機構變慢，怎麼分辨是電池還是參數？"
+        }
+      ],
+      "labs": [
+        {
+          "id": "triage",
+          "title": "Pit 分診",
+          "objective": "遇到症狀時，照從簡單到困難的順序列出檢查項目。",
+          "kind": "logic"
+        }
+      ],
+      "stack": [
+        "wpilib"
+      ],
+      "verified": "2026-09-27",
+      "legacy": [
+        "2027 年起控制系統換成 SystemCore，Driver Station 與部分檢查項目會不同。"
+      ]
+    }
+  ],
+  "paths": [
+    {
+      "id": "core",
+      "name": "核心路徑",
+      "required": true,
+      "goal": "能寫出、部署並除錯一個機構的子系統。每位程式組成員都要完成。",
+      "chapters": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        6,
+        12
+      ]
+    },
+    {
+      "id": "controls",
+      "name": "進階控制路徑",
+      "required": false,
+      "goal": "能量出、調好並驗證一個有重力的機構（手臂或升降）。負責機構控制的人必修。",
+      "chapters": [
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "competition",
+      "name": "競賽實務路徑",
+      "required": false,
+      "goal": "能寫自動程式、用日誌找問題，並在比賽中處理狀況。上場前每位程式組成員都要讀第 19 章。",
+      "chapters": [
+        16,
+        17,
+        18,
+        19
+      ]
+    }
+  ],
+  "mastery": "精通標準：學習目標都做得到、小測驗答對 80% 以上、練習先自己寫過再看提示。只需知道的部分，看得懂、需要時查得到就好。",
+  "tool": {
+    "name": "電梯／手臂調參工作站",
+    "url": "https://vincent0926.github.io/FRC-elevator-PID-Teaching-website/",
+    "repo": "vincent0926/FRC-elevator-PID-Teaching-website",
+    "minVersion": "0.13",
+    "pages": [
+      "home",
+      "calc",
+      "tune",
+      "sim",
+      "learn"
+    ],
+    "scenarios": {
+      "elevator": [
+        "onlyKp",
+        "noKg",
+        "kPTooBig",
+        "kDTooBig",
+        "whyNoKi",
+        "antiWindup",
+        "controlPeriod",
+        "sensorDelay",
+        "lowBattery",
+        "currentLimit",
+        "asymFriction",
+        "stageJump",
+        "softLimit",
+        "supplyLimit",
+        "sparkNoComp"
+      ],
+      "arm": [
+        "armAsElevator",
+        "noKg",
+        "crossVertical",
+        "heavyPayload",
+        "wrongZero",
+        "armWindup",
+        "armKpTooBig"
+      ]
+    },
+    "sections": [
+      "unit0",
+      "unit1",
+      "unit2",
+      "unit3",
+      "unit4",
+      "measure-ks"
+    ],
+    "note": "scenarios 與 sections 要和工具站的 simScenarios.ts、armScenarios.ts、LearnPage.tsx、ArmLearnPage.tsx 一致；電梯與手臂的 4F 都有 measure-ks、unit1～unit4。",
+    "armPages": [
+      "home",
+      "calc",
+      "tune",
+      "sim",
+      "learn"
+    ]
+  },
+  "stack": {
+    "java": "Java 17",
+    "wpilib": "WPILib 2026",
+    "wpilib-exact": "WPILib 2026.2.2",
+    "phoenix6": "Phoenix 6 26.x（2026）",
+    "phoenix6-exact": "Phoenix 6 26.3.0",
+    "akit": "AdvantageKit 2026（v26）",
+    "pathplanner": "PathPlannerLib 2026",
+    "limelight": "LimelightHelpers v1.10（CTRE 範例附帶）"
+  }
+}

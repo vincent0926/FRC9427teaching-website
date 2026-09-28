@@ -1,0 +1,114 @@
+  <p class="headline-code">CAN ID 04｜Java 與物件導向</p>
+  <h1>Lambda 與方法參考：給代課老師的字條</h1>
+  <p class="lede">讀完這章，你會看懂 <code>() -&gt;</code> 和 <code>::</code>，分得清「交出一個做法」和「當場執行一個方法」，並避開搖桿數值只讀一次的經典 bug。</p>
+
+  <h2>生活比喻：導師出差前留的字條</h2>
+  <div class="story">
+    <p><strong>字條本身不是動作。</strong>導師明天要出差，放學前在講桌上留了一疊字條給代課老師。導師寫字條的時候，什麼事都沒發生，沒有人被叫去做任何事。字條裡裝的是「做法」，要等代課老師在適當的時機拿起來照做。</p>
+    <p><strong>字條有四種。</strong>第一種是單純交代一件事：「第一節下課時，請值日生擦黑板。」代課老師照做，不需要回報什麼。第二種是請他查一個數字：「看一下教室溫度是幾度。」查完會得到一個數字。第三種是請他判斷是或否：「看一下外面有沒有下雨。」答案只有有或沒有。第四種是對某個人做一件事：「把這份考卷發給＿＿＿。」代課老師要在空格填上一個人，然後照做。</p>
+    <p><strong>有些字條只寫「照某某的做法」。</strong>點名的流程班長每天都在做，導師不必重寫一遍，字條上只寫：「點名，照班長平常的做法。」</p>
+    <p><strong>「看溫度」和「寫溫度」差很多。</strong>有一張字條寫：「現在 18 度，冷的話幫大家關窗。」另一張寫：「看一下現在幾度，冷的話幫大家關窗。」導師寫字條時是早上 7 點、18 度，代課老師下午 2 點拿起字條時已經 30 度了。照第一張做，他會在大熱天把窗戶關上；照第二張做，他會自己去看溫度，判斷才會對。</p>
+    <p><strong>字條上的名字寫了就不能改。</strong>導師寫「把考卷交給班長小明」，之後就算班長換人，代課老師也不知道該交給誰。所以學校規定：字條上引用的名字，寫上去之後導師就不能再改動那個名字代表的人，不然字條的意思會變得不清楚。</p>
+  </div>
+
+  <p>Command-based 程式到處都是這種字條。你告訴 WPILib「按下 A 鍵時做這件事」，WPILib 會在按鍵被按下的那一刻才去執行。WPILib 文件把這個觀念稱為「把函式當成資料」<a class="ref" href="#src4-1">[1]</a>。</p>
+
+  <table class="map">
+    <thead><tr><th>比喻</th><th>Java</th><th>收什麼 → 回傳什麼</th><th>在 WPILib 裡</th></tr></thead>
+    <tbody>
+      <tr><td>交代一件事</td><td><code>Runnable</code></td><td>無 → 無</td><td>指令要執行的動作</td></tr>
+      <tr><td>查一個數字</td><td><code>DoubleSupplier</code></td><td>無 → 數字</td><td>持續讀取搖桿數值</td></tr>
+      <tr><td>判斷是或否</td><td><code>BooleanSupplier</code></td><td>無 → 是／否</td><td><code>Trigger</code> 的條件</td></tr>
+      <tr><td>對某人做一件事</td><td><code>Consumer&lt;T&gt;</code></td><td>一個東西 → 無</td><td>指令結束時收到「是否被中斷」</td></tr>
+      <tr><td>當場寫一張字條</td><td>Lambda <code>() -&gt; ...</code></td><td colspan="2">當場定義一個做法</td></tr>
+      <tr><td>「照班長的做法」</td><td>方法參考 <code>::</code></td><td colspan="2">指向一個已經寫好的方法</td></tr>
+      <tr><td>寫溫度 vs 看溫度</td><td>呼叫 vs 傳遞</td><td colspan="2">加括號就是當場執行</td></tr>
+      <tr><td>字條上的名字不能改</td><td>effectively final</td><td colspan="2">Lambda 只能用不再被改動的區域變數</td></tr>
+    </tbody>
+  </table>
+  <p>這些「字條格式」在 Java 裡叫<strong>函式介面</strong>（functional interface）：只有一個抽象方法的介面<a class="ref" href="#src4-2">[2]</a>。它們大多在 <code>java.util.function</code> 套件裡，<code>Runnable</code> 則在 <code>java.lang</code><a class="ref" href="#src4-3">[3]</a>。</p>
+
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>字條是一張紙，但 Java 的 lambda 在執行時其實是一個物件，這個物件實作了對應的函式介面（例如 <code>Runnable</code>）。這也是為什麼它能被存進變數、當成參數傳來傳去，和第 1 章學的物件沒有兩樣。</div>
+
+  <h2>Lambda 的寫法</h2>
+  <p>Lambda 的格式是「參數 → 要做的事」<a class="ref" href="#src4-4">[4]</a>。空括號 <code>()</code> 表示不收參數；只有一個參數時可以省略括號；要做的事超過一行，就用大括號包起來。</p>
+  <pre><code>// IntakeSubsystem 裡：回傳一個指令，執行時給一次電壓就結束
+public Command ejectOnce() {
+    return runOnce(() -&gt; setRollerVoltage(-6.0));
+}
+
+// 執行中每個週期給電壓，結束時停止：兩張「交代一件事」的字條
+public Command runRoller(double volts) {
+    return runEnd(() -&gt; setRollerVoltage(volts), () -&gt; setRollerVoltage(0.0));
+}</code></pre>
+  <p><code>runOnce</code> 收一個 <code>Runnable</code>；<code>runEnd</code> 收兩個，一個是執行中每次要做的事，一個是結束時要做的事。字條都交給 WPILib，由它決定什麼時候執行<a class="ref" href="#src4-1">[1]</a>。這些指令 API 的細節在第 8、9 章。</p>
+
+  <h2>方法參考：「照某某的做法」</h2>
+  <pre><code>// 結束時要做的事，已經有 stopRoller() 寫好了，直接指過去
+public Command runRollerUntilReleased(double volts) {
+    return runEnd(() -&gt; setRollerVoltage(volts), this::stopRoller);
+}
+
+// 把「讀左搖桿 Y 軸」這個方法交出去，而不是讀出一個數字
+DoubleSupplier leftY = controller::getLeftY;</code></pre>
+  <p>方法參考的格式是 <code>物件::方法</code> 或 <code>類別::靜態方法</code><a class="ref" href="#src4-5">[5]</a>。WPILib 文件特別提醒：<code>::</code> 後面不加括號，因為這裡是把方法本身交出去，而不是呼叫它<a class="ref" href="#src4-1">[1]</a>。</p>
+
+  <h2>最重要的一件事：寫溫度 vs 看溫度</h2>
+  <p>下面是 FRC 最常見的錯誤之一（<code>drive</code> 是一個假設的底盤 Subsystem）：</p>
+  <pre><code>// 錯：寫溫度。只在綁定的那一刻讀一次搖桿
+double speed = -controller.getLeftY();
+drive.setDefaultCommand(drive.run(() -&gt; drive.arcadeDrive(speed, 0.0)));</code></pre>
+  <p><code>controller.getLeftY()</code> 有括號，所以它在這一行就被執行了，得到一個固定的數字。之後 lambda 每次執行，用的都是那個數字，搖桿怎麼推機器人都不會變。</p>
+  <pre><code>// 對：看溫度。每次執行都重新讀搖桿
+drive.setDefaultCommand(
+    drive.run(() -&gt; drive.arcadeDrive(-controller.getLeftY(), -controller.getRightX())));</code></pre>
+  <p>讀搖桿的程式碼寫在 lambda 裡面，所以每次指令執行（每 20 毫秒）都會重新讀一次。加負號是因為搖桿往前推時 Y 軸讀到的是負值。</p>
+
+  <div class="note"><strong>字條上的名字不能改</strong>Lambda 只能使用 final 或「實際上沒被改過」（effectively final）的區域變數<a class="ref" href="#src4-4">[4]</a>。上面錯誤範例裡的 <code>speed</code> 就是 effectively final，所以編譯器不會報錯，這正是這個 bug 難抓的原因：程式完全合法，只是邏輯錯了。</div>
+
+  <h2>BooleanSupplier 與 Trigger</h2>
+  <pre><code>// 按住 A 鍵時吸入
+controller.a().whileTrue(intake.runRoller(8.0));
+
+// 自訂條件：右扳機按超過一半時吐出
+new Trigger(() -&gt; controller.getRightTriggerAxis() &gt; 0.5)
+    .whileTrue(intake.runRoller(-6.0));</code></pre>
+  <p><code>Trigger</code> 的建構子收一個 <code>BooleanSupplier</code>，也就是「看一下有沒有下雨」這種字條。排程器每個週期都會拿起來看一次。</p>
+
+  <div class="note coach"><strong>教練提醒</strong>看到「搖桿推了機器人沒反應」或「數值永遠是 0」，先檢查搖桿讀取有沒有寫在 lambda 外面。這個 bug 我每一屆新生都會遇到。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：找出 bug，再寫一個條件</h2>
+  <p>第一題：下面這段程式想讓機器人在按住 B 鍵時，用右搖桿 X 軸控制轉向，但轉向完全沒反應。指出原因並修正。</p>
+  <pre><code>double turn = -controller.getRightX();
+controller.b().whileTrue(drive.run(() -&gt; drive.arcadeDrive(0.0, turn)));</code></pre>
+  <p>第二題：寫一個 <code>BooleanSupplier</code>，在左、右扳機都按超過一半時回傳 <code>true</code>。</p>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>第一題：想想 turn 這個變數是什麼時候算出來的，之後還會不會變。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>把讀取搖桿的呼叫移進 lambda 裡，每次執行才會重讀。BooleanSupplier 就是「回傳 boolean、沒有參數」的 lambda。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>第一題改成 drive.arcadeDrive(0.0, -controller.getRightX())；第二題是 () -&gt; controller.getLeftTriggerAxis() &gt; 0.5 &amp;&amp; controller.getRightTriggerAxis() &gt; 0.5。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
+    <p>第一題：<code>getRightX()</code> 在綁定按鍵時就被呼叫了，<code>turn</code> 是固定值。要把讀取搬進 lambda：</p>
+    <pre><code>controller.b().whileTrue(drive.run(() -&gt; drive.arcadeDrive(0.0, -controller.getRightX())));</code></pre>
+    <p>第二題：</p>
+    <pre><code>BooleanSupplier bothTriggers = () -&gt;
+    controller.getLeftTriggerAxis() &gt; 0.5 &amp;&amp; controller.getRightTriggerAxis() &gt; 0.5;</code></pre>
+    </div>
+  </div>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src4-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/basic-programming/functions-as-data.html" target="_blank" rel="noopener">Treating Functions as Data</a></li>
+    <li id="src4-2">Oracle. <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html" target="_blank" rel="noopener">Java SE API: FunctionalInterface</a></li>
+    <li id="src4-3">Oracle. <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html" target="_blank" rel="noopener">Java SE API: java.util.function</a></li>
+    <li id="src4-4">Oracle. <a href="https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html" target="_blank" rel="noopener">The Java Tutorials: Lambda Expressions</a>（語法、effectively final）</li>
+    <li id="src4-5">Oracle. <a href="https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html" target="_blank" rel="noopener">The Java Tutorials: Method References</a></li>
+  </ol>

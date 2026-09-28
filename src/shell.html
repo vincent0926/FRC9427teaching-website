@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FRC 程式設計課程｜9427</title>
+<meta name="version" content="{{version}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+<!--@styles-->
+</style>
+</head>
+<body>
+<section class="landing" id="landing" hidden>
+  <svg class="landing-bg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M40 0H0V40" fill="none" stroke="#FFFFFF" stroke-opacity=".04" stroke-width="1"/>
+      </pattern>
+      <linearGradient id="shade" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="#0D1720" stop-opacity=".92"/>
+        <stop offset=".55" stop-color="#0D1720" stop-opacity=".55"/>
+        <stop offset="1" stop-color="#0D1720" stop-opacity=".25"/>
+      </linearGradient>
+      <radialGradient id="glow" cx=".72" cy=".5" r=".35">
+        <stop offset="0" stop-color="#F2C230" stop-opacity=".16"/>
+        <stop offset="1" stop-color="#F2C230" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1600" height="1000" fill="#13222E"/>
+    <rect width="1600" height="1000" fill="url(#grid)"/>
+
+    <!-- field -->
+    <g transform="rotate(-8 800 500)">
+      <rect x="120" y="170" width="1360" height="660" rx="28" fill="#1A2E3C" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="4"/>
+      <rect x="120" y="170" width="190" height="660" rx="28" fill="#1E5AA8" fill-opacity=".35"/>
+      <rect x="1290" y="170" width="190" height="660" rx="28" fill="#C23440" fill-opacity=".35"/>
+      <line x1="800" y1="170" x2="800" y2="830" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="3"/>
+      <line x1="560" y1="170" x2="560" y2="830" stroke="#1E5AA8" stroke-opacity=".6" stroke-width="3"/>
+      <line x1="1040" y1="170" x2="1040" y2="830" stroke="#C23440" stroke-opacity=".6" stroke-width="3"/>
+      <circle cx="800" cy="500" r="70" fill="none" stroke="#FFFFFF" stroke-opacity=".25" stroke-width="3"/>
+      <polygon points="430,440 470,417 510,440 510,486 470,509 430,486" fill="none" stroke="#6FA3E8" stroke-opacity=".7" stroke-width="3"/>
+      <polygon points="1090,514 1130,491 1170,514 1170,560 1130,583 1090,560" fill="none" stroke="#EC6B75" stroke-opacity=".7" stroke-width="3"/>
+
+      <!-- auto path -->
+      <path d="M250 640 C 420 640, 430 470, 600 450 S 900 330, 1010 300" fill="none" stroke="#F2C230" stroke-width="4" stroke-dasharray="14 12" stroke-linecap="round"/>
+      <circle cx="600" cy="450" r="8" fill="#F2C230"/>
+      <circle cx="1010" cy="300" r="10" fill="none" stroke="#F2C230" stroke-width="4"/>
+
+      <!-- blue robot (swerve, top view) -->
+      <g transform="translate(250 640) rotate(12)">
+        <rect x="-62" y="-62" width="124" height="124" rx="10" fill="#1E5AA8"/>
+        <rect x="-46" y="-46" width="92" height="92" rx="6" fill="#26394A" stroke="#9FB3C4" stroke-width="2"/>
+        <g fill="#0D1720" stroke="#9FB3C4" stroke-width="2">
+          <circle cx="-30" cy="-30" r="11"/><circle cx="30" cy="-30" r="11"/>
+          <circle cx="-30" cy="30" r="11"/><circle cx="30" cy="30" r="11"/>
+        </g>
+        <text x="0" y="6" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="17" font-weight="600" fill="#FFFFFF">9427</text>
+      </g>
+      <!-- red robot -->
+      <g transform="translate(1330 380) rotate(-20)">
+        <rect x="-58" y="-58" width="116" height="116" rx="10" fill="#C23440"/>
+        <rect x="-43" y="-43" width="86" height="86" rx="6" fill="#26394A" stroke="#9FB3C4" stroke-width="2"/>
+        <g fill="#0D1720" stroke="#9FB3C4" stroke-width="2">
+          <circle cx="-28" cy="-28" r="10"/><circle cx="28" cy="-28" r="10"/>
+          <circle cx="-28" cy="28" r="10"/><circle cx="28" cy="28" r="10"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- CAN bus pair along the bottom -->
+    <path d="M-20 915 C 200 885, 400 945, 600 915 S 1000 885, 1200 915 S 1500 945, 1620 915" fill="none" stroke="#F2C230" stroke-width="5" stroke-opacity=".8"/>
+    <path d="M-20 915 C 200 945, 400 885, 600 915 S 1000 945, 1200 915 S 1500 885, 1620 915" fill="none" stroke="#3DBA78" stroke-width="5" stroke-opacity=".8"/>
+    <g font-family="JetBrains Mono, monospace" font-size="15" font-weight="600" fill="#0D1720">
+      <rect x="182" y="899" width="40" height="30" rx="5" fill="#EEF2F5"/><text x="202" y="920" text-anchor="middle">01</text>
+      <rect x="580" y="899" width="40" height="30" rx="5" fill="#EEF2F5"/><text x="600" y="920" text-anchor="middle">07</text>
+      <rect x="980" y="899" width="40" height="30" rx="5" fill="#EEF2F5"/><text x="1000" y="920" text-anchor="middle">13</text>
+      <rect x="1380" y="899" width="40" height="30" rx="5" fill="#EEF2F5"/><text x="1400" y="920" text-anchor="middle">19</text>
+    </g>
+
+    <rect width="1600" height="1000" fill="url(#shade)"/>
+    <rect width="1600" height="1000" fill="url(#glow)"/>
+  </svg>
+
+  <div class="landing-inner">
+    <div>
+      <p class="kicker">Team 9427 程式組</p>
+      <h1>FRC 程式設計課程</h1>
+      <p class="intro">一套為 9427 新成員寫的線上課程。從 Java 的類別與物件開始，一路學到 Command-based 架構、馬達控制、自動階段，最後帶著自己寫的程式上場比賽。</p>
+      <ul class="facts">
+        <li><b>學什麼</b><span>Java 物件導向、WPILib、Phoenix 6、PID 與 MotionMagic、自動路徑與視覺</span></li>
+        <li><b>給誰學</b><span>會開 WPILib 專案但還不會寫程式的新手，以及懂概念卻寫不出來的人</span></li>
+        <li><b>怎麼學</b><span>物件導向用學校與班級當例子，每章附隊上的真實程式碼、小測驗、練習題和官方資料來源</span></li>
+      </ul>
+    </div>
+    <div class="start-wrap">
+      <button class="start" id="startBtn">開始學習<small>20 章</small></button>
+    </div>
+  </div>
+  <p class="landing-foot">學習進度只存在你自己的瀏覽器裡</p>
+</section>
+
+<button class="menu-btn" id="menuBtn" aria-controls="bus" aria-expanded="false">課程地圖</button>
+<div class="layout">
+  <nav class="bus" id="bus" aria-label="課程地圖">
+    <p class="brand"><a href="#" style="color:inherit;text-decoration:none">FRC 程式設計</a></p>
+    <p class="brand-sub">從 Java 物件到上場比賽｜Team 9427</p>
+    <div id="map"></div>
+    <p class="brand-ver">v{{version}}｜<a href="#home">學習路徑</a>｜<a href="docs/INTEGRATION.md">串接說明</a></p>
+  </nav>
+  <main id="main"><div class="col" id="view"></div></main>
+</div>
+
+<!--@templates-->
+<script>
+<!--@scripts-->
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+/* ch6 parts */
+.partmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:22px 0}
+.pcard{text-align:left;font:inherit;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.pcard:hover{border-color:var(--ink)}
+.pcard b{display:block;margin-bottom:4px}
+.pcard span{font-size:14px;color:var(--ink-2);line-height:1.6}
+.parttabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;gap:6px;overflow-x:auto;padding:10px 0;margin:28px 0 0;background:var(--bg);border-bottom:2px solid var(--line)}
+.parttabs button{flex:0 0 auto;font:inherit;font-size:14.5px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.parttabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
+.cpart[hidden]{display:none}
+.partpager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:36px 0 8px;padding-top:18px;border-top:1px dashed var(--line)}
+.tree{display:grid;gap:4px;justify-items:center;margin-bottom:14px}
+.trow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+.tline{width:2px;height:14px;background:var(--line)}
+.tarrow{font-size:13px;color:var(--ink-2)}
+.tnode{font-family:var(--mono);font-size:13.5px;font-weight:600;padding:8px 12px;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;min-width:120px}
+.tnode small{display:block;font-family:var(--sans);font-weight:400;font-size:12px;color:var(--ink-2)}
+.tnode:hover{border-color:var(--ink)}
+.tnode.tsub{border-color:var(--ink)}
+.tnode.tif{border-style:dashed;border-color:var(--blue)}
+.tnode.tcmd{border-color:var(--can-h)}
+.tnode.tdev{border-color:var(--can-l)}
+.tnode[aria-pressed="true"]{background:var(--surface);outline:3px solid var(--can-h);outline-offset:1px}
+.nodeinfo{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px 16px;font-size:15.5px;min-height:90px}
+.nodeinfo h4{margin:0 0 6px;font-size:16px}
+.nodeinfo p{margin:0 0 6px}
+:not(pre)>code,li>strong{overflow-wrap:anywhere}
+/* ch12 CAN lab */
+.canchain{display:flex;flex-wrap:wrap;align-items:center;gap:0;row-gap:10px;margin-bottom:14px}
+.cnode{font-family:var(--mono);font-size:13px;padding:6px 10px;border-radius:8px;border:2px solid var(--can-l);background:var(--bg);line-height:1.4}
+.cnode small{display:block;font-family:var(--sans);font-size:11.5px;color:var(--ink-2)}
+.cnode.off{border-style:dashed;border-color:var(--line);opacity:.6}
+.clink{width:34px;height:22px;padding:0;border:0;cursor:pointer;font-size:14px;color:var(--red);background:linear-gradient(var(--can-h),var(--can-h)) 0 7px/100% 3px no-repeat,linear-gradient(var(--can-l),var(--can-l)) 0 12px/100% 3px no-repeat}
+.clink.cut{background:linear-gradient(var(--can-h),var(--can-h)) 0 7px/35% 3px no-repeat,linear-gradient(var(--can-l),var(--can-l)) 0 12px/35% 3px no-repeat,linear-gradient(var(--can-h),var(--can-h)) 100% 7px/35% 3px no-repeat,linear-gradient(var(--can-l),var(--can-l)) 100% 12px/35% 3px no-repeat}
+.clink:hover{outline:1px dashed var(--ink);outline-offset:2px}
+.call[id^="can"][aria-pressed="true"]{border-color:var(--red);background:var(--surface);font-weight:600}
+/* ch13 / ch14 plots */
+.pidgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 16px;margin-bottom:12px}
+.pidgrid label{display:grid;gap:2px;font-family:var(--mono);font-size:13.5px}
+.pidgrid output{color:var(--ink-2);font-size:12.5px}
+.pidgrid input{width:100%;accent-color:var(--blue)}
+.pidplot{display:block;width:100%;height:auto;background:var(--bg);border:1px solid var(--line);border-radius:6px;margin-bottom:14px}
+/* ch17 fusion bar / ch19 triage */
+.fuse{position:relative;height:64px;margin:6px 8px 30px;border-bottom:2px solid var(--line)}
+.fmark{position:absolute;transform:translateX(-50%);font-size:12.5px;font-family:var(--mono);padding:2px 6px;border-radius:6px;white-space:nowrap;background:var(--bg);border:2px solid}
+.fmark::after{content:"";position:absolute;left:50%;width:2px;height:10px;background:currentColor}
+.fmark.odo{top:2px;color:var(--blue)} .fmark.odo::after{top:100%}
+.fmark.vis{top:2px;color:var(--can-h)} .fmark.vis::after{top:100%}
+.fmark.fus{bottom:-14px;color:var(--can-l);font-weight:700} .fmark.fus::after{bottom:100%}
+.nodeinfo ol{margin:6px 0 0;padding-left:22px}
+/* lab header, simulation note, tool tasks */
+.labhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:26px 0 -12px}
+.labtag{font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--ink);color:var(--bg)}
+.labgoal{flex-basis:100%;color:var(--ink-2);font-size:14.5px}
+.simnote{margin:14px 0 0;font-size:13.5px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:10px}
+.simnote summary{cursor:pointer}
+.simgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px 18px;margin-top:6px}
+.simgrid h4{margin:6px 0 2px;font-size:13px;color:var(--ink)}
+.simgrid ul{margin:0;padding-left:18px}
+.simgrid p{margin:0}
+.tooltasks{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:0 10px 10px 0;padding:6px 20px 12px;margin:30px 0}
+.tooltasks h2{margin-top:14px}
+.tasklist{padding-left:22px}
+.tasklist li{margin:12px 0;position:relative}
+.tasklist p{margin:2px 0;font-size:15px}
+.tasklink{font-weight:700}
+.tasktrack{font-size:12px;margin-left:8px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--ink-2)}
+.taskcheck{color:var(--ink-2)}
+.taskdone{float:right;font-size:13.5px;color:var(--ink-2);cursor:pointer;margin-left:12px}

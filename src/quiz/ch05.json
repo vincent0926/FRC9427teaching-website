@@ -1,0 +1,68 @@
+[
+  {
+    "type": "recall",
+    "q": "Java 常數的命名慣例是？",
+    "e": "常數全大寫、單字間用底線。",
+    "o": [
+      "MaxVolts",
+      "maxVolts",
+      "max_volts",
+      "MAX_VOLTS"
+    ],
+    "a": 3
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "編譯錯誤：class RollerIO is public, should be declared in a file named RollerIO.java。",
+      "evidence": [
+        "檔名是 Roller.java"
+      ]
+    },
+    "q": "怎麼修正？",
+    "e": "public 類別的名稱必須和檔名一致。預期結果：改名後編譯通過。",
+    "o": [
+      "把檔案移到 deploy 資料夾",
+      "把 public 刪掉就好，永遠不用管",
+      "重開 VS Code",
+      "把檔案改名成 RollerIO.java（或類別改名成 Roller）"
+    ],
+    "a": 3
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "手臂程式裡到處寫 setGoal(95.0)、setGoal(15.0)，某次改了得分角度，結果只改到一半。",
+      "evidence": [
+        "同一個角度出現在四個檔案"
+      ]
+    },
+    "q": "最好的整理方式是？",
+    "e": "enum 讓狀態只能是清單上的值，角度也只寫在一個地方。預期結果：之後改角度只要改一處。",
+    "o": [
+      "用 enum ArmState 帶角度欄位，全部改成 setGoal(ArmState.SCORE)",
+      "把數字改成字串",
+      "在每個數字旁邊加註解",
+      "把四個檔案合併成一個"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "把 IntakeSubsystem.java 從 subsystems 資料夾拖到 subsystems/intake 之後，出現一堆編譯錯誤。",
+      "evidence": [
+        "檔案第一行仍是 package frc.robot.subsystems;"
+      ]
+    },
+    "q": "要修正什麼？",
+    "e": "package 宣告要和資料夾一致，用到它的地方也要改 import。預期結果：編譯通過。",
+    "o": [
+      "把資料夾改回來就永遠不能再分資料夾",
+      "刪掉所有 import",
+      "把 package 改成 frc.robot.subsystems.intake，並更新其他檔案的 import",
+      "把類別改成 private"
+    ],
+    "a": 2
+  }
+]

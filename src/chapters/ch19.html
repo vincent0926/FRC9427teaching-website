@@ -1,0 +1,169 @@
+  <p class="headline-code">CAN ID 19｜上場</p>
+  <h1>上場檢查與 Pit 除錯：考試當天</h1>
+  <p class="lede">讀完這章，你會知道出發前、每場比賽前、每場比賽後各要檢查什麼，怎麼從 Driver Station 看出 brownout、roboRIO 重開或網路問題，以及在兩場比賽之間的短短時間裡，照什麼順序把問題找出來、改程式時要守哪些規矩。</p>
+  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 文件（roboRIO 與 NI Driver Station）。2027 年起控制系統換成 SystemCore，Driver Station 與部分檢查項目會不同。本章的檢查清單結合了官方文件與一般隊伍常見的做法，隊上應依自己的機器人調整。</div>
+
+  <h2>生活比喻：考試當天</h2>
+  <div class="story">
+    <p><strong>前一晚就把文具準備好。</strong>准考證、2B 鉛筆、橡皮擦、手錶，前一晚就放進袋子裡。考試當天早上才發現鉛筆沒削，已經來不及了。</p>
+    <p><strong>每一節考試前，再確認一次。</strong>進考場前摸一下：准考證在嗎？座位號碼對嗎？手機關了嗎？這些檢查很無聊，但一節考試只有一次機會。</p>
+    <p><strong>考試中出狀況，先看最簡單的原因。</strong>筆寫不出來，先看是不是沒按下筆頭，再看是不是沒水了，最後才懷疑是不是桌子有問題。從最常見、最容易檢查的原因開始。</p>
+    <p><strong>下課十分鐘只能修小東西。</strong>兩節考試之間只有十分鐘。可以換一支筆、借一個橡皮擦，但不可能重新複習一整章。</p>
+    <p><strong>考完對答案。</strong>每節考完，把題目和自己的答案記下來，回家才知道錯在哪裡。</p>
+  </div>
+  <table class="map">
+    <thead><tr><th>比喻</th><th>比賽</th></tr></thead>
+    <tbody>
+      <tr><td>前一晚準備文具</td><td>出發前：Driver Station 筆電、程式版本、備品</td></tr>
+      <tr><td>每一節考試前確認</td><td>每場比賽前的檢查清單</td></tr>
+      <tr><td>從最常見的原因開始查</td><td>Pit 除錯的分診順序</td></tr>
+      <tr><td>下課十分鐘只能修小東西</td><td>兩場之間只做最小、最有把握的修改</td></tr>
+      <tr><td>考完對答案</td><td>每場後下載日誌、看 DS Log</td></tr>
+    </tbody>
+  </table>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>考試出狀況通常只影響自己；機器人出狀況會影響整個聯盟。另外，考試不能在考場外練習同一份題目，但機器人可以在 Pit 裡重現問題：WPILib 文件建議在 Pit 通電、用網路線連著時搖動線材，甚至把機器人一側抬起再放下，讓問題在 Pit 裡發生，而不是在場上<a class="ref" href="#src19-1">[1]</a>。</div>
+
+  <h2>出發前</h2>
+  <h3>Driver Station 筆電</h3>
+  <p>WPILib 的 Driver Station 最佳實務文件建議<a class="ref" href="#src19-2">[2]</a>：</p>
+  <ul>
+    <li>準備一台<strong>專門用來開車</strong>的筆電，只裝 Driver Station 和儀表板，不拿來寫程式。</li>
+    <li>電源設定改成不睡眠、關閉省電、效能最佳；確認電池在這些設定下至少撐一小時，排隊上場時沒有插座也不怕。</li>
+    <li>出發前裝完所有 Windows 更新並實際連機器人測試，然後<strong>暫停更新</strong>涵蓋整個比賽期間，並設定使用時段避免比賽中安裝更新。</li>
+    <li>帶一條可靠的 USB 線和網路線，用來直接連 roboRIO。</li>
+    <li>Driver Station 不支援 ARM 處理器的筆電。</li>
+  </ul>
+  <h3>程式與工具</h3>
+  <ul>
+    <li>建立 <code>event_</code> 開頭的比賽分支（第 18 章），確認部署時會自動 commit。</li>
+    <li>所有 vendordep（Phoenix 6、PathPlannerLib、AdvantageKit…）更新到要用的版本並在機器人上測過。比賽場地通常沒有網路，文件也提醒不要打算在現場用網路更新軟體<a class="ref" href="#src19-2">[2]</a>。</li>
+    <li>準備一個「已知可以動」的程式版本（例如打一個 Git tag），真的改壞時可以立刻退回。</li>
+    <li>FAT32 隨身碟（第 18 章）至少兩支，一支插在機器人上，一支備用。</li>
+  </ul>
+
+  <h2>每場比賽前</h2>
+  <p>WPILib 文件對 Driver Station 的建議<a class="ref" href="#src19-2">[2]</a><a class="ref" href="#src19-1">[1]</a>：前一場結束前就把筆電開機並登入；關掉不需要的程式；<strong>一定要帶筆電充電器</strong>到場上，因為插電時 Windows 的電源管理比較不激進，Driver Station 表現比較穩定；用魔鬼氈把筆電固定在操作台上。現場要關閉 Windows 防火牆和 Wi-Fi<a class="ref" href="#src19-2">[2]</a>。</p>
+  <p>下面是一份程式組可以用的檢查清單：</p>
+  <table class="map">
+    <thead><tr><th>項目</th><th>怎麼確認</th><th>相關章節</th></tr></thead>
+    <tbody>
+      <tr><td>電池充飽、接頭鎖緊</td><td>電壓表或 Battery Beak；用力扳動電池線，接頭不能動</td><td>本章</td></tr>
+      <tr><td>程式是這一場要用的版本</td><td>儀表板顯示 GitSHA，或確認最後一次部署</td><td>18</td></tr>
+      <tr><td>自動程式選對</td><td>儀表板的選單不是預設的 None</td><td>16</td></tr>
+      <tr><td>機器人擺放位置和 Auto 起始位置一致</td><td>對照 PathPlanner 的起點</td><td>16</td></tr>
+      <tr><td>所有 CAN 裝置都在</td><td>儀表板沒有斷線 Alert；有疑慮時用 Tuner X 掃描</td><td>12</td></tr>
+      <tr><td>機構在安全的起始位置</td><td>手臂收好、升降在底部；需要歸零的機構已歸零</td><td>12</td></tr>
+      <tr><td>視覺相機有畫面</td><td>儀表板看得到相機、看得到 AprilTag</td><td>17</td></tr>
+      <tr><td>隨身碟有插、有空間</td><td>目視；或在程式裡偵測後發 Alert</td><td>18</td></tr>
+    </tbody>
+  </table>
+
+  <h2>每場比賽後</h2>
+  <ol>
+    <li>用 AdvantageScope 下載 AdvantageKit 日誌（第 18 章），檔名或資料夾標上場次。</li>
+    <li>打開 Driver Station 的 Log Viewer，看這一場的電壓、延遲、掉封包和模式。</li>
+    <li>看 Driver Station 的 CAN/Power 分頁，12V fault 計數有沒有增加（見下方 brownout）。</li>
+    <li>問駕駛和操作手：有沒有哪裡「感覺不對」？把時間點記下來，再去日誌裡找。</li>
+    <li>換電池、充電，電池編號和場次一起記錄。</li>
+  </ol>
+
+  <h2>看懂 Brownout</h2>
+  <p>電池電壓在大電流時會瞬間掉下來。WPILib 文件說明 roboRIO（1.0）的分段保護<a class="ref" href="#src19-3">[3]</a>：</p>
+  <table class="map">
+    <thead><tr><th>階段</th><th>電壓</th><th>發生什麼</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>低於 6.8 V</td><td>PWM 腳位的 6V 輸出開始下降</td></tr>
+      <tr><td>2</td><td>低於 6.3 V</td><td>進入 brownout 保護：PWM 輸出關閉、使用者電源軌關閉、CAN 馬達控制器收到停用命令；電壓回到 7.5 V 以上才恢復</td></tr>
+      <tr><td>3</td><td>低於約 4.5 V</td><td>可能直接斷電，電壓回升後重新開機</td></tr>
+    </tbody>
+  </table>
+  <p>roboRIO 2.0 的第 2 階段預設門檻是 6.75 V，可以用 <code>RobotController.setBrownoutVoltage</code> 調整；roboRIO 1.0 固定 6.3 V<a class="ref" href="#src19-3">[3]</a>。發生 brownout 時，roboRIO 的電源燈變琥珀色、Driver Station 的電壓底色變紅並顯示 Voltage Brownout、CAN/Power 分頁的 12V fault 計數加一，DS 日誌也會記錄<a class="ref" href="#src19-3">[3]</a>。</p>
+  <p>程式能做的事：第 11 章的電流限制是最直接的預防。文件也建議做「電流預算」：列出各機構的電流需求，如果某些功能不會同時使用，就在程式裡強制它們不同時動作<a class="ref" href="#src19-3">[3]</a>。</p>
+
+  <h2>從 DS Log 看出斷線原因</h2>
+  <p>Driver Station 的 Log Viewer 會畫出電壓、延遲（trip time）、roboRIO CPU、掉封包與機器人模式，並標出事件<a class="ref" href="#src19-4">[4]</a>。文件整理了幾種典型的斷線樣子，其中最常用來判斷的是<strong>roboRIO 重開</strong>：主要線索是 DS 事件裡的「Time since robot boot」訊息，斷線後其他裝置都 ping 得到、只有 roboRIO 不回應，接著 roboRIO 重新回應<a class="ref" href="#src19-4">[4]</a>。常見的另外兩種是機器人上的網路線問題與無線電重開，看到斷線時先對照文件中的圖例。</p>
+  <p>Driver Station 訊息也有幫助<a class="ref" href="#src19-5">[5]</a>：「No robot code is currently running」表示 roboRIO 有連上，但程式沒在跑（程式當掉、還在開機、或部署失敗）；「The Driver Station has lost communication with the robot」則是 DS 和機器人的通訊中斷。</p>
+
+  <h2>Pit 分診：從最簡單的原因查起</h2>
+  <p>兩場比賽之間時間很短。和第 12 章的 CAN 除錯一樣，先查最常見、最容易檢查的原因。</p>
+  <div class="lab">
+    <div class="calls" role="group" aria-label="選擇症狀">
+      <button class="call tri" data-tri="nomove" aria-pressed="false">整台都不動</button>
+      <button class="call tri" data-tri="onemech" aria-pressed="false">一個機構不動</button>
+      <button class="call tri" data-tri="disconnect" aria-pressed="false">場上斷線</button>
+      <button class="call tri" data-tri="weak" aria-pressed="false">越打越無力、偶爾重開</button>
+      <button class="call tri" data-tri="auto" aria-pressed="false">自動程式走錯</button>
+      <button class="call tri" data-tri="vision" aria-pressed="false">瞄準不準</button>
+    </div>
+    <div class="nodeinfo" id="triInfo" aria-live="polite"></div>
+  </div>
+
+  <h2>比賽期間改程式的規矩</h2>
+  <p>下面是一般隊伍在比賽期間常用的原則，不是官方規定，但能避免大多數「越改越糟」的情況：</p>
+  <ol>
+    <li><strong>一次只改一件事。</strong>同時改兩個地方，出問題時就不知道是哪一個。</li>
+    <li><strong>只改和問題直接相關的地方。</strong>「順便」重構、改命名、升級函式庫，都留到比賽後。</li>
+    <li><strong>改完要在 Pit 測過才上場。</strong>至少 Enable 一次，動一下改到的機構；自動程式的修改要在練習場跑一次，或至少把底盤架高、在模擬裡跑過。</li>
+    <li><strong>改數字前先記下原本的值。</strong>比賽分支的自動 commit（第 18 章）會幫你記，但口頭也要跟隊友說。</li>
+    <li><strong>來不及測，就不要改。</strong>用已知可以動的版本上場，比帶著沒測過的修改上場安全。</li>
+    <li><strong>每次部署後確認版本。</strong>部署失敗但沒注意到，就會帶著舊程式上場。</li>
+  </ol>
+  <div class="note coach"><strong>教練提醒：分工</strong>Pit 裡同時有機構組在修東西時，Enable 前一定要大聲喊，確認所有人的手都離開機器人（第 0 章）。程式組改程式時，指定一個人負責部署，避免兩台電腦先後部署不同版本。</div>
+
+  <h2>常見錯誤</h2>
+  <div class="note warn"><strong>沒帶筆電充電器上場</strong>Windows 在電池模式下的電源管理比較激進，Driver Station 的表現比較難預測<a class="ref" href="#src19-2">[2]</a>。</div>
+  <div class="note warn"><strong>比賽中 Windows 開始更新</strong>出發前沒暫停更新、沒設使用時段，結果上場前筆電在重新開機。</div>
+  <div class="note warn"><strong>把 brownout 當成程式 bug</strong>機構動作突然停一下又恢復，先看 12V fault 計數和 DS Log 的電壓，不要急著改程式。</div>
+  <div class="note warn"><strong>用 USB 線測線材</strong>文件提醒搖線測試時要用網路線連接，不是 USB，否則測不到機器人上真正的通訊路徑<a class="ref" href="#src19-1">[1]</a>。</div>
+  <div class="note warn"><strong>在 Pit 大改程式</strong>兩場之間重寫一整個指令，沒時間測就上場，常常比原本的問題更嚴重。</div>
+
+  <h2>小測驗</h2>
+  <div class="quiz"></div>
+
+  <h2>練習：讓程式幫你做賽前檢查</h2>
+  <p>用第 12 章的 <code>Alert</code>，在 Disabled 時檢查兩件事：電池電壓太低（門檻由隊上決定），以及自動程式選單還是預設值。提示：<code>RobotController.getBatteryVoltage()</code> 回傳電池電壓；<code>AutoBuilder.getAllAutoNames()</code> 回傳專案裡所有 Auto 的名字，可以用它自己建立選單，並記住預設選項。</p>
+  <div class="hints">
+    <div class="hint" data-label="提示 1">
+      <p>兩個檢查都只在 Disabled 時做；電壓會跳動，要避免瞬間掉一下就跳警告。</p>
+    </div>
+    <div class="hint" data-label="提示 2">
+      <p>用兩個 Alert；電壓用 RobotController.getBatteryVoltage() 搭配 Debouncer；選單要能判斷「還是預設值」。</p>
+    </div>
+    <div class="hint" data-label="提示 3">
+      <p>buildAutoChooser 的預設選項拿不到物件，所以自己建 SendableChooser：setDefaultOption("Do Nothing", doNothing)，再用 AutoBuilder.getAllAutoNames() 加入其他選項，判斷 getSelected() == doNothing。</p>
+    </div>
+    <div class="hint solution" data-label="完整解答">
+    <pre><code>// RobotContainer
+private static final double LOW_BATTERY_VOLTS = 12.0; // TODO: 隊上決定門檻
+private final Alert lowBattery = new Alert("電池電壓偏低，上場前請換電池", AlertType.kWarning);
+private final Alert noAuto = new Alert("尚未選擇自動程式", AlertType.kWarning);
+private final Debouncer batteryDebounce = new Debouncer(1.0, Debouncer.DebounceType.kRising);
+private final Command doNothing = Commands.none().withName("DoNothing");
+
+// 建構子裡（Named Commands 註冊之後，第 16 章）
+autoChooser = new SendableChooser&lt;&gt;();
+autoChooser.setDefaultOption("Do Nothing", doNothing);
+for (String name : AutoBuilder.getAllAutoNames()) {
+    autoChooser.addOption(name, new PathPlannerAuto(name)); // 開機時就建立
+}
+SmartDashboard.putData("Auto Chooser", autoChooser);
+
+/** 在 Robot.robotPeriodic() 裡呼叫。 */
+public void updatePreMatchAlerts() {
+    boolean disabled = DriverStation.isDisabled();
+    lowBattery.set(disabled
+        &amp;&amp; batteryDebounce.calculate(RobotController.getBatteryVoltage() &lt; LOW_BATTERY_VOLTS));
+    noAuto.set(disabled &amp;&amp; autoChooser.getSelected() == doNothing);
+}</code></pre>
+    <p>幾個重點：電壓會跳動，用 <code>Debouncer</code> 要求持續 1 秒低於門檻才警告（第 12 章）；只在 Disabled 時檢查，因為比賽中大電流時電壓本來就會掉。<code>buildAutoChooser()</code> 的預設選項是它內部建立的 <code>Commands.none()</code>，程式拿不到那個物件；所以這裡自己建立選單，把自己的 <code>doNothing</code> 當預設選項，就能用 <code>==</code> 判斷有沒有換過。用 AdvantageKit 時，選單換成第 18 章的 <code>LoggedDashboardChooser</code>，判斷方式相同。Alert 會自動被 AdvantageKit 記錄（第 18 章），賽後也查得到。</p>
+    </div>
+  </div>
+
+  <h2>資料來源</h2>
+  <ol class="refs">
+    <li id="src19-1">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/hardware/hardware-basics/preemptive-troubleshooting.html" target="_blank" rel="noopener">Robot Preemptive Troubleshooting</a>（搖線與抬起放下測試、用網路線連接、Driver Station 檢查）</li>
+    <li id="src19-2">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station-best-practices.html" target="_blank" rel="noopener">Driver Station Best Practices</a>（筆電、電源、更新、比賽前與每場前的建議）</li>
+    <li id="src19-3">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/roborio-info/roborio-brownouts.html" target="_blank" rel="noopener">roboRIO Brownout and Understanding Current Draw</a></li>
+    <li id="src19-4">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station-log-viewer.html" target="_blank" rel="noopener">Driver Station Log File Viewer</a></li>
+    <li id="src19-5">WPILib. <a href="https://docs.wpilib.org/en/stable/docs/software/driverstation/driver-station-errors-warnings.html" target="_blank" rel="noopener">Driver Station Errors/Warnings</a></li>
+  </ol>

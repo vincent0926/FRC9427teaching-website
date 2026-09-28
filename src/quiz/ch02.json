@@ -1,0 +1,70 @@
+[
+  {
+    "type": "recall",
+    "q": "沒寫任何存取修飾詞的欄位，誰可以存取？",
+    "e": "不寫修飾詞是套件存取（package-private）。",
+    "o": [
+      "只有子類別",
+      "只有自己",
+      "同一個套件裡的類別",
+      "所有類別"
+    ],
+    "a": 2
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "比賽中 Intake 的電壓偶爾超過 10 V 的上限。",
+      "evidence": [
+        "IntakeSubsystem 的 setVoltage 會把電壓限制在 ±10 V",
+        "有一個 Command 用 intake.getRoller().setControl(...) 直接送電壓"
+      ]
+    },
+    "q": "根本原因與修正是？",
+    "e": "只要外面拿得到馬達物件，封裝裡的規則就能被繞過。預期結果：所有輸出經過同一個入口，電壓不會超過上限。",
+    "o": [
+      "getRoller() 把馬達交出去，繞過了限制；拿掉它，所有輸出都走 setVoltage",
+      "上限應該改成 12 V",
+      "要把 setVoltage 改成 static",
+      "Command 應該改成 public"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "RobotContainer 裡寫了 intake.roller.setControl(...)，編譯失敗。",
+      "evidence": [
+        "roller 在 IntakeSubsystem 裡是 private"
+      ]
+    },
+    "q": "正確的修正是？",
+    "e": "private 欄位就是不讓外面碰；外面需要的功能用 public 方法開放。預期結果：編譯通過，而且限制規則仍然只寫在一個地方。",
+    "o": [
+      "把 IntakeSubsystem 整個複製到 RobotContainer",
+      "在 IntakeSubsystem 加一個 public 方法（例如 setVoltage）讓外面呼叫",
+      "在 RobotContainer 裡再 new 一個同 ID 的 TalonFX",
+      "把 roller 改成 public"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "兩個 Command 都在改手臂的目標角度，但其中一個把角度設成了機構到不了的 200 度。",
+      "evidence": [
+        "ArmSubsystem 的 goal 欄位是 public",
+        "沒有任何地方檢查範圍"
+      ]
+    },
+    "q": "最好的設計修正是？",
+    "e": "範圍檢查集中在 Subsystem 裡，所有入口都受保護。預期結果：任何 Command 設超過範圍的值都會被限制。",
+    "o": [
+      "把上限寫在註解裡提醒大家",
+      "讓每個 Command 自己檢查範圍",
+      "goal 改成 private，只能用會限制範圍的 setGoal 設定",
+      "把 goal 改成 static"
+    ],
+    "a": 2
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "type": "recall",
+    "q": "建構子在什麼時候執行？",
+    "e": "建構子在 new 的時候執行一次，用來設定物件的初始狀態。",
+    "o": [
+      "每次呼叫方法時",
+      "用 new 建立物件時",
+      "物件被刪除時",
+      "程式編譯時"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "程式一 Enable 就當掉，Console 出現例外。",
+      "evidence": [
+        "例外是 NullPointerException",
+        "堆疊指向 shooter.run(6.0) 那一行",
+        "欄位宣告是 private Roller shooter;"
+      ]
+    },
+    "q": "原因是什麼？",
+    "e": "只宣告不 new，變數的值是 null，呼叫方法就會丟出 NullPointerException。修正：在建構子裡 new 出物件。預期結果：不再丟例外，shooter 可以正常呼叫。",
+    "lab": "roller",
+    "o": [
+      "Roller 類別沒有 run 方法",
+      "6.0 超過電壓上限",
+      "shooter 只有宣告、沒有 new，所以是 null",
+      "shooter 應該宣告成 public"
+    ],
+    "a": 2
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "你讓 intake 跑 8 V，卻發現 feeder 也顯示 8 V。",
+      "evidence": [
+        "intake 和 feeder 都是 Roller",
+        "voltage 欄位宣告成 private static double voltage"
+      ]
+    },
+    "q": "問題出在哪？",
+    "e": "static 欄位屬於類別，所有物件共用。每個物件各自的狀態要用非 static 欄位。預期結果：拿掉 static 後兩個物件各自獨立。",
+    "lab": "roller",
+    "o": [
+      "feeder 沒有 new",
+      "intake 和 feeder 用了同一個 CAN ID",
+      "voltage 是 static，所有 Roller 共用同一個值",
+      "run 方法沒有 this"
+    ],
+    "a": 2
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "你寫了 this.name = name; 這行，但印出來的 name 永遠是 null。",
+      "evidence": [
+        "建構子參數叫 nam（少一個 e）",
+        "欄位叫 name"
+      ]
+    },
+    "q": "原因是什麼？",
+    "e": "參數叫 nam，右邊的 name 就指向欄位本身，等於 name = name。修正參數名稱。預期結果：欄位拿到建構時傳入的值。",
+    "o": [
+      "要先呼叫 super()",
+      "字串不能存在欄位裡",
+      "右邊的 name 其實是欄位自己，參數名稱打錯了，所以是把 null 設給自己",
+      "this 不能用在建構子裡"
+    ],
+    "a": 2
+  },
+  {
+    "type": "recall",
+    "q": "下面哪一個最適合寫成 static final 常數？",
+    "e": "所有物件共用而且不會改變的值才適合 static final。",
+    "o": [
+      "目前按下的按鍵",
+      "所有滾輪共用的電壓上限 12.0",
+      "每個滾輪目前的電壓",
+      "手臂現在的角度"
+    ],
+    "a": 1
+  }
+]

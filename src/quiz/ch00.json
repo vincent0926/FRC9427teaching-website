@@ -1,0 +1,91 @@
+[
+  {
+    "type": "recall",
+    "q": "專案加入 Phoenix 6 後，描述這個函式庫的 JSON 檔放在哪裡？",
+    "e": "vendordep 的 JSON 放在 vendordeps，WPILib 依它下載函式庫。",
+    "o": [
+      "專案的 vendordeps 資料夾",
+      "build 資料夾",
+      "src/main/deploy",
+      "C:\\Users\\Public"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "隊友拉下你的程式後編譯失敗，錯誤是找不到 com.ctre.phoenix6。",
+      "evidence": [
+        "你的電腦可以編譯",
+        "隊友的專案裡 vendordeps 資料夾沒有 Phoenix6 的 JSON",
+        "你最後一次 commit 只加了 .java 檔"
+      ]
+    },
+    "q": "最可能的原因和修正是？",
+    "e": "函式庫由 vendordeps 裡的 JSON 決定，沒有 commit 那個檔案，別人的專案就不知道要下載 Phoenix 6。預期結果：隊友 pull 後 WPILib 會下載函式庫，編譯通過。",
+    "o": [
+      "隊友的 VS Code 版本太舊，重裝就好",
+      "vendordep 的 JSON 沒被 commit；把 vendordeps 裡的檔案加進 commit 並 push",
+      "把 import 改成 phoenix5",
+      "Phoenix 6 不支援隊友的電腦"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "你改了程式也按了 commit，但隊友在 GitHub 上看不到修改。",
+      "evidence": [
+        "VS Code 的原始碼控制顯示 commit 成功",
+        "GitHub 網頁上的最新 commit 是昨天的"
+      ]
+    },
+    "q": "下一步做什麼？",
+    "e": "commit 只存在你自己的電腦，push 之後才會上傳。預期結果：GitHub 上出現你的 commit。",
+    "o": [
+      "push 到 GitHub",
+      "刪掉 .git 資料夾重來",
+      "再 commit 一次",
+      "叫隊友重新 clone"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "把路徑檔放在專案根目錄的 paths 資料夾，部署後程式讀不到檔案。",
+      "evidence": [
+        "部署成功，沒有錯誤",
+        "程式在 roboRIO 上找不到檔案"
+      ]
+    },
+    "q": "應該怎麼修正？",
+    "e": "src/main/deploy 裡的檔案會在部署時上傳到 roboRIO 的 /home/lvuser/deploy。預期結果：程式用 deploy 目錄的路徑就能讀到。",
+    "o": [
+      "把檔案放到 src/main/deploy，部署時才會一起上傳到 roboRIO",
+      "把檔案內容貼進 Constants.java",
+      "改用 USB 手動複製到 roboRIO 的任意位置",
+      "把檔案放進 vendordeps"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "新同學修改了 Main.java，之後機器人程式啟動就當掉。",
+      "evidence": [
+        "修改前一切正常",
+        "錯誤訊息指向 Main.java"
+      ]
+    },
+    "q": "最好的處理方式是？",
+    "e": "Command-based 專案裡 Main 只負責啟動 Robot，新手不應該修改。預期結果：還原後程式正常啟動。",
+    "o": [
+      "把 Main.java 刪掉",
+      "重灌 roboRIO",
+      "還原 Main.java，把要加的程式放到 Robot 或 RobotContainer",
+      "在 Main.java 裡多加 try-catch"
+    ],
+    "a": 2
+  }
+]

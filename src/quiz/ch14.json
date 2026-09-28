@@ -1,0 +1,92 @@
+[
+  {
+    "type": "recall",
+    "q": "MotionMagicJerk 設為 0 代表？",
+    "e": "jerk 非 0 才是 S-curve；數值越小越圓滑、越慢。",
+    "o": [
+      "使用預設 jerk",
+      "機構不會動",
+      "不限制 jerk，軌跡是梯形",
+      "最圓滑的 S-curve"
+    ],
+    "a": 2
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "手臂用 MotionMagic，每次移動結束前都跟不上軌跡，最後衝過目標。",
+      "evidence": [
+        "實際位置在加速段就開始落後",
+        "移動中輸出電壓一直在 12 V",
+        "巡航速度設成 12 ÷ kV 的 1.2 倍"
+      ]
+    },
+    "q": "下一步怎麼改？",
+    "e": "軌跡比機構能給的還快，輸出飽和就跟不上。預期結果：實際位置貼著軌跡走，不再衝過頭。",
+    "lab": "profile",
+    "o": [
+      "把 kP 加大",
+      "把 jerk 設成 0",
+      "把巡航速度降到機構能力以下，留餘裕給 PID 與電壓下降",
+      "改用 DutyCycleOut"
+    ],
+    "a": 2
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "升降機構只移動 3 公分，卻發現速度從來沒達到設定的巡航速度。",
+      "evidence": [
+        "巡航速度與加速度設定正確",
+        "到位時間正常"
+      ]
+    },
+    "q": "這代表什麼？",
+    "e": "加速與減速所需距離合計超過總距離時，軌跡還沒到巡航速度就要減速。預期結果：這是預期行為，不需要修改。",
+    "lab": "profile",
+    "o": [
+      "正常：距離太短，走的是三角形軌跡",
+      "MotionMagic 壞了",
+      "巡航速度的單位錯了",
+      "加速度設太大"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "你把 MotionMagicCruiseVelocity 填 80（馬達在規格表上的轉速），手臂一動就猛衝。",
+      "evidence": [
+        "SensorToMechanismRatio = 50",
+        "80 是馬達端 rot/s"
+      ]
+    },
+    "q": "問題在哪？",
+    "e": "所有讀值與設定都變成機構端單位。預期結果：換算成手臂端的速度後動作正常。",
+    "o": [
+      "要改成 rad/s",
+      "設了 SensorToMechanismRatio 之後，速度是機構端單位；80 rot/s 對手臂來說快了約 50 倍",
+      "MotionMagic 不能用在手臂",
+      "要把 jerk 設成 80"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "隊上沒有 Pro 授權，程式改用 DynamicMotionMagicVoltage 後，機構完全不動。",
+      "evidence": [
+        "Tuner X 顯示 UnlicensedFeatureInUse 故障"
+      ]
+    },
+    "q": "該怎麼處理？",
+    "e": "和 EnableFOC 不同，Dynamic MotionMagic 未授權時會關閉輸出。預期結果：改回一般 MotionMagic 後恢復運作。",
+    "o": [
+      "把 EnableFOC 關掉",
+      "改用 CANivore 以外的 bus",
+      "改回 MotionMagicVoltage；需要兩種速度就在狀態改變時套用不同的 MotionMagicConfigs",
+      "把 jerk 設成 0"
+    ],
+    "a": 2
+  }
+]

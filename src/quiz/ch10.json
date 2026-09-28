@@ -1,0 +1,89 @@
+[
+  {
+    "type": "recall",
+    "q": "Commands.parallel(a, b) 什麼時候結束？",
+    "e": "parallel 等全部成員結束；race 是任一結束。",
+    "o": [
+      "任一個結束時",
+      "兩個都結束時",
+      "a 結束時",
+      "永遠不會結束"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "取件動作 sequence(arm.goTo(INTAKE), intake.intakeUntilHasPiece(), arm.goTo(STOW)) 卡在第一步不動。",
+      "evidence": [
+        "手臂已經停在 INTAKE 附近，但 atGoal() 一直是 false",
+        "TOLERANCE_RAD 設成 0.0001"
+      ]
+    },
+    "q": "最可能的原因是？",
+    "e": "sequence 要前一步結束才會進下一步；結束條件太嚴，整個組合就停在那裡。預期結果：把容許誤差調到合理值（依實測）後，順利進入下一步。",
+    "o": [
+      "容許誤差太小，goTo 的 until(atGoal) 永遠不成立",
+      "手臂的預設指令搶走控制",
+      "sequence 不支援三個指令",
+      "Intake 沒有 require"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "程式一執行到自動程式就丟出例外，訊息提到指令已經被組合使用過。",
+      "evidence": [
+        "同一個 Command 物件 score 被放進兩個不同的 sequence"
+      ]
+    },
+    "q": "應該怎麼改？",
+    "e": "同一個指令物件不能放進兩個組合。用 factory 方法每次產生新的物件。預期結果：例外消失。",
+    "o": [
+      "用 parallel 包起來",
+      "每次都呼叫 factory 產生新的指令物件",
+      "加 withTimeout",
+      "把 score 改成 static"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "得分序列執行期間，日誌顯示手臂的預設指令完全沒有執行。",
+      "evidence": [
+        "score = sequence(arm.goTo(SCORE), intake.eject().withTimeout(0.5), arm.goTo(STOW))",
+        "你原本以為吐球的那 0.5 秒會由手臂的預設指令接手"
+      ]
+    },
+    "q": "正確的解讀是？",
+    "e": "組合指令執行時，成員的預設指令不會執行。照第 6 章把目標存在 Subsystem、由 periodic 送出的寫法，手臂仍會停在最後的目標；但預設指令裡的其他動作不會發生，需要的話用 deadline 把它放進組合。預期結果：清楚知道那段時間是誰在控制手臂。",
+    "o": [
+      "Intake 沒有 require 手臂",
+      "組合在整段期間佔住所有成員的 requirements，所以預設指令不會被排程；那段時間手臂需要做的事要放進組合裡",
+      "withTimeout 取消了手臂",
+      "預設指令應該自動插入，這是 bug"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "你想「手臂移到位，同時 Intake 一直吸，手臂到了就一起停」。",
+      "evidence": [
+        "手臂的 goTo 會在到位時結束",
+        "Intake 的吸入指令不會自己結束"
+      ]
+    },
+    "q": "該用哪個組合？",
+    "e": "deadline 以第一個指令為準，它結束時其他成員被取消；parallel 會等不會結束的吸入指令，永遠不結束。預期結果：手臂到位時吸入停止。",
+    "o": [
+      "Commands.race(intake.intake())",
+      "Commands.sequence(arm.goTo(INTAKE), intake.intake())",
+      "Commands.parallel(arm.goTo(INTAKE), intake.intake())",
+      "Commands.deadline(arm.goTo(INTAKE), intake.intake())"
+    ],
+    "a": 3
+  }
+]

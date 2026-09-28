@@ -1,0 +1,90 @@
+[
+  {
+    "type": "recall",
+    "q": "紅方時 PathPlanner 翻轉路徑，場地座標原點在哪？",
+    "e": "原點永遠在藍方。",
+    "o": [
+      "藍方",
+      "紅方",
+      "機器人起始位置",
+      "場地中央"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "在紅方時，自動程式的路徑一開始就往錯的方向走。",
+      "evidence": [
+        "在藍方測試都正常",
+        "翻轉判斷寫在 RobotContainer 建構子裡，存成一個 boolean"
+      ]
+    },
+    "q": "原因與修正是？",
+    "e": "DriverStation.getAlliance() 在連上之前可能是空的。預期結果：lambda 在路徑開始時讀取，顏色正確。",
+    "o": [
+      "PathPlanner 不支援紅方",
+      "路徑要畫兩份",
+      "要把原點移到紅方",
+      "開機時可能還沒連上 FMS，顏色讀錯；翻轉判斷要寫成 lambda，在路徑開始時才判斷"
+    ],
+    "a": 3
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "自動程式跑到 armScore 那一步什麼都沒做，接著直接走下一條路徑。",
+      "evidence": [
+        "GUI 裡的名稱是 ArmScore",
+        "程式註冊的是 NamedCommands.registerCommand(\"armScore\", ...)"
+      ]
+    },
+    "q": "問題在哪？",
+    "e": "名稱必須和 GUI 完全一樣。預期結果：改成一致後該步驟執行得分動作。",
+    "o": [
+      "名稱大小寫不一致，對不上",
+      "armScore 沒有 require",
+      "要先執行 GUI",
+      "Named Commands 只能用在事件標記"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "自動程式在 intake 那一步後就停住，後面的路徑都沒跑。",
+      "evidence": [
+        "intake 的 Named Command 是 intake.run(...) 做的",
+        "Auto 是 sequential 群組"
+      ]
+    },
+    "q": "應該怎麼改？",
+    "e": "sequential 群組要前一步結束才會進下一步。預期結果：吸到物件後自動程式繼續。",
+    "o": [
+      "在 intake 後面加 waitSeconds",
+      "放進 Auto 的指令要會結束，例如改成吸到物件就結束",
+      "把 Auto 改成 parallel",
+      "把 intake 刪掉"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "自動路徑一轉彎，機器人就往反方向轉，越走越偏。",
+      "evidence": [
+        "直線段正常",
+        "陀螺儀是順時針為正"
+      ]
+    },
+    "q": "下一步檢查什麼？",
+    "e": "朝向相反時，直線看不出來，一轉彎就錯。預期結果：修正方向後轉彎正確。",
+    "o": [
+      "陀螺儀方向：WPILib 是逆時針為正，順時針為正的讀值要反過來",
+      "輪子直徑",
+      "PathPlanner 的 PID",
+      "路徑檔有沒有部署"
+    ],
+    "a": 0
+  }
+]

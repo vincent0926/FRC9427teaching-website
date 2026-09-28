@@ -1,0 +1,93 @@
+[
+  {
+    "type": "recall",
+    "q": "robotPeriodic() 在哪些模式會執行？",
+    "e": "robotPeriodic 在每一種模式、每一輪都會呼叫。",
+    "lab": "loop",
+    "o": [
+      "只有 Disabled",
+      "所有模式，而且排在該模式的 periodic 之後",
+      "只有 Teleop",
+      "只有有 Enable 的時候"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "Enable 後整台機器人卡住，按鍵沒反應，Console 一直出現 Loop time of 0.02s overrun。",
+      "evidence": [
+        "teleopPeriodic 裡寫了 while (!limit.get()) { }",
+        "卡住前一刻剛按下歸零鍵"
+      ]
+    },
+    "q": "原因與修正是？",
+    "e": "periodic 必須很快回傳，等待要交給指令架構每輪檢查。預期結果：overrun 消失，其他 Subsystem 繼續更新。",
+    "lab": "loop",
+    "o": [
+      "把 20 ms 改成 100 ms",
+      "把 while 改成 for",
+      "while 迴圈讓主迴圈卡住；改成用 Trigger 或指令的 until 條件，每一輪檢查一次",
+      "roboRIO 太慢，要換新的"
+    ],
+    "a": 2
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "Command-based 專案裡，所有按鍵綁定都沒反應，Subsystem 的 periodic 也從沒執行。",
+      "evidence": [
+        "程式可以部署，也沒有例外",
+        "Robot.java 的 robotPeriodic() 是空的"
+      ]
+    },
+    "q": "下一步檢查什麼？",
+    "e": "排程器每輪 run() 才會呼叫 Subsystem 的 periodic、檢查按鍵、執行指令。預期結果：補上那一行後綁定開始作用。",
+    "lab": "loop",
+    "o": [
+      "robotPeriodic() 裡有沒有 CommandScheduler.getInstance().run()",
+      "搖桿的 USB 順序",
+      "CAN ID 有沒有重複",
+      "vendordep 版本"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "使用 AdvantageKit 時，某個 Subsystem 在建構子裡讀了 Timer.getTimestamp()，重播時結果和實機不同。",
+      "evidence": [
+        "Robot 的欄位直接寫 private final Intake intake = new Intake();",
+        "Logger.start() 寫在 Robot 建構子裡"
+      ]
+    },
+    "q": "原因是什麼？",
+    "e": "Logger.start() 之前讀的時間和 DS 資料不是確定的。改成在 Logger.start() 之後才建立 RobotContainer。預期結果：重播與實機一致。",
+    "o": [
+      "Logger.start() 要放在 robotPeriodic",
+      "欄位初始化比建構子先執行，Intake 在 Logger.start() 之前就讀了時間",
+      "重播不支援 Timer",
+      "Intake 應該改成 static"
+    ],
+    "a": 1
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "自動階段結束進入 Teleop 後，駕駛怎麼推搖桿手臂都不理，要等幾秒才正常。",
+      "evidence": [
+        "自動指令在自動階段結束前還沒跑完",
+        "teleopInit() 是空的"
+      ]
+    },
+    "q": "應該怎麼改？",
+    "e": "沒跑完的自動指令會繼續佔住 Subsystem，駕駛的指令搶不到。預期結果：進入 Teleop 後駕駛立刻取得控制。",
+    "o": [
+      "把自動階段縮短",
+      "在 teleopInit() 取消還在執行的自動指令",
+      "把手臂的預設指令刪掉",
+      "在 disabledInit() 什麼都不做"
+    ],
+    "a": 1
+  }
+]

@@ -1,0 +1,70 @@
+[
+  {
+    "type": "recall",
+    "q": "RollerIO io = new RollerIOSim(); io.setVoltage(8.0); 會執行誰的 setVoltage()？",
+    "e": "多型：實際執行的是物件真正類別的實作。",
+    "o": [
+      "RollerIOSim 的",
+      "都不執行",
+      "RollerIO 介面的 default",
+      "編譯失敗"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "你在 Robot 裡寫了 teleopPeriodc()（打錯字），Teleop 時什麼都不會發生，也沒有任何錯誤。",
+      "evidence": [
+        "方法上面沒有 @Override",
+        "程式編譯成功"
+      ]
+    },
+    "q": "怎麼讓這種錯誤在編譯時就被抓到？",
+    "e": "@Override 要求編譯器確認父類別真的有這個方法。預期結果：打錯的名稱會編譯失敗，改對後 Teleop 正常執行。",
+    "o": [
+      "在覆寫的方法上加 @Override，打錯字時編譯器會報錯",
+      "把方法改成 static",
+      "改用 extends Object",
+      "在方法裡加 System.out.println"
+    ],
+    "a": 0
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "IntakeSubsystem 繼承 SubsystemBase，但它的 periodic() 從來沒被呼叫。",
+      "evidence": [
+        "建構子第一行寫了 super();",
+        "periodic() 的簽章是 public void periodic(int n)"
+      ]
+    },
+    "q": "原因是什麼？",
+    "e": "參數不同就不是覆寫。加上 @Override 會直接編譯失敗，提醒你簽章不對。預期結果：改成 periodic() 後每 20 ms 被呼叫。",
+    "o": [
+      "periodic 必須是 static",
+      "SubsystemBase 不會自動註冊",
+      "periodic(int n) 是新的多載方法，不是覆寫；排程器呼叫的是沒有參數的 periodic()",
+      "super() 讓 periodic 失效"
+    ],
+    "a": 2
+  },
+  {
+    "type": "scenario",
+    "s": {
+      "symptom": "隊上想讓同一個 IntakeSubsystem 在實機用 TalonFX、在模擬用假的馬達。",
+      "evidence": [
+        "目前 IntakeSubsystem 裡直接 new TalonFX"
+      ]
+    },
+    "q": "哪個設計最合適？",
+    "e": "介面描述「能做什麼」，實作可以替換，這就是第 6 章 IO 架構的基礎。預期結果：Subsystem 不用改就能換實作。",
+    "o": [
+      "寫兩個不同的 IntakeSubsystem",
+      "在 IntakeSubsystem 裡用 if 判斷是不是模擬",
+      "讓 TalonFX 繼承模擬類別",
+      "定義 RollerIO 介面，實機與模擬各自 implements，Subsystem 只認介面"
+    ],
+    "a": 3
+  }
+]
