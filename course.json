@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": "2.0.0",
+  "version": "2.0.1",
   "site": "https://vincent0926.github.io/FRC9427teaching-website/",
   "paths": [
     {
@@ -15,12 +15,12 @@
         3,
         4,
         5,
+        6,
         7,
         8,
         9,
         10,
         11,
-        6,
         12
       ]
     },
@@ -171,8 +171,8 @@
       "path": "core",
       "difficulty": 3,
       "prereqs": [
-        8,
-        11
+        3,
+        5
       ],
       "objectives": [
         "照 IO 架構寫出 Subsystem、IO 介面與硬體實作",
@@ -231,6 +231,7 @@
       "difficulty": 2,
       "prereqs": [
         4,
+        6,
         7
       ],
       "objectives": [
@@ -279,6 +280,7 @@
       "path": "core",
       "difficulty": 2,
       "prereqs": [
+        6,
         8
       ],
       "objectives": [
@@ -296,7 +298,8 @@
       "path": "core",
       "difficulty": 2,
       "prereqs": [
-        5
+        5,
+        6
       ],
       "objectives": [
         "在 CANivore 上建立 TalonFX 並寫一份完整設定",
