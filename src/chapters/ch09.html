@@ -1,16 +1,16 @@
   <p class="headline-code">CAN ID 09｜WPILib 基礎</p>
   <h1>Trigger 與按鍵綁定：對講機、門鈴和電燈開關</h1>
-  <p class="lede">讀完這章，你會分清楚 onTrue、whileTrue、toggleOnTrue 的差別，知道怎麼用感測器或條件建立 Trigger、怎麼組合條件，以及為什麼按鍵綁定只在 RobotContainer 裡宣告一次。</p>
+  <p class="lede">指令寫好了，接下來要決定「什麼時候跑」。這章講 onTrue、whileTrue、toggleOnTrue 三種綁定差在哪，怎麼用感測器或任意條件做 Trigger、怎麼把條件組起來，還有為什麼按鍵綁定只能在 RobotContainer 裡寫一次。</p>
 
-  <h2>生活比喻：學校裡的三種按鈕</h2>
+  <h2>先講個比喻：學校裡的三種按鈕</h2>
   <div class="story">
-    <p><strong>門鈴。</strong>警衛室的門鈴按一下，警衛就會出來開門。你按完就放手，警衛照樣把門開完；按住不放也不會讓他開得比較久。</p>
-    <p><strong>對講機。</strong>廣播用的對講機要按住才能說話，一放開聲音就斷了，不管話有沒有講完。</p>
-    <p><strong>電燈開關。</strong>教室的電燈按一下開、再按一下關。如果燈自己壞掉熄了，下次按就是重新開燈。</p>
-    <p><strong>不只人會按按鈕。</strong>下雨偵測器偵測到下雨時，會自動觸發「收回操場的器材」。這個按鈕是由天氣按的，不是人。</p>
-    <p><strong>條件可以組合。</strong>「下雨，而且正在上體育課」才需要改到室內；「火警或地震」任何一個發生都要疏散。</p>
-    <p><strong>防止連按。</strong>有些同學會一直狂按門鈴。警衛室的門鈴裝了防連按裝置：要連續按住一小段時間才算一次。</p>
-    <p><strong>規則開學時就訂好。</strong>哪個按鈕對應哪件事，是開學時訂好、貼在牆上的，不會每節課重新規定。</p>
+    <p>學校裡至少有三種按鈕。第一種是警衛室的門鈴：按一下警衛就出來開門，你按完放手，他照樣把門開完；按住不放也不會讓他開比較久。</p>
+    <p>第二種是廣播的對講機：要按住才能講話，一放開聲音就斷，不管你話講完了沒。</p>
+    <p>第三種是教室的電燈開關：按一下開、再按一下關。如果燈自己壞掉熄了，下次按就是重新開燈。</p>
+    <p>按鈕也不一定是人按的。下雨偵測器偵測到下雨，就會自動觸發「把操場的器材收回來」，這個按鈕是天氣在按。</p>
+    <p>條件還可以組合。「下雨<strong>而且</strong>正在上體育課」才需要改到室內；「火警<strong>或</strong>地震」只要一個發生就要疏散。</p>
+    <p>另外總是有人會狂按門鈴，所以警衛室的門鈴裝了防連按：要連續按住一小段時間才算一次。</p>
+    <p>最後，哪個按鈕對應哪件事，是開學就訂好貼在牆上的，不會每節課重新規定一次。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>WPILib</th></tr></thead>
@@ -24,10 +24,10 @@
       <tr><td>開學時訂好的規則</td><td>在 <code>RobotContainer</code> 建構子裡宣告一次</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>門鈴按一下只會叫警衛一次。但 <code>onTrue</code> 如果在指令還在執行時又被觸發，WPILib 會嘗試再排程同一個指令；因為它已經在執行中，這次排程不會有效果，指令不會重新開始。想要「再按一次就重新開始」，要自己先取消再排程，或換成別的綁定方式。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>門鈴按一下只會叫一次警衛。但 <code>onTrue</code> 在指令還在跑的時候又被觸發，WPILib 會試著再排程同一個指令；它已經在跑了，所以這次排程沒有任何效果，指令不會重來。想要「再按一次就重新開始」，得自己先取消再排程，或換別的綁定方式。</div>
 
   <h2>綁定只宣告一次</h2>
-  <p>WPILib 文件說明，除了自動階段開始時排程的自動指令，以及 Subsystem 空閒時自動排程的預設指令之外，最常見的執行指令方式是綁定到觸發事件，例如操作手按下按鈕。這種綁定是宣告式的：在機器人初始化時「宣告」一次就好，綁定是透過 <code>Trigger</code> 類別完成的<a class="ref" href="#src9-1">[1]</a>。所以綁定都寫在 <code>RobotContainer</code> 的建構子（或它呼叫的 <code>configureBindings()</code>），絕對不要寫在 periodic 裡。</p>
+  <p>除了自動階段開始時排的自動指令、Subsystem 空著時自動排的預設指令，最常見的跑指令方式就是綁到某個觸發事件上，例如操作手按下按鈕。這種綁定是宣告式的，機器人初始化時「宣告」一次就好，靠的是 <code>Trigger</code> 類別<a class="ref" href="#src9-1">[1]</a>。所以綁定全部寫在 <code>RobotContainer</code> 的建構子（或它呼叫的 <code>configureBindings()</code>），絕對不要寫進 periodic。</p>
 
   <h2>取得 Trigger</h2>
   <pre><code>private final CommandXboxController driver = new CommandXboxController(0);   // Driver Station 的 0 號控制器
@@ -42,7 +42,7 @@ operator.rightTrigger(0.5);
 
 // 任意條件：只要能回答 true 或 false
 Trigger armAtGoal = new Trigger(arm::atGoal);</code></pre>
-  <p>任意條件的 Trigger 收一個 <code>BooleanSupplier</code>，也就是第 4 章「看一下有沒有下雨」的字條。WPILib 文件說明，雖然綁定到控制器按鍵最常見，但也可以綁定到任何觸發事件<a class="ref" href="#src9-1">[1]</a>。</p>
+  <p>任意條件的 Trigger 收一個 <code>BooleanSupplier</code>，就是第 4 章那張「看一下有沒有下雨」的字條。綁控制器按鍵最常見，但其實任何觸發事件都可以綁<a class="ref" href="#src9-1">[1]</a>。</p>
 
   <h2>三種主要綁定</h2>
   <table class="map">
@@ -53,7 +53,7 @@ Trigger armAtGoal = new Trigger(arm::atGoal);</code></pre>
       <tr><td><code>toggleOnTrue</code></td><td>指令沒在執行就排程，正在執行就取消</td><td>什麼都不做</td><td>開與關，例如切換某個模式</td></tr>
     </tbody>
   </table>
-  <p>三種都有對應 false 的版本：<code>onFalse</code>、<code>whileFalse</code>、<code>toggleOnFalse</code>。WPILib 文件也說明，綁定方法都會回傳呼叫它的那個 Trigger，所以可以串接，在同一個按鍵的不同狀態綁上不同指令<a class="ref" href="#src9-1">[1]</a>。</p>
+  <p>三種都有 false 的版本：<code>onFalse</code>、<code>whileFalse</code>、<code>toggleOnFalse</code>。而且綁定方法會回傳原本那個 Trigger，所以可以一路串下去，同一顆鍵的按下和放開綁不同指令<a class="ref" href="#src9-1">[1]</a>。</p>
   <pre><code>private void configureBindings() {
     // 門鈴：按一下，手臂移到得分位置，自己到定位就結束
     operator.y().onTrue(arm.goTo(ArmState.SCORE));
@@ -68,7 +68,7 @@ Trigger armAtGoal = new Trigger(arm::atGoal);</code></pre>
 }</code></pre>
 
   <h2>動手試：三種按鈕</h2>
-  <p>同一個「吸入」指令分別綁在三種綁定上。按下、放開，觀察三者的狀態差異。</p>
+  <p>同一個「吸入」指令分別綁在三種綁定上。按下、放開，看三個的狀態有什麼不一樣。多按幾次 toggle 那顆試試看。</p>
   <div class="lab">
     <div class="calls">
       <button class="call" id="btnPress">按下按鍵</button>
@@ -89,22 +89,22 @@ driver.back().or(operator.back()).onTrue(arm.goTo(ArmState.STOW));
 
 // 防連按：必須穩定為 true 0.1 秒才算
 new Trigger(limitSwitch::get).debounce(0.1).onTrue(arm.goTo(ArmState.STOW));</code></pre>
-  <p>WPILib 文件說明，Trigger 可以用 <code>debounce</code> 搭配 <code>Debouncer</code> 類別防止快速重複觸發，特別是來自數位輸入的 Trigger<a class="ref" href="#src9-1">[1]</a>。上面的 <code>limitSwitch</code> 是一個假設的 <code>DigitalInput</code>；依第 6 章的原則，正式程式應該讓 Subsystem 從輸入物件提供這個狀態。</p>
+  <p>Trigger 可以用 <code>debounce</code>（背後是 <code>Debouncer</code> 類別）防止快速重複觸發，數位輸入來的 Trigger 特別需要<a class="ref" href="#src9-1">[1]</a>。上面的 <code>limitSwitch</code> 是假設的 <code>DigitalInput</code>；照第 6 章的原則，正式的程式應該由 Subsystem 從輸入物件提供這個狀態，不要在 RobotContainer 直接讀硬體。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>會一直執行的指令用了 onTrue</strong>把 <code>intake.runState(...)</code> 這種不會自己結束的指令綁在 <code>onTrue</code>，放開後滾輪還是一直轉，直到有別的指令打斷它。按住才做的動作要用 <code>whileTrue</code>。</div>
-  <div class="note warn"><strong>把綁定寫在 periodic 裡</strong>每 20 毫秒新增一次綁定，按一下就會排程成百上千次，而且綁定永遠不會被移除。綁定只在 <code>RobotContainer</code> 建構時做一次。</div>
-  <div class="note warn"><strong>兩顆鍵搶同一個 Subsystem</strong>A 鍵和 B 鍵的指令都 require 手臂，同時按下時，後排程的會打斷前一個（第 8 章）。操作手必須知道這個規則，按鍵配置時就要避免誤觸。</div>
-  <div class="note coach"><strong>教練提醒</strong>按鍵配置要和駕駛、操作手一起決定，並做成一張圖貼在 Driver Station 筆電旁。比賽中沒有時間思考「這顆鍵是按一下還是按住」，配置越一致越好：同類動作用同一種綁定。</div>
+  <div class="note warn"><strong>不會自己結束的指令綁了 onTrue</strong>把 <code>intake.runState(...)</code> 這種不會自己停的指令綁在 <code>onTrue</code>，放開按鍵之後滾輪還是一直轉，轉到有別的指令來打斷為止。按住才做的動作請用 <code>whileTrue</code>。</div>
+  <div class="note warn"><strong>綁定寫在 periodic 裡</strong>每 20 毫秒就多綁一次，按一下就排程成百上千次，而且這些綁定永遠不會被移掉。綁定只在 <code>RobotContainer</code> 建構時做一次。</div>
+  <div class="note warn"><strong>兩顆鍵搶同一個 Subsystem</strong>A 鍵和 B 鍵的指令都 require 手臂，同時按的話，後排上的會打斷先排的（第 8 章）。操作手要知道這件事，排按鍵配置的時候就要避免誤觸。</div>
+  <div class="note coach"><strong>教練提醒</strong>按鍵配置要跟駕駛、操作手一起討論，做成一張圖貼在 Driver Station 筆電旁邊。比賽的時候沒時間想「這顆是按一下還是要按住」，所以配置越一致越好：同一類動作就用同一種綁定。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：設計一組配置</h2>
-  <p>操作手（1 號控制器）的需求：按住右扳機吸入、放開停止；按一下 Y 手臂到 SCORE；按一下 A 手臂到 INTAKE；按住左肩鍵吐出，放開後手臂自動回 STOW。寫出 <code>configureBindings()</code>。</p>
+  <p>操作手（1 號控制器）想要：按住右扳機吸入、放開就停；按一下 Y 手臂到 SCORE；按一下 A 手臂到 INTAKE；按住左肩鍵吐出，放開後手臂自己回 STOW。把 <code>configureBindings()</code> 寫出來。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>先把每個需求分類：「按住才做」「按一下就做」「放開時做」各對應哪一種綁定。</p>
+      <p>先把每個需求分類：「按住才做」「按一下就做」「放開時做」，各自對到哪種綁定？</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>按住：whileTrue；按一下：onTrue；放開時：onFalse。扳機用 rightTrigger(0.5) 取得 Trigger。</p>
@@ -121,7 +121,7 @@ new Trigger(limitSwitch::get).debounce(0.1).onTrue(arm.goTo(ArmState.STOW));</co
         .whileTrue(intake.runState(IntakeState.SCORING))
         .onFalse(arm.goTo(ArmState.STOW));
 }</code></pre>
-    <p>注意每個 <code>arm.goTo(...)</code>、<code>intake.runState(...)</code> 都是呼叫一次 factory、得到一個新的指令物件。第 10 章會說明為什麼這很重要。</p>
+    <p>注意每個 <code>arm.goTo(...)</code>、<code>intake.runState(...)</code> 都是呼叫一次 factory、拿到一個全新的指令物件。為什麼這很重要？第 10 章會講。</p>
     </div>
   </div>
 

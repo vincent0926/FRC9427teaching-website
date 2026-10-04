@@ -1,17 +1,17 @@
   <p class="headline-code">CAN ID 11｜硬體</p>
   <h1>Phoenix 6 與 TalonFX：班長的工作手冊</h1>
-  <p class="lede">讀完這章，你會知道怎麼在 CANivore「9427」上建立 TalonFX、怎麼寫一份完整的設定、各種控制請求的差別、沒有 Pro 授權時 FOC 會怎樣，以及 Phoenix Tuner X 能幫你做什麼。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 Phoenix 6 的 2026 版（26.x）文件。CTRE 網站上標示 latest 的文件已經是 2027 年版本，查資料時請看 stable 版。</div>
+  <p class="lede">隊上的馬達幾乎都是 TalonFX，所以這章很實用。我們會講怎麼在 CANivore「9427」上建立 TalonFX、怎麼寫一份完整的設定、各種控制請求差在哪、沒有 Pro 授權的時候 FOC 會怎樣，最後介紹 Phoenix Tuner X 這個好用的工具。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 Phoenix 6 的 2026 版（26.x）文件寫的。CTRE 網站上標 latest 的已經是 2027 年版了，查資料記得切到 stable。</div>
 
-  <h2>生活比喻：班長的工作手冊</h2>
+  <h2>先講個比喻：班長的工作手冊</h2>
   <div class="story">
-    <p><strong>班長很能幹。</strong>第 6 章說過，班長（TalonFX）自己會控制怎麼帶隊。導師只要說「去禮堂」，走多快、怎麼轉彎，班長自己處理，而且反應比導師快得多。</p>
-    <p><strong>上任時發一整本工作手冊。</strong>班長上任時，導師發給他一整本工作手冊：往哪個方向算前進、休息時要站好還是可以放鬆、最多能讓同學跑多累、帶隊的速度規定。手冊裡沒寫到的項目，一律照學校的預設規定。所以不需要先把舊手冊撕掉再發新的，發一本完整的新手冊，就等於所有舊規定都被換掉了。</p>
-    <p><strong>交代事情用固定格式的單子。</strong>平常導師交代班長，是用學校統一格式的交辦單：「用這個力道帶隊」、「帶到這個位置」、「用這個速度走」。同一種單子印一張就好，每次改上面的數字再交出去，不用每次重印。</p>
-    <p><strong>力道的說法有好幾種。</strong>「用全力的六成」，這個說法會受當天體力影響，同學累的時候六成就沒那麼快。「用固定的力氣」，不管累不累都一樣，比較穩定。還有一種最精準的「直接控制出多少力」，但只有拿到進階證照的班長才能用。</p>
-    <p><strong>沒有進階證照也不會出錯。</strong>交辦單上如果勾了「用進階技巧」，但班長沒有進階證照，他會自動改用一般的方法完成，不會因此拒絕做事。</p>
-    <p><strong>兩條廣播線。</strong>學校舊大樓有一條共用的廣播線，新大樓另外拉了一條速度更快的專線，這條專線有自己的名字，叫「9427」。導師找班長時，要說清楚班長在哪一條線上。同一條線上，每個班長的代號不能重複，不然廣播叫號時兩個人會同時回應。</p>
-    <p><strong>學務處有一套幹部管理系統。</strong>學務處可以用這套系統幫班長設定代號和名字、讓某個班長舉手讓你找到他在哪裡、更新他的訓練、做健康檢查、畫出他最近的表現紀錄，也可以直接下指令測試。</p>
+    <p>第 6 章說過，班長（TalonFX）自己會處理怎麼帶隊。導師只要講「去禮堂」，走多快、怎麼轉彎都是班長的事，而且他反應比導師快很多。</p>
+    <p>班長上任的時候，導師會發一整本工作手冊給他：哪個方向算前進、休息時要站好還是可以放鬆、最多能讓同學跑多累、帶隊速度的規定。手冊沒寫到的，就照學校的預設。所以不用先把舊手冊撕掉再發新的，直接發一本完整的新手冊，舊規定就全部被換掉了。</p>
+    <p>平常導師交代事情，是用學校統一格式的交辦單：「用這個力道帶隊」、「帶到這個位置」、「用這個速度走」。同一種單子印一張就夠了，每次改上面的數字再交出去，不用每次重印。</p>
+    <p>講力道有好幾種說法。「用全力的六成」會受當天體力影響，同學累的時候六成就沒那麼快。「用固定的力氣」就不管累不累都一樣，比較穩。還有一種最精準的「直接控制出多少力」，不過只有拿到進階證照的班長能用。</p>
+    <p>交辦單上如果勾了「用進階技巧」，可是班長沒有進階證照，他會自己改用一般的方法做完，不會因此罷工。</p>
+    <p>學校的舊大樓有一條共用的廣播線，新大樓另外拉了一條更快的專線，名字叫「9427」。導師找班長的時候要講清楚他在哪一條線上。同一條線上每個班長的代號不能重複，不然一叫號兩個人會同時回應。</p>
+    <p>另外學務處有一套幹部管理系統，可以幫班長設定代號和名字、叫某個班長舉手讓你找到他、更新他的訓練、做健康檢查、畫出他最近的表現，也可以直接下指令測試。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>Phoenix 6</th></tr></thead>
@@ -32,10 +32,10 @@
       <tr><td>學務處的幹部管理系統</td><td>Phoenix Tuner X</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>班長累了會變慢，但 TalonFX 的 <code>DutyCycleOut</code> 受影響的是電池電壓：電池電壓掉下來時，同樣的百分比輸出的電壓就變低。另外，工作手冊一旦發下去就存在班長身上，重新開機也還在；但如果你在程式裡每次開機都套用一次完整設定，程式裡的版本就會覆蓋 Tuner X 裡手動改過的設定。以程式裡的設定為準，是比較不容易出錯的做法。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>班長累了會變慢，但 TalonFX 的 <code>DutyCycleOut</code> 受影響的是電池電壓：電池電壓一掉，同樣的百分比輸出的電壓就變低。另外，工作手冊發下去就存在班長身上，重開機也還在；可是如果程式每次開機都套用一次完整設定，程式裡的版本就會蓋掉你在 Tuner X 裡手動改的設定。我們的做法是一律以程式裡的設定為準，比較不會出錯。</div>
 
   <h2>建立 TalonFX：指定 CAN bus</h2>
-  <p>Phoenix 6 的 2026 年更新說明寫明，用字串指定 CAN bus 的建構子已被標為 deprecated，預計 2027 年移除，應改用傳入 <code>CANBus</code> 物件的建構子<a class="ref" href="#src11-4">[4]</a>。只給 CAN ID、不給 bus 的建構子，會使用系統預設的 CAN bus，在 roboRIO 上就是內建的 CAN<a class="ref" href="#src11-5">[5]</a>。</p>
+  <p>Phoenix 6 在 2026 年把「用字串指定 CAN bus」的建構子標成 deprecated，預計 2027 年拿掉，要改用傳 <code>CANBus</code> 物件的版本<a class="ref" href="#src11-4">[4]</a>。如果只給 CAN ID、不給 bus，就會用系統預設的 CAN bus，在 roboRIO 上就是內建那條<a class="ref" href="#src11-5">[5]</a>。</p>
   <pre><code>import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -50,10 +50,10 @@ public final class CANBuses {
 TalonFX armLeader = new TalonFX(21, CANBuses.CANIVORE);  // TODO: 依接線
 // 在 roboRIO 內建 CAN 上
 TalonFX other = new TalonFX(5);                          // TODO: 依接線</code></pre>
-  <p>把 <code>CANBus</code> 集中宣告在一個地方，名字打錯的機會就只有一次。第 5 章的 Constants 也可以用同樣的方式。</p>
+  <p>把 <code>CANBus</code> 集中宣告在一個地方，名字就只有一次打錯的機會。跟第 5 章的 Constants 是同一個道理。</p>
 
   <h2>寫一份完整的設定</h2>
-  <p>CTRE 文件說明，新建立的設定物件本身就包含裝置的所有預設值，所以在套用修改過的完整設定之前，<strong>不需要</strong>先恢復出廠設定；想要恢復出廠設定，只要套用一個全新的設定物件<a class="ref" href="#src11-1">[1]</a>。遷移指南也寫明，完整設定物件中沒有修改的項目會被自動恢復為預設值<a class="ref" href="#src11-2">[2]</a>。</p>
+  <p>新 new 出來的設定物件本身就帶著裝置的所有預設值，所以套用完整設定之前<strong>不用</strong>先恢復出廠設定；真的想恢復出廠，套用一個全新的設定物件就好<a class="ref" href="#src11-1">[1]</a>。完整設定物件裡你沒改到的項目，都會被自動設回預設值<a class="ref" href="#src11-2">[2]</a>。</p>
   <pre><code>TalonFXConfiguration config = new TalonFXConfiguration();
 
 // 方向與休息狀態
@@ -71,11 +71,11 @@ config.Feedback.SensorToMechanismRatio = 1.0;         // TODO
 
 // 只在建構時套用一次
 armLeader.getConfigurator().apply(config);</code></pre>
-  <p>CTRE 文件提醒，<code>apply()</code> 是會等待裝置回應的阻塞呼叫<a class="ref" href="#src11-1">[1]</a>，所以絕對不要放進 periodic。也可以只套用其中一組，例如 <code>armLeader.getConfigurator().apply(config.MotorOutput)</code>，這時只有那一組會被改動<a class="ref" href="#src11-1">[1]</a>，第 6 章的 <code>setBrakeMode</code> 就是這樣做的。</p>
-  <div class="note warn"><strong>完整設定會覆蓋所有東西</strong>如果程式裡有兩個地方各套用一次「完整」的 <code>TalonFXConfiguration</code>，後套用的那一份會把前一份的所有設定蓋回預設值，而不是只加上自己改的部分。同一顆馬達的完整設定只寫在一個地方。</div>
+  <p><code>apply()</code> 會卡住等裝置回應<a class="ref" href="#src11-1">[1]</a>，所以絕對不要放進 periodic。你也可以只套用其中一組，像 <code>armLeader.getConfigurator().apply(config.MotorOutput)</code>，這樣就只會改到那一組<a class="ref" href="#src11-1">[1]</a>，第 6 章的 <code>setBrakeMode</code> 就是這樣寫的。</p>
+  <div class="note warn"><strong>完整設定會蓋掉所有東西</strong>程式裡如果有兩個地方各套用一次「完整」的 <code>TalonFXConfiguration</code>，後套用的會把前一份的設定通通蓋回預設值，不是只加上自己改的部分。同一顆馬達的完整設定，只寫在一個地方。</div>
 
   <h2>控制請求：交辦單</h2>
-  <p>控制請求物件建立一次，之後用 <code>with...</code> 方法修改數值再送出，這是 CTRE 官方範例的寫法<a class="ref" href="#src11-9">[9]</a>。常用的請求：</p>
+  <p>控制請求物件 new 一次，之後用 <code>with...</code> 改數字再送出，CTRE 的範例都是這樣寫<a class="ref" href="#src11-9">[9]</a>。常用的有這些：</p>
   <table class="map">
     <thead><tr><th>請求</th><th>做什麼</th><th>本課程用在</th></tr></thead>
     <tbody>
@@ -89,19 +89,19 @@ armLeader.getConfigurator().apply(config);</code></pre>
       <tr><td><code>TorqueCurrentFOC</code> 等</td><td>直接控制轉矩電流</td><td>需要 Pro 授權</td></tr>
     </tbody>
   </table>
-  <p>CTRE 文件說明，電壓類控制請求的輸出通常不受供電電壓影響（輸出電壓上限仍受供電電壓限制），所以比 DutyCycle 類請求更穩定、結果更容易重現；TorqueCurrentFOC 則需要 Pro 授權<a class="ref" href="#src11-3">[3]</a>。所以本課程一律用 Voltage 類的請求。</p>
+  <p>電壓類的控制請求，輸出通常不會受供電電壓影響（但輸出電壓的上限還是被供電電壓限制住），所以比 DutyCycle 類穩定、結果比較好重現；TorqueCurrentFOC 則要 Pro 授權<a class="ref" href="#src11-3">[3]</a>。所以這個課程一律用 Voltage 類。</p>
 
   <h2>EnableFOC 與 Pro 授權</h2>
-  <p>FOC（Field Oriented Control）是一種換相方式，CTRE 說明它能讓峰值功率提高約 15%，而支援 FOC 的控制請求都有一個 <code>EnableFOC</code> 欄位<a class="ref" href="#src11-3">[3]</a>。這個欄位在 API 裡的預設值是 true，使用 FOC 需要 Phoenix Pro 授權<a class="ref" href="#src11-6">[6]</a>。</p>
-  <p>第 6 章留下的問題在這裡有了答案：CTRE 文件寫明，控制<strong>未授權</strong>的裝置時，支援 <code>EnableFOC</code> 的控制請求會自動退回一般（非 FOC）換相<a class="ref" href="#src11-3">[3]</a>。所以沒有 Pro 授權時，不改 <code>EnableFOC</code> 也能正常運作，只是沒有 FOC 的效能提升。只有 <code>TorqueCurrentFOC</code> 這類本身就依賴 FOC 的請求，才真的需要 Pro。</p>
-  <div class="note"><strong>模擬時要對應</strong>第 6 章 D 部分提過：CTRE 的模擬範例用 <code>DCMotor.getKrakenX60Foc</code>。沒有 Pro 授權的隊伍，實機跑的是一般換相，模擬時就應該用 <code>DCMotor.getKrakenX60</code>，兩邊才一致。</div>
+  <p>FOC（Field Oriented Control）是一種換相方式，CTRE 說它可以讓峰值功率多大約 15%。支援 FOC 的控制請求都有一個 <code>EnableFOC</code> 欄位<a class="ref" href="#src11-3">[3]</a>，API 裡預設是 true，但要用 FOC 得有 Phoenix Pro 授權<a class="ref" href="#src11-6">[6]</a>。</p>
+  <p>那沒有 Pro 怎麼辦？第 6 章留下的問題在這裡解答：控制<strong>沒授權</strong>的裝置時，支援 <code>EnableFOC</code> 的請求會自動退回一般（非 FOC）換相<a class="ref" href="#src11-3">[3]</a>。所以不改 <code>EnableFOC</code> 也能正常跑，只是沒有 FOC 的效能加成。只有 <code>TorqueCurrentFOC</code> 這種本身就靠 FOC 的請求，才真的非 Pro 不可。</p>
+  <div class="note"><strong>模擬時要對應</strong>第 6 章 D 部分提過，CTRE 的模擬範例用的是 <code>DCMotor.getKrakenX60Foc</code>。沒有 Pro 的話，實機跑的是一般換相，模擬就該用 <code>DCMotor.getKrakenX60</code>，兩邊才對得上。</div>
 
   <h2>讀取感測資料</h2>
-  <p>TalonFX 的讀值是用 <code>StatusSignal</code> 取得的。第 6 章 C 部分已經示範完整寫法：把訊號存成欄位，每個週期用 <code>BaseStatusSignal.refreshAll(...)</code> 一次刷新，再用 <code>getValueAsDouble()</code> 取值<a class="ref" href="#src11-8">[8]</a>。要記得兩件事：Phoenix 6 的位置單位是轉數（rotations）、速度是每秒轉數；設定了 <code>SensorToMechanismRatio</code> 之後，讀到的就是機構端的數值。</p>
+  <p>TalonFX 的讀值是用 <code>StatusSignal</code> 拿的。完整寫法第 6 章 C 部分示範過了：訊號存成欄位，每個週期用 <code>BaseStatusSignal.refreshAll(...)</code> 一次刷新，再用 <code>getValueAsDouble()</code> 取值<a class="ref" href="#src11-8">[8]</a>。兩件事要記得：Phoenix 6 的位置單位是轉數（rotations）、速度是每秒轉數；設了 <code>SensorToMechanismRatio</code> 之後，讀到的就是機構端的數值。</p>
 
   <h2>Phoenix Tuner X</h2>
-  <p>CTRE 的說明文章列出 Tuner X 能做的事：設定裝置的名稱與 ID、讓裝置閃燈以便在機器人上找到它、把所有裝置的韌體更新到最新版、在 Windows 或 Android 上直接控制單顆馬達、畫出速度與位置等訊號，以及對裝置做 Self Test<a class="ref" href="#src11-7">[7]</a>。</p>
-  <p>新機器人第一次通電時，建議的順序是：</p>
+  <p>Tuner X 可以做的事很多：設定裝置的名稱和 ID、讓裝置閃燈好在機器人上找到它、把所有裝置的韌體更新到最新、在 Windows 或 Android 上直接控制單顆馬達、畫出速度和位置這些訊號，還有對裝置做 Self Test<a class="ref" href="#src11-7">[7]</a>。</p>
+  <p>新機器人第一次通電，我建議照這個順序：</p>
   <ol>
     <li>用 Tuner X 找到所有裝置，逐一閃燈，確認每一顆在機器人上的位置。</li>
     <li>設定 CAN ID，同一條 bus 上不可重複；隊上可以約定編號規則，例如手臂用 20 幾號。</li>
@@ -110,22 +110,22 @@ armLeader.getConfigurator().apply(config);</code></pre>
     <li>用低電壓手動轉動每顆馬達，確認方向，再把結果寫進程式的 <code>Inverted</code> 設定。</li>
     <li>把 CAN ID 對照表寫進 <code>Constants</code>，並貼在機器人上。</li>
   </ol>
-  <div class="note coach"><strong>教練提醒：在 Tuner X 手動轉馬達前</strong>先確認機構周圍沒有人、機構不會撞到極限位置，並從很低的輸出開始。手臂這類有重力的機構，放開控制時可能會掉下來。</div>
+  <div class="note coach"><strong>教練提醒：用 Tuner X 手動轉馬達之前</strong>先確定機構旁邊沒人、機構不會撞到極限位置，而且從很低的輸出開始。手臂這種有重力的機構，一放開控制就可能掉下來。</div>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>CAN bus 名稱打錯</strong><code>new CANBus("9247")</code> 這種錯字不會編譯失敗，但程式找不到裝置，讀值全部失敗、馬達不動。把名稱集中在一個常數裡，並和 Tuner X 顯示的名稱對照。</div>
-  <div class="note warn"><strong>CAN ID 重複</strong>同一條 bus 上兩顆裝置 ID 相同，會互相干擾，Tuner X 會標示重複的裝置。模擬時更嚴格：第 6 章 D 部分提過，模擬時所有 bus 會合併，ID 必須全機唯一。</div>
-  <div class="note warn"><strong>在 periodic 裡套用設定</strong><code>apply()</code> 會等待裝置回應，放在 periodic 裡會拖慢每一輪，還可能造成 loop overrun（第 7 章）。</div>
-  <div class="note warn"><strong>用 DutyCycleOut 做需要重現的控制</strong>電池從滿電到快沒電時，同樣的百分比會得到不同的速度，調好的參數會跟著失準。用 Voltage 類請求。</div>
+  <div class="note warn"><strong>CAN bus 名稱打錯</strong><code>new CANBus("9247")</code> 這種錯字不會編譯失敗，但程式找不到裝置，讀值全部失敗、馬達完全不動。名稱集中在一個常數，再跟 Tuner X 上顯示的名稱對一下。</div>
+  <div class="note warn"><strong>CAN ID 重複</strong>同一條 bus 上兩顆裝置 ID 一樣，會互相干擾，Tuner X 會標出重複的裝置。模擬時更嚴格：第 6 章 D 部分講過，模擬時所有 bus 會合成一條，ID 必須全機唯一。</div>
+  <div class="note warn"><strong>在 periodic 裡套用設定</strong><code>apply()</code> 會等裝置回應，放在 periodic 裡會拖慢每一輪，還可能 loop overrun（第 7 章）。</div>
+  <div class="note warn"><strong>需要重現的控制用了 DutyCycleOut</strong>電池從滿電用到快沒電，同樣的百分比會跑出不同的速度，調好的參數也跟著跑掉。用 Voltage 類的請求。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：幫 Intake 滾輪寫硬體層</h2>
-  <p>替第 6 章練習的 <code>RollerIO</code> 寫 <code>RollerIOHardware</code>：滾輪馬達在 CANivore「9427」上、CAN ID 待定；設定為 Coast、開啟供電電流限制（數值待定）；<code>setVoltage</code> 使用重複使用的 <code>VoltageOut</code>；<code>updateInputs</code> 讀取速度、輸出電壓、供電電流。</p>
+  <p>幫第 6 章練習的 <code>RollerIO</code> 寫一個 <code>RollerIOHardware</code>：滾輪馬達在 CANivore「9427」上，CAN ID 先待定；設定成 Coast、開供電電流限制（數值待定）；<code>setVoltage</code> 用重複使用的 <code>VoltageOut</code>；<code>updateInputs</code> 讀速度、輸出電壓、供電電流。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>照第 6 章 ArmIOHardware 的結構：欄位裡建立 TalonFX、控制請求和要讀的訊號，建構子套用設定。</p>
+      <p>照第 6 章 ArmIOHardware 的結構寫：欄位裡建 TalonFX、控制請求和要讀的訊號，建構子裡套設定。</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>CANivore 用 new TalonFX(id, CANBuses.CANIVORE)；請求用 new VoltageOut(0.0) 建一次；訊號用 getVelocity()、getMotorVoltage()、getSupplyCurrent()。</p>
@@ -164,7 +164,7 @@ armLeader.getConfigurator().apply(config);</code></pre>
         motor.setControl(request.withOutput(volts));
     }
 }</code></pre>
-    <p>滾輪用 Coast：停止時讓滾輪自然停下，不會卡住遊戲物件。手臂則用 Brake（第 6 章），因為手臂要撐住重力。這是隊上依機構決定的，不是固定規則。</p>
+    <p>滾輪用 Coast：停的時候讓它自己慢慢停，不會卡住遊戲物件。手臂則用 Brake（第 6 章），因為要撐住重力。這是我們看機構決定的，不是什麼固定規則。</p>
     </div>
   </div>
 

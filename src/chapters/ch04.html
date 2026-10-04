@@ -1,17 +1,17 @@
   <p class="headline-code">CAN ID 04｜Java 與物件導向</p>
   <h1>Lambda 與方法參考：給代課老師的字條</h1>
-  <p class="lede">讀完這章，你會看懂 <code>() -&gt;</code> 和 <code>::</code>，分得清「交出一個做法」和「當場執行一個方法」，並避開搖桿數值只讀一次的經典 bug。</p>
+  <p class="lede">Command-based 的程式裡到處都是 <code>() -&gt;</code> 和 <code>::</code>，第一次看會覺得很像亂碼。這章把它們拆開講，重點是分清楚「把做法交出去」跟「當場執行」的差別。搞懂這個，你就不會踩到那個每屆都有人踩的搖桿 bug。</p>
 
-  <h2>生活比喻：導師出差前留的字條</h2>
+  <h2>先講個比喻：導師出差前留的字條</h2>
   <div class="story">
-    <p><strong>字條本身不是動作。</strong>導師明天要出差，放學前在講桌上留了一疊字條給代課老師。導師寫字條的時候，什麼事都沒發生，沒有人被叫去做任何事。字條裡裝的是「做法」，要等代課老師在適當的時機拿起來照做。</p>
-    <p><strong>字條有四種。</strong>第一種是單純交代一件事：「第一節下課時，請值日生擦黑板。」代課老師照做，不需要回報什麼。第二種是請他查一個數字：「看一下教室溫度是幾度。」查完會得到一個數字。第三種是請他判斷是或否：「看一下外面有沒有下雨。」答案只有有或沒有。第四種是對某個人做一件事：「把這份考卷發給＿＿＿。」代課老師要在空格填上一個人，然後照做。</p>
-    <p><strong>有些字條只寫「照某某的做法」。</strong>點名的流程班長每天都在做，導師不必重寫一遍，字條上只寫：「點名，照班長平常的做法。」</p>
-    <p><strong>「看溫度」和「寫溫度」差很多。</strong>有一張字條寫：「現在 18 度，冷的話幫大家關窗。」另一張寫：「看一下現在幾度，冷的話幫大家關窗。」導師寫字條時是早上 7 點、18 度，代課老師下午 2 點拿起字條時已經 30 度了。照第一張做，他會在大熱天把窗戶關上；照第二張做，他會自己去看溫度，判斷才會對。</p>
-    <p><strong>字條上的名字寫了就不能改。</strong>導師寫「把考卷交給班長小明」，之後就算班長換人，代課老師也不知道該交給誰。所以學校規定：字條上引用的名字，寫上去之後導師就不能再改動那個名字代表的人，不然字條的意思會變得不清楚。</p>
+    <p>導師明天要出差，放學前在講桌上留了一疊字條給代課老師。重點是：導師在寫字條的當下，什麼事都沒發生，沒有人被叫去做事。字條裡裝的是「做法」，要等代課老師在對的時間拿起來照做。</p>
+    <p>字條大概有四種。第一種單純交代一件事：「第一節下課請值日生擦黑板。」照做就好，不用回報。第二種是查一個數字：「看一下教室幾度。」查完會拿到一個數字。第三種是判斷是或否：「看一下外面有沒有下雨。」答案只有有或沒有。第四種是對某個人做事：「把這份考卷發給＿＿＿。」代課老師要在空格填一個人再照做。</p>
+    <p>有些事班長每天都在做，像點名，導師就不用再寫一次流程，字條上只寫「點名，照班長平常的做法」。</p>
+    <p>接下來是最重要的一個例子。有一張字條寫：「現在 18 度，冷的話幫大家關窗。」另一張寫：「看一下現在幾度，冷的話幫大家關窗。」導師寫字條是早上 7 點、18 度，代課老師下午 2 點拿起來的時候已經 30 度了。照第一張做，他會在大熱天把窗戶關起來；照第二張，他會自己去看溫度，這樣判斷才對。</p>
+    <p>最後一個規矩：導師寫了「把考卷交給班長小明」，之後如果班長換人，代課老師就不知道該交給誰了。所以學校規定，字條上寫到的名字，寫上去之後就不能再改它代表誰，不然字條的意思會亂掉。</p>
   </div>
 
-  <p>Command-based 程式到處都是這種字條。你告訴 WPILib「按下 A 鍵時做這件事」，WPILib 會在按鍵被按下的那一刻才去執行。WPILib 文件把這個觀念稱為「把函式當成資料」<a class="ref" href="#src4-1">[1]</a>。</p>
+  <p>Command-based 程式裡到處都是這種字條。你跟 WPILib 說「按 A 鍵的時候做這件事」，它會等到真的有人按 A 那一刻才去做。WPILib 文件管這個叫「把函式當成資料」<a class="ref" href="#src4-1">[1]</a>。</p>
 
   <table class="map">
     <thead><tr><th>比喻</th><th>Java</th><th>收什麼 → 回傳什麼</th><th>在 WPILib 裡</th></tr></thead>
@@ -26,12 +26,12 @@
       <tr><td>字條上的名字不能改</td><td>effectively final</td><td colspan="2">Lambda 只能用不再被改動的區域變數</td></tr>
     </tbody>
   </table>
-  <p>這些「字條格式」在 Java 裡叫<strong>函式介面</strong>（functional interface）：只有一個抽象方法的介面<a class="ref" href="#src4-2">[2]</a>。它們大多在 <code>java.util.function</code> 套件裡，<code>Runnable</code> 則在 <code>java.lang</code><a class="ref" href="#src4-3">[3]</a>。</p>
+  <p>這幾種「字條格式」在 Java 裡叫<strong>函式介面</strong>（functional interface），意思是只有一個抽象方法的介面<a class="ref" href="#src4-2">[2]</a>。大部分放在 <code>java.util.function</code> 套件，<code>Runnable</code> 比較特別，在 <code>java.lang</code><a class="ref" href="#src4-3">[3]</a>。</p>
 
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>字條是一張紙，但 Java 的 lambda 在執行時其實是一個物件，這個物件實作了對應的函式介面（例如 <code>Runnable</code>）。這也是為什麼它能被存進變數、當成參數傳來傳去，和第 1 章學的物件沒有兩樣。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>字條只是一張紙，但 Java 的 lambda 執行時其實是一個物件，實作了對應的函式介面（例如 <code>Runnable</code>）。所以它才能被存進變數、當參數傳來傳去，跟第 1 章學的物件沒什麼兩樣。</div>
 
   <h2>Lambda 的寫法</h2>
-  <p>Lambda 的格式是「參數 → 要做的事」<a class="ref" href="#src4-4">[4]</a>。空括號 <code>()</code> 表示不收參數；只有一個參數時可以省略括號；要做的事超過一行，就用大括號包起來。</p>
+  <p>Lambda 就是「參數 → 要做的事」<a class="ref" href="#src4-4">[4]</a>。空括號 <code>()</code> 代表不收參數；只有一個參數的話括號可以省略；要做的事超過一行，就用大括號包起來。</p>
   <pre><code>// IntakeSubsystem 裡：回傳一個指令，執行時給一次電壓就結束
 public Command ejectOnce() {
     return runOnce(() -&gt; setRollerVoltage(-6.0));
@@ -41,7 +41,7 @@ public Command ejectOnce() {
 public Command runRoller(double volts) {
     return runEnd(() -&gt; setRollerVoltage(volts), () -&gt; setRollerVoltage(0.0));
 }</code></pre>
-  <p><code>runOnce</code> 收一個 <code>Runnable</code>；<code>runEnd</code> 收兩個，一個是執行中每次要做的事，一個是結束時要做的事。字條都交給 WPILib，由它決定什麼時候執行<a class="ref" href="#src4-1">[1]</a>。這些指令 API 的細節在第 8、9 章。</p>
+  <p><code>runOnce</code> 收一個 <code>Runnable</code>。<code>runEnd</code> 收兩個，一個是執行中每次要做的事，一個是結束時要做的事。字條交給 WPILib 之後，什麼時候執行就是它的事了<a class="ref" href="#src4-1">[1]</a>。這些指令 API 第 8、9 章會細講，現在看得懂字條在哪就好。</p>
 
   <h2>方法參考：「照某某的做法」</h2>
   <pre><code>// 結束時要做的事，已經有 stopRoller() 寫好了，直接指過去
@@ -51,20 +51,20 @@ public Command runRollerUntilReleased(double volts) {
 
 // 把「讀左搖桿 Y 軸」這個方法交出去，而不是讀出一個數字
 DoubleSupplier leftY = controller::getLeftY;</code></pre>
-  <p>方法參考的格式是 <code>物件::方法</code> 或 <code>類別::靜態方法</code><a class="ref" href="#src4-5">[5]</a>。WPILib 文件特別提醒：<code>::</code> 後面不加括號，因為這裡是把方法本身交出去，而不是呼叫它<a class="ref" href="#src4-1">[1]</a>。</p>
+  <p>方法參考的寫法是 <code>物件::方法</code> 或 <code>類別::靜態方法</code><a class="ref" href="#src4-5">[5]</a>。注意 <code>::</code> 後面<strong>不加括號</strong>，因為你是把方法本身交出去，不是呼叫它<a class="ref" href="#src4-1">[1]</a>。</p>
 
   <h2>最重要的一件事：寫溫度 vs 看溫度</h2>
-  <p>下面是 FRC 最常見的錯誤之一（<code>drive</code> 是一個假設的底盤 Subsystem）：</p>
+  <p>這是 FRC 最常見的錯誤之一，真的很常見（<code>drive</code> 是假設的底盤 Subsystem）：</p>
   <pre><code>// 錯：寫溫度。只在綁定的那一刻讀一次搖桿
 double speed = -controller.getLeftY();
 drive.setDefaultCommand(drive.run(() -&gt; drive.arcadeDrive(speed, 0.0)));</code></pre>
-  <p><code>controller.getLeftY()</code> 有括號，所以它在這一行就被執行了，得到一個固定的數字。之後 lambda 每次執行，用的都是那個數字，搖桿怎麼推機器人都不會變。</p>
+  <p><code>controller.getLeftY()</code> 有括號，所以在這一行就執行了，拿到一個固定的數字。之後 lambda 每次跑，用的都是那個數字，你搖桿怎麼推機器人都不理你。</p>
   <pre><code>// 對：看溫度。每次執行都重新讀搖桿
 drive.setDefaultCommand(
     drive.run(() -&gt; drive.arcadeDrive(-controller.getLeftY(), -controller.getRightX())));</code></pre>
-  <p>讀搖桿的程式碼寫在 lambda 裡面，所以每次指令執行（每 20 毫秒）都會重新讀一次。加負號是因為搖桿往前推時 Y 軸讀到的是負值。</p>
+  <p>讀搖桿那段寫在 lambda 裡面，所以指令每次執行（每 20 毫秒）都會重讀一次。前面加負號，是因為搖桿往前推的時候 Y 軸讀到的是負的。</p>
 
-  <div class="note"><strong>字條上的名字不能改</strong>Lambda 只能使用 final 或「實際上沒被改過」（effectively final）的區域變數<a class="ref" href="#src4-4">[4]</a>。上面錯誤範例裡的 <code>speed</code> 就是 effectively final，所以編譯器不會報錯，這正是這個 bug 難抓的原因：程式完全合法，只是邏輯錯了。</div>
+  <div class="note"><strong>字條上的名字不能改</strong>Lambda 裡只能用 final 或「實際上沒被改過」（effectively final）的區域變數<a class="ref" href="#src4-4">[4]</a>。上面錯誤範例的 <code>speed</code> 剛好就是 effectively final，所以編譯器一聲不吭。這也是這個 bug 難抓的原因：程式完全合法，只是邏輯錯了。</div>
 
   <h2>BooleanSupplier 與 Trigger</h2>
   <pre><code>// 按住 A 鍵時吸入
@@ -73,30 +73,30 @@ controller.a().whileTrue(intake.runRoller(8.0));
 // 自訂條件：右扳機按超過一半時吐出
 new Trigger(() -&gt; controller.getRightTriggerAxis() &gt; 0.5)
     .whileTrue(intake.runRoller(-6.0));</code></pre>
-  <p><code>Trigger</code> 的建構子收一個 <code>BooleanSupplier</code>，也就是「看一下有沒有下雨」這種字條。排程器每個週期都會拿起來看一次。</p>
+  <p><code>Trigger</code> 的建構子收一個 <code>BooleanSupplier</code>，就是「看一下有沒有下雨」那種字條，排程器每個週期都會拿起來看一次。</p>
 
-  <div class="note coach"><strong>教練提醒</strong>看到「搖桿推了機器人沒反應」或「數值永遠是 0」，先檢查搖桿讀取有沒有寫在 lambda 外面。這個 bug 我每一屆新生都會遇到。</div>
+  <div class="note coach"><strong>教練提醒</strong>只要聽到「搖桿推了機器人沒反應」或「數值永遠是 0」，先去看讀搖桿的那行是不是寫在 lambda 外面。這個 bug 每一屆新生都會遇到，真的每一屆。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：找出 bug，再寫一個條件</h2>
-  <p>第一題：下面這段程式想讓機器人在按住 B 鍵時，用右搖桿 X 軸控制轉向，但轉向完全沒反應。指出原因並修正。</p>
+  <p>第一題：下面這段想讓機器人在按住 B 鍵時用右搖桿 X 軸轉向，結果轉向完全沒反應。為什麼？怎麼改？</p>
   <pre><code>double turn = -controller.getRightX();
 controller.b().whileTrue(drive.run(() -&gt; drive.arcadeDrive(0.0, turn)));</code></pre>
-  <p>第二題：寫一個 <code>BooleanSupplier</code>，在左、右扳機都按超過一半時回傳 <code>true</code>。</p>
+  <p>第二題：寫一個 <code>BooleanSupplier</code>，左右兩個扳機都按超過一半的時候回傳 <code>true</code>。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>第一題：想想 turn 這個變數是什麼時候算出來的，之後還會不會變。</p>
+      <p>第一題：想想 turn 是什麼時候算出來的？算完之後還會變嗎？</p>
     </div>
     <div class="hint" data-label="提示 2">
-      <p>把讀取搖桿的呼叫移進 lambda 裡，每次執行才會重讀。BooleanSupplier 就是「回傳 boolean、沒有參數」的 lambda。</p>
+      <p>把讀搖桿的呼叫搬進 lambda 裡，每次執行才會重讀。BooleanSupplier 就是「沒有參數、回傳 boolean」的 lambda。</p>
     </div>
     <div class="hint" data-label="提示 3">
       <p>第一題改成 drive.arcadeDrive(0.0, -controller.getRightX())；第二題是 () -&gt; controller.getLeftTriggerAxis() &gt; 0.5 &amp;&amp; controller.getRightTriggerAxis() &gt; 0.5。</p>
     </div>
     <div class="hint solution" data-label="完整解答">
-    <p>第一題：<code>getRightX()</code> 在綁定按鍵時就被呼叫了，<code>turn</code> 是固定值。要把讀取搬進 lambda：</p>
+    <p>第一題：<code>getRightX()</code> 在綁按鍵的時候就被呼叫了，<code>turn</code> 從此就是固定值。要把讀取搬進 lambda：</p>
     <pre><code>controller.b().whileTrue(drive.run(() -&gt; drive.arcadeDrive(0.0, -controller.getRightX())));</code></pre>
     <p>第二題：</p>
     <pre><code>BooleanSupplier bothTriggers = () -&gt;

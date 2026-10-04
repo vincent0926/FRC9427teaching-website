@@ -1,16 +1,16 @@
   <p class="headline-code">CAN ID 02｜Java 與物件導向</p>
   <h1>封裝：成績簿不能放在講台上</h1>
-  <p class="lede">讀完這章，你會知道為什麼欄位幾乎都寫成 private、四種存取層級的差別，以及為什麼 Subsystem 不該讓外面直接碰馬達。</p>
+  <p class="lede">你會發現隊上的程式裡，欄位幾乎都寫成 <code>private</code>。這章講為什麼要這樣，順便把四種存取層級講清楚，最後回到機器人：為什麼 Subsystem 不能讓外面直接碰馬達。</p>
 
-  <h2>生活比喻：一本成績簿的遭遇</h2>
+  <h2>先講個比喻：一本成績簿的遭遇</h2>
   <div class="story">
-    <p><strong>成績簿放在講台上。</strong>某一班把成績簿放在講台，誰都能翻、誰都能寫。一開始相安無事，直到有人把自己的數學改成 150 分，又有人不小心把別人的分數寫進自己那一格。期末結算時，導師發現分數對不上，但完全查不出是誰、在什麼時候改的。</p>
-    <p><strong>學校訂了新規定。</strong>從此成績簿鎖在導師的抽屜裡，學生拿不到。要登記成績，唯一的管道是交給任課老師，由老師寫進去。老師每次登記前都會檢查：分數必須在 0 到 100 之間。不合規定的分數，老師直接退回。</p>
-    <p><strong>想知道分數，可以問。</strong>學生可以問老師「我這次考幾分？」，老師會告訴你一個數字。但老師不會把整本成績簿交給你，因為交出去之後你想怎麼寫都行，前面的規定就白訂了。</p>
-    <p><strong>後來學校換成電子系統。</strong>成績從紙本改成校務系統，存放方式完全不同。但對學生來說什麼都沒變：一樣交給老師登記，一樣問老師查分數。內部怎麼存，外面根本不需要知道。</p>
-    <p><strong>不是所有東西都要鎖起來。</strong>學校裡的資訊分成幾種公開程度：自己的日記只有自己能看；班級日誌只給同班看；社團的傳承筆記會留給直屬學弟妹；公布欄則是全校都能看。</p>
+    <p>有一班把成績簿放在講台上，誰都能翻、誰都能寫。一開始沒事，後來有人把自己的數學改成 150 分，又有人不小心把別人的分數寫進自己那格。期末算成績的時候，導師發現分數兜不起來，但根本查不出是誰、什麼時候改的。</p>
+    <p>學校只好訂新規定：成績簿鎖進導師的抽屜，學生拿不到。要登記成績只有一個管道，就是交給任課老師，由老師寫進去。老師每次登記前都會檢查分數是不是在 0 到 100 之間，不對就直接退回。</p>
+    <p>想知道自己幾分可以問老師，老師會告訴你一個數字。但老師不會把整本成績簿拿給你，因為一交出去你想寫什麼都行，前面的規定就白訂了。</p>
+    <p>後來學校改用電子校務系統，成績的存法完全不一樣了。可是對學生來說什麼都沒變，一樣交給老師登記、一樣問老師查分數。裡面怎麼存，外面根本不用知道。</p>
+    <p>當然也不是什麼都要鎖起來。學校的資訊本來就有不同的公開程度：日記只有自己能看，班級日誌給同班看，社團的傳承筆記會留給直屬學弟妹，公布欄則是全校都看得到。</p>
   </div>
-  <p>這整個故事就是<strong>封裝</strong>（encapsulation）。Oracle 的官方教學把它描述為：隱藏物件內部的狀態，並要求所有互動都透過物件的方法進行<a class="ref" href="#src2-1">[1]</a>。</p>
+  <p>這整個故事講的就是<strong>封裝</strong>（encapsulation）。Oracle 的 Java 教學是這樣說的：把物件內部的狀態藏起來，所有互動都要透過物件的方法來做<a class="ref" href="#src2-1">[1]</a>。</p>
 
   <table class="map">
     <thead><tr><th>比喻</th><th>Java</th><th>在機器人上</th></tr></thead>
@@ -24,7 +24,7 @@
   </table>
 
   <h2>四種存取層級</h2>
-  <p>Java 有四種存取層級<a class="ref" href="#src2-2">[2]</a>，對應故事最後一段的四種公開程度：</p>
+  <p>Java 有四種存取層級<a class="ref" href="#src2-2">[2]</a>，剛好對到故事最後那四種公開程度：</p>
   <table class="map">
     <thead><tr><th>修飾詞</th><th>同一個類別</th><th>同一個套件</th><th>子類別</th><th>其他地方</th><th>像是</th></tr></thead>
     <tbody>
@@ -34,10 +34,10 @@
       <tr><td><code>public</code></td><td>可以</td><td>可以</td><td>可以</td><td>可以</td><td>公布欄</td></tr>
     </tbody>
   </table>
-  <p>第二列不是漏寫：欄位或方法前面<strong>什麼修飾詞都不加</strong>，本身就是一種存取層級，叫 package-private（Oracle 文件稱為 no modifier），例如 <code>int seatNumber;</code>。它是 Java 的預設值，所以很容易在不知不覺中用到<a class="ref" href="#src2-2">[2]</a>。</p>
-  <p>「套件」是第 5 章的主題，「子類別」是第 3 章的主題。現在只要記得 Oracle 教學給的原則：除非有充分理由，否則使用最嚴格的存取層級，並避免 public 欄位（常數除外）<a class="ref" href="#src2-2">[2]</a>。</p>
+  <p>第二列不是我漏寫。欄位或方法前面<strong>什麼都不加</strong>，本身就是一種存取層級，叫 package-private（Oracle 文件叫它 no modifier），例如 <code>int seatNumber;</code>。因為它是預設值，很容易不知不覺就用到了<a class="ref" href="#src2-2">[2]</a>。</p>
+  <p>「套件」第 5 章才會講，「子類別」是第 3 章。現在只要記住 Oracle 教學給的原則：沒有好理由的話，就用最嚴格的那一層；除了常數以外，不要有 public 欄位<a class="ref" href="#src2-2">[2]</a>。</p>
 
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>日記是「每個人」的，但 Java 的 <code>private</code> 是以「類別」為單位，不是以物件為單位。同一個類別的程式碼，可以讀寫另一個同類別物件的 private 欄位。也就是說，在 <code>Roller</code> 類別裡面，<code>intake</code> 的方法其實看得到 <code>feeder</code> 的 <code>voltage</code>。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>日記是「每個人」各自的，但 Java 的 <code>private</code> 是以「類別」為單位，不是以物件為單位。同一個類別裡的程式碼，可以讀寫另一個同類別物件的 private 欄位。換句話說，在 <code>Roller</code> 類別裡面，<code>intake</code> 的方法其實看得到 <code>feeder</code> 的 <code>voltage</code>。</div>
 
   <h2>換成機器人：沒有封裝的 Intake</h2>
   <pre><code>public class IntakeSubsystem extends SubsystemBase {
@@ -46,10 +46,10 @@
 
 // 某個 Command 裡
 intake.roller.setControl(new VoltageOut(12)); // 繞過了所有規則</code></pre>
-  <p>問題有兩個。第一，電壓上限、方向這些規則沒有地方放，每個用到的人都得自己記得。第二，Command-based 架構靠「這個指令需要哪個 Subsystem」來避免兩個指令同時搶同一個機構（第 8 章細講）；如果指令能直接拿到馬達，這個保護就失效了。</p>
+  <p>這樣寫有兩個問題。一是電壓上限、方向這些規則沒地方放，每個用到的人都要自己記得。二是 Command-based 架構是靠「這個指令需要哪個 Subsystem」來避免兩個指令同時搶同一個機構（第 8 章會講）；指令如果能直接拿到馬達，這層保護就沒用了。</p>
 
   <h2>封裝後的 Intake</h2>
-  <p>WPILib 的 Command-based 範本在 Subsystem 裡就寫著註解：馬達控制器、感測器這些元件一般應該宣告為 private，只透過 public 方法對外開放<a class="ref" href="#src2-3">[3]</a>。</p>
+  <p>WPILib 的 Command-based 範本裡，Subsystem 本身就有一行註解：馬達控制器、感測器這類元件一般要宣告成 private，只透過 public 方法對外開放<a class="ref" href="#src2-3">[3]</a>。照這個原則改寫：</p>
   <pre><code>import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
@@ -76,28 +76,28 @@ public class IntakeSubsystem extends SubsystemBase {
         return roller.getVelocity().getValueAsDouble();
     }
 }</code></pre>
-  <p>外面只看得到三個方法，電壓一定先被限制。明年想把開迴路改成閉迴路，只要改這個類別裡面，呼叫的人完全不用動，這就是「紙本換成電子系統」。</p>
+  <p>現在外面只看得到三個方法，而且電壓一定會先被 <code>MathUtil.clamp</code> 限制住<a class="ref" href="#src2-4">[4]</a>。明年想把開迴路改成閉迴路，只要改這個類別裡面，呼叫的人一行都不用動，這就是故事裡的「紙本換成電子系統」。</p>
 
-  <div class="note"><strong>private 和 final 不一樣</strong><code>private</code> 管的是「誰看得到」，<code>final</code> 管的是「能不能換掉」。<code>private final TalonFX roller</code> 的意思是：外人看不到這顆馬達，而且這個欄位永遠指向同一顆馬達。</div>
+  <div class="note"><strong>private 和 final 是兩回事</strong><code>private</code> 管「誰看得到」，<code>final</code> 管「能不能換掉」。<code>private final TalonFX roller</code> 的意思是：外人看不到這顆馬達，而且這個欄位永遠指向同一顆馬達。</div>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>把整本成績簿交出去</strong>寫了 <code>private TalonFX roller</code>，又加一個 <code>public TalonFX getRoller()</code>。外面拿到物件後一樣可以直接 <code>setControl</code>，封裝等於沒做。getter 應該回傳資料（轉速、位置），不該回傳可以被操作的硬體物件。</div>
-  <div class="note coach"><strong>教練提醒</strong>Code review 時我第一眼看的就是 Subsystem 裡有沒有 public 的硬體欄位或回傳硬體的 getter。有的話，這個 Subsystem 的規則遲早會被某個 Command 繞過。</div>
+  <div class="note warn"><strong>把整本成績簿交出去</strong>欄位寫了 <code>private TalonFX roller</code>，結果又加一個 <code>public TalonFX getRoller()</code>。外面拿到物件一樣可以直接 <code>setControl</code>，等於白封裝。getter 應該回傳資料（轉速、位置），不要回傳可以被操作的硬體物件。</div>
+  <div class="note coach"><strong>教練提醒</strong>Code review 的時候，我第一眼就是看 Subsystem 裡有沒有 public 的硬體欄位，或是會回傳硬體的 getter。有的話，這個 Subsystem 的規則遲早會被某個 Command 繞過去。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：封裝一支手臂</h2>
-  <p>寫一個純 Java 的 <code>Arm</code> 類別：private 欄位 <code>goalDegrees</code>；方法 <code>setGoal(double degrees)</code> 把目標限制在 0 到 110 度；方法 <code>getGoal()</code> 回傳目前目標。上下限寫成 private static final 常數，並加上 TODO 註解提醒要實測。</p>
+  <p>寫一個純 Java 的 <code>Arm</code> 類別：一個 private 欄位 <code>goalDegrees</code>；<code>setGoal(double degrees)</code> 把目標限制在 0 到 110 度；<code>getGoal()</code> 回傳目前目標。上下限寫成 private static final 常數，並加 TODO 註解提醒之後要實測。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>「外面不能直接改」的欄位要 private，外面要用的功能才開 public 方法。</p>
+      <p>不想讓外面直接改的欄位就設 private，外面真的要用的功能才開 public 方法。</p>
     </div>
     <div class="hint" data-label="提示 2">
-      <p>上下限是這個類別自己用的常數：private static final。限制範圍用 Math.max 與 Math.min。</p>
+      <p>上下限是這個類別自己用的常數，所以是 private static final。限制範圍用 Math.max 和 Math.min。</p>
     </div>
     <div class="hint" data-label="提示 3">
-      <p>setGoal 裡寫 goalDegrees = Math.max(MIN_DEGREES, Math.min(MAX_DEGREES, degrees));，初始值可以用 MIN_DEGREES。</p>
+      <p>setGoal 裡寫 goalDegrees = Math.max(MIN_DEGREES, Math.min(MAX_DEGREES, degrees));，初始值可以直接用 MIN_DEGREES。</p>
     </div>
     <div class="hint solution" data-label="完整解答">
     <pre><code>public class Arm {
