@@ -1,15 +1,15 @@
   <p class="headline-code">CAN ID 17｜上場</p>
   <h1>視覺與定位：看門牌校正位置</h1>
-  <p class="lede">讀完這章，你會知道 AprilTag 是什麼、為什麼要把視覺量測「融合」進里程計而不是直接取代、標準差代表什麼、怎麼用 Limelight 的 MegaTag2 更新 CTRE swerve 的位置，以及兩種瞄準做法的差別。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 文件，以及 CTRE Phoenix6-Examples 附的 LimelightHelpers。Limelight 與 PhotonVision 的韌體與函式庫每年更新，使用前請對照當年的版本。本章延續第 16 章，以 CTRE swerve 為例。</div>
+  <p class="lede">第 16 章說里程計會飄，這章就來把它拉回來。我們會講 AprilTag 是什麼、為什麼視覺量測要「融合」進里程計而不是直接取代它、標準差代表什麼，然後用 Limelight 的 MegaTag2 更新 CTRE swerve 的位置，最後比較兩種瞄準的做法。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 文件和 CTRE Phoenix6-Examples 附的 LimelightHelpers 寫的。Limelight 和 PhotonVision 的韌體、函式庫每年都會更新，用之前對一下當年的版本。延續第 16 章，一樣拿 CTRE swerve 當例子。</div>
 
-  <h2>生活比喻：看門牌校正位置</h2>
+  <h2>先講個比喻：看門牌校正位置</h2>
   <div class="story">
-    <p><strong>靠步數記位置，走久了會偏。</strong>第 16 章的校外教學，司機靠里程表推算位置。走得越久、被擦撞越多次，推算就偏得越多。</p>
-    <p><strong>路邊有門牌。</strong>每棟建築物門口都釘著一塊門牌，門牌的位置在地圖上早就標好了。看到門牌、量出自己離它多遠、在它哪一側，就能算出自己在地圖上的哪裡。</p>
-    <p><strong>但看門牌也會看錯。</strong>門牌很遠的時候看不清楚，估出來的距離誤差很大；同時看到兩三塊門牌，就準得多。車子在急轉彎時看出去的畫面是糊的，這時候看到的最好別信。</p>
-    <p><strong>所以不是「看到門牌就全聽它的」。</strong>聰明的司機會把兩種資訊合起來：步數推算很穩但會慢慢偏，門牌很準但偶爾會跳。門牌看得清楚時多信門牌一點，看不清楚時多信自己的推算。</p>
-    <p><strong>方向盤比門牌更知道車頭朝哪。</strong>車頭朝哪個方向，看車上的指南針就很準，不需要靠遠方的門牌推算。</p>
+    <p>回到第 16 章的校外教學：司機靠里程表推算位置，開越久、被擦撞越多次，就偏越多。</p>
+    <p>好在路邊有門牌。每棟建築門口都釘著一塊，門牌在地圖上的位置早就標好了。看到門牌，量一下自己離它多遠、在它哪一邊，就能算出自己在地圖上的哪裡。</p>
+    <p>不過門牌也會看錯。很遠的門牌看不清楚，估出來的距離誤差很大；同時看到兩三塊就準多了。車子急轉彎時看出去的畫面是糊的，這時候看到的最好別信。</p>
+    <p>所以聰明的司機不會「看到門牌就全聽它的」，而是把兩種資訊合起來：里程表推算很穩但會慢慢偏，門牌很準但偶爾會跳。門牌看得清楚就多信門牌一點，看不清楚就多信自己的推算。</p>
+    <p>還有一點：車頭朝哪個方向，看車上的指南針就很準了，不需要靠遠方的門牌去推。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>程式</th></tr></thead>
@@ -23,18 +23,18 @@
       <tr><td>車上的指南針</td><td>陀螺儀的朝向</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>司機看到門牌是「現在」看到的；相機的影像從拍攝、處理到送進程式，中間有延遲。位置估計器會用量測的時間戳，把這筆資料對回「拍照那一刻」機器人在哪裡，所以時間戳一定要正確。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>司機看到門牌是「當下」看到的；相機的影像從拍照、處理到送進程式，中間有延遲。位置估計器會用時間戳把這筆資料對回「拍照那一刻」機器人在哪，所以時間戳一定要對。</div>
 
   <h2>AprilTag</h2>
-  <p>WPILib 文件說明：AprilTag 是密西根大學研究人員開發的視覺標籤系統，能以低運算量提供高精度的定位；在 FRC 裡，它讓機器人知道自己在場上的位置，以便對準目標。從 2023 年起，場上散布著多個 AprilTag，每一個都在已知的位置；從 2024 年起使用 36h11 家族<a class="ref" href="#src17-1">[1]</a>。</p>
-  <p>練習場自己貼 AprilTag 時要注意：文件提醒要把標籤固定在硬的背板上保持平整，因為辨識演算法假設標籤是平的<a class="ref" href="#src17-1">[1]</a>。</p>
+  <p>AprilTag 是密西根大學的研究人員做的視覺標籤系統，運算量小、定位又很準。在 FRC 裡，它讓機器人知道自己在場上的哪裡，好去對準目標。從 2023 年開始場上就貼了好幾個 AprilTag，每個都在已知的位置；2024 年起用的是 36h11 家族<a class="ref" href="#src17-1">[1]</a>。</p>
+  <p>練習場自己貼 AprilTag 的話要注意：標籤要固定在硬的背板上、保持平整，因為辨識演算法假設標籤是平的<a class="ref" href="#src17-1">[1]</a>。貼在會彎的紙板上，結果就會怪怪的。</p>
 
   <h2>融合，而不是取代</h2>
-  <p>WPILib 提供 <code>SwerveDrivePoseEstimator</code> 等位置估計器，可以直接取代里程計，並把「有延遲補償的視覺位置」和編碼器、陀螺儀的量測融合在一起<a class="ref" href="#src17-2">[2]</a>。用法是每一輪呼叫 <code>update</code> 放入里程計資料，偶爾有視覺結果時呼叫 <code>addVisionMeasurement</code><a class="ref" href="#src17-2">[2]</a>。CTRE 的 swerve 底盤已經內建同樣的機制，所以直接呼叫 drivetrain 的 <code>addVisionMeasurement</code> 就好<a class="ref" href="#src17-3">[3]</a>。</p>
+  <p>WPILib 有 <code>SwerveDrivePoseEstimator</code> 這類位置估計器，可以直接取代里程計，把「有延遲補償的視覺位置」跟編碼器、陀螺儀的量測融合在一起<a class="ref" href="#src17-2">[2]</a>。用法是每一輪呼叫 <code>update</code> 餵里程計資料，有視覺結果的時候再呼叫 <code>addVisionMeasurement</code><a class="ref" href="#src17-2">[2]</a>。CTRE 的 swerve 底盤已經內建一樣的機制，直接呼叫 drivetrain 的 <code>addVisionMeasurement</code> 就好<a class="ref" href="#src17-3">[3]</a>。</p>
 
   <h3>標準差：你有多相信這筆資料</h3>
-  <p>WPILib 文件說明，位置估計器可以設定模型和量測的標準差。標準差描述雜訊有多分散；給某個量越小的標準差，融合時就越相信它。例如把視覺量測的標準差調大，估計器就比較不受雜亂的視覺資料影響，代價是修正偏差比較慢<a class="ref" href="#src17-2">[2]</a>。</p>
-  <p>針對 AprilTag，文件給了三條具體建議<a class="ref" href="#src17-2">[2]</a>：</p>
+  <p>位置估計器可以設定模型和量測的標準差。標準差就是雜訊有多散；給某個量越小的標準差，融合時就越相信它。比如把視覺量測的標準差調大，估計器就比較不會被亂跳的視覺資料影響，代價是修正偏差比較慢<a class="ref" href="#src17-2">[2]</a>。</p>
+  <p>針對 AprilTag，WPILib 給了三條很具體的建議<a class="ref" href="#src17-2">[2]</a>：</p>
   <ul>
     <li>視覺的朝向標準差設得<strong>非常大</strong>（朝向交給陀螺儀）。</li>
     <li>陀螺儀的朝向標準差設得小。</li>
@@ -42,7 +42,7 @@
   </ul>
 
   <h2>動手試：信誰多一點</h2>
-  <p>下面把問題簡化成一維：里程計說機器人在 x = 3.00 m，視覺說在 x = 3.40 m。調整兩者的標準差，看融合後的估計會落在哪裡。這是用「變異數倒數加權」算的，和位置估計器（卡爾曼濾波）融合時的想法一樣。</p>
+  <p>下面把問題簡化成一維：里程計說機器人在 x = 3.00 m，視覺說在 x = 3.40 m。調兩邊的標準差，看融合之後的估計會落在哪。這是用「變異數倒數加權」算的，跟位置估計器（卡爾曼濾波）融合的想法一樣。</p>
   <div class="lab">
     <div class="pidgrid">
       <label>里程計標準差 <output id="fuOv"></output><input type="range" id="fuO" min="0.02" max="1" step="0.02" value="0.1"></label>
@@ -52,11 +52,11 @@
     <div class="fuse" id="fuBar" aria-hidden="true"></div>
     <div class="console" id="fuConsole" aria-live="polite"></div>
   </div>
-  <p>這個實驗裡，視覺的標準差設成「0.05 m × 距離²，看到多個標籤時除以標籤數」。這只是示範用的經驗式，不是官方公式；隊上要用實際資料調整。</p>
+  <p>這個實驗裡，視覺的標準差是用「0.05 m × 距離²，看到多個標籤就除以標籤數」算的。這只是我拿來示範的經驗式，不是官方公式，實際要用隊上的資料去調。</p>
 
   <h2>用 Limelight 更新位置</h2>
-  <p>CTRE 的 swerve 範例附了一段 Limelight 整合的程式，使用 <code>LimelightHelpers</code> 的 MegaTag2 位置估計<a class="ref" href="#src17-4">[4]</a>。MegaTag2 需要先告訴 Limelight 機器人的朝向，<code>LimelightHelpers</code> 的註解寫明呼叫 <code>getBotPoseEstimate_wpiBlue_MegaTag2</code> 之前要先呼叫 <code>SetRobotOrientation</code>，而且 yaw 為 0 代表機器人面向紅方牆面，也就是第 16 章「原點在藍方」的場地座標<a class="ref" href="#src17-5">[5]</a>。</p>
-  <p>下面照 CTRE 範例的流程，加上文件建議的「距離越遠越不信」：</p>
+  <p>CTRE 的 swerve 範例附了一段 Limelight 整合程式，用的是 <code>LimelightHelpers</code> 的 MegaTag2 位置估計<a class="ref" href="#src17-4">[4]</a>。MegaTag2 要先告訴 Limelight 機器人朝哪：呼叫 <code>getBotPoseEstimate_wpiBlue_MegaTag2</code> 之前要先呼叫 <code>SetRobotOrientation</code>，而且 yaw 為 0 代表機器人面向紅方牆面，就是第 16 章「原點在藍方」的場地座標<a class="ref" href="#src17-5">[5]</a>。</p>
+  <p>下面照 CTRE 範例的流程寫，再加上 WPILib 建議的「距離越遠越不信」：</p>
   <pre><code>private static final String LL = "limelight"; // TODO: 和 Limelight 網頁設定的名稱一致
 
 @Override
@@ -83,12 +83,12 @@ public void robotPeriodic() {
 }</code></pre>
   <p>幾個重點：</p>
   <ul>
-    <li><strong>旋轉太快就丟掉。</strong>CTRE 範例的門檻是每秒 2 圈<a class="ref" href="#src17-4">[4]</a>。範例的註解也說明，這段程式只是示範「可以整合視覺」，通常還需要依距離和標籤數調整標準差，實際做法要依隊伍需求調整<a class="ref" href="#src17-4">[4]</a>。</li>
-    <li><strong>時間戳的時基。</strong>CTRE swerve 的 <code>addVisionMeasurement</code> 在範例裡被覆寫，用 <code>Utils.fpgaToCurrentTime</code> 把 FPGA 時間轉成 Phoenix 的時基再交給底盤<a class="ref" href="#src17-3">[3]</a>。用 Tuner X 產生的 <code>CommandSwerveDrivetrain</code> 已經包含這段；自己寫的話不能漏掉。</li>
-    <li><strong>朝向交給陀螺儀。</strong>第三個標準差設極大，對應 WPILib 的建議<a class="ref" href="#src17-2">[2]</a>。</li>
+    <li><strong>轉太快就丟掉。</strong>CTRE 範例的門檻是每秒 2 圈<a class="ref" href="#src17-4">[4]</a>。範例自己的註解也講了，這段只是示範「可以整合視覺」，一般還要看距離和標籤數去調標準差，實際怎麼做看隊伍需求<a class="ref" href="#src17-4">[4]</a>。</li>
+    <li><strong>時間戳的時基。</strong>範例裡覆寫了 CTRE swerve 的 <code>addVisionMeasurement</code>，用 <code>Utils.fpgaToCurrentTime</code> 把 FPGA 時間轉成 Phoenix 的時基再交給底盤<a class="ref" href="#src17-3">[3]</a>。Tuner X 產生的 <code>CommandSwerveDrivetrain</code> 已經有這段；自己寫的話千萬別漏。</li>
+    <li><strong>朝向交給陀螺儀。</strong>第三個標準差設超大，就是照 WPILib 的建議<a class="ref" href="#src17-2">[2]</a>。</li>
   </ul>
-  <div class="note"><strong>放在 IO 架構裡</strong>本章為了對照 CTRE 範例，把程式寫在 <code>robotPeriodic</code>。依第 6 章的架構，比較好的做法是寫一個 <code>VisionIO</code>（硬體版讀 Limelight、模擬版回傳空結果；重播時和第 6 章一樣用空實作，資料由日誌填回），讓 Vision Subsystem 在 periodic 裡取得結果再交給底盤，這樣視覺資料也能被記錄與重播（第 18 章）。</div>
-  <p>PhotonVision 是另一套常見的開源選擇，也能在協同處理器上辨識 AprilTag 並輸出位置估計，最後同樣交給 <code>addVisionMeasurement</code>。不管用哪一套，「融合、依距離調整標準差、丟掉不可靠的量測」這三件事都一樣。</p>
+  <div class="note"><strong>放進 IO 架構</strong>這章為了跟 CTRE 範例對照，把程式寫在 <code>robotPeriodic</code>。照第 6 章的架構，比較好的寫法是做一個 <code>VisionIO</code>（硬體版讀 Limelight、模擬版回傳空結果；重播時跟第 6 章一樣用空實作，資料由日誌填回），讓 Vision Subsystem 在 periodic 裡拿結果再交給底盤，這樣視覺資料也能被記錄、重播（第 18 章）。</div>
+  <p>PhotonVision 是另一套很多隊在用的開源選擇，一樣能在協同處理器上辨識 AprilTag、輸出位置估計，最後也是交給 <code>addVisionMeasurement</code>。不管用哪套，「融合、看距離調標準差、丟掉不可靠的量測」這三件事都一樣。</p>
 
   <h2>瞄準的兩種做法</h2>
   <table class="map">
@@ -98,7 +98,7 @@ public void robotPeriodic() {
       <tr><td>用估計的位置</td><td>從估計的 <code>Pose2d</code> 和目標在場上的座標，算出該朝哪個角度</td><td>看不到目標也能轉；和自動階段用同一套座標</td><td>位置估計要準，視覺融合要做好</td></tr>
     </tbody>
   </table>
-  <p><code>LimelightHelpers.getTX</code> 回傳準心到目標的水平偏移角度（度），<code>getTV</code> 回傳是否有看到目標<a class="ref" href="#src17-5">[5]</a>。第一種做法大致如下：</p>
+  <p><code>LimelightHelpers.getTX</code> 回傳準心到目標的水平偏移角度（度），<code>getTV</code> 回傳有沒有看到目標<a class="ref" href="#src17-5">[5]</a>。第一種做法大概長這樣：</p>
   <pre><code>private final PIDController aimPid = new PIDController(0.0, 0.0, 0.0); // TODO: 輸入度，輸出 rad/s
 
 public Command aimWithTx(DoubleSupplier forward, DoubleSupplier strafe) {
@@ -112,24 +112,24 @@ public Command aimWithTx(DoubleSupplier forward, DoubleSupplier strafe) {
             .withRotationalRate(rot);
     });
 }</code></pre>
-  <p>PID 的輸出正負號一定要上機確認：WPILib 的旋轉是逆時針為正（第 16 章），而 <code>tx</code> 的正負代表目標在準心的哪一側，兩者方向不一定相同。先把 kP 設很小，確認機器人是「轉向」目標而不是「轉離」目標，再慢慢加大。</p>
-  <p>第二種做法用第 16 章的座標：目標在場上的座標減掉機器人的座標，得到一個向量，它的角度就是機器人應該面對的方向，再交給 CTRE 的 <code>FieldCentricFacingAngle</code> 之類「朝向固定角度」的請求。這種做法在紅方時要記得目標座標也要換成紅方那一個。</p>
+  <p>PID 輸出的正負號一定要上機確認：WPILib 的旋轉是逆時針為正（第 16 章），<code>tx</code> 的正負則代表目標在準心的哪一邊，兩個方向不一定一樣。先把 kP 設很小，確認機器人是「轉向」目標而不是「轉走」，再慢慢加大。</p>
+  <p>第二種做法用第 16 章的座標：目標在場上的座標減掉機器人的座標，得到一個向量，它的角度就是機器人該面對的方向，再交給 CTRE 的 <code>FieldCentricFacingAngle</code> 這類「朝向固定角度」的請求。這種做法在紅方時，記得目標座標也要換成紅方那一個。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>看到標籤就直接 resetPose</strong>視覺量測偶爾會跳，直接把位置重設成它，機器人在場上會瞬間移位，路徑跟隨跟著亂跑。用 <code>addVisionMeasurement</code> 融合。</div>
-  <div class="note warn"><strong>時間戳用錯時基</strong>把 FPGA 時間直接交給 CTRE swerve 而沒有轉換，估計器會把量測對到錯的時間點，位置被拉來拉去。</div>
-  <div class="note warn"><strong>相機位置沒量準</strong>Limelight 要知道相機裝在機器人上的哪裡、朝哪個角度。這組數字錯了，所有視覺位置都會偏。</div>
-  <div class="note warn"><strong>忘了呼叫 SetRobotOrientation</strong>MegaTag2 需要機器人的朝向，沒有提供時結果不可靠。</div>
-  <div class="note warn"><strong>練習場的標籤貼歪、沒貼平</strong>演算法假設標籤是平的，彎曲或位置跟場地圖不一致的標籤會讓練習時的結果和正式比賽不同。</div>
+  <div class="note warn"><strong>看到標籤就直接 resetPose</strong>視覺量測偶爾會跳，直接把位置重設成它，機器人在場上會瞬間「瞬移」，路徑跟隨也跟著亂跑。要用 <code>addVisionMeasurement</code> 融合。</div>
+  <div class="note warn"><strong>時間戳時基用錯</strong>FPGA 時間沒轉換就直接丟給 CTRE swerve，估計器會把量測對到錯的時間點，位置被拉來拉去。</div>
+  <div class="note warn"><strong>相機位置沒量準</strong>Limelight 要知道相機裝在機器人哪裡、朝什麼角度。這組數字錯了，所有視覺位置都會偏。</div>
+  <div class="note warn"><strong>忘了呼叫 SetRobotOrientation</strong>MegaTag2 需要機器人的朝向，沒給的話結果不能信。</div>
+  <div class="note warn"><strong>練習場的標籤貼歪、沒貼平</strong>演算法假設標籤是平的，彎掉的、或位置跟場地圖對不上的標籤，會讓練習時的結果跟正式比賽不一樣。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：記錄被丟掉的量測</h2>
-  <p>在上面的視覺程式裡，加上兩個計數：接受了幾筆量測、因為旋轉太快丟掉幾筆，每輪用 <code>SmartDashboard.putNumber</code> 顯示。想一想：這兩個數字在比賽中能幫你發現什麼問題？</p>
+  <p>在上面的視覺程式裡加兩個計數：接受了幾筆量測、因為轉太快丟掉幾筆，每輪用 <code>SmartDashboard.putNumber</code> 顯示出來。再想想：比賽中這兩個數字可以幫你發現什麼問題？</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>要分兩種情況計數：有看到標籤時，接受或因為旋轉太快而丟掉。</p>
+      <p>分兩種情況算：有看到標籤時，是被接受了，還是因為轉太快被丟掉。</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>在 if (est != null &amp;&amp; est.tagCount &gt; 0) 裡面再判斷 Math.abs(omegaRps) &lt; 2.0，分別讓兩個欄位加一。</p>
@@ -153,7 +153,7 @@ if (est != null &amp;&amp; est.tagCount &gt; 0) {
 }
 SmartDashboard.putNumber("Vision/Accepted", acceptedCount);
 SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
-    <p>如果整場比賽 Accepted 幾乎沒增加，可能是相機沒連上、名稱打錯、曝光設定不對，或是機器人大部分時間都看不到標籤。如果 RejectedSpin 很多，代表門檻可能太嚴，或是駕駛習慣一直邊轉邊移動。把這些數字記錄下來（第 18 章），賽後就能回頭查。</p>
+    <p>如果整場 Accepted 幾乎沒在動，可能是相機沒連上、名字打錯、曝光沒設好，或是機器人大部分時間根本看不到標籤。RejectedSpin 很多的話，可能是門檻太嚴，或是駕駛習慣一直邊轉邊跑。把這些數字記下來（第 18 章），賽後就能回頭查。</p>
     </div>
   </div>
 

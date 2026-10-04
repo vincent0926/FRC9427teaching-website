@@ -3343,16 +3343,16 @@ public boolean atBottom() {
 <template id="tpl-ch13">
   <p class="headline-code">CAN ID 13｜控制</p>
   <h1>PID 與前饋：推書車上斜坡</h1>
-  <p class="lede">讀完這章，你會知道 P、I、D 各自在做什麼，kS、kV、kA、kG 這些前饋項代表什麼，為什麼手臂只用 PID 會「差一點點到不了」，以及怎麼照順序手動調出第一組能用的參數。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 與 Phoenix 6 的 2026 版（26.x）文件。本章所有增益數值都只是示範，你的機構一定要自己調。</div>
+  <p class="lede">進階控制從這章開始。你大概聽過 PID，但只用 PID 的手臂常常會「差一點點就是到不了」。這章講 P、I、D 各自在幹嘛，kS、kV、kA、kG 這些前饋又是什麼，最後照順序手動調出第一組能用的參數。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 和 Phoenix 6 的 2026 版（26.x）文件寫的。裡面出現的增益數字都只是示範，你的機構一定要自己調，不要抄。</div>
 
-  <h2>生活比喻：推書車上斜坡</h2>
+  <h2>先講個比喻：推書車上斜坡</h2>
   <div class="story">
-    <p><strong>圖書股長要把書車推到坡道中間的一個記號。</strong>坡道通往圖書館，記號畫在半路上。書車很重，一放手就會滑下來。</p>
-    <p><strong>離記號越遠，推得越用力。</strong>這是最直覺的做法：還差很遠就用力推，快到了就輕輕推。問題是，到了記號附近「差距很小」，他就只輕輕推，但坡道一直把車往下拉。結果書車停在記號下面一點點的地方：推的力剛好等於下滑的力，永遠差那一點。</p>
-    <p><strong>速度太快就踩煞車。</strong>如果他推得太猛，書車衝過記號，再被拉回來，來回晃好幾次。聰明的做法是看書車現在跑多快：跑得快就先收一點力，像門上的緩衝器一樣，讓車子平穩地停下來。</p>
-    <p><strong>一直差一點，就慢慢加力。</strong>另一個辦法是：只要書車一直停在記號下面，就每秒多加一點力，直到真的推到記號。這個辦法有效，但反應慢，而且如果一開始就差很多，累積的力會太大，衝過頭之後要很久才收得回來。</p>
-    <p><strong>最好的辦法是事先知道要多少力。</strong>有經驗的股長知道：在這個坡道上，光是「讓書車不滑下來」就要一定的力，坡越陡要越多。起步時要先多用一點力，克服輪子卡住的那一下。想維持某個速度，就要對應的力。這些力不必等看到誤差才出，一開始就先給；剩下的一點點誤差，再靠「看距離」和「看速度」修正。</p>
+    <p>圖書股長要把書車推到坡道中間的一個記號。坡道通往圖書館，記號畫在半路上，書車很重，一放手就會滑下來。</p>
+    <p>最直覺的推法是：離記號越遠推越用力，快到了就輕輕推。問題是快到記號的時候「差很少」，他就只推一點點，可是坡道一直在把車往下拉。結果書車停在記號下面一點點：推的力剛好等於往下滑的力，就是永遠差那一點。</p>
+    <p>如果推太猛，書車會衝過記號、又被拉回來，來回晃好幾次。比較聰明的是看書車現在跑多快：跑太快就先收一點力，像門上的緩衝器那樣，讓車子穩穩地停下來。</p>
+    <p>還有一招：只要書車一直停在記號下面，就每秒多加一點力，加到真的推到為止。這招有用，但反應很慢，而且一開始如果差很多，累積的力會太大，衝過頭之後要很久才收得回來。</p>
+    <p>真正有經驗的股長會<strong>事先</strong>知道要多少力：在這個坡道上，光是「不讓書車滑下來」就要一定的力，坡越陡要越多；起步要先多出一點力，克服輪子卡住那一下；想維持某個速度，就要對應的力。這些力不用等看到誤差才出，一開始就先給。剩下那一點點誤差，再靠「看距離」和「看速度」去修。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>控制</th></tr></thead>
@@ -3370,18 +3370,18 @@ public boolean atBottom() {
       <tr><td>加速要多出的力</td><td>kA（加速度前饋）</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>斜坡的坡度是固定的，所以推書車的重力前饋是一個定值，這跟升降機構一樣。手臂不同：手臂水平時重力的影響最大，垂直時幾乎是零，所以手臂的 kG 要乘上 cos(角度)。另外，PID 輸出的單位是伏特（或 duty cycle、安培），不是真的「力」，只是在馬達上電壓大致對應力矩和速度。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>斜坡的坡度是固定的，所以推書車的重力前饋是一個定值，跟升降機構一樣。手臂就不一樣了：水平的時候重力影響最大，垂直時幾乎是零，所以手臂的 kG 要乘上 cos(角度)。另外，PID 輸出的單位是伏特（或 duty cycle、安培），不是真的「力」，只是在馬達上電壓大致對應到力矩和速度。</div>
 
   <h2>回饋與前饋</h2>
-  <p>控制分成兩種思路：</p>
+  <p>控制大概分兩種想法：</p>
   <ul>
-    <li><strong>回饋（feedback）</strong>：看誤差修正，看到差多少才出力。PID 就是回饋控制器。</li>
-    <li><strong>前饋（feedforward）</strong>：依照機構的物理特性，事先算出「要達到目標狀態大概需要多少輸出」，不用等誤差出現。</li>
+    <li><strong>回饋（feedback）</strong>：看誤差來修，看到差多少才出力。PID 就是回饋控制器。</li>
+    <li><strong>前饋（feedforward）</strong>：照機構的物理特性，事先算好「要到目標狀態大概需要多少輸出」，不用等誤差出現。</li>
   </ul>
-  <p>WPILib 文件用垂直手臂示範了三種策略：只用前饋，手臂能追上緩慢平順的移動，但離目標遠時表現不好，也無法修正干擾；只用 PID，「沒有好的調法」，因為手臂即使到了目標也需要持續的輸出來撐住，純回饋會停在目標以外的平衡點；兩者合用才是正解<a class="ref" href="#src13-1">[1]</a>。</p>
+  <p>WPILib 拿垂直手臂比較過三種做法。只用前饋：慢慢平順地動還追得上，但離目標遠就不太行，有干擾也修不回來。只用 PID：官方直接說「沒有好的調法」，因為手臂就算到了目標也要持續出力撐住，純回饋會停在目標旁邊的某個平衡點。兩個一起用才是正解<a class="ref" href="#src13-1">[1]</a>。</p>
 
   <h2>P、I、D 各自做什麼</h2>
-  <p>WPILib 文件的說法：P 讓位置誤差趨近 0，D 讓速度誤差趨近 0，I 讓累積的誤差趨近 0，三項加起來就是控制輸出<a class="ref" href="#src13-2">[2]</a>。</p>
+  <p>簡單講：P 想讓位置誤差變 0，D 想讓速度誤差變 0，I 想讓累積的誤差變 0，三項加起來就是控制輸出<a class="ref" href="#src13-2">[2]</a>。</p>
   <table class="map">
     <thead><tr><th>項</th><th>輸出</th><th>像什麼</th><th>太大會怎樣</th></tr></thead>
     <tbody>
@@ -3390,24 +3390,24 @@ public boolean atBottom() {
       <tr><td>I</td><td><code>kI × ∫e dt</code></td><td>「一直差一點就慢慢加力」</td><td>積分飽和，衝過頭很久才回來</td></tr>
     </tbody>
   </table>
-  <p>「軟體彈簧」和「軟體阻尼」都是 WPILib 文件的比喻：P 就像彈簧的 F = −kx，D 就像門的緩衝器，阻力隨速度線性增加<a class="ref" href="#src13-2">[2]</a>。</p>
-  <p>關於 I：WPILib 文件提醒，kI 太大會造成積分飽和。處理方法依序是：把 kI 降低，能降到 0 最好；誤差太大時把積分歸零（<code>setIZone</code>）；限制積分的上下限（<code>setIntegratorRange</code>）<a class="ref" href="#src13-3">[3]</a>。實務上，前饋做好之後通常就不需要 I。</p>
+  <p>「軟體彈簧」和「軟體阻尼」是 WPILib 自己用的比喻：P 就像彈簧的 F = −kx，D 就像門的緩衝器，速度越快阻力越大<a class="ref" href="#src13-2">[2]</a>。</p>
+  <p>至於 I，kI 太大會造成積分飽和（windup）。處理方式照順序是：先把 kI 調小，能調到 0 最好；誤差太大的時候把積分歸零（<code>setIZone</code>）；限制積分的上下限（<code>setIntegratorRange</code>）<a class="ref" href="#src13-3">[3]</a>。老實說，前饋做好之後，大部分時候根本用不到 I。</p>
 
   <h2>前饋：kS、kV、kA、kG</h2>
-  <p>WPILib 用永磁直流馬達的「電壓平衡方程式」描述前饋<a class="ref" href="#src13-4">[4]</a>：</p>
+  <p>WPILib 是用永磁直流馬達的「電壓平衡方程式」來描述前饋的<a class="ref" href="#src13-4">[4]</a>：</p>
   <pre><code>簡單馬達：V = kS·sgn(v) + kV·v + kA·a
 升降機構：V = kG + kS·sgn(v) + kV·v + kA·a
 手臂：    V = kG·cos(θ) + kS·sgn(ω) + kV·ω + kA·α</code></pre>
   <ul>
-    <li><strong>kS</strong>：克服靜摩擦、讓機構剛好開始動的電壓，不管速度多少都一樣。</li>
-    <li><strong>kV</strong>：維持某個固定速度需要的電壓（主要是抵銷馬達的反電動勢）。電壓和速度的關係對 FRC 零件來說幾乎是線性的。</li>
-    <li><strong>kA</strong>：產生某個加速度需要的電壓。</li>
-    <li><strong>kG</strong>：抵銷重力。升降是定值，手臂要乘 cos(θ)，因為重力不是直接作用在馬達上。</li>
+    <li><strong>kS</strong>：克服靜摩擦、讓機構剛好開始動的電壓，跟速度無關。</li>
+    <li><strong>kV</strong>：維持某個固定速度要的電壓（主要是抵銷馬達的反電動勢）。對 FRC 的零件來說，電壓跟速度幾乎是線性關係。</li>
+    <li><strong>kA</strong>：產生某個加速度要的電壓。</li>
+    <li><strong>kG</strong>：抵銷重力。升降機構是定值，手臂要乘 cos(θ)，因為重力不是直接作用在馬達上的。</li>
   </ul>
-  <p>以上說明都來自 WPILib 文件<a class="ref" href="#src13-4">[4]</a>。注意 cos(θ) 的 θ 是「和水平的夾角」，這就是第 6 章和第 12 章一直強調「0 度必須是水平」的原因。</p>
+  <p>這幾個定義都出自 WPILib 文件<a class="ref" href="#src13-4">[4]</a>。注意 cos(θ) 的 θ 是「跟水平的夾角」，所以第 6 章和第 12 章才會一直碎念「0 度一定要是水平」。</p>
 
   <h2>在 TalonFX 上設定</h2>
-  <p>第 6 章的手臂已經在 TalonFX 的 Slot0 裡放了這些增益。CTRE 文件說明，控制器內的閉迴路沒有感測延遲，而且以 1 kHz 更新，比在 roboRIO 上跑反應更快<a class="ref" href="#src13-5">[5]</a>。</p>
+  <p>第 6 章的手臂已經把這些增益放在 TalonFX 的 Slot0 裡了。在控制器裡跑閉迴路沒有感測延遲，更新頻率是 1 kHz，反應比在 roboRIO 上跑快<a class="ref" href="#src13-5">[5]</a>。</p>
   <pre><code>Slot0Configs slot0 = config.Slot0;
 slot0.GravityType = GravityTypeValue.Arm_Cosine; // 預設是 Elevator_Static
 slot0.kG = 0.0; // [MODEL→SYSID] TODO: 讓手臂水平停住的電壓
@@ -3417,14 +3417,14 @@ slot0.kA = 0.0; // [MODEL→SYSID] TODO: 單位 V / (rot/s²)
 slot0.kP = 0.0; // [TUNED] TODO: 單位 V / rot
 slot0.kI = 0.0; // [TUNED] 前饋做好後通常維持 0
 slot0.kD = 0.0; // [TUNED] TODO: 單位 V / (rot/s)</code></pre>
-  <p>單位要特別注意。Phoenix 6 的增益是「機構單位」：CTRE 文件舉例，100:1 減速時 kP = 1 代表機構誤差 1 圈輸出 1 V，也就是馬達誤差 100 圈才輸出 1 V<a class="ref" href="#src13-6">[6]</a>。WPILib 的 <code>ArmFeedforward</code>、<code>PIDController</code> 則是你餵什麼單位就用什麼單位，第 6 章 D-3 用的是弧度。同一組數字不能直接在兩邊互換。</p>
-  <p>CTRE 文件也提供一個估算 kP 起始值的方法：手臂離目標 0.1 圈時，如果 1 V 就足以讓它慢慢移動，那麼 kP = 1 V ÷ 0.1 rot = 10 V/rot，是一個安全的起點<a class="ref" href="#src13-6">[6]</a>。</p>
+  <p>單位要特別小心。Phoenix 6 的增益是「機構單位」：CTRE 舉的例子是 100:1 減速時，kP = 1 代表機構差 1 圈輸出 1 V，也就是馬達要差 100 圈才輸出 1 V<a class="ref" href="#src13-6">[6]</a>。WPILib 的 <code>ArmFeedforward</code>、<code>PIDController</code> 則是你餵什麼單位它就用什麼單位，第 6 章 D-3 用的是弧度。所以同一組數字<strong>不能</strong>直接在兩邊換來換去。</p>
+  <p>kP 不知道從多少開始的話，CTRE 有個估法：手臂離目標 0.1 圈的時候，如果 1 V 就能讓它慢慢動，那 kP = 1 V ÷ 0.1 rot = 10 V/rot，這是個安全的起點<a class="ref" href="#src13-6">[6]</a>。</p>
 
   <h3>kS 的正負號</h3>
-  <p>摩擦永遠和運動方向相反，所以 kS 的正負號要看方向。Phoenix 6 的 <code>StaticFeedforwardSign</code> 有兩種：預設的 <code>UseVelocitySign</code> 依速度目標的正負決定，速度閉迴路一定用它，也建議用在 MotionMagic；<code>UseClosedLoopSign</code> 依誤差的正負決定，用在沒有速度目標的單純位置閉迴路，但 kS 不能太大，否則在目標附近會抖動<a class="ref" href="#src13-5">[5]</a>。</p>
+  <p>摩擦永遠跟運動方向相反，所以 kS 的正負號要看往哪邊動。Phoenix 6 的 <code>StaticFeedforwardSign</code> 有兩種：預設的 <code>UseVelocitySign</code> 看速度目標的正負，速度閉迴路一定用它，MotionMagic 也建議用它；<code>UseClosedLoopSign</code> 看誤差的正負，適合沒有速度目標的單純位置閉迴路，但 kS 不能太大，不然在目標附近會抖<a class="ref" href="#src13-5">[5]</a>。</p>
 
   <h2>動手試：調一支手臂</h2>
-  <p>下面的模擬手臂在 0 度（水平）靜止，目標是往上 72 度（0.2 圈）。模擬裡的手臂有重力、摩擦和 10 ms 的量測延遲。調整三個增益，按「執行」看 2 秒內的角度變化。</p>
+  <p>下面這支模擬手臂從 0 度（水平）出發，目標是往上 72 度（0.2 圈）。模擬裡有重力、摩擦，還有 10 ms 的量測延遲。調三個增益，按「執行」看 2 秒內角度怎麼變。</p>
   <div class="lab">
     <div class="pidgrid">
       <label>kP <output id="pidPv"></output><input type="range" id="pidP" min="0" max="300" step="5" value="20"></label>
@@ -3441,25 +3441,25 @@ slot0.kD = 0.0; // [TUNED] TODO: 單位 V / (rot/s)</code></pre>
     </div>
     <div class="console" id="pidConsole" aria-live="polite"></div>
   </div>
-  <p>試試看這幾件事：只有 P 時，手臂停在目標下方；加上 kG 之後誤差變小很多；kP 調很大時會衝過頭；加一點 kD 就能把過衝壓小。模擬的真實 kG 是 0.6 V，你把 kG 調過頭會發生什麼事？</p>
+  <p>建議照這個順序玩：先只給 P，看手臂停在目標下面；再加 kG，誤差馬上小很多；把 kP 拉很大，看它衝過頭；最後加一點 kD 把過衝壓下來。模擬裡真正的 kG 是 0.6 V，你故意把 kG 調過頭會怎樣？</p>
 
   <h2>手動調參的順序</h2>
-  <p>CTRE 文件建議的手動調參流程<a class="ref" href="#src13-5">[5]</a>：</p>
+  <p>CTRE 建議的手動調參順序是這樣<a class="ref" href="#src13-5">[5]</a>：</p>
   <ol>
-    <li>所有增益設為 0。</li>
-    <li>升降或手臂機構先找 kG。</li>
+    <li>所有增益歸零。</li>
+    <li>升降或手臂先找 kG。</li>
     <li>選好 kS 的正負號模式。</li>
-    <li>增加 kS，直到馬達「差一點就要動」。</li>
-    <li>如果有速度目標，增加 kV，直到實際速度貼近目標速度。</li>
-    <li>增加 kP，直到開始在目標附近振盪。</li>
-    <li>在不產生抖動的前提下，盡量增加 kD。</li>
+    <li>慢慢加 kS，加到馬達「差一點就要動了」。</li>
+    <li>有速度目標的話，加 kV 到實際速度貼著目標速度。</li>
+    <li>加 kP，加到開始在目標附近晃。</li>
+    <li>在不會抖的範圍內，kD 盡量加。</li>
   </ol>
-  <p>找 kG 的方法：升降機構是用開迴路找出「剛好能停在某個高度」的輸出；手臂是找出「剛好能水平向前停住」的輸出<a class="ref" href="#src13-5">[5]</a>。WPILib 的手臂教學提醒，kG 要調得相當精確<a class="ref" href="#src13-1">[1]</a>。</p>
-  <p>飛輪這類速度機構，CTRE 另外建議在低速（約最大速度 10%）調 kS、在高速（約 80%）調 kV，兩者交替調到不再變化，最後才加 kP<a class="ref" href="#src13-6">[6]</a>。手動調出來的數字可以用，但第 15 章的 SysId 能用量測資料直接算出 kS、kV、kA、kG，比猜的準。</p>
-  <div class="note coach"><strong>教練提醒：調參時的安全</strong>每次改完增益都先用小目標測試，手指放在 Enter（Disable）或空白鍵（緊急停止）上（第 0 章）。手臂 kG 的正負號錯了，手臂會被往下推而不是撐住。電流限制和軟體極限（第 6 章）在調參時一定要開著。</div>
+  <p>kG 怎麼找：升降機構用開迴路找出「剛好能停在某個高度」的輸出；手臂則是找「剛好能水平向前停住」的輸出<a class="ref" href="#src13-5">[5]</a>。WPILib 的手臂教學也特別提醒，kG 要調得滿精準的<a class="ref" href="#src13-1">[1]</a>。</p>
+  <p>飛輪這種速度機構，CTRE 建議在低速（大約最大速度的 10%）調 kS、在高速（大約 80%）調 kV，兩個輪流調到不再變，最後才加 kP<a class="ref" href="#src13-6">[6]</a>。手動調出來的數字能用，但第 15 章的 SysId 可以直接從量測資料算出 kS、kV、kA、kG，比用猜的準多了。</p>
+  <div class="note coach"><strong>教練提醒：調參時的安全</strong>每次改完增益，先用小目標試，手指放在 Enter（Disable）或空白鍵（緊急停止）上（第 0 章）。手臂 kG 正負號弄反的話，手臂會被往下推而不是撐住。調參的時候電流限制和軟體極限（第 6 章）一定要開著，不要為了「看清楚一點」把它關掉。</div>
 
   <h2>參數從哪裡來</h2>
-  <p>不是每個參數都能用公式算準。每個數字都應該知道它從哪裡來，下次機構改了才知道要重做哪一步。本課程和電梯／手臂調參工作站用同一套分類：</p>
+  <p>不是每個參數都能用公式算準。重點是每個數字你都要知道它是怎麼來的，下次機構改了，才知道要重做哪一步。這個課程跟電梯／手臂調參工作站用的是同一套分類：</p>
   <table class="map provtable">
     <thead><tr><th>參數</th><th>來源</th><th>怎麼得到</th></tr></thead>
     <tbody>
@@ -3472,29 +3472,29 @@ slot0.kD = 0.0; // [TUNED] TODO: 單位 V / (rot/s)</code></pre>
       <tr><td>上面實驗裡的「真實 kG 0.6 V」</td><td>[SIM]</td><td>只是模擬器的設定，和任何真實機構無關</td></tr>
     </tbody>
   </table>
-  <p>把這張表串起來，就是調參的整個流程：</p>
+  <p>把這張表串起來，就是調參的完整流程：</p>
   <ol>
-    <li><strong>理論／模型</strong>：算出初始預期，知道數量級對不對。</li>
+    <li><strong>理論／模型</strong>：先算出大概的預期，確認數量級沒錯。</li>
     <li><strong>系統鑑別（SysId）</strong>：量出真實機構的 kS、kG、kV、kA。</li>
-    <li><strong>閉迴路調參</strong>：在前饋正確的前提下調 kP、kD。</li>
-    <li><strong>實機驗證</strong>：用日誌確認實際位置貼著目標，換電池、換負載也要成立。</li>
+    <li><strong>閉迴路調參</strong>：前饋對了之後，再調 kP、kD。</li>
+    <li><strong>實機驗證</strong>：用日誌確認實際位置有貼著目標，而且換電池、換負載也一樣成立。</li>
   </ol>
-  <p>程式碼裡每個參數後面的標籤就是這個分類。把滑鼠移到標籤上可以看說明。</p>
+  <p>程式碼裡每個參數後面的小標籤就是這個分類，滑鼠移上去可以看說明。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>用 I 來補重力</strong>手臂停在目標下方，第一個反應常常是加 kI。它確實會慢慢推上去，但反應慢又容易飽和。缺的其實是 kG。</div>
-  <div class="note warn"><strong>忘了改 GravityType</strong>Phoenix 6 預設是 <code>Elevator_Static</code>，手臂忘了改成 <code>Arm_Cosine</code>，kG 在任何角度都是定值，手臂抬高時反而會被推過頭。</div>
-  <div class="note warn"><strong>增益單位搞錯</strong>把網路上別隊用弧度調出來的 kP 直接填進 Phoenix 的 Slot0（單位是圈），差了 2π 倍；或是忘了 Phoenix 的增益已經是機構端單位。</div>
-  <div class="note warn"><strong>kD 加太多</strong>D 對雜訊很敏感，太大時馬達會嗡嗡作響或抖動，發熱也會增加。</div>
+  <div class="note warn"><strong>拿 I 來補重力</strong>手臂停在目標下面，很多人第一個反應是加 kI。它確實會慢慢推上去，但反應慢又容易飽和。真正缺的是 kG。</div>
+  <div class="note warn"><strong>忘了改 GravityType</strong>Phoenix 6 預設是 <code>Elevator_Static</code>，手臂忘了改成 <code>Arm_Cosine</code> 的話，kG 在任何角度都一樣大，手臂抬高時反而會被推過頭。</div>
+  <div class="note warn"><strong>增益單位搞錯</strong>把網路上別隊用弧度調的 kP 直接填進 Phoenix 的 Slot0（單位是圈），差了 2π 倍；或是忘了 Phoenix 的增益已經是機構端單位。</div>
+  <div class="note warn"><strong>kD 加太多</strong>D 對雜訊很敏感，太大的話馬達會嗡嗡叫或抖，也會比較燙。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：飛輪的速度控制</h2>
-  <p>替射球飛輪寫 TalonFX 設定：用 <code>VelocityVoltage</code> 控制，Slot0 放 kS、kV、kP（數值待定），並在 Subsystem 寫 <code>setVelocityGoal(double rps)</code> 和 <code>atSpeed()</code> 兩個方法（誤差小於 2 rps 就算到速）。想一想：飛輪需要 kG 嗎？需要 kA 嗎？</p>
+  <p>幫射球飛輪寫 TalonFX 設定：用 <code>VelocityVoltage</code> 控制，Slot0 放 kS、kV、kP（數值待定），然後在 Subsystem 寫 <code>setVelocityGoal(double rps)</code> 和 <code>atSpeed()</code>（誤差小於 2 rps 就算到速）。順便想一下：飛輪需要 kG 嗎？需要 kA 嗎？</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>先決定這個機構需要哪些前饋：飛輪水平轉動，重力會不會讓它加速或減速？</p>
+      <p>先想這個機構需要哪些前饋：飛輪是水平轉的，重力會讓它加速或減速嗎？</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>用 VelocityVoltage(0.0).withSlot(0)；Slot0 放 kS、kV、kP，飛輪用 Coast。Subsystem 記住目標轉速，在 periodic 送出。</p>
@@ -3544,7 +3544,7 @@ public void setVelocityGoal(double rps) {
 public boolean atSpeed() {
     return Math.abs(inputs.velocityRps - goalRps) &lt; TOLERANCE_RPS;
 }</code></pre>
-    <p>飛輪水平轉動，重力不會讓它加速或減速，所以不需要 kG。kA 只有在「目標速度一直在變」時才有用；飛輪通常是一個固定目標，CTRE 的速度閉迴路範例也只用 kS、kV、kP<a class="ref" href="#src13-7">[7]</a>。滾輪和飛輪用 Coast：停止時讓它自然減速，不要急煞。</p>
+    <p>飛輪水平轉，重力不會讓它加速或減速，所以不用 kG。kA 只有在「目標速度一直在變」的時候才有用；飛輪通常就是一個固定目標，CTRE 的速度閉迴路範例也只用 kS、kV、kP<a class="ref" href="#src13-7">[7]</a>。滾輪和飛輪用 Coast：停的時候讓它自己慢慢減速，不要急煞。</p>
     </div>
   </div>
 
@@ -3563,16 +3563,16 @@ public boolean atSpeed() {
 <template id="tpl-ch14">
   <p class="headline-code">CAN ID 14｜控制</p>
   <h1>MotionMagic：校車司機怎麼開到下一站</h1>
-  <p class="lede">讀完這章，你會知道為什麼不能直接把目標丟給 PID、梯形和 S-curve 軌跡長什麼樣子、MotionMagic 的巡航速度、加速度和 jerk 怎麼設，以及 MotionMagic Expo 和 Dynamic MotionMagic 的差別。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 Phoenix 6 的 2026 版（26.x）文件。第 6 章已經用過 <code>MotionMagicVoltage</code>，本章解釋它背後在做什麼、參數怎麼選。</div>
+  <p class="lede">第 6 章其實已經偷偷用了 <code>MotionMagicVoltage</code>，這章來解釋它到底在做什麼。為什麼不能直接把目標丟給 PID？梯形和 S-curve 軌跡長怎樣？巡航速度、加速度、jerk 要怎麼設？最後順便比較 MotionMagic Expo 和 Dynamic MotionMagic。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 Phoenix 6 的 2026 版（26.x）文件寫的。</div>
 
-  <h2>生活比喻：校車開到下一站</h2>
+  <h2>先講個比喻：校車開到下一站</h2>
   <div class="story">
-    <p><strong>新手司機只看距離。</strong>下一站還很遠，他就把油門踩到底；快到了才猛踩煞車。車上的同學一下往後倒、一下往前撲，書包掉滿地。這就是第 13 章只用 P 的樣子：一開始誤差很大，輸出直接衝到最大。</p>
-    <p><strong>老司機有一張行車計畫。</strong>老司機出發前就想好了：先用固定的加速度慢慢起步，到了速限就維持巡航，算好距離提早開始減速，剛好停在站牌前。每一秒車子該在哪裡、該開多快，都在計畫裡。</p>
-    <p><strong>站很近時，來不及開到速限。</strong>如果下一站就在隔壁，車子還沒加速到速限，就得開始減速了。這時候的速度圖不是梯形，而是一個尖尖的三角形。</p>
-    <p><strong>更好的司機連「踩油門的動作」都很溫和。</strong>加速度本身也不是一瞬間從 0 跳到最大，而是慢慢踩下去、慢慢放開。同學幾乎感覺不到頓挫。代價是到站時間稍微久一點，但可以用稍大的加速度補回來。</p>
-    <p><strong>司機自己照計畫開，老師只要說下一站是哪裡。</strong>老師不用每秒告訴司機該踩多少油門，只要說「開到圖書館」。中途想改去體育館，說一聲就好，司機會從目前的位置和速度重新規劃。</p>
+    <p>新手校車司機只看距離：下一站還很遠，油門就踩到底；快到了才猛踩煞車。車上同學一下往後倒、一下往前撲，書包掉滿地。這就是第 13 章只用 P 的樣子：一開始誤差很大，輸出直接衝到最大。</p>
+    <p>老司機不一樣，他出發前就有一張行車計畫：用固定的加速度慢慢起步，到速限就維持巡航，算好距離提早減速，剛好停在站牌前。每一秒車子該在哪、該開多快，全都在計畫裡。</p>
+    <p>如果下一站就在隔壁呢？車子還沒加速到速限就得開始減速了，這時候的速度圖不是梯形，而是一個尖尖的三角形。</p>
+    <p>更厲害的司機連踩油門的動作都很溫柔，加速度不是一瞬間從 0 跳到最大，而是慢慢踩下去、慢慢放開，同學幾乎感覺不到頓一下。代價是到站稍微慢一點，不過可以用大一點的加速度補回來。</p>
+    <p>而且司機是自己照計畫開的，老師不用每秒告訴他踩多少油門，只要說「開到圖書館」。中途想改去體育館，說一聲就好，司機會從現在的位置和速度重新規劃。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>MotionMagic</th></tr></thead>
@@ -3588,22 +3588,22 @@ public boolean atSpeed() {
       <tr><td>中途改目的地</td><td>隨時用 <code>withPosition</code> 換目標</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>司機會看路況臨時變通，MotionMagic 不會：它只照你設定的速度、加速度上限規劃，不知道機構實際上做不做得到。設得比機構能力還快，馬達輸出飽和，機構就跟不上計畫，誤差越來越大。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>司機會看路況臨時變通，MotionMagic 不會。它只照你設的速度、加速度上限去規劃，根本不知道機構實際上做不做得到。設得比機構能力還快，馬達輸出飽和，機構就跟不上計畫，誤差越拉越大。</div>
 
   <h2>為什麼需要軌跡</h2>
-  <p>WPILib 文件說明，直接命令機構到達目標狀態雖然可能可行，但通常不是最好的做法；比較好的方式是讓目標平順地變化，也就是運動軌跡<a class="ref" href="#src14-1">[1]</a>。第 13 章也提過，前饋的 kV、kA 需要「目標速度」和「目標加速度」，軌跡剛好提供這兩個值。</p>
-  <p>CTRE 文件列出 MotionMagic 相對於單純位置 PID 的好處：整段運動都在控制之下，而不是一路衝向目標；控制機構的慣性，讓目標之間的轉換平順；電池負載和馬達負載改變時，重現性更好<a class="ref" href="#src14-2">[2]</a>。</p>
+  <p>直接叫機構「去目標」也許做得到，但通常不是最好的方法；比較好的是讓目標平順地變過去，也就是運動軌跡<a class="ref" href="#src14-1">[1]</a>。而且第 13 章說過，前饋的 kV、kA 需要「目標速度」和「目標加速度」，軌跡剛好就提供這兩個。</p>
+  <p>跟單純的位置 PID 比，MotionMagic 的好處是：整段運動都在控制之下，不是一路衝向目標；機構的慣性被控制住，目標之間的切換很平順；電池和馬達負載變了，重現性也比較好<a class="ref" href="#src14-2">[2]</a>。</p>
 
   <h2>梯形、三角形與 S-curve</h2>
-  <p>MotionMagic 會自動產生不超過巡航速度、加速度與 jerk 限制的梯形或 S-curve 速度曲線<a class="ref" href="#src14-2">[2]</a>。</p>
+  <p>MotionMagic 會自動產生梯形或 S-curve 的速度曲線，保證不超過你設的巡航速度、加速度和 jerk<a class="ref" href="#src14-2">[2]</a>。</p>
   <ul>
     <li><strong>梯形</strong>：加速 → 以巡航速度等速 → 減速。</li>
-    <li><strong>三角形</strong>：距離太短，來不及達到巡航速度就要開始減速<a class="ref" href="#src14-2">[2]</a>。</li>
-    <li><strong>S-curve</strong>：jerk 設成非 0 時，曲線的轉角被磨圓，變成連續的 S 形。CTRE 說明它能減少機構振盪、動作更穩定可重現；但 jerk 限制本身會讓動作花更多時間，可以用較大的加速度補償<a class="ref" href="#src14-2">[2]</a>。</li>
+    <li><strong>三角形</strong>：距離太短，還沒到巡航速度就得開始減速<a class="ref" href="#src14-2">[2]</a>。</li>
+    <li><strong>S-curve</strong>：jerk 設成非 0，曲線的轉角會被磨圓，變成連續的 S 形。好處是機構比較不會晃、動作更穩定好重現；壞處是 jerk 限制會讓動作花比較久，可以用大一點的加速度補回來<a class="ref" href="#src14-2">[2]</a>。</li>
   </ul>
 
   <h2>動手試：畫出速度曲線</h2>
-  <p>調整移動距離、巡航速度和加速度，看看速度曲線什麼時候是梯形、什麼時候變成三角形，以及總共要花多少時間。單位是手臂端的圈數（rot）。</p>
+  <p>拉一拉移動距離、巡航速度和加速度，看速度曲線什麼時候是梯形、什麼時候變三角形，總共要花多久。單位是手臂端的圈數（rot）。試試看把距離縮到很短會怎樣。</p>
   <div class="lab">
     <div class="pidgrid">
       <label>距離 <output id="mmDv"></output><input type="range" id="mmD" min="0.02" max="0.5" step="0.01" value="0.25"></label>
@@ -3615,7 +3615,7 @@ public boolean atSpeed() {
   </div>
 
   <h2>設定 MotionMagic</h2>
-  <p>CTRE 文件寫明，MotionMagic 必須設定巡航速度與加速度，jerk 可選<a class="ref" href="#src14-2">[2]</a>。用第 6 章手臂的設定為例：</p>
+  <p>MotionMagic 一定要設巡航速度和加速度，jerk 可以不設<a class="ref" href="#src14-2">[2]</a>。拿第 6 章手臂的設定當例子：</p>
   <pre><code>MotionMagicConfigs mm = config.MotionMagic;
 mm.MotionMagicCruiseVelocity = 0.0; // [CONSTRAINT] TODO: rot/s（手臂端）
 mm.MotionMagicAcceleration = 0.0;   // [CONSTRAINT] TODO: rot/s²
@@ -3624,23 +3624,23 @@ mm.MotionMagicJerk = 0.0;           // [CONSTRAINT] TODO: rot/s³，0 = 梯形�
 // 在 MotionMagic 裡，Slot0 的每一項這樣用：
 // kG 重力、kS 靜摩擦、kV × 軌跡速度、kA × 軌跡加速度、
 // kP × 位置誤差、kD × 速度誤差</code></pre>
-  <p>最後那段註解是 CTRE 文件對 MotionMagic 增益的說明<a class="ref" href="#src14-2">[2]</a>：軌跡在每個瞬間都有目標速度和加速度，kV、kA 會用上它們；PID 只負責修正剩下的誤差。這也是為什麼 CTRE 建議 MotionMagic 用速度正負號決定 kS 的方向（第 13 章）。</p>
-  <p>送出目標和第 6 章一樣，建立一次、重複使用：</p>
+  <p>最後那段註解講的是 MotionMagic 的增益怎麼運作<a class="ref" href="#src14-2">[2]</a>：軌跡在每個瞬間都有目標速度和加速度，kV、kA 會拿去用；PID 只負責修剩下的誤差。所以 MotionMagic 才建議用速度的正負號決定 kS 的方向（第 13 章）。</p>
+  <p>送目標的寫法跟第 6 章一樣，建一次、重複用：</p>
   <pre><code>private final MotionMagicVoltage request = new MotionMagicVoltage(0.0);
 
 public void setPositionGoal(double positionRot) {
     leader.setControl(request.withPosition(positionRot));
 }</code></pre>
-  <p>CTRE 文件說明，設定好之後 roboRIO 只需要定期送出目標位置，沒有「必須等軌跡跑完」的規定；需要知道是否到位時，自己讀位置判斷即可<a class="ref" href="#src14-2">[2]</a>。第 6 章的 <code>atGoal()</code> 就是這樣做的。</p>
+  <p>設定好之後，roboRIO 只要定期送目標位置就好，沒有規定一定要等軌跡跑完；想知道到位了沒，自己讀位置判斷<a class="ref" href="#src14-2">[2]</a>。第 6 章的 <code>atGoal()</code> 就是這樣寫的。</p>
 
   <h3>參數怎麼選</h3>
   <ol>
-    <li><strong>先估機構最快能多快。</strong>[MODEL] 第 13 章的前饋告訴我們，維持速度 <var>v</var> 大約要 kV × <var>v</var> 伏特。所以 12 V 左右能達到的速度上限大約是 12 ÷ kV（還要扣掉 kS、kG）。巡航速度設在這個上限以下，留一些餘裕給 PID 修正和電池電壓下降。</li>
-    <li><strong>加速度從保守開始。</strong>[CONSTRAINT] 先設「約 0.5 秒加速到巡航速度」，也就是加速度 = 巡航速度 × 2，確認平順後再往上加。CTRE 的範例正是巡航 80 rps、加速度 160 rps/s（0.5 秒）<a class="ref" href="#src14-2">[2]</a>。</li>
-    <li><strong>機構會晃，再加 jerk。</strong>CTRE 的範例 jerk 1600 rot/s³，代表約 0.1 秒從 0 加到 160 rot/s² 的最大加速度<a class="ref" href="#src14-2">[2]</a>。</li>
-    <li><strong>看圖調整。</strong>把目標位置、實際位置畫在同一張圖（AdvantageScope 或 Tuner X 的 Plot），實際位置應該貼著軌跡走。跟不上 → 巡航速度或加速度太大，或 kV、kA 不準。</li>
+    <li><strong>先估機構最快能多快。</strong>[MODEL] 第 13 章的前饋說，維持速度 <var>v</var> 大約要 kV × <var>v</var> 伏特，所以 12 V 左右能到的速度上限大概是 12 ÷ kV（還要扣掉 kS、kG）。巡航速度設在這個上限以下，留點空間給 PID 修正和電池掉電。</li>
+    <li><strong>加速度先保守一點。</strong>[CONSTRAINT] 先設「大約 0.5 秒加速到巡航速度」，也就是加速度 = 巡航速度 × 2，確定很順之後再往上加。CTRE 的範例剛好就是巡航 80 rps、加速度 160 rps/s（0.5 秒）<a class="ref" href="#src14-2">[2]</a>。</li>
+    <li><strong>機構會晃再加 jerk。</strong>CTRE 範例的 jerk 是 1600 rot/s³，意思是大約 0.1 秒從 0 加到 160 rot/s² 的最大加速度<a class="ref" href="#src14-2">[2]</a>。</li>
+    <li><strong>看圖調。</strong>把目標位置和實際位置畫在同一張圖上（AdvantageScope 或 Tuner X 的 Plot），實際位置應該貼著軌跡走。跟不上的話，就是巡航速度或加速度太大，不然就是 kV、kA 不準。</li>
   </ol>
-  <div class="note"><strong>可以即時修改</strong>CTRE 文件提到，韌體 24.0.6.0 以後，巡航速度、加速度與 jerk 都可以在執行中修改<a class="ref" href="#src14-2">[2]</a>。不過修改設定仍然是會等待回應的 <code>apply</code>（第 11 章），只能在狀態改變時做一次，不要放在 periodic。</div>
+  <div class="note"><strong>可以邊跑邊改</strong>韌體 24.0.6.0 以後，巡航速度、加速度和 jerk 都可以在執行中改<a class="ref" href="#src14-2">[2]</a>。但改設定一樣是會卡住等回應的 <code>apply</code>（第 11 章），只能在狀態改變時做一次，別放進 periodic。</div>
 
   <h2>MotionMagic 的其他版本</h2>
   <table class="map">
@@ -3652,26 +3652,26 @@ public void setPositionGoal(double positionRot) {
       <tr><td><code>DynamicMotionMagicVoltage</code></td><td>在請求中直接指定速度、加速度、jerk，可隨時更換</td><td>Pro 授權 + CANivore</td></tr>
     </tbody>
   </table>
-  <p><strong>MotionMagic Expo</strong>：CTRE 說明它產生指數型軌跡，最貼近系統本身的動態，相較於梯形能同時減少過衝與到位時間。它使用獨立的 <code>MotionMagicExpo_kV</code> 與 <code>MotionMagicExpo_kA</code>（單位固定是伏特），供電電壓除以 kV 就是軌跡的最高速度；巡航速度設為 0 時，會朝系統的最高速度加速<a class="ref" href="#src14-2">[2]</a>。這兩個值可以直接用第 15 章 SysId 算出的 kV、kA 當起點。</p>
-  <div class="note warn"><strong>Dynamic MotionMagic 沒有 Pro 會停止輸出</strong>和 EnableFOC 不同（第 11 章），CTRE 文件寫明：未授權的 TalonFX 使用 Dynamic MotionMagic 時，會<strong>關閉輸出</strong>並觸發 <code>UnlicensedFeatureInUse</code> 故障<a class="ref" href="#src14-2">[2]</a>。沒有 Pro 就不要用它。</div>
+  <p><strong>MotionMagic Expo</strong>：它產生的是指數型軌跡，最貼近系統本身的動態，跟梯形比，過衝和到位時間都可以一起變少。它有自己的 <code>MotionMagicExpo_kV</code> 和 <code>MotionMagicExpo_kA</code>（單位固定是伏特），供電電壓除以 kV 就是軌跡的最高速度；巡航速度設 0 的話，會往系統的最高速度加速<a class="ref" href="#src14-2">[2]</a>。這兩個值可以直接拿第 15 章 SysId 算出來的 kV、kA 當起點。</p>
+  <div class="note warn"><strong>Dynamic MotionMagic 沒有 Pro 會直接停止輸出</strong>這點跟 EnableFOC 不一樣（第 11 章）：沒授權的 TalonFX 用 Dynamic MotionMagic，會<strong>直接關掉輸出</strong>，還觸發 <code>UnlicensedFeatureInUse</code> 故障<a class="ref" href="#src14-2">[2]</a>。我們沒有 Pro，所以不要用它。</div>
 
   <h2>在 roboRIO 上做同樣的事</h2>
-  <p>如果馬達控制器沒有內建軌跡功能，或像第 6 章 D-3 一樣在模擬中自己算，WPILib 提供 <code>TrapezoidProfile</code> 產生軌跡，<code>ProfiledPIDController</code> 則把軌跡和 PID 結合在一起<a class="ref" href="#src14-1">[1]</a><a class="ref" href="#src14-3">[3]</a>。CTRE 文件也示範了用 <code>TrapezoidProfile</code> 每 20 ms 算一個點，再把位置和速度交給 <code>PositionVoltage</code> 的做法<a class="ref" href="#src14-4">[4]</a>。能用 MotionMagic 時，讓控制器自己跑（1 kHz）比較簡單，也比較不受 roboRIO 迴圈延遲影響。</p>
+  <p>如果馬達控制器沒有內建軌跡功能，或是像第 6 章 D-3 那樣在模擬裡自己算，WPILib 有 <code>TrapezoidProfile</code> 可以產生軌跡，<code>ProfiledPIDController</code> 則是把軌跡跟 PID 包在一起<a class="ref" href="#src14-1">[1]</a><a class="ref" href="#src14-3">[3]</a>。CTRE 也示範過用 <code>TrapezoidProfile</code> 每 20 ms 算一個點，再把位置和速度丟給 <code>PositionVoltage</code><a class="ref" href="#src14-4">[4]</a>。不過能用 MotionMagic 的話，讓控制器自己跑（1 kHz）比較簡單，也比較不會被 roboRIO 迴圈延遲影響。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>單位用錯</strong>設了 <code>SensorToMechanismRatio</code> 之後，巡航速度和加速度都是<strong>機構端</strong>的 rot/s、rot/s²。把馬達端的數字填進去，手臂會快上幾十倍。</div>
-  <div class="note warn"><strong>巡航速度超過機構能力</strong>軌跡跑得比馬達能給的還快，輸出飽和，實際位置越落越後，到終點附近很容易衝過頭。先用 12 ÷ kV 估算上限。</div>
-  <div class="note warn"><strong>每一輪都重新建立請求物件</strong><code>new MotionMagicVoltage(...)</code> 放在 periodic 裡會一直產生垃圾物件。建立一次，用 <code>withPosition</code> 改目標。</div>
-  <div class="note warn"><strong>以為 jerk 越大越好</strong>jerk 是 S-curve 的「圓滑程度」，數值<strong>越小</strong>越圓滑、越慢；設 0 則完全不限制（梯形）。</div>
+  <div class="note warn"><strong>單位填錯</strong>設了 <code>SensorToMechanismRatio</code> 之後，巡航速度和加速度都是<strong>機構端</strong>的 rot/s、rot/s²。把馬達端的數字填進去，手臂會快上幾十倍，很恐怖。</div>
+  <div class="note warn"><strong>巡航速度超過機構能力</strong>軌跡跑得比馬達給得出來的還快，輸出飽和，實際位置越落越後，到終點附近很容易衝過頭。先用 12 ÷ kV 估一下上限。</div>
+  <div class="note warn"><strong>每一輪都 new 請求物件</strong><code>new MotionMagicVoltage(...)</code> 放在 periodic 裡會一直產生垃圾物件。建一次，用 <code>withPosition</code> 改目標就好。</div>
+  <div class="note warn"><strong>以為 jerk 越大越好</strong>jerk 是 S-curve 的「圓滑程度」，數字<strong>越小</strong>越圓滑、也越慢；設 0 是完全不限制（梯形）。很多人以為反過來。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：升降機構的兩種速度</h2>
-  <p>升降機構平常用正常速度，但機器人身上夾著遊戲物件時要慢一點，避免甩掉。沒有 Pro 授權，不能用 Dynamic MotionMagic。請想出一個做法，並寫出關鍵程式。</p>
+  <p>升降機構平常用正常速度，但機器人夾著遊戲物件的時候要慢一點，免得甩掉。我們沒有 Pro，不能用 Dynamic MotionMagic。你會怎麼做？寫出關鍵的程式。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>不能用 Dynamic MotionMagic，就只剩「改設定」這條路。想想設定該在什麼時候改、多久改一次。</p>
+      <p>不能用 Dynamic MotionMagic，就只剩「改設定」這條路。想想看：設定要在什麼時候改、多久改一次？</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>準備兩份 MotionMagicConfigs（快、慢），只在「有沒有夾著物件」改變時用 getConfigurator().apply(...) 套用其中一份。</p>
@@ -3680,7 +3680,7 @@ public void setPositionGoal(double positionRot) {
       <p>用一個 boolean slowMode 記住目前狀態，setSlowMode(slow) 開頭寫 if (slow == slowMode) return;，避免每輪都 apply。</p>
     </div>
     <div class="hint solution" data-label="完整解答">
-    <p>一個做法（單位寫法照 CTRE 的 MotionMagic 範例<a class="ref" href="#src14-5">[5]</a>）：準備兩份 <code>MotionMagicConfigs</code>，只在「有沒有夾著物件」改變時套用一次。</p>
+    <p>一種做法（單位寫法照 CTRE 的 MotionMagic 範例<a class="ref" href="#src14-5">[5]</a>）：準備兩份 <code>MotionMagicConfigs</code>，只有在「有沒有夾著物件」改變時才套用一次。</p>
     <pre><code>// 放在 ElevatorIOHardware（硬體層），Subsystem 透過 IO 介面呼叫 setSlowMode
 private final MotionMagicConfigs fastMM = new MotionMagicConfigs()
     .withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.0))        // TODO
@@ -3696,7 +3696,7 @@ public void setSlowMode(boolean slow) {
     slowMode = slow;
     leader.getConfigurator().apply(slow ? slowMM : fastMM);
 }</code></pre>
-    <p>只套用 <code>MotionMagicConfigs</code> 這一組，其他設定不受影響（第 11 章）。在 Subsystem 裡可以用 Trigger 偵測「有沒有物件」的變化來呼叫它（第 9 章）。另一個做法是用 Slot0 / Slot1 準備兩組不同的增益，但巡航速度和加速度不在 Slot 裡，所以還是要改 <code>MotionMagicConfigs</code>。</p>
+    <p>只套 <code>MotionMagicConfigs</code> 這一組，其他設定不會被動到（第 11 章）。在 Subsystem 裡可以用 Trigger 偵測「有沒有物件」的變化來呼叫它（第 9 章）。你可能會想到用 Slot0 / Slot1 準備兩組增益，但巡航速度和加速度不在 Slot 裡，所以最後還是得改 <code>MotionMagicConfigs</code>。</p>
     </div>
   </div>
 
@@ -3713,16 +3713,16 @@ public void setSlowMode(boolean slow) {
 <template id="tpl-ch15">
   <p class="headline-code">CAN ID 15｜控制</p>
   <h1>SysId 系統鑑別：體適能檢測</h1>
-  <p class="lede">讀完這章，你會知道 SysId 在量什麼、四項測試是什麼、怎麼在手臂上用 <code>SysIdRoutine</code> 搭配 Phoenix 的 SignalLogger 收資料、怎麼把 hoot 檔轉成 SysId 讀得懂的格式，以及怎麼把算出來的 kS、kV、kA、kG 填回程式。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 與 Phoenix 6 的 2026 版（26.x）文件。SysId 隨 WPILib 安裝程式一起安裝。</div>
+  <p class="lede">第 13 章的參數是用「試」的，這章要改成用「量」的。我們會講 SysId 在量什麼、四項測試在做什麼、資料怎麼變成 kS、kV、kA、kG，還有怎麼判斷資料能不能信。後半段是實作：在手臂上用 <code>SysIdRoutine</code> 配 Phoenix 的 SignalLogger 收資料、把 hoot 檔轉成 SysId 看得懂的格式，最後把結果填回程式。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 和 Phoenix 6 的 2026 版（26.x）文件寫的。SysId 不用另外裝，WPILib 安裝程式就附了。</div>
 
-  <h2>生活比喻：體適能檢測</h2>
+  <h2>先講個比喻：體適能檢測</h2>
   <div class="story">
-    <p><strong>體育老師不猜，而是量。</strong>要幫每位同學排訓練課表，老師可以憑感覺猜「他大概跑多快」，但更好的做法是做體適能檢測，用數據說話。第 13 章的手動調參就像憑感覺猜，這一章要做的是檢測。</p>
-    <p><strong>檢測有兩種項目。</strong>第一種是「漸速跑」：跑步機的速度一點一點慢慢調高，這時候同學幾乎沒有在「加速」，量到的主要是「維持某個速度要花多少力」。第二種是「起跑衝刺」：槍聲一響就全力起跑，量到的是「身體要加速有多吃力」。</p>
-    <p><strong>往前、往回各做一次。</strong>兩種項目都要往前做一次、往回做一次，總共四項。做完往前立刻做往回，剛好也回到起點。</p>
-    <p><strong>檢測時老師要在旁邊看著。</strong>跑步機不會自己停，跑到快撞牆了，老師要喊停。檢測本身只負責出題，安全要自己顧。</p>
-    <p><strong>成績單交給分析軟體。</strong>檢測記錄交給電腦，電腦用一套公式去配合數據，算出這位同學的各項數值。算出來的數字是很好的起點，但不是保證完美，實際上課還要再微調。</p>
+    <p>體育老師要幫每個同學排訓練課表，可以憑感覺猜「他大概跑多快」，但更好的方法是做體適能檢測，讓數據說話。第 13 章的手動調參就是憑感覺猜，這章要做的是檢測。</p>
+    <p>檢測有兩種項目。第一種是「漸速跑」：跑步機的速度一點一點慢慢調高，同學幾乎沒有在「加速」，所以量到的主要是「維持某個速度要花多少力」。第二種是「起跑衝刺」：槍一響就全力衝，量的是「身體要加速有多吃力」。</p>
+    <p>兩種都要往前做一次、往回做一次，總共四項。往前做完馬上做往回，剛好也回到起點。</p>
+    <p>檢測時老師一定要在旁邊看著，因為跑步機不會自己停，快撞牆了要有人喊停。檢測只負責出題，安全要自己顧。</p>
+    <p>最後成績交給電腦，電腦用一套公式去配合數據，算出這個同學的各項數值。算出來的數字是很好的起點，但不保證完美，真的上課還是要再微調。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>SysId</th></tr></thead>
@@ -3737,10 +3737,10 @@ public void setSlowMode(boolean slow) {
       <tr><td>算出的各項數值</td><td>kS、kV、kA、kG</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>同學會累，檢測結果每天不同；馬達不會累，但會變熱，電池電壓也會下降。所以測試要用電量充足的電池，而且每項測試時間不長。另外，SysId 用的公式是固定的物理模型（第 13 章的電壓平衡方程式），機構如果有模型沒描述到的東西，例如很大的背隙或會卡住的地方，結果就會不準。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>同學會累，每天測出來都不一樣；馬達不會累，但會變熱，電池電壓也會掉。所以測試要用電充飽的電池，每項也不要測太久。還有，SysId 用的是固定的物理模型（第 13 章的電壓平衡方程式），機構如果有模型沒描述到的東西，像很大的背隙或會卡住的地方，結果就會不準。</div>
 
   <h2>SysId 在量什麼</h2>
-  <p>WPILib 文件說明，系統鑑別是透過分析輸入與輸出的統計資料，找出描述系統行為的數學模型；SysId 會用最小平方法等曲線擬合技術，從實際量測中找出模型係數<a class="ref" href="#src15-1">[1]</a>。它支援三種模型<a class="ref" href="#src15-1">[1]</a>：</p>
+  <p>系統鑑別就是分析輸入和輸出的資料，找出一個能描述系統行為的數學模型。SysId 用最小平方法這類曲線擬合，從實際量測裡把模型的係數找出來<a class="ref" href="#src15-1">[1]</a>。它支援三種模型<a class="ref" href="#src15-1">[1]</a>：</p>
   <table class="map">
     <thead><tr><th>分析類型</th><th>模型</th><th>適合</th></tr></thead>
     <tbody>
@@ -3749,24 +3749,24 @@ public void setSlowMode(boolean slow) {
       <tr><td>Arm</td><td>V = kG·cos(θ) + kS·sgn(ω) + kV·ω + kA·α</td><td>手臂</td></tr>
     </tbody>
   </table>
-  <p>這三個式子就是第 13 章的前饋方程式。SysId 做的事，就是替你的機構找出式子裡的係數。</p>
+  <p>有沒有很眼熟？這三條就是第 13 章的前饋方程式。SysId 做的事，就是幫你的機構把式子裡的係數找出來。</p>
 
   <h2>四項測試</h2>
-  <p>WPILib 文件說明，標準的鑑別流程有兩種測試<a class="ref" href="#src15-2">[2]</a>：</p>
+  <p>標準流程有兩種測試<a class="ref" href="#src15-2">[2]</a>：</p>
   <ul>
-    <li><strong>Quasistatic</strong>：機構被非常緩慢地加速，所以和加速度有關的電壓可以忽略（「近乎靜態」）。</li>
-    <li><strong>Dynamic</strong>：給機構一個固定的「步階電壓」，用來量加速時的行為。</li>
+    <li><strong>Quasistatic</strong>：讓機構非常慢地加速，所以跟加速度有關的電壓可以忽略（「近乎靜態」的意思）。</li>
+    <li><strong>Dynamic</strong>：直接給機構一個固定的「步階電壓」，量它加速時的表現。</li>
   </ul>
-  <p>兩種測試都要往前、往後各做一次，共四項。順序不拘，但建議做完往前立刻做往後，機構大致會回到原位<a class="ref" href="#src15-2">[2]</a>。</p>
+  <p>兩種都要往前、往後各做一次，共四項。順序隨意，但建議往前做完馬上做往後，機構大概會回到原位<a class="ref" href="#src15-2">[2]</a>。</p>
 
   <h2>收了哪些資料</h2>
-  <p>每一個取樣點記下三樣東西：馬達的<strong>電壓</strong>、機構的<strong>位置</strong>與<strong>速度</strong>，再加上現在跑的是哪一項測試（SysId 用「state」字串分段）<a class="ref" href="#src15-7">[7]</a>。加速度沒有直接量，是從速度變化算出來的，所以雜訊特別多。</p>
-  <p>每一個點都代入同一條式子。以升降機構為例：</p>
+  <p>每個取樣點會記三樣東西：馬達的<strong>電壓</strong>、機構的<strong>位置</strong>和<strong>速度</strong>，再加上現在在跑哪一項測試（SysId 用「state」字串來分段）<a class="ref" href="#src15-7">[7]</a>。加速度沒有直接量，是從速度變化算出來的，所以雜訊特別多。</p>
+  <p>每一個點都代進同一條式子。拿升降機構當例子：</p>
   <pre><code>V = kS·sgn(v) + kG + kV·v + kA·a</code></pre>
-  <p>一次測試有幾百個點，就有幾百條這樣的式子，但未知數只有 kS、kG、kV、kA 四個。每個點都有量測誤差，不可能每條式子都剛好成立。</p>
+  <p>一次測試有幾百個點，就有幾百條這種式子，但未知數只有 kS、kG、kV、kA 四個。每個點都有量測誤差，不可能每一條都剛好成立。</p>
 
   <h2>回歸：從資料找出係數</h2>
-  <p>SysId 做的是最小平方法之類的曲線擬合：找一組 kS、kG、kV、kA，讓所有點的「預測電壓」和「實際電壓」差距的平方加起來最小<a class="ref" href="#src15-1">[1]</a>。四項測試各自負責讓某些係數能被分辨出來：</p>
+  <p>所以 SysId 用最小平方法這類曲線擬合：找一組 kS、kG、kV、kA，讓所有點的「預測電壓」跟「實際電壓」的差距平方加起來最小<a class="ref" href="#src15-1">[1]</a>。四項測試各自負責讓某幾個係數分得出來：</p>
   <table class="map">
     <thead><tr><th>測試</th><th>資料的特性</th><th>主要幫忙分辨</th></tr></thead>
     <tbody>
@@ -3775,10 +3775,10 @@ public void setSlowMode(boolean slow) {
       <tr><td>正向＋反向</td><td>摩擦方向相反，重力方向不變</td><td>把 kS 和 kG 分開</td></tr>
     </tbody>
   </table>
-  <p>最後一列是為什麼一定要做正反兩個方向。升降機構往上時截距是 kG + kS，往下時是 kG − kS（摩擦反過來，重力不變）。只有一個方向，就只看得到兩者的和，分不開。手臂的 kG 還乘上 cos θ，會隨角度變化，所以也分得開，但一樣需要兩個方向來判斷摩擦。</p>
+  <p>最後一列就是「為什麼一定要做正反兩個方向」。升降機構往上時截距是 kG + kS，往下時是 kG − kS（摩擦反過來，重力不變）。只做一個方向，你就只看得到兩個加起來，分不開。手臂的 kG 還要乘 cos θ、會隨角度變，所以分得開，但判斷摩擦一樣要兩個方向。</p>
 
   <h2>動手試：用資料擬合 kS、kG、kV</h2>
-  <p>下面是一台模擬升降機構的 quasistatic 資料（正向、反向）。擬合只用 quasistatic，所以只估 kS、kG、kV。先看乾淨資料的結果，再一個一個打開壞資料，看擬合出來的參數怎麼偏掉。</p>
+  <p>下面是一台模擬升降機構的 quasistatic 資料（正向、反向）。只用 quasistatic 擬合，所以只估 kS、kG、kV。先看乾淨資料的結果，再把壞資料一個一個打開，看擬合出來的參數怎麼跑掉。</p>
   <div class="lab">
     <div class="calls" role="group" aria-label="資料狀況">
       <button class="call sid" data-sid="tail" aria-pressed="false">速度門檻太低（包含還沒動的點）</button>
@@ -3791,13 +3791,13 @@ public void setSlowMode(boolean slow) {
   </div>
 
   <h2>怎麼判斷資料能不能信</h2>
-  <p>WPILib 的 SysId 在 Diagnostics 區塊提供三個擬合指標<a class="ref" href="#src15-9">[9]</a>：</p>
+  <p>SysId 的 Diagnostics 區塊有三個擬合指標<a class="ref" href="#src15-9">[9]</a>：</p>
   <ul>
-    <li><strong>模擬速度 r²</strong>：用擬合出的參數，從實際電壓模擬出速度，和量到的速度比較。文件說大於 0.9 代表擬合良好。</li>
-    <li><strong>加速度 r²</strong>：機構振動讓加速度很吵，即使很好的資料也很少超過 0.5；低於約 0.2 時，kA 的可信度就很有疑問。</li>
-    <li><strong>模擬速度 RMSE</strong>：模擬速度誤差的標準差，可以當作測試過程雜訊大小的估計。</li>
+    <li><strong>模擬速度 r²</strong>：拿擬合出來的參數，從實際電壓模擬出速度，再跟量到的速度比。大於 0.9 就是擬合得不錯。</li>
+    <li><strong>加速度 r²</strong>：機構會振動，加速度很吵，就算很好的資料也很少超過 0.5；低於大概 0.2 的話，kA 就很可疑了。</li>
+    <li><strong>模擬速度 RMSE</strong>：模擬速度誤差的標準差，可以當成這次測試雜訊有多大的估計。</li>
   </ul>
-  <p>也要看圖。文件說明，好的 quasistatic 速度對時間圖幾乎是直線，dynamic 則是指數形狀地接近穩定速度；偏離這些形狀就代表機構設定、分析設定或測試過程有問題。常見的壞資料<a class="ref" href="#src15-9">[9]</a>：</p>
+  <p>數字之外也要看圖。好的 quasistatic 速度對時間圖幾乎是一條直線，dynamic 則是像指數那樣慢慢靠近穩定速度。長得不像，就代表機構設定、分析設定或測試過程有問題。常見的壞資料有這些<a class="ref" href="#src15-9">[9]</a>：</p>
   <table class="map">
     <thead><tr><th>狀況</th><th>圖上看起來</th><th>怎麼處理</th></tr></thead>
     <tbody>
@@ -3807,20 +3807,20 @@ public void setSlowMode(boolean slow) {
       <tr><td>撞到機械極限</td><td>速度突然掉到 0，電壓卻還在升</td><td>丟掉那段資料，下次提早放開</td></tr>
     </tbody>
   </table>
-  <p>文件也提到：機構相對馬達很輕時，kA 會趨近 0，前饋可以忽略它；但 kA 量不準時，算出的回饋增益也會不準，需要手動調<a class="ref" href="#src15-9">[9]</a>。</p>
+  <p>另外，機構比馬達輕很多的時候，kA 會趨近 0，前饋可以不管它；但 kA 量不準的話，算出來的回饋增益也會不準，要手動調<a class="ref" href="#src15-9">[9]</a>。</p>
 
   <h3>為什麼和理論值不一樣</h3>
-  <p>第 13 章的 kG、kV、kA 可以從質量、齒輪比和馬達常數估計 [MODEL]，但 SysId [SYSID] 量到的幾乎一定不同。常見原因：</p>
+  <p>第 13 章的 kG、kV、kA 可以用質量、齒輪比和馬達常數去估 [MODEL]，但 SysId [SYSID] 量到的幾乎一定不一樣。常見的原因是：</p>
   <ul>
-    <li><strong>模型沒算到的東西</strong>：齒輪箱與鏈條的效率損失、軸承摩擦、線材的拉力、螺絲和電線的質量。</li>
-    <li><strong>模型假設的誤差</strong>：質量、力臂或重心估錯；每顆馬達的常數也有個體差異。</li>
-    <li><strong>機構資料填錯</strong>：差很多（例如差好幾倍）時，通常不是摩擦，而是齒輪比、鼓輪半徑或單位填錯。工具站 4F 單元二會把 SysId 結果和理論值比較，推測可能填錯的資料（見本章的工具站任務）。</li>
+    <li><strong>模型沒算到的東西</strong>：齒輪箱和鏈條的效率損失、軸承摩擦、線材的拉力、螺絲和電線的質量。</li>
+    <li><strong>模型的假設本來就有誤差</strong>：質量、力臂或重心估錯；每顆馬達的常數也都有一點個體差異。</li>
+    <li><strong>機構資料填錯</strong>：差很多（差好幾倍那種）的時候，通常不是摩擦，而是齒輪比、鼓輪半徑或單位填錯了。工具站 4F 單元二會拿 SysId 結果跟理論值比，幫你推測可能填錯哪個（看本章的工具站任務）。</li>
   </ul>
-  <p>差一點是正常的，這就是為什麼要量：理論值告訴你數量級對不對，SysId 告訴你真實機構是多少。</p>
+  <p>差一點是正常的，這也是為什麼要量：理論值告訴你數量級對不對，SysId 告訴你真實的機構到底是多少。</p>
 
   <h2>寫 SysIdRoutine</h2>
-  <p>WPILib 提供 <code>SysIdRoutine</code>：<code>Config</code> 描述測試設定（quasistatic 的電壓上升速率、dynamic 的步階電壓、安全用的最長時間、記錄測試狀態的回呼），<code>Mechanism</code> 描述怎麼驅動馬達和記錄資料<a class="ref" href="#src15-2">[2]</a>。文件建議把 routine 和回呼都寫在 Subsystem 裡<a class="ref" href="#src15-2">[2]</a>。</p>
-  <p>用 TalonFX 時，CTRE 建議不用 <code>SysIdRoutine</code> 自己記錄，而是用 Phoenix 的 <code>SignalLogger</code><a class="ref" href="#src15-2">[2]</a>。它的好處是自動擷取所有狀態訊號、帶著 CAN 上的時間戳，而且不受主迴圈時間和 Java GC 影響，能明顯提高系統鑑別的準確度<a class="ref" href="#src15-3">[3]</a>。下面依照 CTRE 官方 SysId 範例的寫法<a class="ref" href="#src15-4">[4]</a>，加到第 6 章的 <code>ArmSubsystem</code>：</p>
+  <p>WPILib 有一個 <code>SysIdRoutine</code>：<code>Config</code> 寫測試設定（quasistatic 的電壓上升速率、dynamic 的步階電壓、安全用的最長時間、記錄測試狀態的回呼），<code>Mechanism</code> 寫怎麼驅動馬達、怎麼記錄資料<a class="ref" href="#src15-2">[2]</a>。routine 和回呼建議都寫在 Subsystem 裡<a class="ref" href="#src15-2">[2]</a>。</p>
+  <p>用 TalonFX 的話，建議不要讓 <code>SysIdRoutine</code> 自己記錄，改用 Phoenix 的 <code>SignalLogger</code><a class="ref" href="#src15-2">[2]</a>。它會自動抓所有狀態訊號，帶著 CAN 上的時間戳，而且不受主迴圈時間和 Java GC 影響，系統鑑別會準很多<a class="ref" href="#src15-3">[3]</a>。下面照 CTRE 官方 SysId 範例的寫法<a class="ref" href="#src15-4">[4]</a>，加進第 6 章的 <code>ArmSubsystem</code>：</p>
   <pre><code>import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -3848,14 +3848,14 @@ public class ArmSubsystem extends SubsystemBase {
         return sysId.dynamic(direction);
     }
 }</code></pre>
-  <p>重點：</p>
+  <p>幾個重點：</p>
   <ul>
-    <li>電壓回呼沒有直接呼叫 IO，而是切換成第 6 章的 <code>ControlMode.VOLTAGE</code>，讓 periodic 送出電壓。這樣才不會被下一輪的 <code>setPositionGoal</code> 蓋掉。</li>
-    <li>測試指令結束後，<code>mode</code> 仍然是 <code>VOLTAGE</code>，手臂不會自己回到位置控制；下一次呼叫 <code>setGoal</code> 才會切回。測完記得先讓手臂回到安全位置。</li>
-    <li>CTRE 範例把 dynamic 電壓降到 4 V 以避免電壓驟降（brownout）<a class="ref" href="#src15-4">[4]</a>。手臂行程很短，這裡示範更小的值；數值要依機構調整。</li>
-    <li>CTRE 範例也把要用到的 Position、Velocity、MotorVoltage 訊號提高到 250 Hz，讓資料更密<a class="ref" href="#src15-4">[4]</a>。</li>
+    <li>電壓回呼沒有直接呼叫 IO，而是切到第 6 章的 <code>ControlMode.VOLTAGE</code>，讓 periodic 去送電壓。不然下一輪的 <code>setPositionGoal</code> 會把它蓋掉。</li>
+    <li>測試指令結束後 <code>mode</code> 還停在 <code>VOLTAGE</code>，手臂不會自己回到位置控制，要等下一次呼叫 <code>setGoal</code> 才會切回去。測完記得先讓手臂回到安全位置。</li>
+    <li>CTRE 範例把 dynamic 電壓降到 4 V，避免電壓驟降（brownout）<a class="ref" href="#src15-4">[4]</a>。手臂行程很短，這裡示範更小的值；實際數字要看機構調。</li>
+    <li>CTRE 範例也把會用到的 Position、Velocity、MotorVoltage 訊號拉到 250 Hz，資料比較密<a class="ref" href="#src15-4">[4]</a>。</li>
   </ul>
-  <p>在 <code>RobotContainer</code> 裡把四項測試綁到按鍵上，按住才執行，放開立刻停止（第 9 章的 <code>whileTrue</code>）。CTRE 範例也用兩個按鍵手動開始、停止記錄<a class="ref" href="#src15-4">[4]</a>：</p>
+  <p>在 <code>RobotContainer</code> 把四項測試綁到按鍵上，按住才跑、放開馬上停（第 9 章的 <code>whileTrue</code>）。CTRE 範例也是用兩個按鍵手動開始、停止記錄<a class="ref" href="#src15-4">[4]</a>：</p>
   <pre><code>// 只在測試用的配置裡綁定，比賽用的配置不要有
 controller.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
 controller.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
@@ -3867,29 +3867,29 @@ controller.x().whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));</co
 
   <h2>跑測試</h2>
   <ol>
-    <li>換上充飽的電池，確認機構周圍沒有人。</li>
-    <li>把手臂放在行程中間，Enable（Teleop）。</li>
+    <li>換一顆充飽的電池，確認機構旁邊沒人。</li>
+    <li>手臂放在行程中間，Enable（Teleop）。</li>
     <li>按開始記錄。</li>
-    <li>按住 Y（quasistatic 往前），手臂接近上限前放開；接著按住 A（往後），接近下限前放開。</li>
-    <li>同樣做 B、X（dynamic）。dynamic 動得很快，要更早放開。</li>
-    <li>按停止記錄，再 Disable。</li>
+    <li>按住 Y（quasistatic 往前），手臂快到上限前放開；接著按住 A（往後），快到下限前放開。</li>
+    <li>B、X（dynamic）也一樣。dynamic 動得很快，要更早放。</li>
+    <li>按停止記錄，然後 Disable。</li>
   </ol>
-  <div class="note warn"><strong>SysIdRoutine 不會替你停</strong>WPILib 文件警告：routine 只會產生電壓命令，超過安全範圍時要自己提早停止，軟硬體極限也要自己設好<a class="ref" href="#src15-5">[5]</a>。第 6 章的軟體極限（SoftwareLimitSwitch）在測試時一定要開著。</div>
-  <div class="note warn"><strong>一份日誌只能有一個 routine</strong>WPILib 文件警告：只有「裡面只有一個 routine」的日誌檔能拿來分析。多顆馬達可以放在同一個 routine 裡同時跑，但如果先測一個機構、再測另一個，中間沒有取出日誌或重開 roboRIO，分析會失敗<a class="ref" href="#src15-5">[5]</a>。用 SignalLogger 時，每次測完一個機構就 stop，再 start 開新檔。</div>
-  <p>補充：CTRE 文件說明，在 roboRIO 2（或插著 USB 隨身碟的 roboRIO 1）上，SignalLogger 預設會在開機後、機器人被 Enable 或 Driver Station 連上時自動開始記錄<a class="ref" href="#src15-3">[3]</a>。手動 start / stop 可以讓一個檔案裡只有這次的測試，比較好找。</p>
+  <div class="note warn"><strong>SysIdRoutine 不會幫你停</strong>routine 只會一直送電壓命令，快超出安全範圍時要你自己提早放開，軟硬體極限也要自己設好<a class="ref" href="#src15-5">[5]</a>。第 6 章的軟體極限（SoftwareLimitSwitch）測試時一定要開著。</div>
+  <div class="note warn"><strong>一份日誌只能有一個 routine</strong>只有「裡面只有一個 routine」的日誌才能拿去分析。多顆馬達可以放在同一個 routine 裡一起跑，但如果你先測一個機構、再測另一個，中間沒有取出日誌或重開 roboRIO，分析就會失敗<a class="ref" href="#src15-5">[5]</a>。用 SignalLogger 的話，每測完一個機構就 stop，再 start 開新檔。</div>
+  <p>補充一下：在 roboRIO 2（或插著 USB 隨身碟的 roboRIO 1）上，SignalLogger 預設會在開機後、機器人被 Enable 或 Driver Station 連上時自動開始記錄<a class="ref" href="#src15-3">[3]</a>。手動 start / stop 可以讓一個檔案裡只有這次的測試，比較好找。</p>
 
   <h2>取出資料並分析</h2>
   <ol>
-    <li><strong>取出 hoot 檔。</strong>用 Tuner X 左側的檔案總管下載 hoot 日誌，下載後會自動放進右邊的轉檔佇列<a class="ref" href="#src15-6">[6]</a>。</li>
-    <li><strong>轉成 WPILog。</strong>在 Convert 分頁選 wpilog 格式轉檔。可以用篩選只留下要的訊號，例如某顆 TalonFX 的 MotorVoltage、Position、Velocity<a class="ref" href="#src15-6">[6]</a>。沒有 Pro 授權的裝置只能匯出一部分免費訊號，但 TalonFX 的 Position、Velocity、MotorVoltage 都在免費清單裡<a class="ref" href="#src15-3">[3]</a>。</li>
-    <li><strong>載入 SysId。</strong>在 Log Loader 開啟檔案，把名稱含 "state" 的字串項目拖到 Test State；再把 Position、Velocity、Voltage 拖到對應欄位<a class="ref" href="#src15-7">[7]</a>。</li>
-    <li><strong>檢查單位與分析類型。</strong>手臂選 Arm。資料單位如果不對，用 Data Selector 的 Units 修正<a class="ref" href="#src15-7">[7]</a>。設了 <code>SensorToMechanismRatio</code> 的 TalonFX，Position、Velocity 已經是手臂端的 rotations、rot/s。</li>
-    <li><strong>看 Feedforward 結果。</strong>畫面會顯示算出的 kS、kV、kA、kG。</li>
+    <li><strong>拿出 hoot 檔。</strong>用 Tuner X 左邊的檔案總管下載 hoot 日誌，下載完會自動丟進右邊的轉檔佇列<a class="ref" href="#src15-6">[6]</a>。</li>
+    <li><strong>轉成 WPILog。</strong>在 Convert 分頁選 wpilog 格式轉檔。可以用篩選只留要的訊號，例如某顆 TalonFX 的 MotorVoltage、Position、Velocity<a class="ref" href="#src15-6">[6]</a>。沒有 Pro 的裝置只能匯出一部分免費訊號，還好 TalonFX 的 Position、Velocity、MotorVoltage 都在免費清單裡<a class="ref" href="#src15-3">[3]</a>。</li>
+    <li><strong>載入 SysId。</strong>在 Log Loader 開檔，把名稱有 "state" 的字串項目拖到 Test State，再把 Position、Velocity、Voltage 拖到對應的欄位<a class="ref" href="#src15-7">[7]</a>。</li>
+    <li><strong>檢查單位和分析類型。</strong>手臂選 Arm。單位不對的話用 Data Selector 的 Units 修正<a class="ref" href="#src15-7">[7]</a>。有設 <code>SensorToMechanismRatio</code> 的 TalonFX，Position、Velocity 已經是手臂端的 rotations、rot/s 了。</li>
+    <li><strong>看 Feedforward 結果。</strong>畫面上會顯示算出來的 kS、kV、kA、kG。</li>
   </ol>
-  <p>Feedback 區塊也會用 LQR 算出建議的 kP、kD，但 WPILib 文件強調這些只是「有根據的猜測」，不保證完美，應該當成進一步調整的起點<a class="ref" href="#src15-8">[8]</a>。要讓建議值符合 TalonFX 的控制器，需要選對 Gain Settings Preset 與 Controller Type<a class="ref" href="#src15-8">[8]</a>。</p>
+  <p>Feedback 區塊也會用 LQR 算出建議的 kP、kD，不過 WPILib 自己都說這只是「有根據的猜測」，不保證完美，當成往下調的起點就好<a class="ref" href="#src15-8">[8]</a>。要讓建議值對得上 TalonFX 的控制器，Gain Settings Preset 和 Controller Type 要選對<a class="ref" href="#src15-8">[8]</a>。</p>
 
   <h2>把結果填回程式</h2>
-  <p>SysId 的單位和 Phoenix 6 Slot0 的單位要一致：如果載入的資料是手臂端 rotations，得到的 kV 就是 V/(rot/s)、kA 是 V/(rot/s²)，可以直接填進 Slot0。</p>
+  <p>SysId 的單位要跟 Phoenix 6 Slot0 的單位一樣：載入的資料如果是手臂端 rotations，得到的 kV 就是 V/(rot/s)、kA 是 V/(rot/s²)，可以直接填進 Slot0。</p>
   <pre><code>// 量測日期：YYYY-MM-DD，電池編號：__，SysId 資料檔：__
 config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 config.Slot0.kS = 0.0; // [SYSID] TODO: SysId
@@ -3902,24 +3902,24 @@ config.Slot0.kD = 0.0; // [TUNED] TODO
 // 用 MotionMagic Expo 時（第 14 章），也可以用 kV、kA 當起點
 config.MotionMagic.MotionMagicExpo_kV = 0.0; // [SYSID] TODO
 config.MotionMagic.MotionMagicExpo_kA = 0.0; // [SYSID] TODO</code></pre>
-  <p>把量測日期、電池和資料檔寫在註解裡。機構改過（換馬達、改齒輪比、加重量）就要重測。</p>
-  <p>另外，WPILib 文件提到，SysId 算出的前饋不只能用在軌跡追蹤，也能讓開迴路控制更好操作，因為搖桿輸入會更接近機構的實際反應<a class="ref" href="#src15-1">[1]</a>。</p>
+  <p>量測日期、用哪顆電池、資料檔名都寫在註解裡。機構只要改過（換馬達、改齒輪比、加重量）就要重測。</p>
+  <p>順帶一提，SysId 算出來的前饋不只能用在軌跡追蹤，連開迴路控制都會變好操作，因為搖桿推多少，機構的反應會更接近你預期的<a class="ref" href="#src15-1">[1]</a>。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>手臂的 0 度不是水平</strong>Arm 模型用 cos(θ)，θ 是和水平的夾角。0 度不是水平時算出的 kG 會錯，手臂在某些角度撐不住（第 12 章的 MagnetOffset）。</div>
-  <div class="note warn"><strong>一個日誌裡混了好幾次測試</strong>先測手臂、再測升降，沒有分開記錄，SysId 會分析失敗或給出奇怪的結果。</div>
-  <div class="note warn"><strong>測試時撞到極限</strong>撞到機械極限的那段資料會讓擬合失準，還可能損壞機構。每項測試都在接近極限前放開。</div>
-  <div class="note warn"><strong>拿低電量電池測</strong>dynamic 測試時電壓驟降，資料品質變差，嚴重時 roboRIO brownout。</div>
-  <div class="note warn"><strong>把 SysId 的 kP 當最終答案</strong>回饋增益只是起點，還是要上機確認沒有振盪或抖動。</div>
+  <div class="note warn"><strong>手臂的 0 度不是水平</strong>Arm 模型用 cos(θ)，θ 是跟水平的夾角。0 度不是水平的話算出來的 kG 會錯，手臂在某些角度會撐不住（第 12 章的 MagnetOffset）。</div>
+  <div class="note warn"><strong>一個日誌裡混了好幾次測試</strong>先測手臂再測升降，卻沒有分開記錄，SysId 會分析失敗，或給你很怪的結果。</div>
+  <div class="note warn"><strong>測試時撞到極限</strong>撞到機械極限那段資料會讓擬合跑掉，還可能把機構撞壞。每項測試都要在快到極限前放開。</div>
+  <div class="note warn"><strong>拿快沒電的電池測</strong>dynamic 測試時電壓驟降，資料變很爛，嚴重的話 roboRIO 直接 brownout。</div>
+  <div class="note warn"><strong>把 SysId 的 kP 當最終答案</strong>回饋增益只是起點，還是要上機確認不會晃、不會抖。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：測試用的按鍵配置</h2>
-  <p>比賽時不應該能誤觸 SysId。請改寫上面的綁定：只有在 Test 模式（第 7 章）時，四個按鍵才會執行 SysId 測試。</p>
+  <p>比賽時絕對不能誤觸到 SysId。改寫上面的綁定，讓四個按鍵只有在 Test 模式（第 7 章）時才會跑 SysId。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>要讓兩個條件都成立時才執行，第 9 章學過怎麼組合 Trigger。</p>
+      <p>兩個條件都成立才執行，第 9 章教過怎麼組合 Trigger。</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>用 new Trigger(DriverStation::isTest) 表示「在 Test 模式」，再用 .and(...) 和按鍵組合。</p>
@@ -3934,7 +3934,7 @@ controller.y().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Directi
 controller.a().and(testMode).whileTrue(arm.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
 controller.b().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kForward));
 controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.kReverse));</code></pre>
-    <p>用第 9 章的 <code>and</code> 組合條件：兩個條件都成立時 Trigger 才為真。按鍵放開或離開 Test 模式時，<code>whileTrue</code> 會取消指令。第 7 章的 <code>Robot.java</code> 把 <code>CommandScheduler.getInstance().run()</code> 放在 <code>robotPeriodic()</code>，所以 Test 模式下排程器照樣運作；<code>testInit()</code> 的 <code>cancelAll()</code> 則確保進入 Test 時先把其他指令停掉。</p>
+    <p>用第 9 章的 <code>and</code> 組合條件，兩個都成立 Trigger 才會是 true。放開按鍵或離開 Test 模式，<code>whileTrue</code> 就會取消指令。第 7 章的 <code>Robot.java</code> 把 <code>CommandScheduler.getInstance().run()</code> 放在 <code>robotPeriodic()</code>，所以 Test 模式下排程器照樣在跑；<code>testInit()</code> 的 <code>cancelAll()</code> 則確保一進 Test 就先把其他指令停掉。</p>
     </div>
   </div>
 
@@ -3955,16 +3955,16 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
 <template id="tpl-ch16">
   <p class="headline-code">CAN ID 16｜上場</p>
   <h1>自動階段與路徑：校外教學的行程表</h1>
-  <p class="lede">讀完這章，你會知道場地座標怎麼定、里程計怎麼估計機器人位置以及它為什麼會飄、PathPlanner 的路徑和 Auto 怎麼變成指令，以及紅藍聯盟翻轉、Named Commands、自動程式選單這些上場前一定要處理好的細節。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 與 PathPlannerLib 2026 的文件。PathPlanner 的 API 每年都可能改，網路上舊的範例（例如 2024 年以前的 <code>HolonomicPathFollowerConfig</code>）已經不能用。本章以 swerve 底盤為例。</div>
+  <p class="lede">自動階段那十幾秒，沒有人能碰搖桿，機器人全靠你事先寫好的程式。這章講場地座標怎麼定、里程計怎麼估位置（還有它為什麼會飄）、PathPlanner 的路徑和 Auto 怎麼變成指令。最後是幾個上場前一定要搞定的細節：紅藍聯盟翻轉、Named Commands、自動程式選單。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 和 PathPlannerLib 2026 的文件寫的。PathPlanner 的 API 幾乎每年都會改，網路上的舊範例（像 2024 年以前的 <code>HolonomicPathFollowerConfig</code>）已經不能用了。這章拿 swerve 底盤當例子。</div>
 
-  <h2>生活比喻：校外教學的行程表</h2>
+  <h2>先講個比喻：校外教學的行程表</h2>
   <div class="story">
-    <p><strong>老師不能跟車，全靠行程表。</strong>校外教學的前 15 分鐘，老師必須留在學校，遊覽車只能照事先寫好的行程表走。路線怎麼開、在哪一站下車做什麼，都要提前寫好。</p>
-    <p><strong>司機靠里程表和方向盤估計位置。</strong>車上沒有 GPS，司機只能記「往北開了多少公里、在哪裡左轉」，推算現在在哪裡。短程很準，但開久了、中途被別的車擦撞一下，推算就會越來越偏。</p>
-    <p><strong>地圖的原點永遠在藍色校門。</strong>學校有紅、藍兩個校門，兩邊的路線剛好左右對稱。地圖只畫一份，原點永遠在藍色校門；從紅色校門出發時，就把整份路線翻過去用。</p>
-    <p><strong>每一站要做的事，用代號寫在行程表上。</strong>行程表上寫「到博物館：活動 A」。活動 A 是什麼，出發前老師要先跟領隊說清楚；如果出發後才說，領隊手上的行程表早就印好了，不會知道活動 A 要做什麼。</p>
-    <p><strong>好幾份行程表，出發前選一份。</strong>老師準備了幾份行程表：天氣好走 A 路線，下雨走 B 路線。出發前在黑板上選好，遊覽車就照那一份走。</p>
+    <p>校外教學的前 15 分鐘，老師得留在學校，不能跟車，遊覽車只能照事先寫好的行程表走。路線怎麼開、哪一站下車做什麼，全部都要提前寫好。</p>
+    <p>車上沒有 GPS，司機只能記「往北開了幾公里、在哪裡左轉」，自己推算現在在哪。短程很準，但開久了，或中途被別的車擦到一下，推算就會越來越偏。</p>
+    <p>學校有紅、藍兩個校門，兩邊的路線剛好左右對稱。地圖只畫一份，原點永遠在藍色校門；從紅色校門出發，就把整份路線翻過去用。</p>
+    <p>行程表上會寫「到博物館：活動 A」。活動 A 是什麼，出發前老師就要先跟領隊講清楚。出發後才講就來不及了，領隊手上的行程表早就印好，根本不知道活動 A 要幹嘛。</p>
+    <p>老師通常會準備好幾份行程表：天氣好走 A 路線，下雨走 B 路線。出發前在黑板上選好一份，遊覽車就照那份走。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>程式</th></tr></thead>
@@ -3981,28 +3981,28 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
       <tr><td>黑板上選一份行程表</td><td>儀表板上的自動程式選單（SendableChooser）</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>遊覽車偏了司機會看路標修正；機器人的里程計自己不會修正，要靠第 17 章的視覺定位（AprilTag）才能把位置拉回來。另外，路線「翻過去」的方式取決於當年的場地：WPILib 文件說明，FRC 的場地有「鏡射」和「旋轉」兩種配置，不同年份不一樣<a class="ref" href="#src16-1">[1]</a>。上場前一定要在紅方實際跑一次，確認翻轉後的路徑是對的。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>遊覽車開偏了，司機會看路標修正；機器人的里程計不會自己修正，要靠第 17 章的視覺定位（AprilTag）才拉得回來。還有，路線要怎麼「翻過去」看當年的場地：FRC 場地有「鏡射」和「旋轉」兩種配置，每年不一樣<a class="ref" href="#src16-1">[1]</a>。上場前一定要在紅方實際跑一次，確認翻過去的路徑是對的。</div>
 
   <h2>場地與機器人的座標</h2>
-  <p>WPILib 大多數情況使用 NWU 慣例：X 軸正向朝前、Y 軸正向朝左、Z 軸朝上；角度 0° 對齊 +X，逆時針為正，所以 90° 是 +Y<a class="ref" href="#src16-1">[1]</a>。兩個要特別注意的地方<a class="ref" href="#src16-1">[1]</a>：</p>
+  <p>WPILib 大部分時候用 NWU 慣例：X 往前是正、Y 往左是正、Z 往上；角度 0° 對著 +X，逆時針為正，所以 90° 就是 +Y<a class="ref" href="#src16-1">[1]</a>。有兩個地方特別容易出錯<a class="ref" href="#src16-1">[1]</a>：</p>
   <ul>
-    <li>有些陀螺儀是<strong>順時針為正</strong>，讀值要確認方向，必要時反過來。</li>
-    <li>搖桿用的是另一套座標（NED）：往前推是負的 Y、往右推是正的 X。把搖桿值交給底盤時，常常需要加負號。</li>
+    <li>有些陀螺儀是<strong>順時針為正</strong>，讀值方向要確認，需要的話反過來。</li>
+    <li>搖桿用的是另一套座標（NED）：往前推是負的 Y、往右推是正的 X。所以搖桿值丟給底盤之前，常常要加負號。</li>
   </ul>
 
   <h2>里程計：機器人怎麼知道自己在哪</h2>
-  <p>里程計用輪子的編碼器和陀螺儀，推算機器人在場上的位置（<code>Pose2d</code>：x、y、朝向）。WPILib 文件說明：因為只用編碼器和陀螺儀，估計的位置會隨時間漂移，特別是和其他機器人碰撞時；不過在自動階段通常非常準確<a class="ref" href="#src16-2">[2]</a>。所以自動階段靠里程計跑路徑是可行的，但每次開始前都要把位置設對。</p>
-  <p>用 CTRE Tuner X 產生的 swerve 程式，底盤會自己維護里程計，<code>getState().Pose</code> 就是目前估計的位置<a class="ref" href="#src16-3">[3]</a>。</p>
+  <p>里程計用輪子的編碼器加陀螺儀，推算機器人在場上的位置（<code>Pose2d</code>：x、y、朝向）。因為只靠編碼器和陀螺儀，估出來的位置會隨時間慢慢飄，跟別台機器人撞一下更明顯；不過在自動階段通常很準<a class="ref" href="#src16-2">[2]</a>。所以自動階段靠里程計跑路徑沒問題，前提是每次開始前位置都要設對。</p>
+  <p>如果底盤是用 CTRE Tuner X 產生的 swerve 程式，它會自己維護里程計，<code>getState().Pose</code> 就是目前估計的位置<a class="ref" href="#src16-3">[3]</a>。</p>
 
   <h2>PathPlanner 是什麼</h2>
-  <p>PathPlanner 分成兩部分：電腦上的 GUI，用來畫路徑、組 Auto；機器人程式裡的 PathPlannerLib，負責讀檔並跟隨路徑。PathPlannerLib 可以用 WPILib 的 Vendor Dependency Manager 安裝<a class="ref" href="#src16-4">[4]</a>（第 0 章的 vendordep）。</p>
-  <p>在 GUI 裡，<strong>Path</strong> 是一條路線；<strong>Auto</strong> 是一個 sequential 指令群組，裡面可以放路徑跟隨指令、Named Commands、等待指令和巢狀的指令群組，同一條路徑可以在多個 Auto 裡重複使用<a class="ref" href="#src16-5">[5]</a>。換句話說，Auto 就是第 10 章的組合指令，只是用 GUI 畫出來。</p>
+  <p>PathPlanner 分兩塊：電腦上的 GUI 用來畫路徑、組 Auto；機器人程式裡的 PathPlannerLib 負責讀檔、跟著路徑跑。PathPlannerLib 用 WPILib 的 Vendor Dependency Manager 就能裝<a class="ref" href="#src16-4">[4]</a>（第 0 章講過的 vendordep）。</p>
+  <p>GUI 裡的 <strong>Path</strong> 就是一條路線；<strong>Auto</strong> 則是一個 sequential 指令群組，裡面可以放路徑跟隨指令、Named Commands、等待指令，還有巢狀的指令群組，同一條路徑也可以在好幾個 Auto 裡重複用<a class="ref" href="#src16-5">[5]</a>。說白了，Auto 就是第 10 章的組合指令，只是用 GUI 畫出來而已。</p>
 
   <h3>Robot Config</h3>
-  <p>GUI 的設定頁要填機器人的質量、轉動慣量（MOI）、輪子與馬達等資料，PathPlanner 用它們限制軌跡的最大速度、加速度。文件提醒這些值要盡量準確：質量要含保險桿和電池；MOI 建議用 SysId 的結果計算，粗估的公式假設質量均勻分布，通常不準<a class="ref" href="#src16-6">[6]</a>。這裡又用到第 15 章的 SysId。</p>
+  <p>GUI 的設定頁要填機器人的質量、轉動慣量（MOI）、輪子和馬達這些資料，PathPlanner 會用它們限制軌跡的最大速度和加速度。這些值要盡量準：質量要包含保險桿和電池；MOI 最好用 SysId 的結果算，粗估的公式假設質量平均分布，通常不準<a class="ref" href="#src16-6">[6]</a>。你看，第 15 章的 SysId 又出現了。</p>
 
   <h2>設定 AutoBuilder</h2>
-  <p>PathPlannerLib 用 <code>AutoBuilder</code> 把 GUI 裡的 Auto 變成指令，文件建議在底盤 Subsystem 的建構子裡設定<a class="ref" href="#src16-7">[7]</a>。以下是 CTRE 官方 swerve + PathPlanner 範例的寫法<a class="ref" href="#src16-3">[3]</a>：</p>
+  <p>PathPlannerLib 用 <code>AutoBuilder</code> 把 GUI 裡的 Auto 變成指令，建議在底盤 Subsystem 的建構子裡設定<a class="ref" href="#src16-7">[7]</a>。下面是 CTRE 官方 swerve + PathPlanner 範例的寫法<a class="ref" href="#src16-3">[3]</a>：</p>
   <pre><code>private void configureAutoBuilder() {
     try {
         var config = RobotConfig.fromGUISettings();
@@ -4024,17 +4024,17 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
         DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
     }
 }</code></pre>
-  <p>逐項看：</p>
+  <p>一項一項看：</p>
   <ul>
-    <li><strong>速度必須是機器人座標</strong>（robot relative），不是場地座標<a class="ref" href="#src16-7">[7]</a>。</li>
-    <li><strong>PID</strong>：路徑跟隨本身有前饋，PID 只修正「實際位置和路徑的差距」，這和第 13 章的觀念一樣。</li>
-    <li><strong>翻轉</strong>：最後一個參數回傳 true 時，路徑會翻到紅方那一側。文件特別強調<strong>原點永遠在藍方</strong>；如果需要其他依聯盟顏色的轉換，要自己處理<a class="ref" href="#src16-7">[7]</a>。</li>
-    <li><strong>最後的 <code>this</code></strong>：讓路徑跟隨指令 require 底盤 Subsystem（第 8 章）。</li>
+    <li><strong>速度一定要是機器人座標</strong>（robot relative），不是場地座標<a class="ref" href="#src16-7">[7]</a>。</li>
+    <li><strong>PID</strong>：路徑跟隨本身就有前饋，PID 只負責修「實際位置跟路徑差多少」，跟第 13 章是同一個觀念。</li>
+    <li><strong>翻轉</strong>：最後一個參數回傳 true，路徑就會翻到紅方那一側。這裡特別強調<strong>原點永遠在藍方</strong>；其他要看聯盟顏色的轉換，要自己處理<a class="ref" href="#src16-7">[7]</a>。</li>
+    <li><strong>最後那個 <code>this</code></strong>：讓路徑跟隨指令 require 底盤 Subsystem（第 8 章）。</li>
   </ul>
-  <div class="note warn"><strong>DriverStation.getAlliance() 可能是空的</strong>它回傳 <code>Optional</code>：還沒連上 Driver Station 或 FMS 時沒有值。上面的寫法用 <code>orElse(Alliance.Blue)</code> 預設藍方。這也是為什麼「是否翻轉」要寫成 lambda，在路徑<strong>開始跑的時候</strong>才判斷，而不是開機時就決定。</div>
+  <div class="note warn"><strong>DriverStation.getAlliance() 可能是空的</strong>它回傳的是 <code>Optional</code>，還沒連上 Driver Station 或 FMS 的時候是空的。上面用 <code>orElse(Alliance.Blue)</code> 預設成藍方。這也是為什麼「要不要翻轉」要寫成 lambda：在路徑<strong>開始跑的那一刻</strong>才判斷，不是開機時就決定。</div>
 
   <h2>Named Commands</h2>
-  <p>Auto 和路徑上的事件標記（event marker）要執行機構動作時，用的是名字。程式裡要用 <code>NamedCommands.registerCommand</code> 把名字和指令對起來，名字必須和 GUI 裡完全一樣<a class="ref" href="#src16-8">[8]</a>。</p>
+  <p>Auto 和路徑上的事件標記（event marker）要讓機構做事的時候，是用名字找指令的。程式裡要用 <code>NamedCommands.registerCommand</code> 把名字跟指令對起來，名字要跟 GUI 裡的一字不差<a class="ref" href="#src16-8">[8]</a>。</p>
   <pre><code>public RobotContainer() {
     // 1. 建立 Subsystem
     // 2. 註冊 Named Commands（一定要在建立任何 Auto 或 Path 之前）
@@ -4047,43 +4047,43 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
     // 4. 按鍵綁定
     configureBindings();
 }</code></pre>
-  <div class="note warn"><strong>順序很重要</strong>文件警告：Named Commands 必須在建立任何 PathPlanner Auto 或 Path 之前註冊；之後才註冊的，已經建立的 Auto 不會用到它。建議在 RobotContainer 裡、Subsystem 建立之後、其他指令建立之前註冊<a class="ref" href="#src16-8">[8]</a>。</div>
-  <p>事件標記還有一個容易忽略的規則：路徑跑到終點時，所有由事件標記觸發的指令都會被要求結束。如果想在路徑結束時才啟動某個動作，應該放在 Auto 裡、或放在下一條路徑的開頭<a class="ref" href="#src16-5">[5]</a>。</p>
-  <p><code>intake.intakeUntilHasPiece()</code> 是示範名稱，代表「吸到遊戲物件才結束」的指令。Auto 是 sequential 群組，所以放進去的指令<strong>一定要會結束</strong>，否則後面的步驟永遠不會開始（第 10 章）。第 6 章的 <code>goTo</code> 用 <code>until(this::atGoal)</code> 結束，剛好適合。</p>
+  <div class="note warn"><strong>順序很重要</strong>Named Commands 一定要在建立任何 PathPlanner Auto 或 Path <strong>之前</strong>註冊；晚註冊的話，已經建好的 Auto 根本不會用到它。建議在 RobotContainer 裡、Subsystem 建好之後、其他指令建立之前註冊<a class="ref" href="#src16-8">[8]</a>。</div>
+  <p>事件標記還有一條很容易漏掉的規則：路徑跑到終點時，所有事件標記觸發的指令都會被要求結束。如果你想在路徑結束後才開始某個動作，要放在 Auto 裡，或放到下一條路徑的開頭<a class="ref" href="#src16-5">[5]</a>。</p>
+  <p><code>intake.intakeUntilHasPiece()</code> 只是示範名字，意思是「吸到遊戲物件才結束」的指令。Auto 是 sequential 群組，所以放進去的指令<strong>一定要會結束</strong>，不然後面的步驟永遠輪不到（第 10 章）。第 6 章的 <code>goTo</code> 用 <code>until(this::atGoal)</code> 結束，剛好適合。</p>
 
   <h2>自動程式選單與載入時機</h2>
-  <p><code>AutoBuilder.buildAutoChooser()</code> 會建立一個包含專案中所有 Auto 的 <code>SendableChooser</code>，預設選項是 <code>Commands.none()</code>，也可以傳入名字指定預設的 Auto<a class="ref" href="#src16-7">[7]</a>。然後第 7 章的 <code>getAutonomousCommand()</code> 只要回傳選到的那一個：</p>
+  <p><code>AutoBuilder.buildAutoChooser()</code> 會做出一個包含專案裡所有 Auto 的 <code>SendableChooser</code>，預設選項是 <code>Commands.none()</code>，也可以傳名字指定預設的 Auto<a class="ref" href="#src16-7">[7]</a>。然後第 7 章的 <code>getAutonomousCommand()</code> 回傳選到的那個就好：</p>
   <pre><code>public Command getAutonomousCommand() {
     return autoChooser.getSelected();
 }</code></pre>
   <ul>
-    <li><strong>開機時就載入。</strong>文件強烈建議在程式啟動時就建立所有 Auto，而不是要跑的時候才建立，因為載入複雜的路徑可能造成很大的延遲<a class="ref" href="#src16-7">[7]</a>。<code>buildAutoChooser</code> 在建構子裡呼叫，本身就符合這個建議。</li>
-    <li><strong>刪掉的 Auto 還在選單裡？</strong>它會載入 deploy 資料夾裡的所有 Auto；<code>build.gradle</code> 要有 <code>deleteOldFiles = true</code>，否則刪掉的檔案不會從 roboRIO 上清掉<a class="ref" href="#src16-7">[7]</a>。</li>
+    <li><strong>開機時就載入。</strong>官方很強烈建議在程式啟動時就把所有 Auto 建好，不要等到要跑才建，因為載入複雜的路徑可能卡很久<a class="ref" href="#src16-7">[7]</a>。在建構子裡呼叫 <code>buildAutoChooser</code> 本身就符合這點。</li>
+    <li><strong>刪掉的 Auto 還在選單裡？</strong>它會載入 deploy 資料夾裡所有的 Auto；<code>build.gradle</code> 要有 <code>deleteOldFiles = true</code>，不然你刪掉的檔案不會從 roboRIO 上清掉<a class="ref" href="#src16-7">[7]</a>。</li>
   </ul>
 
   <h2>上場前的自動程式檢查</h2>
   <ol>
-    <li>選單裡選的是這一場要跑的 Auto，而且不是預設的「None」。</li>
-    <li>機器人擺放的位置和 Auto 的起始位置一致（Auto 有設起始位置時，會用 <code>resetPose</code> 重設里程計）。</li>
-    <li>Driver Station 上的聯盟顏色正確，路徑會往正確的一側翻。</li>
+    <li>選單選的是這一場要跑的 Auto，而且不是預設的「None」。（真的有隊伍這樣上場過。）</li>
+    <li>機器人擺的位置跟 Auto 的起始位置一樣（Auto 有設起始位置的話，會用 <code>resetPose</code> 重設里程計）。</li>
+    <li>Driver Station 上的聯盟顏色是對的，路徑才會往正確的那邊翻。</li>
     <li>在練習場或模擬（第 6 章 D 部分）裡，紅藍兩邊都實際跑過一次。</li>
   </ol>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>Named Command 名字不一致</strong>GUI 裡叫 <code>ArmScore</code>、程式裡註冊 <code>armScore</code>，大小寫不同就對不上，Auto 跑到那一步什麼都不做。</div>
-  <div class="note warn"><strong>在 Auto 裡放不會結束的指令</strong>例如 <code>run(...)</code> 做成的預設指令，整個 Auto 就卡在那一步。</div>
-  <div class="note warn"><strong>陀螺儀方向相反</strong>順時針為正的陀螺儀沒反過來，里程計的朝向就和實際相反，路徑跟隨一轉彎就走錯方向，場地導向駕駛也會亂掉。</div>
-  <div class="note warn"><strong>開機時判斷聯盟顏色</strong>在 RobotContainer 建構子裡讀 <code>getAlliance()</code>，那時可能還沒連上 FMS，拿到的是空值或錯的顏色。</div>
-  <div class="note warn"><strong>Robot Config 亂填</strong>質量、MOI、輪徑填錯，PathPlanner 產生的軌跡會超過機器人做得到的加速度，路徑越跑越偏。</div>
+  <div class="note warn"><strong>Named Command 名字對不上</strong>GUI 裡叫 <code>ArmScore</code>，程式註冊的是 <code>armScore</code>，大小寫不一樣就對不上，Auto 跑到那一步什麼都不做。</div>
+  <div class="note warn"><strong>Auto 裡放了不會結束的指令</strong>像是用 <code>run(...)</code> 做的預設指令，整個 Auto 就卡死在那一步。</div>
+  <div class="note warn"><strong>陀螺儀方向反了</strong>順時針為正的陀螺儀沒反過來，里程計的朝向就跟實際相反，路徑一轉彎就走錯邊，場地導向駕駛也會亂掉。</div>
+  <div class="note warn"><strong>開機時就判斷聯盟顏色</strong>在 RobotContainer 建構子裡讀 <code>getAlliance()</code>，那時候可能還沒連上 FMS，拿到的是空值或錯的顏色。</div>
+  <div class="note warn"><strong>Robot Config 亂填</strong>質量、MOI、輪徑填錯，PathPlanner 產生的軌跡會超過機器人實際做得到的加速度，路徑越跑越偏。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：兩段式自動程式</h2>
-  <p>不用 GUI，只用程式組出一個 Auto：先把手臂移到 SCORE、等手臂到位後跑一條叫 <code>"Leave"</code> 的路徑，同時把手臂收回 STOW。提示：<code>AutoBuilder.followPath(PathPlannerPath.fromPathFile("Leave"))</code> 會回傳跟隨這條路徑的指令，而 <code>fromPathFile</code> 可能丟出例外。</p>
+  <p>不用 GUI，純用程式組一個 Auto：先把手臂移到 SCORE，手臂到位之後跑一條叫 <code>"Leave"</code> 的路徑，同時把手臂收回 STOW。給你一個線索：<code>AutoBuilder.followPath(PathPlannerPath.fromPathFile("Leave"))</code> 會回傳跟隨這條路徑的指令，而 <code>fromPathFile</code> 可能會丟例外。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>整個動作分兩段：先手臂到位，再同時「走路徑」和「收手臂」。載入路徑可能失敗，要處理例外。</p>
+      <p>整個動作分兩段：先手臂到位，再同時「走路徑」跟「收手臂」。載入路徑可能失敗，例外要處理。</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>用 Commands.sequence 與 Commands.parallel；路徑用 PathPlannerPath.fromPathFile("Leave")，再交給 AutoBuilder.followPath(...)。</p>
@@ -4109,8 +4109,8 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
 
 // RobotContainer 建構子裡，buildAutoChooser 之後
 autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
-    <p>幾個重點：<code>sequence</code> 等手臂到位才出發；<code>parallel</code> 讓走路徑和收手臂同時進行，兩者都結束才算完成（第 10 章），手臂和底盤是不同的 Subsystem，不會互相打斷。載入失敗時回傳 <code>Commands.none()</code> 並回報錯誤，比讓整支程式當掉好。這個 Auto 在建構子裡就建好，符合「開機時載入」的建議。</p>
-    <p>注意這條路徑沒有經過 <code>PathPlannerAuto</code>，所以不會自動重設起始位置；實際使用時要確認里程計在出發前已經設對。</p>
+    <p>講幾個重點：<code>sequence</code> 等手臂到位才出發；<code>parallel</code> 讓走路徑跟收手臂一起進行，兩個都結束才算完成（第 10 章）；手臂和底盤是不同的 Subsystem，不會互相打斷。載入失敗時回傳 <code>Commands.none()</code> 並回報錯誤，總比整支程式掛掉好。這個 Auto 在建構子裡就建好，符合「開機時載入」的建議。</p>
+    <p>還有，這條路徑沒有經過 <code>PathPlannerAuto</code>，所以不會自動重設起始位置；真的要用的話，要確定出發前里程計已經設對了。</p>
     </div>
   </div>
 
@@ -4130,16 +4130,16 @@ autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
 <template id="tpl-ch17">
   <p class="headline-code">CAN ID 17｜上場</p>
   <h1>視覺與定位：看門牌校正位置</h1>
-  <p class="lede">讀完這章，你會知道 AprilTag 是什麼、為什麼要把視覺量測「融合」進里程計而不是直接取代、標準差代表什麼、怎麼用 Limelight 的 MegaTag2 更新 CTRE swerve 的位置，以及兩種瞄準做法的差別。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 文件，以及 CTRE Phoenix6-Examples 附的 LimelightHelpers。Limelight 與 PhotonVision 的韌體與函式庫每年更新，使用前請對照當年的版本。本章延續第 16 章，以 CTRE swerve 為例。</div>
+  <p class="lede">第 16 章說里程計會飄，這章就來把它拉回來。我們會講 AprilTag 是什麼、為什麼視覺量測要「融合」進里程計而不是直接取代它、標準差代表什麼，然後用 Limelight 的 MegaTag2 更新 CTRE swerve 的位置，最後比較兩種瞄準的做法。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 文件和 CTRE Phoenix6-Examples 附的 LimelightHelpers 寫的。Limelight 和 PhotonVision 的韌體、函式庫每年都會更新，用之前對一下當年的版本。延續第 16 章，一樣拿 CTRE swerve 當例子。</div>
 
-  <h2>生活比喻：看門牌校正位置</h2>
+  <h2>先講個比喻：看門牌校正位置</h2>
   <div class="story">
-    <p><strong>靠步數記位置，走久了會偏。</strong>第 16 章的校外教學，司機靠里程表推算位置。走得越久、被擦撞越多次，推算就偏得越多。</p>
-    <p><strong>路邊有門牌。</strong>每棟建築物門口都釘著一塊門牌，門牌的位置在地圖上早就標好了。看到門牌、量出自己離它多遠、在它哪一側，就能算出自己在地圖上的哪裡。</p>
-    <p><strong>但看門牌也會看錯。</strong>門牌很遠的時候看不清楚，估出來的距離誤差很大；同時看到兩三塊門牌，就準得多。車子在急轉彎時看出去的畫面是糊的，這時候看到的最好別信。</p>
-    <p><strong>所以不是「看到門牌就全聽它的」。</strong>聰明的司機會把兩種資訊合起來：步數推算很穩但會慢慢偏，門牌很準但偶爾會跳。門牌看得清楚時多信門牌一點，看不清楚時多信自己的推算。</p>
-    <p><strong>方向盤比門牌更知道車頭朝哪。</strong>車頭朝哪個方向，看車上的指南針就很準，不需要靠遠方的門牌推算。</p>
+    <p>回到第 16 章的校外教學：司機靠里程表推算位置，開越久、被擦撞越多次，就偏越多。</p>
+    <p>好在路邊有門牌。每棟建築門口都釘著一塊，門牌在地圖上的位置早就標好了。看到門牌，量一下自己離它多遠、在它哪一邊，就能算出自己在地圖上的哪裡。</p>
+    <p>不過門牌也會看錯。很遠的門牌看不清楚，估出來的距離誤差很大；同時看到兩三塊就準多了。車子急轉彎時看出去的畫面是糊的，這時候看到的最好別信。</p>
+    <p>所以聰明的司機不會「看到門牌就全聽它的」，而是把兩種資訊合起來：里程表推算很穩但會慢慢偏，門牌很準但偶爾會跳。門牌看得清楚就多信門牌一點，看不清楚就多信自己的推算。</p>
+    <p>還有一點：車頭朝哪個方向，看車上的指南針就很準了，不需要靠遠方的門牌去推。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>程式</th></tr></thead>
@@ -4153,18 +4153,18 @@ autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
       <tr><td>車上的指南針</td><td>陀螺儀的朝向</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>司機看到門牌是「現在」看到的；相機的影像從拍攝、處理到送進程式，中間有延遲。位置估計器會用量測的時間戳，把這筆資料對回「拍照那一刻」機器人在哪裡，所以時間戳一定要正確。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>司機看到門牌是「當下」看到的；相機的影像從拍照、處理到送進程式，中間有延遲。位置估計器會用時間戳把這筆資料對回「拍照那一刻」機器人在哪，所以時間戳一定要對。</div>
 
   <h2>AprilTag</h2>
-  <p>WPILib 文件說明：AprilTag 是密西根大學研究人員開發的視覺標籤系統，能以低運算量提供高精度的定位；在 FRC 裡，它讓機器人知道自己在場上的位置，以便對準目標。從 2023 年起，場上散布著多個 AprilTag，每一個都在已知的位置；從 2024 年起使用 36h11 家族<a class="ref" href="#src17-1">[1]</a>。</p>
-  <p>練習場自己貼 AprilTag 時要注意：文件提醒要把標籤固定在硬的背板上保持平整，因為辨識演算法假設標籤是平的<a class="ref" href="#src17-1">[1]</a>。</p>
+  <p>AprilTag 是密西根大學的研究人員做的視覺標籤系統，運算量小、定位又很準。在 FRC 裡，它讓機器人知道自己在場上的哪裡，好去對準目標。從 2023 年開始場上就貼了好幾個 AprilTag，每個都在已知的位置；2024 年起用的是 36h11 家族<a class="ref" href="#src17-1">[1]</a>。</p>
+  <p>練習場自己貼 AprilTag 的話要注意：標籤要固定在硬的背板上、保持平整，因為辨識演算法假設標籤是平的<a class="ref" href="#src17-1">[1]</a>。貼在會彎的紙板上，結果就會怪怪的。</p>
 
   <h2>融合，而不是取代</h2>
-  <p>WPILib 提供 <code>SwerveDrivePoseEstimator</code> 等位置估計器，可以直接取代里程計，並把「有延遲補償的視覺位置」和編碼器、陀螺儀的量測融合在一起<a class="ref" href="#src17-2">[2]</a>。用法是每一輪呼叫 <code>update</code> 放入里程計資料，偶爾有視覺結果時呼叫 <code>addVisionMeasurement</code><a class="ref" href="#src17-2">[2]</a>。CTRE 的 swerve 底盤已經內建同樣的機制，所以直接呼叫 drivetrain 的 <code>addVisionMeasurement</code> 就好<a class="ref" href="#src17-3">[3]</a>。</p>
+  <p>WPILib 有 <code>SwerveDrivePoseEstimator</code> 這類位置估計器，可以直接取代里程計，把「有延遲補償的視覺位置」跟編碼器、陀螺儀的量測融合在一起<a class="ref" href="#src17-2">[2]</a>。用法是每一輪呼叫 <code>update</code> 餵里程計資料，有視覺結果的時候再呼叫 <code>addVisionMeasurement</code><a class="ref" href="#src17-2">[2]</a>。CTRE 的 swerve 底盤已經內建一樣的機制，直接呼叫 drivetrain 的 <code>addVisionMeasurement</code> 就好<a class="ref" href="#src17-3">[3]</a>。</p>
 
   <h3>標準差：你有多相信這筆資料</h3>
-  <p>WPILib 文件說明，位置估計器可以設定模型和量測的標準差。標準差描述雜訊有多分散；給某個量越小的標準差，融合時就越相信它。例如把視覺量測的標準差調大，估計器就比較不受雜亂的視覺資料影響，代價是修正偏差比較慢<a class="ref" href="#src17-2">[2]</a>。</p>
-  <p>針對 AprilTag，文件給了三條具體建議<a class="ref" href="#src17-2">[2]</a>：</p>
+  <p>位置估計器可以設定模型和量測的標準差。標準差就是雜訊有多散；給某個量越小的標準差，融合時就越相信它。比如把視覺量測的標準差調大，估計器就比較不會被亂跳的視覺資料影響，代價是修正偏差比較慢<a class="ref" href="#src17-2">[2]</a>。</p>
+  <p>針對 AprilTag，WPILib 給了三條很具體的建議<a class="ref" href="#src17-2">[2]</a>：</p>
   <ul>
     <li>視覺的朝向標準差設得<strong>非常大</strong>（朝向交給陀螺儀）。</li>
     <li>陀螺儀的朝向標準差設得小。</li>
@@ -4172,7 +4172,7 @@ autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
   </ul>
 
   <h2>動手試：信誰多一點</h2>
-  <p>下面把問題簡化成一維：里程計說機器人在 x = 3.00 m，視覺說在 x = 3.40 m。調整兩者的標準差，看融合後的估計會落在哪裡。這是用「變異數倒數加權」算的，和位置估計器（卡爾曼濾波）融合時的想法一樣。</p>
+  <p>下面把問題簡化成一維：里程計說機器人在 x = 3.00 m，視覺說在 x = 3.40 m。調兩邊的標準差，看融合之後的估計會落在哪。這是用「變異數倒數加權」算的，跟位置估計器（卡爾曼濾波）融合的想法一樣。</p>
   <div class="lab">
     <div class="pidgrid">
       <label>里程計標準差 <output id="fuOv"></output><input type="range" id="fuO" min="0.02" max="1" step="0.02" value="0.1"></label>
@@ -4182,11 +4182,11 @@ autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
     <div class="fuse" id="fuBar" aria-hidden="true"></div>
     <div class="console" id="fuConsole" aria-live="polite"></div>
   </div>
-  <p>這個實驗裡，視覺的標準差設成「0.05 m × 距離²，看到多個標籤時除以標籤數」。這只是示範用的經驗式，不是官方公式；隊上要用實際資料調整。</p>
+  <p>這個實驗裡，視覺的標準差是用「0.05 m × 距離²，看到多個標籤就除以標籤數」算的。這只是我拿來示範的經驗式，不是官方公式，實際要用隊上的資料去調。</p>
 
   <h2>用 Limelight 更新位置</h2>
-  <p>CTRE 的 swerve 範例附了一段 Limelight 整合的程式，使用 <code>LimelightHelpers</code> 的 MegaTag2 位置估計<a class="ref" href="#src17-4">[4]</a>。MegaTag2 需要先告訴 Limelight 機器人的朝向，<code>LimelightHelpers</code> 的註解寫明呼叫 <code>getBotPoseEstimate_wpiBlue_MegaTag2</code> 之前要先呼叫 <code>SetRobotOrientation</code>，而且 yaw 為 0 代表機器人面向紅方牆面，也就是第 16 章「原點在藍方」的場地座標<a class="ref" href="#src17-5">[5]</a>。</p>
-  <p>下面照 CTRE 範例的流程，加上文件建議的「距離越遠越不信」：</p>
+  <p>CTRE 的 swerve 範例附了一段 Limelight 整合程式，用的是 <code>LimelightHelpers</code> 的 MegaTag2 位置估計<a class="ref" href="#src17-4">[4]</a>。MegaTag2 要先告訴 Limelight 機器人朝哪：呼叫 <code>getBotPoseEstimate_wpiBlue_MegaTag2</code> 之前要先呼叫 <code>SetRobotOrientation</code>，而且 yaw 為 0 代表機器人面向紅方牆面，就是第 16 章「原點在藍方」的場地座標<a class="ref" href="#src17-5">[5]</a>。</p>
+  <p>下面照 CTRE 範例的流程寫，再加上 WPILib 建議的「距離越遠越不信」：</p>
   <pre><code>private static final String LL = "limelight"; // TODO: 和 Limelight 網頁設定的名稱一致
 
 @Override
@@ -4213,12 +4213,12 @@ public void robotPeriodic() {
 }</code></pre>
   <p>幾個重點：</p>
   <ul>
-    <li><strong>旋轉太快就丟掉。</strong>CTRE 範例的門檻是每秒 2 圈<a class="ref" href="#src17-4">[4]</a>。範例的註解也說明，這段程式只是示範「可以整合視覺」，通常還需要依距離和標籤數調整標準差，實際做法要依隊伍需求調整<a class="ref" href="#src17-4">[4]</a>。</li>
-    <li><strong>時間戳的時基。</strong>CTRE swerve 的 <code>addVisionMeasurement</code> 在範例裡被覆寫，用 <code>Utils.fpgaToCurrentTime</code> 把 FPGA 時間轉成 Phoenix 的時基再交給底盤<a class="ref" href="#src17-3">[3]</a>。用 Tuner X 產生的 <code>CommandSwerveDrivetrain</code> 已經包含這段；自己寫的話不能漏掉。</li>
-    <li><strong>朝向交給陀螺儀。</strong>第三個標準差設極大，對應 WPILib 的建議<a class="ref" href="#src17-2">[2]</a>。</li>
+    <li><strong>轉太快就丟掉。</strong>CTRE 範例的門檻是每秒 2 圈<a class="ref" href="#src17-4">[4]</a>。範例自己的註解也講了，這段只是示範「可以整合視覺」，一般還要看距離和標籤數去調標準差，實際怎麼做看隊伍需求<a class="ref" href="#src17-4">[4]</a>。</li>
+    <li><strong>時間戳的時基。</strong>範例裡覆寫了 CTRE swerve 的 <code>addVisionMeasurement</code>，用 <code>Utils.fpgaToCurrentTime</code> 把 FPGA 時間轉成 Phoenix 的時基再交給底盤<a class="ref" href="#src17-3">[3]</a>。Tuner X 產生的 <code>CommandSwerveDrivetrain</code> 已經有這段；自己寫的話千萬別漏。</li>
+    <li><strong>朝向交給陀螺儀。</strong>第三個標準差設超大，就是照 WPILib 的建議<a class="ref" href="#src17-2">[2]</a>。</li>
   </ul>
-  <div class="note"><strong>放在 IO 架構裡</strong>本章為了對照 CTRE 範例，把程式寫在 <code>robotPeriodic</code>。依第 6 章的架構，比較好的做法是寫一個 <code>VisionIO</code>（硬體版讀 Limelight、模擬版回傳空結果；重播時和第 6 章一樣用空實作，資料由日誌填回），讓 Vision Subsystem 在 periodic 裡取得結果再交給底盤，這樣視覺資料也能被記錄與重播（第 18 章）。</div>
-  <p>PhotonVision 是另一套常見的開源選擇，也能在協同處理器上辨識 AprilTag 並輸出位置估計，最後同樣交給 <code>addVisionMeasurement</code>。不管用哪一套，「融合、依距離調整標準差、丟掉不可靠的量測」這三件事都一樣。</p>
+  <div class="note"><strong>放進 IO 架構</strong>這章為了跟 CTRE 範例對照，把程式寫在 <code>robotPeriodic</code>。照第 6 章的架構，比較好的寫法是做一個 <code>VisionIO</code>（硬體版讀 Limelight、模擬版回傳空結果；重播時跟第 6 章一樣用空實作，資料由日誌填回），讓 Vision Subsystem 在 periodic 裡拿結果再交給底盤，這樣視覺資料也能被記錄、重播（第 18 章）。</div>
+  <p>PhotonVision 是另一套很多隊在用的開源選擇，一樣能在協同處理器上辨識 AprilTag、輸出位置估計，最後也是交給 <code>addVisionMeasurement</code>。不管用哪套，「融合、看距離調標準差、丟掉不可靠的量測」這三件事都一樣。</p>
 
   <h2>瞄準的兩種做法</h2>
   <table class="map">
@@ -4228,7 +4228,7 @@ public void robotPeriodic() {
       <tr><td>用估計的位置</td><td>從估計的 <code>Pose2d</code> 和目標在場上的座標，算出該朝哪個角度</td><td>看不到目標也能轉；和自動階段用同一套座標</td><td>位置估計要準，視覺融合要做好</td></tr>
     </tbody>
   </table>
-  <p><code>LimelightHelpers.getTX</code> 回傳準心到目標的水平偏移角度（度），<code>getTV</code> 回傳是否有看到目標<a class="ref" href="#src17-5">[5]</a>。第一種做法大致如下：</p>
+  <p><code>LimelightHelpers.getTX</code> 回傳準心到目標的水平偏移角度（度），<code>getTV</code> 回傳有沒有看到目標<a class="ref" href="#src17-5">[5]</a>。第一種做法大概長這樣：</p>
   <pre><code>private final PIDController aimPid = new PIDController(0.0, 0.0, 0.0); // TODO: 輸入度，輸出 rad/s
 
 public Command aimWithTx(DoubleSupplier forward, DoubleSupplier strafe) {
@@ -4242,24 +4242,24 @@ public Command aimWithTx(DoubleSupplier forward, DoubleSupplier strafe) {
             .withRotationalRate(rot);
     });
 }</code></pre>
-  <p>PID 的輸出正負號一定要上機確認：WPILib 的旋轉是逆時針為正（第 16 章），而 <code>tx</code> 的正負代表目標在準心的哪一側，兩者方向不一定相同。先把 kP 設很小，確認機器人是「轉向」目標而不是「轉離」目標，再慢慢加大。</p>
-  <p>第二種做法用第 16 章的座標：目標在場上的座標減掉機器人的座標，得到一個向量，它的角度就是機器人應該面對的方向，再交給 CTRE 的 <code>FieldCentricFacingAngle</code> 之類「朝向固定角度」的請求。這種做法在紅方時要記得目標座標也要換成紅方那一個。</p>
+  <p>PID 輸出的正負號一定要上機確認：WPILib 的旋轉是逆時針為正（第 16 章），<code>tx</code> 的正負則代表目標在準心的哪一邊，兩個方向不一定一樣。先把 kP 設很小，確認機器人是「轉向」目標而不是「轉走」，再慢慢加大。</p>
+  <p>第二種做法用第 16 章的座標：目標在場上的座標減掉機器人的座標，得到一個向量，它的角度就是機器人該面對的方向，再交給 CTRE 的 <code>FieldCentricFacingAngle</code> 這類「朝向固定角度」的請求。這種做法在紅方時，記得目標座標也要換成紅方那一個。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>看到標籤就直接 resetPose</strong>視覺量測偶爾會跳，直接把位置重設成它，機器人在場上會瞬間移位，路徑跟隨跟著亂跑。用 <code>addVisionMeasurement</code> 融合。</div>
-  <div class="note warn"><strong>時間戳用錯時基</strong>把 FPGA 時間直接交給 CTRE swerve 而沒有轉換，估計器會把量測對到錯的時間點，位置被拉來拉去。</div>
-  <div class="note warn"><strong>相機位置沒量準</strong>Limelight 要知道相機裝在機器人上的哪裡、朝哪個角度。這組數字錯了，所有視覺位置都會偏。</div>
-  <div class="note warn"><strong>忘了呼叫 SetRobotOrientation</strong>MegaTag2 需要機器人的朝向，沒有提供時結果不可靠。</div>
-  <div class="note warn"><strong>練習場的標籤貼歪、沒貼平</strong>演算法假設標籤是平的，彎曲或位置跟場地圖不一致的標籤會讓練習時的結果和正式比賽不同。</div>
+  <div class="note warn"><strong>看到標籤就直接 resetPose</strong>視覺量測偶爾會跳，直接把位置重設成它，機器人在場上會瞬間「瞬移」，路徑跟隨也跟著亂跑。要用 <code>addVisionMeasurement</code> 融合。</div>
+  <div class="note warn"><strong>時間戳時基用錯</strong>FPGA 時間沒轉換就直接丟給 CTRE swerve，估計器會把量測對到錯的時間點，位置被拉來拉去。</div>
+  <div class="note warn"><strong>相機位置沒量準</strong>Limelight 要知道相機裝在機器人哪裡、朝什麼角度。這組數字錯了，所有視覺位置都會偏。</div>
+  <div class="note warn"><strong>忘了呼叫 SetRobotOrientation</strong>MegaTag2 需要機器人的朝向，沒給的話結果不能信。</div>
+  <div class="note warn"><strong>練習場的標籤貼歪、沒貼平</strong>演算法假設標籤是平的，彎掉的、或位置跟場地圖對不上的標籤，會讓練習時的結果跟正式比賽不一樣。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：記錄被丟掉的量測</h2>
-  <p>在上面的視覺程式裡，加上兩個計數：接受了幾筆量測、因為旋轉太快丟掉幾筆，每輪用 <code>SmartDashboard.putNumber</code> 顯示。想一想：這兩個數字在比賽中能幫你發現什麼問題？</p>
+  <p>在上面的視覺程式裡加兩個計數：接受了幾筆量測、因為轉太快丟掉幾筆，每輪用 <code>SmartDashboard.putNumber</code> 顯示出來。再想想：比賽中這兩個數字可以幫你發現什麼問題？</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>要分兩種情況計數：有看到標籤時，接受或因為旋轉太快而丟掉。</p>
+      <p>分兩種情況算：有看到標籤時，是被接受了，還是因為轉太快被丟掉。</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>在 if (est != null &amp;&amp; est.tagCount &gt; 0) 裡面再判斷 Math.abs(omegaRps) &lt; 2.0，分別讓兩個欄位加一。</p>
@@ -4283,7 +4283,7 @@ if (est != null &amp;&amp; est.tagCount &gt; 0) {
 }
 SmartDashboard.putNumber("Vision/Accepted", acceptedCount);
 SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
-    <p>如果整場比賽 Accepted 幾乎沒增加，可能是相機沒連上、名稱打錯、曝光設定不對，或是機器人大部分時間都看不到標籤。如果 RejectedSpin 很多，代表門檻可能太嚴，或是駕駛習慣一直邊轉邊移動。把這些數字記錄下來（第 18 章），賽後就能回頭查。</p>
+    <p>如果整場 Accepted 幾乎沒在動，可能是相機沒連上、名字打錯、曝光沒設好，或是機器人大部分時間根本看不到標籤。RejectedSpin 很多的話，可能是門檻太嚴，或是駕駛習慣一直邊轉邊跑。把這些數字記下來（第 18 章），賽後就能回頭查。</p>
     </div>
   </div>
 
@@ -4300,16 +4300,16 @@ SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
 <template id="tpl-ch18">
   <p class="headline-code">CAN ID 18｜上場</p>
   <h1>模擬、日誌與重播：比賽錄影和賽後檢討</h1>
-  <p class="lede">讀完這章，你會知道模擬、日誌、重播三者差在哪裡，怎麼從機器人取出日誌、用 AdvantageScope 看資料，重播的完整步驟，哪些寫法會讓重播失準，以及怎麼讓每一場比賽的程式版本都找得回來。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 AdvantageKit 2026 版（v26.0.2）的文件。AdvantageKit 網站和 GitHub main 分支已經開始出現 2027 版的內容（例如類別改名），查資料時要確認版本。第 6 章 E 部分已經介紹過 <code>@AutoLog</code>、<code>Logger.processInputs</code> 和三種模式，本章接著講怎麼用。</div>
+  <p class="lede">比賽中機器人出包，賽後你只能靠記憶猜嗎？不用，只要有日誌。這章講模擬、日誌、重播三個差在哪，怎麼從機器人拿出日誌、在 AdvantageScope 裡看資料，重播怎麼做，哪些寫法會讓重播不準，還有怎麼讓每一場比賽的程式版本都找得回來。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 AdvantageKit 2026 版（v26.0.2）的文件寫的。AdvantageKit 網站和 GitHub main 分支已經開始出現 2027 版的東西（像類別改名），查資料要確認版本。<code>@AutoLog</code>、<code>Logger.processInputs</code> 和三種模式在第 6 章 E 部分講過了，這章講怎麼用。</div>
 
-  <h2>生活比喻：比賽錄影和賽後檢討</h2>
+  <h2>先講個比喻：比賽錄影和賽後檢討</h2>
   <div class="story">
-    <p><strong>體育課的練習賽全程錄影。</strong>每一場練習賽，攝影機都把「場上發生的事」完整錄下來：誰在哪裡、球往哪裡飛、裁判吹了什麼哨。另外，每個球員也把「自己當時怎麼想、決定做什麼」寫在筆記上。</p>
-    <p><strong>賽後一起看錄影。</strong>教練把錄影和筆記放在同一個時間軸上，一格一格看：球員在第 12 秒為什麼沒有傳球？原來他當時以為隊友被擋住了。</p>
-    <p><strong>重新推演：換一套想法會怎樣？</strong>教練還可以說：「用同一段錄影，照新的戰術重新想一次，每一格你會怎麼決定？」因為看到的畫面完全一樣，新的決定可以和原本的決定逐格比較。</p>
-    <p><strong>但推演改變不了錄影。</strong>在推演裡決定「這時候往左跑」，錄影裡的你還是往右跑了，之後的畫面也不會因此改變。推演只能回答「看到這些畫面時，新想法會怎麼決定」，不能回答「照新想法打，比賽會變成怎樣」。</p>
-    <p><strong>錄影要標上是哪一版戰術。</strong>戰術本每場之間都在改，如果錄影沒標註當時用的是哪一版，事後就不知道要拿哪一版來推演。</p>
+    <p>體育課的每一場練習賽都全程錄影，攝影機把場上發生的事完整錄下來：誰在哪、球往哪飛、裁判吹了什麼哨。另外每個球員也會把「自己當時怎麼想、決定做什麼」寫在筆記上。</p>
+    <p>賽後教練把錄影跟筆記放在同一條時間軸上，一格一格看：第 12 秒他為什麼沒傳球？喔，原來他以為隊友被擋住了。</p>
+    <p>教練還可以說：「用同一段錄影，照新戰術重想一次，每一格你會怎麼決定？」因為看到的畫面完全一樣，新的決定可以跟原本的逐格比較。</p>
+    <p>但推演改變不了錄影。你在推演裡決定「這時候往左跑」，錄影裡的你還是往右跑了，後面的畫面也不會變。推演只能回答「看到這些畫面，新想法會怎麼決定」，回答不了「照新想法打，比賽會變怎樣」。</p>
+    <p>最後，戰術本每場之間都在改，錄影如果沒標當時用的是哪一版，事後就不知道該拿哪一版來推演。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>AdvantageKit</th></tr></thead>
@@ -4322,7 +4322,7 @@ SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
       <tr><td>錄影標上戰術版本</td><td>日誌 metadata 記錄 Git commit</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>錄影只能看到鏡頭拍到的東西；AdvantageKit 的重播要求程式讀到的<strong>每一個</strong>外部資料都被記錄下來，只要漏了一個，重播出來的決定就可能和當時不同。這就是本章後半「確定性」要講的。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>錄影只拍得到鏡頭範圍內的東西；AdvantageKit 的重播卻要求程式讀到的<strong>每一個</strong>外部資料都被記錄下來，漏一個，重播出來的決定就可能跟當時不一樣。這就是後半段「確定性」要講的。</div>
 
   <h2>模擬、日誌、重播</h2>
   <table class="map">
@@ -4336,8 +4336,8 @@ SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
   </table>
 
   <h2>取得日誌</h2>
-  <p>AdvantageKit 文件說明，在 roboRIO 上 <code>WPILOGWriter</code> 預設寫到 USB 隨身碟（<code>/U/logs</code>），所以 roboRIO 上<strong>必須插一支 FAT32 格式的隨身碟</strong><a class="ref" href="#src18-1">[1]</a>。取出日誌最方便的方法是 AdvantageScope：在偏好設定填好機器人位址與日誌資料夾，然後用 File → Download Logs 下載，最新的日誌會排在最上面<a class="ref" href="#src18-2">[2]</a>。</p>
-  <p>AdvantageScope 能開的格式包括 WPILib 與 AdvantageKit 產生的 <code>.wpilog</code>，以及 Phoenix 6 SignalLogger 的 <code>.hoot</code>（第 15 章）。同時開啟多個檔案時，時間會自動對齊<a class="ref" href="#src18-2">[2]</a>，所以可以把 AdvantageKit 日誌和 hoot 放在一起看。</p>
+  <p>在 roboRIO 上，<code>WPILOGWriter</code> 預設寫到 USB 隨身碟（<code>/U/logs</code>），所以 roboRIO 上<strong>一定要插一支 FAT32 的隨身碟</strong><a class="ref" href="#src18-1">[1]</a>。拿日誌最方便的是用 AdvantageScope：在偏好設定填好機器人位址和日誌資料夾，再用 File → Download Logs 下載，最新的會排在最上面<a class="ref" href="#src18-2">[2]</a>。</p>
+  <p>AdvantageScope 開得了 WPILib 和 AdvantageKit 產生的 <code>.wpilog</code>，也開得了 Phoenix 6 SignalLogger 的 <code>.hoot</code>（第 15 章）。同時開好幾個檔案時間會自動對齊<a class="ref" href="#src18-2">[2]</a>，所以 AdvantageKit 日誌和 hoot 可以放在一起看，超方便。</p>
 
   <h2>在 AdvantageScope 裡看什麼</h2>
   <table class="map">
@@ -4352,29 +4352,29 @@ SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
       <tr><td>Metadata</td><td>程式版本（Git commit）等資訊</td></tr>
     </tbody>
   </table>
-  <p>AdvantageKit 會自動記錄一些東西，不需要設定：時間戳、Driver Station 與搖桿的所有資料、透過 AdvantageKit 儀表板類別讀的輸入、WPILib Alert 的狀態（第 12 章）、Console 輸出，以及預設 CAN ID 的 PDP / PDH 各通道電流<a class="ref" href="#src18-3">[3]</a>。</p>
+  <p>有些東西 AdvantageKit 會自動記，不用設定：時間戳、Driver Station 和搖桿的所有資料、透過 AdvantageKit 儀表板類別讀的輸入、WPILib Alert 的狀態（第 12 章）、Console 輸出，還有預設 CAN ID 的 PDP / PDH 每個通道的電流<a class="ref" href="#src18-3">[3]</a>。</p>
 
   <h3>要記錄哪些輸出</h3>
-  <p>AdvantageKit 文件把輸出定義為「能在模擬中重新算出的值」，例如里程計位置、馬達電壓、內部狀態、給駕駛的狀態資訊。雖然這些值重播時算得出來，但實機上還是應該記錄重要的輸出，因為比賽之間通常來不及重播<a class="ref" href="#src18-4">[4]</a>。<code>Pose2d</code> 這類 WPILib 幾何物件可以直接記錄，在 2D Field 分頁顯示<a class="ref" href="#src18-4">[4]</a>。</p>
+  <p>所謂「輸出」，是指能在模擬裡重新算出來的值，像里程計位置、馬達電壓、內部狀態、給駕駛看的狀態資訊。這些值重播時算得出來沒錯，但實機上還是要記重要的輸出，因為兩場比賽之間通常根本來不及重播<a class="ref" href="#src18-4">[4]</a>。<code>Pose2d</code> 這類 WPILib 幾何物件可以直接記，在 2D Field 分頁就能看<a class="ref" href="#src18-4">[4]</a>。</p>
   <pre><code>Logger.recordOutput("Arm/Goal", goal);                 // enum
 Logger.recordOutput("Drive/Pose", drivetrain.getState().Pose);
 Logger.recordOutput("Vision/Accepted", acceptedCount);  // 第 17 章的練習</code></pre>
-  <p>AdvantageKit 2026 版新增了單位資訊的記錄，例如 <code>Logger.recordOutput("MyAngle", 3.141, "radians")</code>，AdvantageScope 畫圖時就能正確換算單位<a class="ref" href="#src18-5">[5]</a>。</p>
+  <p>AdvantageKit 2026 版還多了單位資訊，例如 <code>Logger.recordOutput("MyAngle", 3.141, "radians")</code>，AdvantageScope 畫圖時就能正確換算單位<a class="ref" href="#src18-5">[5]</a>。</p>
 
   <h2>重播的完整步驟</h2>
   <ol>
-    <li><strong>找到當時的程式版本。</strong>在 AdvantageScope 的 Metadata 分頁找到 <code>GitSHA</code>，用 <code>git checkout</code> 回到那個 commit<a class="ref" href="#src18-6">[6]</a>（怎麼記錄 GitSHA 見下一節）。</li>
-    <li><strong>切換成重播模式。</strong>AdvantageKit 範本專案只要把 <code>Constants.java</code> 的 <code>simMode</code> 改成 <code>REPLAY</code><a class="ref" href="#src18-7">[7]</a>（第 6 章 E-4）。</li>
-    <li><strong>指定日誌。</strong><code>LogFileUtil.findReplayLog()</code> 依序使用：環境變數 <code>AKIT_LOG_PATH</code>、AdvantageScope 目前開著的檔案、執行時跳出的選擇視窗<a class="ref" href="#src18-7">[7]</a>。最簡單的做法是先在 AdvantageScope 開好那份日誌。</li>
-    <li><strong>用模擬模式執行程式。</strong>WPILib 的 Simulate Robot Code，<strong>不要開模擬 GUI</strong>（範本預設已關閉）<a class="ref" href="#src18-7">[7]</a>。</li>
-    <li><strong>看結果。</strong>產生的新日誌會自動在 AdvantageScope 開啟。重播算出的輸出在 <code>ReplayOutputs</code> 表，原本的輸入與輸出保持不變，可以直接對照<a class="ref" href="#src18-7">[7]</a>。</li>
+    <li><strong>找到當時的程式版本。</strong>在 AdvantageScope 的 Metadata 分頁找 <code>GitSHA</code>，用 <code>git checkout</code> 回到那個 commit<a class="ref" href="#src18-6">[6]</a>（GitSHA 怎麼記，下一節講）。</li>
+    <li><strong>切到重播模式。</strong>AdvantageKit 範本專案只要把 <code>Constants.java</code> 的 <code>simMode</code> 改成 <code>REPLAY</code><a class="ref" href="#src18-7">[7]</a>（第 6 章 E-4）。</li>
+    <li><strong>指定日誌。</strong><code>LogFileUtil.findReplayLog()</code> 會照順序找：環境變數 <code>AKIT_LOG_PATH</code>、AdvantageScope 現在開著的檔案、執行時跳出來的選擇視窗<a class="ref" href="#src18-7">[7]</a>。最簡單就是先在 AdvantageScope 把那份日誌開好。</li>
+    <li><strong>用模擬模式跑。</strong>WPILib 的 Simulate Robot Code，<strong>不要開模擬 GUI</strong>（範本預設已經關了）<a class="ref" href="#src18-7">[7]</a>。</li>
+    <li><strong>看結果。</strong>新產生的日誌會自動在 AdvantageScope 打開。重播算出來的輸出在 <code>ReplayOutputs</code> 表，原本的輸入和輸出都還在，可以直接對照<a class="ref" href="#src18-7">[7]</a>。</li>
   </ol>
-  <p>第 6 章 E-5 的 <code>setUseTiming(false)</code> 讓重播盡快跑完，文件特別說明這<strong>不會影響</strong>重播的準確度<a class="ref" href="#src18-7">[7]</a>。</p>
-  <div class="note"><strong>Replay Watch</strong>調整位置估計這類需要反覆嘗試的工作，可以用 <code>./gradlew replayWatch</code>（Windows 是 <code>gradle.bat replayWatch</code>）：每次修改 <code>src</code> 裡的程式，重播就自動再跑一次，AdvantageScope 也會保留時間範圍和畫面。它每次會覆蓋上一次的重播結果，但不會修改原始日誌；日誌越短、電腦單核效能越好，越好用<a class="ref" href="#src18-8">[8]</a>。</div>
-  <div class="note warn"><strong>重播的限制</strong>AdvantageKit 文件說明，重播時修改程式的輸出<strong>不能影響</strong>重播的輸入<a class="ref" href="#src18-7">[7]</a>。例如把手臂的 kP 改大後重播，記錄裡的手臂位置還是當時的位置，因為那是從日誌讀回來的輸入。重播適合回答「看到同樣的資料，新的邏輯會怎麼決定」，不能回答「照新的邏輯，機器人會怎麼動」；後者要用模擬。</div>
+  <p>第 6 章 E-5 的 <code>setUseTiming(false)</code> 讓重播用最快速度跑完，這<strong>不會影響</strong>重播的準確度<a class="ref" href="#src18-7">[7]</a>，放心用。</p>
+  <div class="note"><strong>Replay Watch</strong>調位置估計這種要一直試的工作，可以用 <code>./gradlew replayWatch</code>（Windows 是 <code>gradle.bat replayWatch</code>）：只要改了 <code>src</code> 裡的程式，重播就自動再跑一次，AdvantageScope 的時間範圍和畫面也會保留。它每次會蓋掉上一次的重播結果，但不會動原始日誌；日誌越短、電腦單核越快，越好用<a class="ref" href="#src18-8">[8]</a>。</div>
+  <div class="note warn"><strong>重播的限制</strong>重播時改程式，輸出<strong>不能影響</strong>重播的輸入<a class="ref" href="#src18-7">[7]</a>。比如把手臂的 kP 調大再重播，記錄裡的手臂位置還是當時的位置，因為那是從日誌讀回來的輸入。重播適合回答「看到同樣的資料，新邏輯會怎麼決定」，回答不了「照新邏輯，機器人會怎麼動」；後者要用模擬。</div>
 
   <h2>確定性：重播準確的前提</h2>
-  <p>AdvantageKit 文件說明，重播要求所有資料來源都是確定、同步的；IO 介面保證了 Subsystem 的部分，但很容易不小心讀到沒被記錄的資料，所以建議開發過程中定期測試重播<a class="ref" href="#src18-9">[9]</a>。文件列出的常見陷阱<a class="ref" href="#src18-9">[9]</a>：</p>
+  <p>重播要求所有資料來源都是確定、同步的。IO 介面顧好了 Subsystem 的部分，但很容易一不小心就讀到沒被記錄的資料，所以要在開發過程中定期測重播<a class="ref" href="#src18-9">[9]</a>。常見的陷阱有這些<a class="ref" href="#src18-9">[9]</a>：</p>
   <table class="map">
     <thead><tr><th>陷阱</th><th>改成</th></tr></thead>
     <tbody>
@@ -4386,14 +4386,14 @@ Logger.recordOutput("Vision/Accepted", acceptedCount);  // 第 17 章的練習</
       <tr><td>亂數、走訪無序集合（例如 HashMap）</td><td>避免，或把結果當輸入記錄</td></tr>
     </tbody>
   </table>
-  <p>另外，主要的機器人邏輯必須是單執行緒；真的需要執行緒時，只能放在 IO 實作裡。<code>recordOutput</code>、<code>processInputs</code> 也不是執行緒安全的，只能在主執行緒呼叫<a class="ref" href="#src18-11">[11]</a>。</p>
+  <p>還有，主要的機器人邏輯必須是單執行緒；真的需要執行緒，只能放在 IO 實作裡。<code>recordOutput</code>、<code>processInputs</code> 也不是執行緒安全的，只能在主執行緒呼叫<a class="ref" href="#src18-11">[11]</a>。</p>
 
   <h3>第 16、17 章的 CTRE swerve 怎麼辦</h3>
-  <p>上面表格的第四條要特別說明：第 16、17 章用的是 Tuner X 產生的 CTRE swerve，它直接操作硬體，沒有經過 IO 層，所以<strong>底盤的部分無法準確重播</strong><a class="ref" href="#src18-9">[9]</a>。手臂、Intake 等照第 6 章寫的 Subsystem 不受影響。</p>
-  <p>如果隊上需要底盤也能重播，AdvantageKit 提供 TalonFX swerve 範本專案：一樣可以用 Tuner X 的 swerve 產生器設定，並提供高頻里程計、斷線警告、位置估計器整合、模擬，以及保證準確的重播<a class="ref" href="#src18-12">[12]</a>。要不要換，是隊上在賽季開始前就要決定的事，不要在比賽前換。</p>
+  <p>表格第四條要特別講一下：第 16、17 章用的是 Tuner X 產生的 CTRE swerve，它直接操作硬體，沒經過 IO 層，所以<strong>底盤這部分沒辦法準確重播</strong><a class="ref" href="#src18-9">[9]</a>。手臂、Intake 這些照第 6 章寫的 Subsystem 則不受影響。</p>
+  <p>如果隊上希望底盤也能重播，AdvantageKit 有 TalonFX swerve 範本專案：一樣可以用 Tuner X 的 swerve 產生器設定，還有高頻里程計、斷線警告、位置估計器整合、模擬，以及保證準確的重播<a class="ref" href="#src18-12">[12]</a>。要不要換是賽季開始前就要決定的事，千萬不要比賽前才換。</p>
 
   <h3>自動程式選單也是輸入</h3>
-  <p>第 16 章用 <code>SmartDashboard.putData</code> 放的自動程式選單，是從 NetworkTables 讀值，重播時讀不到當時選了什麼。AdvantageKit 提供 <code>LoggedDashboardChooser</code>，可以直接包住 PathPlanner 的 <code>buildAutoChooser()</code><a class="ref" href="#src18-13">[13]</a>：</p>
+  <p>第 16 章用 <code>SmartDashboard.putData</code> 放的自動程式選單是從 NetworkTables 讀值的，重播時讀不到當時選了哪個。AdvantageKit 有 <code>LoggedDashboardChooser</code>，可以直接包住 PathPlanner 的 <code>buildAutoChooser()</code><a class="ref" href="#src18-13">[13]</a>：</p>
   <pre><code>private final LoggedDashboardChooser&lt;Command&gt; autoChooser;
 
 public RobotContainer() {
@@ -4406,35 +4406,35 @@ public Command getAutonomousCommand() {
 }</code></pre>
 
   <h2>讓每一場的程式版本找得回來</h2>
-  <p>重播需要當時在機器人上跑的程式。AdvantageKit 範本已經裝好兩個工具<a class="ref" href="#src18-6">[6]</a>：</p>
+  <p>重播需要當時在機器人上跑的那份程式。AdvantageKit 範本已經幫你裝好兩個工具<a class="ref" href="#src18-6">[6]</a>：</p>
   <ul>
-    <li><strong>Gversion</strong>：編譯時產生 <code>BuildConstants.java</code>，裡面有 Git commit 的 hash，以及是否有尚未 commit 的修改（dirty）。在 <code>Robot</code> 建構子裡用 <code>Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA)</code> 記進日誌。<code>BuildConstants.java</code> 要加進 <code>.gitignore</code>。</li>
-    <li><strong>Event Deploy</strong>：比賽期間程式一直在改，常常帶著沒 commit 的修改就部署。這個 Gradle 任務會在部署前，把目前的修改自動 commit 到名稱以 <code>event</code> 開頭的分支。</li>
+    <li><strong>Gversion</strong>：編譯時產生 <code>BuildConstants.java</code>，裡面有 Git commit 的 hash，還有有沒有沒 commit 的修改（dirty）。在 <code>Robot</code> 建構子裡用 <code>Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA)</code> 記進日誌。<code>BuildConstants.java</code> 要加進 <code>.gitignore</code>。</li>
+    <li><strong>Event Deploy</strong>：比賽期間程式一直在改，常常帶著沒 commit 的東西就部署了。這個 Gradle 任務會在部署前，自動把目前的修改 commit 到名字以 <code>event</code> 開頭的分支。</li>
   </ul>
-  <p>比賽時的流程<a class="ref" href="#src18-6">[6]</a>：</p>
+  <p>比賽時的流程是這樣<a class="ref" href="#src18-6">[6]</a>：</p>
   <ol>
-    <li>出發前建立並切換到 <code>event_</code> 開頭的分支，例如 <code>event_2026twcmp</code>，每個賽事（例如一場區域賽）一個分支。</li>
-    <li>照平常方式部署，每次部署前會自動產生一個 commit。</li>
-    <li>比賽結束後，把分支 squash and merge 回開發分支，保持歷史乾淨。</li>
-    <li>要重播時，從日誌的 metadata 找到 hash，<code>git checkout</code> 回去；即使之後被 squash，只要 event 分支還在，原本的 commit 就找得回來，所以 event 分支不要刪。</li>
+    <li>出發前開一個 <code>event_</code> 開頭的分支並切過去，例如 <code>event_2026twcmp</code>，一個賽事（例如一場區域賽）一個分支。</li>
+    <li>照平常那樣部署，每次部署前會自動多一個 commit。</li>
+    <li>比完之後，把分支 squash and merge 回開發分支，讓歷史乾淨一點。</li>
+    <li>要重播的時候，從日誌的 metadata 找 hash，<code>git checkout</code> 回去。就算之後被 squash，只要 event 分支還在，原本的 commit 就找得回來，所以 event 分支不要刪。</li>
   </ol>
-  <div class="note coach"><strong>教練提醒：隨身碟也是檢查項目</strong>沒插隨身碟、隨身碟滿了、格式不是 FAT32，日誌就不會寫進去，出問題時什麼都查不到。把「隨身碟有插、有空間」放進第 19 章的賽前檢查。</div>
+  <div class="note coach"><strong>教練提醒：隨身碟也要檢查</strong>沒插隨身碟、隨身碟滿了、格式不是 FAT32，日誌就寫不進去，出事的時候什麼都查不到。把「隨身碟有插、有空間」放進第 19 章的賽前檢查。</div>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>重播時開著模擬 GUI</strong>文件明確要求重播時關閉模擬 GUI。</div>
-  <div class="note warn"><strong>拿錯版本的程式重播</strong>程式已經改過還直接重播舊日誌，輸出對不上，還以為找到了 bug。先確認 GitSHA，並注意 dirty 標記。</div>
-  <div class="note warn"><strong>在 Robot 欄位裡直接 new Subsystem</strong>欄位初始化會在 <code>Logger.start()</code> 之前執行，Subsystem 建構子讀到的時間和 DS 資料就不是確定的。</div>
-  <div class="note warn"><strong>用 SmartDashboard.getNumber 調參數</strong>重播時讀不到當時的值。改用 <code>LoggedNetworkNumber</code> 等 AdvantageKit 的儀表板類別<a class="ref" href="#src18-13">[13]</a>。</div>
-  <div class="note warn"><strong>以為改了 kP 重播就能看到新的動作</strong>重播改變不了輸入，要看新的動作請用模擬。</div>
+  <div class="note warn"><strong>重播時開著模擬 GUI</strong>重播時一定要關掉模擬 GUI。</div>
+  <div class="note warn"><strong>拿錯版本的程式重播</strong>程式已經改過了還直接重播舊日誌，輸出對不上，你還以為找到 bug 了。先確認 GitSHA，也要注意 dirty 標記。</div>
+  <div class="note warn"><strong>在 Robot 的欄位裡直接 new Subsystem</strong>欄位初始化會在 <code>Logger.start()</code> 之前跑，Subsystem 建構子讀到的時間和 DS 資料就不是確定的。</div>
+  <div class="note warn"><strong>用 SmartDashboard.getNumber 調參數</strong>重播時讀不到當時的值。改用 <code>LoggedNetworkNumber</code> 這類 AdvantageKit 的儀表板類別<a class="ref" href="#src18-13">[13]</a>。</div>
+  <div class="note warn"><strong>以為改了 kP 重播就能看到新動作</strong>重播改不了輸入，要看新的動作請用模擬。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：賽後找出為什麼沒射球</h2>
-  <p>比賽中有一次，操作手按了射球鍵，但機器人沒有射。日誌裡有 <code>Flywheel/VelocityRps</code>（輸入）和 <code>Flywheel/AtSpeed</code>（輸出），但射球的判斷條件是 <code>flywheel.atSpeed() &amp;&amp; arm.atGoal()</code>，<code>Arm/AtGoal</code> 當時沒有記錄（假設這支程式還沒加上第 6 章 E-3 的那幾行 <code>recordOutput</code>）。你會怎麼查？</p>
+  <p>比賽中有一次操作手按了射球鍵，機器人卻沒射。日誌裡有 <code>Flywheel/VelocityRps</code>（輸入）和 <code>Flywheel/AtSpeed</code>（輸出），但射球的條件是 <code>flywheel.atSpeed() &amp;&amp; arm.atGoal()</code>，而 <code>Arm/AtGoal</code> 當時沒記錄（假設這份程式還沒加第 6 章 E-3 那幾行 <code>recordOutput</code>）。你會怎麼查？</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>先確定時間點，再一個一個條件檢查：哪個條件有記錄、哪個沒有？</p>
+      <p>先確定時間點，再一個條件一個條件檢查：哪個有記錄、哪個沒有？</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>用 Joysticks 分頁找到按鍵時間，Line Graph 看 Flywheel/AtSpeed。沒記錄的條件，可以用重播補記錄。</p>
@@ -4444,12 +4444,12 @@ public Command getAutonomousCommand() {
     </div>
     <div class="hint solution" data-label="完整解答">
     <ol>
-      <li>在 AdvantageScope 的 Joysticks 分頁找到按下射球鍵的時間點。</li>
-      <li>在 Line Graph 看那段時間的 <code>Flywheel/AtSpeed</code>。如果它是 false，原因就在飛輪（第 13 章）。</li>
-      <li>如果飛輪到速了，懷疑是手臂。這時用<strong>重播</strong>：checkout 當時的 GitSHA，在 <code>ArmSubsystem.periodic</code> 補上 <code>Logger.recordOutput("Arm/AtGoal", atGoal())</code>，切換成 REPLAY 執行。</li>
-      <li>在 <code>ReplayOutputs</code> 表看 <code>Arm/AtGoal</code>。因為手臂的位置是從日誌讀回來的輸入，重播算出的 <code>atGoal()</code> 就和當時完全一樣。</li>
+      <li>在 AdvantageScope 的 Joysticks 分頁找到按射球鍵的時間點。</li>
+      <li>用 Line Graph 看那段時間的 <code>Flywheel/AtSpeed</code>。如果是 false，問題就在飛輪（第 13 章）。</li>
+      <li>如果飛輪有到速，那就懷疑手臂。這時候用<strong>重播</strong>：checkout 當時的 GitSHA，在 <code>ArmSubsystem.periodic</code> 補上 <code>Logger.recordOutput("Arm/AtGoal", atGoal())</code>，切成 REPLAY 跑。</li>
+      <li>在 <code>ReplayOutputs</code> 表看 <code>Arm/AtGoal</code>。因為手臂位置是從日誌讀回來的輸入，重播算出的 <code>atGoal()</code> 會跟當時一模一樣。</li>
     </ol>
-    <p>這正是重播最擅長的事：補記錄當時忘了記錄的輸出。只要手臂是照第 6 章用 IO 層寫的，重播的結果就是準確的。找到原因後，把這行 <code>recordOutput</code> 留在程式裡，下次就不用重播了。</p>
+    <p>這就是重播最擅長的事：把當時忘了記的輸出補記回來。只要手臂是照第 6 章用 IO 層寫的，重播的結果就是準的。找到原因之後，那行 <code>recordOutput</code> 就留在程式裡，下次就不用再重播了。</p>
     </div>
   </div>
 
@@ -4474,16 +4474,16 @@ public Command getAutonomousCommand() {
 <template id="tpl-ch19">
   <p class="headline-code">CAN ID 19｜上場</p>
   <h1>上場檢查與 Pit 除錯：考試當天</h1>
-  <p class="lede">讀完這章，你會知道出發前、每場比賽前、每場比賽後各要檢查什麼，怎麼從 Driver Station 看出 brownout、roboRIO 重開或網路問題，以及在兩場比賽之間的短短時間裡，照什麼順序把問題找出來、改程式時要守哪些規矩。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 文件（roboRIO 與 NI Driver Station）。2027 年起控制系統換成 SystemCore，Driver Station 與部分檢查項目會不同。本章的檢查清單結合了官方文件與一般隊伍常見的做法，隊上應依自己的機器人調整。</div>
+  <p class="lede">最後一章，講的是比賽當天。程式寫得再好，上場前忘了檢查一樣會出事。這章整理出發前、每場比賽前、每場比賽後要檢查什麼，怎麼從 Driver Station 看出 brownout、roboRIO 重開或網路問題，還有兩場比賽之間那一點點時間，要照什麼順序找問題、改程式要守哪些規矩。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 文件（roboRIO 和 NI Driver Station）寫的。2027 年起控制系統會換成 SystemCore，Driver Station 和一些檢查項目會不一樣。這裡的檢查清單是官方文件加上很多隊伍常見的做法，請依隊上的機器人自己調整。</div>
 
-  <h2>生活比喻：考試當天</h2>
+  <h2>先講個比喻：考試當天</h2>
   <div class="story">
-    <p><strong>前一晚就把文具準備好。</strong>准考證、2B 鉛筆、橡皮擦、手錶，前一晚就放進袋子裡。考試當天早上才發現鉛筆沒削，已經來不及了。</p>
-    <p><strong>每一節考試前，再確認一次。</strong>進考場前摸一下：准考證在嗎？座位號碼對嗎？手機關了嗎？這些檢查很無聊，但一節考試只有一次機會。</p>
-    <p><strong>考試中出狀況，先看最簡單的原因。</strong>筆寫不出來，先看是不是沒按下筆頭，再看是不是沒水了，最後才懷疑是不是桌子有問題。從最常見、最容易檢查的原因開始。</p>
-    <p><strong>下課十分鐘只能修小東西。</strong>兩節考試之間只有十分鐘。可以換一支筆、借一個橡皮擦，但不可能重新複習一整章。</p>
-    <p><strong>考完對答案。</strong>每節考完，把題目和自己的答案記下來，回家才知道錯在哪裡。</p>
+    <p>准考證、2B 鉛筆、橡皮擦、手錶，前一晚就要放進袋子。考試當天早上才發現鉛筆沒削，就來不及了。</p>
+    <p>每節考試進場前再摸一下：准考證在嗎？座位號碼對嗎？手機關了嗎？這些檢查很無聊，但一節考試就只有一次機會。</p>
+    <p>考到一半筆寫不出來，先看是不是沒按筆頭，再看是不是沒水，最後才懷疑是不是桌子有問題。從最常見、最好檢查的原因開始找。</p>
+    <p>兩節考試中間只有十分鐘，可以換支筆、借個橡皮擦，但不可能重新複習一整章。</p>
+    <p>每節考完把題目和自己的答案記下來，回家才知道錯在哪。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>比賽</th></tr></thead>
@@ -4495,29 +4495,29 @@ public Command getAutonomousCommand() {
       <tr><td>考完對答案</td><td>每場後下載日誌、看 DS Log</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>考試出狀況通常只影響自己；機器人出狀況會影響整個聯盟。另外，考試不能在考場外練習同一份題目，但機器人可以在 Pit 裡重現問題：WPILib 文件建議在 Pit 通電、用網路線連著時搖動線材，甚至把機器人一側抬起再放下，讓問題在 Pit 裡發生，而不是在場上<a class="ref" href="#src19-1">[1]</a>。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>考試出狀況通常只影響你自己，機器人出狀況會拖累整個聯盟。還有，考試不能在考場外先練同一份題目，但機器人可以在 Pit 裡把問題弄出來：WPILib 建議在 Pit 通電、用網路線連著的時候去搖線，甚至把機器人一邊抬起來再放下，讓問題在 Pit 裡發生，而不是在場上<a class="ref" href="#src19-1">[1]</a>。</div>
 
   <h2>出發前</h2>
   <h3>Driver Station 筆電</h3>
-  <p>WPILib 的 Driver Station 最佳實務文件建議<a class="ref" href="#src19-2">[2]</a>：</p>
+  <p>WPILib 的 Driver Station 最佳實務建議這幾件事<a class="ref" href="#src19-2">[2]</a>：</p>
   <ul>
-    <li>準備一台<strong>專門用來開車</strong>的筆電，只裝 Driver Station 和儀表板，不拿來寫程式。</li>
-    <li>電源設定改成不睡眠、關閉省電、效能最佳；確認電池在這些設定下至少撐一小時，排隊上場時沒有插座也不怕。</li>
-    <li>出發前裝完所有 Windows 更新並實際連機器人測試，然後<strong>暫停更新</strong>涵蓋整個比賽期間，並設定使用時段避免比賽中安裝更新。</li>
+    <li>準備一台<strong>專門開車用</strong>的筆電，只裝 Driver Station 和儀表板，不要拿來寫程式。</li>
+    <li>電源設定改成不睡眠、關省電、效能最佳；確認在這些設定下電池至少撐一小時，排隊上場沒插座也不怕。</li>
+    <li>出發前把 Windows 更新全部裝完、實際連機器人測過，然後<strong>暫停更新</strong>到比賽結束，再設好使用時段，免得比賽中跑去裝更新。</li>
     <li>帶一條可靠的 USB 線和網路線，用來直接連 roboRIO。</li>
-    <li>Driver Station 不支援 ARM 處理器的筆電。</li>
+    <li>Driver Station 不支援 ARM 處理器的筆電，買筆電前要注意。</li>
   </ul>
   <h3>程式與工具</h3>
   <ul>
-    <li>建立 <code>event_</code> 開頭的比賽分支（第 18 章），確認部署時會自動 commit。</li>
-    <li>所有 vendordep（Phoenix 6、PathPlannerLib、AdvantageKit…）更新到要用的版本並在機器人上測過。比賽場地通常沒有網路，文件也提醒不要打算在現場用網路更新軟體<a class="ref" href="#src19-2">[2]</a>。</li>
-    <li>準備一個「已知可以動」的程式版本（例如打一個 Git tag），真的改壞時可以立刻退回。</li>
+    <li>開好 <code>event_</code> 開頭的比賽分支（第 18 章），確認部署時會自動 commit。</li>
+    <li>所有 vendordep（Phoenix 6、PathPlannerLib、AdvantageKit…）都更新到要用的版本，而且在機器人上測過。比賽場地通常沒網路，不要打算到現場才上網更新<a class="ref" href="#src19-2">[2]</a>。</li>
+    <li>準備一個「確定會動」的程式版本（例如打一個 Git tag），真的改壞了可以馬上退回去。</li>
     <li>FAT32 隨身碟（第 18 章）至少兩支，一支插在機器人上，一支備用。</li>
   </ul>
 
   <h2>每場比賽前</h2>
-  <p>WPILib 文件對 Driver Station 的建議<a class="ref" href="#src19-2">[2]</a><a class="ref" href="#src19-1">[1]</a>：前一場結束前就把筆電開機並登入；關掉不需要的程式；<strong>一定要帶筆電充電器</strong>到場上，因為插電時 Windows 的電源管理比較不激進，Driver Station 表現比較穩定；用魔鬼氈把筆電固定在操作台上。現場要關閉 Windows 防火牆和 Wi-Fi<a class="ref" href="#src19-2">[2]</a>。</p>
-  <p>下面是一份程式組可以用的檢查清單：</p>
+  <p>Driver Station 這邊要做的<a class="ref" href="#src19-2">[2]</a><a class="ref" href="#src19-1">[1]</a>：前一場還沒結束就先把筆電開機登入；關掉用不到的程式；<strong>一定要帶筆電充電器</strong>上場，因為插著電的時候 Windows 的電源管理比較不會亂來，Driver Station 比較穩；用魔鬼氈把筆電黏在操作台上。現場要關掉 Windows 防火牆和 Wi-Fi<a class="ref" href="#src19-2">[2]</a>。</p>
+  <p>下面是程式組可以直接拿去用的檢查清單：</p>
   <table class="map">
     <thead><tr><th>項目</th><th>怎麼確認</th><th>相關章節</th></tr></thead>
     <tbody>
@@ -4535,14 +4535,14 @@ public Command getAutonomousCommand() {
   <h2>每場比賽後</h2>
   <ol>
     <li>用 AdvantageScope 下載 AdvantageKit 日誌（第 18 章），檔名或資料夾標上場次。</li>
-    <li>打開 Driver Station 的 Log Viewer，看這一場的電壓、延遲、掉封包和模式。</li>
-    <li>看 Driver Station 的 CAN/Power 分頁，12V fault 計數有沒有增加（見下方 brownout）。</li>
-    <li>問駕駛和操作手：有沒有哪裡「感覺不對」？把時間點記下來，再去日誌裡找。</li>
-    <li>換電池、充電，電池編號和場次一起記錄。</li>
+    <li>打開 Driver Station 的 Log Viewer，看這場的電壓、延遲、掉封包和模式。</li>
+    <li>看 Driver Station 的 CAN/Power 分頁，12V fault 計數有沒有變多（下面會講 brownout）。</li>
+    <li>問駕駛和操作手：有沒有哪裡「感覺怪怪的」？把時間點記下來，再去日誌裡找。</li>
+    <li>換電池、充電，電池編號跟場次一起記下來。</li>
   </ol>
 
   <h2>看懂 Brownout</h2>
-  <p>電池電壓在大電流時會瞬間掉下來。WPILib 文件說明 roboRIO（1.0）的分段保護<a class="ref" href="#src19-3">[3]</a>：</p>
+  <p>大電流的時候，電池電壓會一瞬間掉下去。roboRIO（1.0）有分段的保護機制<a class="ref" href="#src19-3">[3]</a>：</p>
   <table class="map">
     <thead><tr><th>階段</th><th>電壓</th><th>發生什麼</th></tr></thead>
     <tbody>
@@ -4551,15 +4551,15 @@ public Command getAutonomousCommand() {
       <tr><td>3</td><td>低於約 4.5 V</td><td>可能直接斷電，電壓回升後重新開機</td></tr>
     </tbody>
   </table>
-  <p>roboRIO 2.0 的第 2 階段預設門檻是 6.75 V，可以用 <code>RobotController.setBrownoutVoltage</code> 調整；roboRIO 1.0 固定 6.3 V<a class="ref" href="#src19-3">[3]</a>。發生 brownout 時，roboRIO 的電源燈變琥珀色、Driver Station 的電壓底色變紅並顯示 Voltage Brownout、CAN/Power 分頁的 12V fault 計數加一，DS 日誌也會記錄<a class="ref" href="#src19-3">[3]</a>。</p>
-  <p>程式能做的事：第 11 章的電流限制是最直接的預防。文件也建議做「電流預算」：列出各機構的電流需求，如果某些功能不會同時使用，就在程式裡強制它們不同時動作<a class="ref" href="#src19-3">[3]</a>。</p>
+  <p>roboRIO 2.0 第 2 階段的預設門檻是 6.75 V，可以用 <code>RobotController.setBrownoutVoltage</code> 調；roboRIO 1.0 固定 6.3 V<a class="ref" href="#src19-3">[3]</a>。brownout 發生時，roboRIO 的電源燈會變琥珀色、Driver Station 的電壓底色變紅並顯示 Voltage Brownout、CAN/Power 分頁的 12V fault 計數加一，DS 日誌也會記下來<a class="ref" href="#src19-3">[3]</a>。</p>
+  <p>程式能做什麼？第 11 章的電流限制是最直接的預防。另外可以做「電流預算」：列出每個機構要多少電流，某些功能本來就不會同時用的話，就在程式裡強制它們不要同時動<a class="ref" href="#src19-3">[3]</a>。</p>
 
   <h2>從 DS Log 看出斷線原因</h2>
-  <p>Driver Station 的 Log Viewer 會畫出電壓、延遲（trip time）、roboRIO CPU、掉封包與機器人模式，並標出事件<a class="ref" href="#src19-4">[4]</a>。文件整理了幾種典型的斷線樣子，其中最常用來判斷的是<strong>roboRIO 重開</strong>：主要線索是 DS 事件裡的「Time since robot boot」訊息，斷線後其他裝置都 ping 得到、只有 roboRIO 不回應，接著 roboRIO 重新回應<a class="ref" href="#src19-4">[4]</a>。常見的另外兩種是機器人上的網路線問題與無線電重開，看到斷線時先對照文件中的圖例。</p>
-  <p>Driver Station 訊息也有幫助<a class="ref" href="#src19-5">[5]</a>：「No robot code is currently running」表示 roboRIO 有連上，但程式沒在跑（程式當掉、還在開機、或部署失敗）；「The Driver Station has lost communication with the robot」則是 DS 和機器人的通訊中斷。</p>
+  <p>Driver Station 的 Log Viewer 會畫出電壓、延遲（trip time）、roboRIO CPU、掉封包和機器人模式，還會標出事件<a class="ref" href="#src19-4">[4]</a>。WPILib 整理了幾種典型的斷線圖，最常用來判斷的是<strong>roboRIO 重開</strong>：主要線索是 DS 事件裡出現「Time since robot boot」，斷線時其他裝置都 ping 得到、只有 roboRIO 沒反應，接著 roboRIO 又回來了<a class="ref" href="#src19-4">[4]</a>。另外兩種常見的是機器人上的網路線問題和無線電重開，看到斷線先拿去跟文件裡的圖對一下。</p>
+  <p>Driver Station 的訊息也很有用<a class="ref" href="#src19-5">[5]</a>：「No robot code is currently running」代表 roboRIO 有連上，但程式沒在跑（程式掛了、還在開機，或部署失敗）；「The Driver Station has lost communication with the robot」則是 DS 跟機器人斷線了。</p>
 
   <h2>Pit 分診：從最簡單的原因查起</h2>
-  <p>兩場比賽之間時間很短。和第 12 章的 CAN 除錯一樣，先查最常見、最容易檢查的原因。</p>
+  <p>兩場比賽之間時間很趕。跟第 12 章的 CAN 除錯一樣，從最常見、最好檢查的原因開始查。</p>
   <div class="lab">
     <div class="calls" role="group" aria-label="選擇症狀">
       <button class="call tri" data-tri="nomove" aria-pressed="false">整台都不動</button>
@@ -4573,32 +4573,32 @@ public Command getAutonomousCommand() {
   </div>
 
   <h2>比賽期間改程式的規矩</h2>
-  <p>下面是一般隊伍在比賽期間常用的原則，不是官方規定，但能避免大多數「越改越糟」的情況：</p>
+  <p>下面這些是很多隊伍比賽期間會守的原則，不是官方規定，但可以避免大部分「越改越糟」的狀況：</p>
   <ol>
-    <li><strong>一次只改一件事。</strong>同時改兩個地方，出問題時就不知道是哪一個。</li>
-    <li><strong>只改和問題直接相關的地方。</strong>「順便」重構、改命名、升級函式庫，都留到比賽後。</li>
-    <li><strong>改完要在 Pit 測過才上場。</strong>至少 Enable 一次，動一下改到的機構；自動程式的修改要在練習場跑一次，或至少把底盤架高、在模擬裡跑過。</li>
-    <li><strong>改數字前先記下原本的值。</strong>比賽分支的自動 commit（第 18 章）會幫你記，但口頭也要跟隊友說。</li>
-    <li><strong>來不及測，就不要改。</strong>用已知可以動的版本上場，比帶著沒測過的修改上場安全。</li>
-    <li><strong>每次部署後確認版本。</strong>部署失敗但沒注意到，就會帶著舊程式上場。</li>
+    <li><strong>一次只改一件事。</strong>同時改兩個地方，出問題就不知道是哪個害的。</li>
+    <li><strong>只改跟問題直接有關的地方。</strong>「順便」重構、改命名、升級函式庫，通通留到比完再說。</li>
+    <li><strong>改完要在 Pit 測過才能上場。</strong>至少 Enable 一次、動一下改到的機構；自動程式改了要在練習場跑一次，不然至少把底盤架高、在模擬裡跑過。</li>
+    <li><strong>改數字前先記下原本的值。</strong>比賽分支的自動 commit（第 18 章）會幫你記，但嘴巴也要跟隊友講一聲。</li>
+    <li><strong>來不及測，就不要改。</strong>用確定會動的版本上場，比帶著沒測過的修改上場安全多了。</li>
+    <li><strong>每次部署完都確認版本。</strong>部署失敗卻沒發現，就會帶著舊程式上場。</li>
   </ol>
-  <div class="note coach"><strong>教練提醒：分工</strong>Pit 裡同時有機構組在修東西時，Enable 前一定要大聲喊，確認所有人的手都離開機器人（第 0 章）。程式組改程式時，指定一個人負責部署，避免兩台電腦先後部署不同版本。</div>
+  <div class="note coach"><strong>教練提醒：分工</strong>Pit 裡機構組也在修東西的時候，Enable 前一定要大聲喊，確定所有人的手都離開機器人了（第 0 章）。程式組改程式時，指定一個人負責部署，不要兩台電腦一前一後部署不同版本。</div>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>沒帶筆電充電器上場</strong>Windows 在電池模式下的電源管理比較激進，Driver Station 的表現比較難預測<a class="ref" href="#src19-2">[2]</a>。</div>
-  <div class="note warn"><strong>比賽中 Windows 開始更新</strong>出發前沒暫停更新、沒設使用時段，結果上場前筆電在重新開機。</div>
-  <div class="note warn"><strong>把 brownout 當成程式 bug</strong>機構動作突然停一下又恢復，先看 12V fault 計數和 DS Log 的電壓，不要急著改程式。</div>
-  <div class="note warn"><strong>用 USB 線測線材</strong>文件提醒搖線測試時要用網路線連接，不是 USB，否則測不到機器人上真正的通訊路徑<a class="ref" href="#src19-1">[1]</a>。</div>
-  <div class="note warn"><strong>在 Pit 大改程式</strong>兩場之間重寫一整個指令，沒時間測就上場，常常比原本的問題更嚴重。</div>
+  <div class="note warn"><strong>沒帶筆電充電器上場</strong>Windows 用電池的時候電源管理比較激進，Driver Station 的表現比較難預測<a class="ref" href="#src19-2">[2]</a>。</div>
+  <div class="note warn"><strong>比賽中 Windows 開始更新</strong>出發前沒暫停更新、沒設使用時段，結果要上場了筆電還在重開機。</div>
+  <div class="note warn"><strong>把 brownout 當成程式 bug</strong>機構突然停一下又恢復，先看 12V fault 計數和 DS Log 的電壓，不要急著改程式。</div>
+  <div class="note warn"><strong>用 USB 線測線材</strong>搖線測試要用網路線連，不是 USB，不然測不到機器人上真正的通訊路徑<a class="ref" href="#src19-1">[1]</a>。</div>
+  <div class="note warn"><strong>在 Pit 大改程式</strong>兩場之間重寫一整個指令、沒時間測就上場，結果常常比原本的問題還慘。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：讓程式幫你做賽前檢查</h2>
-  <p>用第 12 章的 <code>Alert</code>，在 Disabled 時檢查兩件事：電池電壓太低（門檻由隊上決定），以及自動程式選單還是預設值。提示：<code>RobotController.getBatteryVoltage()</code> 回傳電池電壓；<code>AutoBuilder.getAllAutoNames()</code> 回傳專案裡所有 Auto 的名字，可以用它自己建立選單，並記住預設選項。</p>
+  <p>用第 12 章的 <code>Alert</code>，在 Disabled 時檢查兩件事：電池電壓太低（門檻隊上自己訂），還有自動程式選單還停在預設值。線索：<code>RobotController.getBatteryVoltage()</code> 回傳電池電壓；<code>AutoBuilder.getAllAutoNames()</code> 回傳專案裡所有 Auto 的名字，可以拿它自己建選單，順便記住預設選項。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>兩個檢查都只在 Disabled 時做；電壓會跳動，要避免瞬間掉一下就跳警告。</p>
+      <p>兩個檢查都只在 Disabled 時做；電壓會跳，要避免瞬間掉一下就跳警告。</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>用兩個 Alert；電壓用 RobotController.getBatteryVoltage() 搭配 Debouncer；選單要能判斷「還是預設值」。</p>
@@ -4629,7 +4629,7 @@ public void updatePreMatchAlerts() {
         &amp;&amp; batteryDebounce.calculate(RobotController.getBatteryVoltage() &lt; LOW_BATTERY_VOLTS));
     noAuto.set(disabled &amp;&amp; autoChooser.getSelected() == doNothing);
 }</code></pre>
-    <p>幾個重點：電壓會跳動，用 <code>Debouncer</code> 要求持續 1 秒低於門檻才警告（第 12 章）；只在 Disabled 時檢查，因為比賽中大電流時電壓本來就會掉。<code>buildAutoChooser()</code> 的預設選項是它內部建立的 <code>Commands.none()</code>，程式拿不到那個物件；所以這裡自己建立選單，把自己的 <code>doNothing</code> 當預設選項，就能用 <code>==</code> 判斷有沒有換過。用 AdvantageKit 時，選單換成第 18 章的 <code>LoggedDashboardChooser</code>，判斷方式相同。Alert 會自動被 AdvantageKit 記錄（第 18 章），賽後也查得到。</p>
+    <p>講幾個重點：電壓會跳，所以用 <code>Debouncer</code> 要求持續 1 秒低於門檻才警告（第 12 章）；只在 Disabled 時檢查，因為比賽中大電流時電壓本來就會掉。<code>buildAutoChooser()</code> 的預設選項是它裡面自己 new 的 <code>Commands.none()</code>，程式拿不到那個物件；所以這裡自己建選單，把自己的 <code>doNothing</code> 當預設，就能用 <code>==</code> 判斷有沒有換過。用 AdvantageKit 的話，選單換成第 18 章的 <code>LoggedDashboardChooser</code>，判斷方式一樣。Alert 會自動被 AdvantageKit 記下來（第 18 章），賽後也查得到。</p>
     </div>
   </div>
 

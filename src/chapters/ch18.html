@@ -1,15 +1,15 @@
   <p class="headline-code">CAN ID 18｜上場</p>
   <h1>模擬、日誌與重播：比賽錄影和賽後檢討</h1>
-  <p class="lede">讀完這章，你會知道模擬、日誌、重播三者差在哪裡，怎麼從機器人取出日誌、用 AdvantageScope 看資料，重播的完整步驟，哪些寫法會讓重播失準，以及怎麼讓每一場比賽的程式版本都找得回來。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 AdvantageKit 2026 版（v26.0.2）的文件。AdvantageKit 網站和 GitHub main 分支已經開始出現 2027 版的內容（例如類別改名），查資料時要確認版本。第 6 章 E 部分已經介紹過 <code>@AutoLog</code>、<code>Logger.processInputs</code> 和三種模式，本章接著講怎麼用。</div>
+  <p class="lede">比賽中機器人出包，賽後你只能靠記憶猜嗎？不用，只要有日誌。這章講模擬、日誌、重播三個差在哪，怎麼從機器人拿出日誌、在 AdvantageScope 裡看資料，重播怎麼做，哪些寫法會讓重播不準，還有怎麼讓每一場比賽的程式版本都找得回來。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 AdvantageKit 2026 版（v26.0.2）的文件寫的。AdvantageKit 網站和 GitHub main 分支已經開始出現 2027 版的東西（像類別改名），查資料要確認版本。<code>@AutoLog</code>、<code>Logger.processInputs</code> 和三種模式在第 6 章 E 部分講過了，這章講怎麼用。</div>
 
-  <h2>生活比喻：比賽錄影和賽後檢討</h2>
+  <h2>先講個比喻：比賽錄影和賽後檢討</h2>
   <div class="story">
-    <p><strong>體育課的練習賽全程錄影。</strong>每一場練習賽，攝影機都把「場上發生的事」完整錄下來：誰在哪裡、球往哪裡飛、裁判吹了什麼哨。另外，每個球員也把「自己當時怎麼想、決定做什麼」寫在筆記上。</p>
-    <p><strong>賽後一起看錄影。</strong>教練把錄影和筆記放在同一個時間軸上，一格一格看：球員在第 12 秒為什麼沒有傳球？原來他當時以為隊友被擋住了。</p>
-    <p><strong>重新推演：換一套想法會怎樣？</strong>教練還可以說：「用同一段錄影，照新的戰術重新想一次，每一格你會怎麼決定？」因為看到的畫面完全一樣，新的決定可以和原本的決定逐格比較。</p>
-    <p><strong>但推演改變不了錄影。</strong>在推演裡決定「這時候往左跑」，錄影裡的你還是往右跑了，之後的畫面也不會因此改變。推演只能回答「看到這些畫面時，新想法會怎麼決定」，不能回答「照新想法打，比賽會變成怎樣」。</p>
-    <p><strong>錄影要標上是哪一版戰術。</strong>戰術本每場之間都在改，如果錄影沒標註當時用的是哪一版，事後就不知道要拿哪一版來推演。</p>
+    <p>體育課的每一場練習賽都全程錄影，攝影機把場上發生的事完整錄下來：誰在哪、球往哪飛、裁判吹了什麼哨。另外每個球員也會把「自己當時怎麼想、決定做什麼」寫在筆記上。</p>
+    <p>賽後教練把錄影跟筆記放在同一條時間軸上，一格一格看：第 12 秒他為什麼沒傳球？喔，原來他以為隊友被擋住了。</p>
+    <p>教練還可以說：「用同一段錄影，照新戰術重想一次，每一格你會怎麼決定？」因為看到的畫面完全一樣，新的決定可以跟原本的逐格比較。</p>
+    <p>但推演改變不了錄影。你在推演裡決定「這時候往左跑」，錄影裡的你還是往右跑了，後面的畫面也不會變。推演只能回答「看到這些畫面，新想法會怎麼決定」，回答不了「照新想法打，比賽會變怎樣」。</p>
+    <p>最後，戰術本每場之間都在改，錄影如果沒標當時用的是哪一版，事後就不知道該拿哪一版來推演。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>AdvantageKit</th></tr></thead>
@@ -22,7 +22,7 @@
       <tr><td>錄影標上戰術版本</td><td>日誌 metadata 記錄 Git commit</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>錄影只能看到鏡頭拍到的東西；AdvantageKit 的重播要求程式讀到的<strong>每一個</strong>外部資料都被記錄下來，只要漏了一個，重播出來的決定就可能和當時不同。這就是本章後半「確定性」要講的。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>錄影只拍得到鏡頭範圍內的東西；AdvantageKit 的重播卻要求程式讀到的<strong>每一個</strong>外部資料都被記錄下來，漏一個，重播出來的決定就可能跟當時不一樣。這就是後半段「確定性」要講的。</div>
 
   <h2>模擬、日誌、重播</h2>
   <table class="map">
@@ -36,8 +36,8 @@
   </table>
 
   <h2>取得日誌</h2>
-  <p>AdvantageKit 文件說明，在 roboRIO 上 <code>WPILOGWriter</code> 預設寫到 USB 隨身碟（<code>/U/logs</code>），所以 roboRIO 上<strong>必須插一支 FAT32 格式的隨身碟</strong><a class="ref" href="#src18-1">[1]</a>。取出日誌最方便的方法是 AdvantageScope：在偏好設定填好機器人位址與日誌資料夾，然後用 File → Download Logs 下載，最新的日誌會排在最上面<a class="ref" href="#src18-2">[2]</a>。</p>
-  <p>AdvantageScope 能開的格式包括 WPILib 與 AdvantageKit 產生的 <code>.wpilog</code>，以及 Phoenix 6 SignalLogger 的 <code>.hoot</code>（第 15 章）。同時開啟多個檔案時，時間會自動對齊<a class="ref" href="#src18-2">[2]</a>，所以可以把 AdvantageKit 日誌和 hoot 放在一起看。</p>
+  <p>在 roboRIO 上，<code>WPILOGWriter</code> 預設寫到 USB 隨身碟（<code>/U/logs</code>），所以 roboRIO 上<strong>一定要插一支 FAT32 的隨身碟</strong><a class="ref" href="#src18-1">[1]</a>。拿日誌最方便的是用 AdvantageScope：在偏好設定填好機器人位址和日誌資料夾，再用 File → Download Logs 下載，最新的會排在最上面<a class="ref" href="#src18-2">[2]</a>。</p>
+  <p>AdvantageScope 開得了 WPILib 和 AdvantageKit 產生的 <code>.wpilog</code>，也開得了 Phoenix 6 SignalLogger 的 <code>.hoot</code>（第 15 章）。同時開好幾個檔案時間會自動對齊<a class="ref" href="#src18-2">[2]</a>，所以 AdvantageKit 日誌和 hoot 可以放在一起看，超方便。</p>
 
   <h2>在 AdvantageScope 裡看什麼</h2>
   <table class="map">
@@ -52,29 +52,29 @@
       <tr><td>Metadata</td><td>程式版本（Git commit）等資訊</td></tr>
     </tbody>
   </table>
-  <p>AdvantageKit 會自動記錄一些東西，不需要設定：時間戳、Driver Station 與搖桿的所有資料、透過 AdvantageKit 儀表板類別讀的輸入、WPILib Alert 的狀態（第 12 章）、Console 輸出，以及預設 CAN ID 的 PDP / PDH 各通道電流<a class="ref" href="#src18-3">[3]</a>。</p>
+  <p>有些東西 AdvantageKit 會自動記，不用設定：時間戳、Driver Station 和搖桿的所有資料、透過 AdvantageKit 儀表板類別讀的輸入、WPILib Alert 的狀態（第 12 章）、Console 輸出，還有預設 CAN ID 的 PDP / PDH 每個通道的電流<a class="ref" href="#src18-3">[3]</a>。</p>
 
   <h3>要記錄哪些輸出</h3>
-  <p>AdvantageKit 文件把輸出定義為「能在模擬中重新算出的值」，例如里程計位置、馬達電壓、內部狀態、給駕駛的狀態資訊。雖然這些值重播時算得出來，但實機上還是應該記錄重要的輸出，因為比賽之間通常來不及重播<a class="ref" href="#src18-4">[4]</a>。<code>Pose2d</code> 這類 WPILib 幾何物件可以直接記錄，在 2D Field 分頁顯示<a class="ref" href="#src18-4">[4]</a>。</p>
+  <p>所謂「輸出」，是指能在模擬裡重新算出來的值，像里程計位置、馬達電壓、內部狀態、給駕駛看的狀態資訊。這些值重播時算得出來沒錯，但實機上還是要記重要的輸出，因為兩場比賽之間通常根本來不及重播<a class="ref" href="#src18-4">[4]</a>。<code>Pose2d</code> 這類 WPILib 幾何物件可以直接記，在 2D Field 分頁就能看<a class="ref" href="#src18-4">[4]</a>。</p>
   <pre><code>Logger.recordOutput("Arm/Goal", goal);                 // enum
 Logger.recordOutput("Drive/Pose", drivetrain.getState().Pose);
 Logger.recordOutput("Vision/Accepted", acceptedCount);  // 第 17 章的練習</code></pre>
-  <p>AdvantageKit 2026 版新增了單位資訊的記錄，例如 <code>Logger.recordOutput("MyAngle", 3.141, "radians")</code>，AdvantageScope 畫圖時就能正確換算單位<a class="ref" href="#src18-5">[5]</a>。</p>
+  <p>AdvantageKit 2026 版還多了單位資訊，例如 <code>Logger.recordOutput("MyAngle", 3.141, "radians")</code>，AdvantageScope 畫圖時就能正確換算單位<a class="ref" href="#src18-5">[5]</a>。</p>
 
   <h2>重播的完整步驟</h2>
   <ol>
-    <li><strong>找到當時的程式版本。</strong>在 AdvantageScope 的 Metadata 分頁找到 <code>GitSHA</code>，用 <code>git checkout</code> 回到那個 commit<a class="ref" href="#src18-6">[6]</a>（怎麼記錄 GitSHA 見下一節）。</li>
-    <li><strong>切換成重播模式。</strong>AdvantageKit 範本專案只要把 <code>Constants.java</code> 的 <code>simMode</code> 改成 <code>REPLAY</code><a class="ref" href="#src18-7">[7]</a>（第 6 章 E-4）。</li>
-    <li><strong>指定日誌。</strong><code>LogFileUtil.findReplayLog()</code> 依序使用：環境變數 <code>AKIT_LOG_PATH</code>、AdvantageScope 目前開著的檔案、執行時跳出的選擇視窗<a class="ref" href="#src18-7">[7]</a>。最簡單的做法是先在 AdvantageScope 開好那份日誌。</li>
-    <li><strong>用模擬模式執行程式。</strong>WPILib 的 Simulate Robot Code，<strong>不要開模擬 GUI</strong>（範本預設已關閉）<a class="ref" href="#src18-7">[7]</a>。</li>
-    <li><strong>看結果。</strong>產生的新日誌會自動在 AdvantageScope 開啟。重播算出的輸出在 <code>ReplayOutputs</code> 表，原本的輸入與輸出保持不變，可以直接對照<a class="ref" href="#src18-7">[7]</a>。</li>
+    <li><strong>找到當時的程式版本。</strong>在 AdvantageScope 的 Metadata 分頁找 <code>GitSHA</code>，用 <code>git checkout</code> 回到那個 commit<a class="ref" href="#src18-6">[6]</a>（GitSHA 怎麼記，下一節講）。</li>
+    <li><strong>切到重播模式。</strong>AdvantageKit 範本專案只要把 <code>Constants.java</code> 的 <code>simMode</code> 改成 <code>REPLAY</code><a class="ref" href="#src18-7">[7]</a>（第 6 章 E-4）。</li>
+    <li><strong>指定日誌。</strong><code>LogFileUtil.findReplayLog()</code> 會照順序找：環境變數 <code>AKIT_LOG_PATH</code>、AdvantageScope 現在開著的檔案、執行時跳出來的選擇視窗<a class="ref" href="#src18-7">[7]</a>。最簡單就是先在 AdvantageScope 把那份日誌開好。</li>
+    <li><strong>用模擬模式跑。</strong>WPILib 的 Simulate Robot Code，<strong>不要開模擬 GUI</strong>（範本預設已經關了）<a class="ref" href="#src18-7">[7]</a>。</li>
+    <li><strong>看結果。</strong>新產生的日誌會自動在 AdvantageScope 打開。重播算出來的輸出在 <code>ReplayOutputs</code> 表，原本的輸入和輸出都還在，可以直接對照<a class="ref" href="#src18-7">[7]</a>。</li>
   </ol>
-  <p>第 6 章 E-5 的 <code>setUseTiming(false)</code> 讓重播盡快跑完，文件特別說明這<strong>不會影響</strong>重播的準確度<a class="ref" href="#src18-7">[7]</a>。</p>
-  <div class="note"><strong>Replay Watch</strong>調整位置估計這類需要反覆嘗試的工作，可以用 <code>./gradlew replayWatch</code>（Windows 是 <code>gradle.bat replayWatch</code>）：每次修改 <code>src</code> 裡的程式，重播就自動再跑一次，AdvantageScope 也會保留時間範圍和畫面。它每次會覆蓋上一次的重播結果，但不會修改原始日誌；日誌越短、電腦單核效能越好，越好用<a class="ref" href="#src18-8">[8]</a>。</div>
-  <div class="note warn"><strong>重播的限制</strong>AdvantageKit 文件說明，重播時修改程式的輸出<strong>不能影響</strong>重播的輸入<a class="ref" href="#src18-7">[7]</a>。例如把手臂的 kP 改大後重播，記錄裡的手臂位置還是當時的位置，因為那是從日誌讀回來的輸入。重播適合回答「看到同樣的資料，新的邏輯會怎麼決定」，不能回答「照新的邏輯，機器人會怎麼動」；後者要用模擬。</div>
+  <p>第 6 章 E-5 的 <code>setUseTiming(false)</code> 讓重播用最快速度跑完，這<strong>不會影響</strong>重播的準確度<a class="ref" href="#src18-7">[7]</a>，放心用。</p>
+  <div class="note"><strong>Replay Watch</strong>調位置估計這種要一直試的工作，可以用 <code>./gradlew replayWatch</code>（Windows 是 <code>gradle.bat replayWatch</code>）：只要改了 <code>src</code> 裡的程式，重播就自動再跑一次，AdvantageScope 的時間範圍和畫面也會保留。它每次會蓋掉上一次的重播結果，但不會動原始日誌；日誌越短、電腦單核越快，越好用<a class="ref" href="#src18-8">[8]</a>。</div>
+  <div class="note warn"><strong>重播的限制</strong>重播時改程式，輸出<strong>不能影響</strong>重播的輸入<a class="ref" href="#src18-7">[7]</a>。比如把手臂的 kP 調大再重播，記錄裡的手臂位置還是當時的位置，因為那是從日誌讀回來的輸入。重播適合回答「看到同樣的資料，新邏輯會怎麼決定」，回答不了「照新邏輯，機器人會怎麼動」；後者要用模擬。</div>
 
   <h2>確定性：重播準確的前提</h2>
-  <p>AdvantageKit 文件說明，重播要求所有資料來源都是確定、同步的；IO 介面保證了 Subsystem 的部分，但很容易不小心讀到沒被記錄的資料，所以建議開發過程中定期測試重播<a class="ref" href="#src18-9">[9]</a>。文件列出的常見陷阱<a class="ref" href="#src18-9">[9]</a>：</p>
+  <p>重播要求所有資料來源都是確定、同步的。IO 介面顧好了 Subsystem 的部分，但很容易一不小心就讀到沒被記錄的資料，所以要在開發過程中定期測重播<a class="ref" href="#src18-9">[9]</a>。常見的陷阱有這些<a class="ref" href="#src18-9">[9]</a>：</p>
   <table class="map">
     <thead><tr><th>陷阱</th><th>改成</th></tr></thead>
     <tbody>
@@ -86,14 +86,14 @@ Logger.recordOutput("Vision/Accepted", acceptedCount);  // 第 17 章的練習</
       <tr><td>亂數、走訪無序集合（例如 HashMap）</td><td>避免，或把結果當輸入記錄</td></tr>
     </tbody>
   </table>
-  <p>另外，主要的機器人邏輯必須是單執行緒；真的需要執行緒時，只能放在 IO 實作裡。<code>recordOutput</code>、<code>processInputs</code> 也不是執行緒安全的，只能在主執行緒呼叫<a class="ref" href="#src18-11">[11]</a>。</p>
+  <p>還有，主要的機器人邏輯必須是單執行緒；真的需要執行緒，只能放在 IO 實作裡。<code>recordOutput</code>、<code>processInputs</code> 也不是執行緒安全的，只能在主執行緒呼叫<a class="ref" href="#src18-11">[11]</a>。</p>
 
   <h3>第 16、17 章的 CTRE swerve 怎麼辦</h3>
-  <p>上面表格的第四條要特別說明：第 16、17 章用的是 Tuner X 產生的 CTRE swerve，它直接操作硬體，沒有經過 IO 層，所以<strong>底盤的部分無法準確重播</strong><a class="ref" href="#src18-9">[9]</a>。手臂、Intake 等照第 6 章寫的 Subsystem 不受影響。</p>
-  <p>如果隊上需要底盤也能重播，AdvantageKit 提供 TalonFX swerve 範本專案：一樣可以用 Tuner X 的 swerve 產生器設定，並提供高頻里程計、斷線警告、位置估計器整合、模擬，以及保證準確的重播<a class="ref" href="#src18-12">[12]</a>。要不要換，是隊上在賽季開始前就要決定的事，不要在比賽前換。</p>
+  <p>表格第四條要特別講一下：第 16、17 章用的是 Tuner X 產生的 CTRE swerve，它直接操作硬體，沒經過 IO 層，所以<strong>底盤這部分沒辦法準確重播</strong><a class="ref" href="#src18-9">[9]</a>。手臂、Intake 這些照第 6 章寫的 Subsystem 則不受影響。</p>
+  <p>如果隊上希望底盤也能重播，AdvantageKit 有 TalonFX swerve 範本專案：一樣可以用 Tuner X 的 swerve 產生器設定，還有高頻里程計、斷線警告、位置估計器整合、模擬，以及保證準確的重播<a class="ref" href="#src18-12">[12]</a>。要不要換是賽季開始前就要決定的事，千萬不要比賽前才換。</p>
 
   <h3>自動程式選單也是輸入</h3>
-  <p>第 16 章用 <code>SmartDashboard.putData</code> 放的自動程式選單，是從 NetworkTables 讀值，重播時讀不到當時選了什麼。AdvantageKit 提供 <code>LoggedDashboardChooser</code>，可以直接包住 PathPlanner 的 <code>buildAutoChooser()</code><a class="ref" href="#src18-13">[13]</a>：</p>
+  <p>第 16 章用 <code>SmartDashboard.putData</code> 放的自動程式選單是從 NetworkTables 讀值的，重播時讀不到當時選了哪個。AdvantageKit 有 <code>LoggedDashboardChooser</code>，可以直接包住 PathPlanner 的 <code>buildAutoChooser()</code><a class="ref" href="#src18-13">[13]</a>：</p>
   <pre><code>private final LoggedDashboardChooser&lt;Command&gt; autoChooser;
 
 public RobotContainer() {
@@ -106,35 +106,35 @@ public Command getAutonomousCommand() {
 }</code></pre>
 
   <h2>讓每一場的程式版本找得回來</h2>
-  <p>重播需要當時在機器人上跑的程式。AdvantageKit 範本已經裝好兩個工具<a class="ref" href="#src18-6">[6]</a>：</p>
+  <p>重播需要當時在機器人上跑的那份程式。AdvantageKit 範本已經幫你裝好兩個工具<a class="ref" href="#src18-6">[6]</a>：</p>
   <ul>
-    <li><strong>Gversion</strong>：編譯時產生 <code>BuildConstants.java</code>，裡面有 Git commit 的 hash，以及是否有尚未 commit 的修改（dirty）。在 <code>Robot</code> 建構子裡用 <code>Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA)</code> 記進日誌。<code>BuildConstants.java</code> 要加進 <code>.gitignore</code>。</li>
-    <li><strong>Event Deploy</strong>：比賽期間程式一直在改，常常帶著沒 commit 的修改就部署。這個 Gradle 任務會在部署前，把目前的修改自動 commit 到名稱以 <code>event</code> 開頭的分支。</li>
+    <li><strong>Gversion</strong>：編譯時產生 <code>BuildConstants.java</code>，裡面有 Git commit 的 hash，還有有沒有沒 commit 的修改（dirty）。在 <code>Robot</code> 建構子裡用 <code>Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA)</code> 記進日誌。<code>BuildConstants.java</code> 要加進 <code>.gitignore</code>。</li>
+    <li><strong>Event Deploy</strong>：比賽期間程式一直在改，常常帶著沒 commit 的東西就部署了。這個 Gradle 任務會在部署前，自動把目前的修改 commit 到名字以 <code>event</code> 開頭的分支。</li>
   </ul>
-  <p>比賽時的流程<a class="ref" href="#src18-6">[6]</a>：</p>
+  <p>比賽時的流程是這樣<a class="ref" href="#src18-6">[6]</a>：</p>
   <ol>
-    <li>出發前建立並切換到 <code>event_</code> 開頭的分支，例如 <code>event_2026twcmp</code>，每個賽事（例如一場區域賽）一個分支。</li>
-    <li>照平常方式部署，每次部署前會自動產生一個 commit。</li>
-    <li>比賽結束後，把分支 squash and merge 回開發分支，保持歷史乾淨。</li>
-    <li>要重播時，從日誌的 metadata 找到 hash，<code>git checkout</code> 回去；即使之後被 squash，只要 event 分支還在，原本的 commit 就找得回來，所以 event 分支不要刪。</li>
+    <li>出發前開一個 <code>event_</code> 開頭的分支並切過去，例如 <code>event_2026twcmp</code>，一個賽事（例如一場區域賽）一個分支。</li>
+    <li>照平常那樣部署，每次部署前會自動多一個 commit。</li>
+    <li>比完之後，把分支 squash and merge 回開發分支，讓歷史乾淨一點。</li>
+    <li>要重播的時候，從日誌的 metadata 找 hash，<code>git checkout</code> 回去。就算之後被 squash，只要 event 分支還在，原本的 commit 就找得回來，所以 event 分支不要刪。</li>
   </ol>
-  <div class="note coach"><strong>教練提醒：隨身碟也是檢查項目</strong>沒插隨身碟、隨身碟滿了、格式不是 FAT32，日誌就不會寫進去，出問題時什麼都查不到。把「隨身碟有插、有空間」放進第 19 章的賽前檢查。</div>
+  <div class="note coach"><strong>教練提醒：隨身碟也要檢查</strong>沒插隨身碟、隨身碟滿了、格式不是 FAT32，日誌就寫不進去，出事的時候什麼都查不到。把「隨身碟有插、有空間」放進第 19 章的賽前檢查。</div>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>重播時開著模擬 GUI</strong>文件明確要求重播時關閉模擬 GUI。</div>
-  <div class="note warn"><strong>拿錯版本的程式重播</strong>程式已經改過還直接重播舊日誌，輸出對不上，還以為找到了 bug。先確認 GitSHA，並注意 dirty 標記。</div>
-  <div class="note warn"><strong>在 Robot 欄位裡直接 new Subsystem</strong>欄位初始化會在 <code>Logger.start()</code> 之前執行，Subsystem 建構子讀到的時間和 DS 資料就不是確定的。</div>
-  <div class="note warn"><strong>用 SmartDashboard.getNumber 調參數</strong>重播時讀不到當時的值。改用 <code>LoggedNetworkNumber</code> 等 AdvantageKit 的儀表板類別<a class="ref" href="#src18-13">[13]</a>。</div>
-  <div class="note warn"><strong>以為改了 kP 重播就能看到新的動作</strong>重播改變不了輸入，要看新的動作請用模擬。</div>
+  <div class="note warn"><strong>重播時開著模擬 GUI</strong>重播時一定要關掉模擬 GUI。</div>
+  <div class="note warn"><strong>拿錯版本的程式重播</strong>程式已經改過了還直接重播舊日誌，輸出對不上，你還以為找到 bug 了。先確認 GitSHA，也要注意 dirty 標記。</div>
+  <div class="note warn"><strong>在 Robot 的欄位裡直接 new Subsystem</strong>欄位初始化會在 <code>Logger.start()</code> 之前跑，Subsystem 建構子讀到的時間和 DS 資料就不是確定的。</div>
+  <div class="note warn"><strong>用 SmartDashboard.getNumber 調參數</strong>重播時讀不到當時的值。改用 <code>LoggedNetworkNumber</code> 這類 AdvantageKit 的儀表板類別<a class="ref" href="#src18-13">[13]</a>。</div>
+  <div class="note warn"><strong>以為改了 kP 重播就能看到新動作</strong>重播改不了輸入，要看新的動作請用模擬。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：賽後找出為什麼沒射球</h2>
-  <p>比賽中有一次，操作手按了射球鍵，但機器人沒有射。日誌裡有 <code>Flywheel/VelocityRps</code>（輸入）和 <code>Flywheel/AtSpeed</code>（輸出），但射球的判斷條件是 <code>flywheel.atSpeed() &amp;&amp; arm.atGoal()</code>，<code>Arm/AtGoal</code> 當時沒有記錄（假設這支程式還沒加上第 6 章 E-3 的那幾行 <code>recordOutput</code>）。你會怎麼查？</p>
+  <p>比賽中有一次操作手按了射球鍵，機器人卻沒射。日誌裡有 <code>Flywheel/VelocityRps</code>（輸入）和 <code>Flywheel/AtSpeed</code>（輸出），但射球的條件是 <code>flywheel.atSpeed() &amp;&amp; arm.atGoal()</code>，而 <code>Arm/AtGoal</code> 當時沒記錄（假設這份程式還沒加第 6 章 E-3 那幾行 <code>recordOutput</code>）。你會怎麼查？</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>先確定時間點，再一個一個條件檢查：哪個條件有記錄、哪個沒有？</p>
+      <p>先確定時間點，再一個條件一個條件檢查：哪個有記錄、哪個沒有？</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>用 Joysticks 分頁找到按鍵時間，Line Graph 看 Flywheel/AtSpeed。沒記錄的條件，可以用重播補記錄。</p>
@@ -144,12 +144,12 @@ public Command getAutonomousCommand() {
     </div>
     <div class="hint solution" data-label="完整解答">
     <ol>
-      <li>在 AdvantageScope 的 Joysticks 分頁找到按下射球鍵的時間點。</li>
-      <li>在 Line Graph 看那段時間的 <code>Flywheel/AtSpeed</code>。如果它是 false，原因就在飛輪（第 13 章）。</li>
-      <li>如果飛輪到速了，懷疑是手臂。這時用<strong>重播</strong>：checkout 當時的 GitSHA，在 <code>ArmSubsystem.periodic</code> 補上 <code>Logger.recordOutput("Arm/AtGoal", atGoal())</code>，切換成 REPLAY 執行。</li>
-      <li>在 <code>ReplayOutputs</code> 表看 <code>Arm/AtGoal</code>。因為手臂的位置是從日誌讀回來的輸入，重播算出的 <code>atGoal()</code> 就和當時完全一樣。</li>
+      <li>在 AdvantageScope 的 Joysticks 分頁找到按射球鍵的時間點。</li>
+      <li>用 Line Graph 看那段時間的 <code>Flywheel/AtSpeed</code>。如果是 false，問題就在飛輪（第 13 章）。</li>
+      <li>如果飛輪有到速，那就懷疑手臂。這時候用<strong>重播</strong>：checkout 當時的 GitSHA，在 <code>ArmSubsystem.periodic</code> 補上 <code>Logger.recordOutput("Arm/AtGoal", atGoal())</code>，切成 REPLAY 跑。</li>
+      <li>在 <code>ReplayOutputs</code> 表看 <code>Arm/AtGoal</code>。因為手臂位置是從日誌讀回來的輸入，重播算出的 <code>atGoal()</code> 會跟當時一模一樣。</li>
     </ol>
-    <p>這正是重播最擅長的事：補記錄當時忘了記錄的輸出。只要手臂是照第 6 章用 IO 層寫的，重播的結果就是準確的。找到原因後，把這行 <code>recordOutput</code> 留在程式裡，下次就不用重播了。</p>
+    <p>這就是重播最擅長的事：把當時忘了記的輸出補記回來。只要手臂是照第 6 章用 IO 層寫的，重播的結果就是準的。找到原因之後，那行 <code>recordOutput</code> 就留在程式裡，下次就不用再重播了。</p>
     </div>
   </div>
 
