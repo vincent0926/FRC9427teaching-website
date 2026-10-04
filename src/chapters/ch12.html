@@ -1,15 +1,15 @@
   <p class="headline-code">CAN ID 12｜硬體</p>
   <h1>感測器與 CAN 除錯：計步器、刻度尺和廣播線</h1>
-  <p class="lede">讀完這章，你會知道 TalonFX 內建編碼器和 CANcoder 的差別、怎麼設定 CANcoder 的零點、怎麼接極限開關並用它歸零，以及 CAN 上找不到裝置時，照什麼順序把問題找出來。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 與 Phoenix 6 的 2026 版（26.x）文件。2025 年起 CANcoder 的 <code>AbsoluteSensorRange</code> 已改成 <code>AbsoluteSensorDiscontinuityPoint</code>，網路上舊的範例還看得到舊名稱。</div>
+  <p class="lede">機器人要知道自己在哪，靠的是感測器；感測器要能讀到，靠的是 CAN。這章講 TalonFX 內建編碼器和 CANcoder 差在哪、CANcoder 零點怎麼設、極限開關怎麼接、怎麼歸零。最後是最實用的部分：CAN 上找不到裝置的時候，照什麼順序查。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 和 Phoenix 6 的 2026 版（26.x）文件寫的。CANcoder 的 <code>AbsoluteSensorRange</code> 從 2025 年起改名叫 <code>AbsoluteSensorDiscontinuityPoint</code>，網路上舊範例還會看到舊名字。</div>
 
-  <h2>生活比喻：班長的計步器、牆上的刻度尺</h2>
+  <h2>比喻：班長的計步器、牆上的刻度尺</h2>
   <div class="story">
-    <p><strong>班長身上有一個計步器。</strong>班長每走一步，計步器就加一，非常靈敏、反應很快。但它只知道「從早上戴上到現在走了幾步」，每天早上都從 0 開始算。如果昨天放學時班長停在走廊中間，今天早上計步器還是從 0 開始，它不知道自己在哪裡。</p>
-    <p><strong>走廊牆上有一把刻度尺。</strong>刻度尺不管什麼時候看，都能直接讀出「現在在第幾公尺」，一大早看也是對的。只是刻度尺裝上去的時候，0 不一定剛好對準走廊起點，所以要記下一個「校正值」，讀到的數字加上校正值，才是真正的位置。</p>
-    <p><strong>走廊盡頭有一個門擋。</strong>門擋只會告訴你一件事：「碰到了」或「還沒碰到」。它不能告訴你距離多遠，但很適合用來確認「已經到底了」，也可以用來重新對準計步器：碰到門擋時，就知道現在一定在走廊盡頭。</p>
-    <p><strong>廣播線是一條串起來的線。</strong>學校的廣播線從廣播室出發，依序經過每一間教室，最後接到走廊盡頭。線的兩端各要裝一個吸音墊，不然聲音跑到盡頭會反彈回來，跟新的廣播疊在一起，聽起來全是回音。中間某一段線被剪斷，斷點後面的教室就全部聽不到。</p>
-    <p><strong>點名點不到，要照順序找。</strong>某班點名沒人回應，先確定是不是兩個班長用了同一個代號，再沿著廣播線一段一段查，看是從哪一間教室開始聽不到的。</p>
+    <p>班長身上戴著一個計步器，走一步就加一，很靈敏、反應很快。但它只知道「從早上戴上到現在走了幾步」，每天早上都從 0 開始算。昨天放學班長停在走廊中間，今天早上計步器一樣從 0 開始，它根本不知道自己在哪。</p>
+    <p>走廊牆上則有一把刻度尺，什麼時候看都能直接讀出「現在在第幾公尺」，一大早看也是對的。只是刻度尺裝上去的時候，0 不一定剛好對準走廊起點，所以要記一個「校正值」，讀到的數字加上校正值才是真的位置。</p>
+    <p>走廊盡頭還有一個門擋。門擋只會告訴你「碰到了」或「還沒」，講不出距離多遠，但拿來確認「已經到底了」剛剛好。而且一碰到門擋，就知道現在一定在盡頭，可以順便把計步器對準。</p>
+    <p>學校的廣播線是一條串起來的線，從廣播室出發，一間教室接一間教室，最後接到走廊盡頭。線的兩端各要裝一個吸音墊，不然聲音跑到底會反彈回來，跟新的廣播疊在一起，聽起來全是回音。中間哪一段被剪斷，斷點後面的教室就通通聽不到。</p>
+    <p>所以某班點名沒人回應的時候，要照順序找：先確定是不是兩個班長用了同一個代號，再沿著廣播線一段一段查，看是從哪一間開始聽不到的。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>程式與硬體</th></tr></thead>
@@ -25,7 +25,7 @@
       <tr><td>兩個班長同一個代號</td><td>同型號裝置 CAN ID 重複</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>刻度尺是直線的，CANcoder 量的是旋轉，轉滿一圈又會回到同一個讀數。所以 CANcoder 只能在「一圈以內」告訴你絕對角度；如果它和機構之間還有減速，機構轉不到一圈時 CANcoder 可能已經轉了好幾圈，這時它也不知道自己在第幾圈。把 CANcoder 裝在「機構整個行程不超過一圈」的軸上，才能發揮絕對位置的好處。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>刻度尺是直的，CANcoder 量的卻是旋轉，轉滿一圈就回到同一個讀數。所以 CANcoder 只能在「一圈以內」告訴你絕對角度。如果它跟機構之間還有減速，機構轉不到一圈它可能已經轉好幾圈了，這時它也不知道自己在第幾圈。要把 CANcoder 裝在「機構整個行程不超過一圈」的軸上，絕對位置才有意義。</div>
 
   <h2>三種感測器，各自適合做什麼</h2>
   <table class="map">
@@ -36,10 +36,10 @@
       <tr><td>極限開關</td><td>有沒有碰到</td><td>直接知道有沒有碰到</td><td>安全停止、歸零</td></tr>
     </tbody>
   </table>
-  <p>WPILib 文件也是這樣建議：極限開關只能感測單一位置，適合確保動作不超過極限，但不適合在接近極限時控制速度；手臂的旋轉關節最好用絕對編碼器這類感測器控制，極限開關則當作後備，在編碼器失效時防止機構跑過頭<a class="ref" href="#src12-1">[1]</a>。</p>
+  <p>WPILib 的建議也差不多：極限開關只感測得到一個位置，拿來確保不超過極限很好，但不適合在快到極限時控制速度；手臂的旋轉關節最好用絕對編碼器這類感測器來控制，極限開關當後備，萬一編碼器壞了還能防止機構跑過頭<a class="ref" href="#src12-1">[1]</a>。</p>
 
   <h2>CANcoder：設定零點與方向</h2>
-  <p>CANcoder 是一顆接在 CAN 上的磁性旋轉編碼器<a class="ref" href="#src12-2">[2]</a>。CTRE 官方範例的設定寫法如下<a class="ref" href="#src12-3">[3]</a>：</p>
+  <p>CANcoder 是一顆接在 CAN 上的磁性旋轉編碼器<a class="ref" href="#src12-2">[2]</a>。CTRE 範例的設定是這樣寫的<a class="ref" href="#src12-3">[3]</a>：</p>
   <pre><code>CANcoder armEncoder = new CANcoder(23, CANBuses.CANIVORE); // TODO: 依接線
 
 CANcoderConfiguration ccConfig = new CANcoderConfiguration();
@@ -48,16 +48,16 @@ ccConfig.MagnetSensor.withAbsoluteSensorDiscontinuityPoint(Rotations.of(0.5));
 ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive; // TODO: 上機確認
 ccConfig.MagnetSensor.withMagnetOffset(Rotations.of(0.0)); // [MEASURED] TODO: 依下面的步驟量測
 armEncoder.getConfigurator().apply(ccConfig);</code></pre>
-  <p>三個設定的意思：</p>
+  <p>三個設定分別是：</p>
   <ul>
-    <li><strong>SensorDirection</strong>：哪個方向轉算正。要和 TalonFX 的 <code>Inverted</code> 一致，也就是手臂往上時，兩邊的讀數都要變大。</li>
-    <li><strong>AbsoluteSensorDiscontinuityPoint</strong>：讀數在哪裡從最大跳回最小。設 0.5 時讀數在 -0.5 到 0.5 圈之間。要把這個斷點放在手臂<strong>永遠到不了</strong>的角度，不然手臂經過那裡時讀數會突然跳一圈。</li>
-    <li><strong>MagnetOffset</strong>：校正值。量測方法：先把 offset 設成 0、套用設定，把手臂擺到你定義為 0 度的位置（例如水平），讀出 CANcoder 的絕對位置 <var>x</var>，offset 就填 <var>−x</var>。</li>
+    <li><strong>SensorDirection</strong>：哪個方向轉算正。要跟 TalonFX 的 <code>Inverted</code> 一致，也就是手臂往上的時候，兩邊讀數都要變大。</li>
+    <li><strong>AbsoluteSensorDiscontinuityPoint</strong>：讀數在哪裡從最大跳回最小。設 0.5 的話讀數就在 -0.5 到 0.5 圈之間。這個斷點要放在手臂<strong>永遠到不了</strong>的角度，不然手臂經過那裡讀數會突然跳一圈。</li>
+    <li><strong>MagnetOffset</strong>：校正值。量法：先把 offset 設 0、套用設定，把手臂擺到你定義的 0 度（例如水平），讀出 CANcoder 的絕對位置 <var>x</var>，offset 就填 <var>−x</var>。</li>
   </ul>
-  <div class="note coach"><strong>教練提醒：offset 記錄在程式裡</strong>每次重裝磁鐵、拆裝 CANcoder，零點都會變。把 offset 寫在 Constants 裡並註明量測日期，比只存在 Tuner X 裡可靠，第 11 章說過：程式裡套用的完整設定會蓋掉 Tuner X 手動改的值。</div>
+  <div class="note coach"><strong>教練提醒：offset 要寫進程式</strong>只要重裝磁鐵、拆裝 CANcoder，零點就會變。offset 寫在 Constants 裡、註明哪天量的，比只存在 Tuner X 裡可靠得多。第 11 章講過：程式套用的完整設定會蓋掉你在 Tuner X 手動改的值。</div>
 
   <h2>讓 TalonFX 直接讀 CANcoder</h2>
-  <p>第 6 章的手臂用 TalonFX 內建編碼器，<code>SensorToMechanismRatio</code> 填馬達到手臂的齒輪比。加上 CANcoder 後，可以讓 TalonFX 直接用 CANcoder 當回授來源，閉迴路仍然在控制器內執行<a class="ref" href="#src12-4">[4]</a>：</p>
+  <p>第 6 章的手臂用的是 TalonFX 內建編碼器，<code>SensorToMechanismRatio</code> 填馬達到手臂的齒輪比。加了 CANcoder 之後，可以讓 TalonFX 直接拿 CANcoder 當回授來源，閉迴路還是在控制器裡跑<a class="ref" href="#src12-4">[4]</a>：</p>
   <pre><code>TalonFXConfiguration config = new TalonFXConfiguration();
 config.Feedback.FeedbackRemoteSensorID = armEncoder.getDeviceID();
 config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
@@ -65,7 +65,7 @@ config.Feedback.SensorToMechanismRatio = 1.0; // TODO: CANcoder 轉數 / 手臂�
 config.Feedback.RotorToSensorRatio = 1.0;     // TODO: 馬達轉數 / CANcoder 轉數
 // ...其他設定同第 6 章
 armLeader.getConfigurator().apply(config);</code></pre>
-  <p>注意「sensor」換人了：用遠端 CANcoder 時，<code>SensorToMechanismRatio</code> 是 <strong>CANcoder 到手臂</strong>的比例。CANcoder 直接裝在手臂轉軸上時就是 1.0，不再是馬達的齒輪比。</p>
+  <p>注意，這時候「sensor」換人了：用遠端 CANcoder 時，<code>SensorToMechanismRatio</code> 是 <strong>CANcoder 到手臂</strong>的比例。CANcoder 直接裝在手臂轉軸上就是 1.0，不是馬達的齒輪比。這裡很容易填錯。</p>
   <table class="map">
     <thead><tr><th>FeedbackSensorSource</th><th>做什麼</th><th>需要 Pro</th></tr></thead>
     <tbody>
@@ -74,12 +74,12 @@ armLeader.getConfigurator().apply(config);</code></pre>
       <tr><td><code>SyncCANcoder</code></td><td>開機時用 CANcoder 對齊內建編碼器，之後用內建編碼器控制，並持續監看兩者是否差太多</td><td>需要</td></tr>
     </tbody>
   </table>
-  <p>CTRE 文件寫明，沒有 Pro 授權時，<code>FusedCANcoder</code> 和 <code>SyncCANcoder</code> 會退回 <code>RemoteCANcoder</code>，並觸發 <code>UsingFusedCANcoderWhileUnlicensed</code> 故障<a class="ref" href="#src12-4">[4]</a>。<code>RotorToSensorRatio</code> 是馬達轉數對 CANcoder 轉數的比例；CTRE 在手臂重力補償的說明中也要求，用絕對感測器時要把這個比例設好，並讓位置 0 代表手臂水平向前<a class="ref" href="#src12-5">[5]</a>。</p>
+  <p>沒有 Pro 授權的話，<code>FusedCANcoder</code> 和 <code>SyncCANcoder</code> 會退回 <code>RemoteCANcoder</code>，還會觸發 <code>UsingFusedCANcoderWhileUnlicensed</code> 故障<a class="ref" href="#src12-4">[4]</a>。<code>RotorToSensorRatio</code> 是馬達轉數對 CANcoder 轉數的比例；CTRE 在講手臂重力補償時也特別要求，用絕對感測器就要把這個比例設好，而且位置 0 要代表手臂水平向前<a class="ref" href="#src12-5">[5]</a>。</p>
 
   <h2>極限開關</h2>
   <h3>接在 roboRIO 的 DIO</h3>
-  <p>WPILib 文件說明，roboRIO 內建的數位輸入因為有內部上拉電阻，預設會讀到 high<a class="ref" href="#src12-6">[6]</a>。也就是說，<code>DigitalInput.get()</code> 在<strong>什麼都沒接</strong>時回傳 <code>true</code>。開關接到地線時，接通讀 <code>false</code>、斷開讀 <code>true</code>。</p>
-  <p>所以要先想清楚：「線掉了」會被讀成什麼？</p>
+  <p>roboRIO 內建的數位輸入有內部上拉電阻，所以預設會讀到 high<a class="ref" href="#src12-6">[6]</a>。換句話說，<code>DigitalInput.get()</code> 在<strong>什麼都沒接</strong>的時候回傳 <code>true</code>。開關接到地線的話，接通讀 <code>false</code>、斷開讀 <code>true</code>。</p>
+  <p>所以你一定要先想清楚：「線掉了」會被讀成什麼？</p>
   <table class="map">
     <thead><tr><th>開關種類</th><th>沒碰到</th><th>碰到</th><th>線掉了</th></tr></thead>
     <tbody>
@@ -87,42 +87,42 @@ armLeader.getConfigurator().apply(config);</code></pre>
       <tr><td>常閉（NC），接地</td><td><code>false</code></td><td><code>true</code></td><td><code>true</code>（看起來像碰到）</td></tr>
     </tbody>
   </table>
-  <p>用常開開關時，線掉了程式會以為「還沒到底」，繼續往下推；用常閉開關時，線掉了程式會以為「已經到底」，機構停下來。後者比較安全，因為壞掉時是停，不是撞。這是隊上選擇接法的依據，不是唯一答案，但一定要把這張表寫在程式註解裡。</p>
+  <p>用常開開關，線掉了程式會以為「還沒到底」，繼續往下推；用常閉開關，線掉了程式會以為「已經到底」，機構就停住了。後者比較安全，因為壞掉的時候是停，不是撞。這是選接法的理由，不是唯一答案，但不管怎麼接，這張表一定要寫在程式註解裡。</p>
   <pre><code>/** 常閉開關接 DIO 0：碰到或線掉了都回傳 true。 */
 private final DigitalInput bottomLimit = new DigitalInput(0); // TODO: 依接線
 
 public boolean atBottom() {
     return bottomLimit.get();
 }</code></pre>
-  <p>要讓 TalonFX 在碰到開關時停止往那個方向輸出，可以把開關狀態直接帶進控制請求<a class="ref" href="#src12-7">[7]</a>：</p>
+  <p>想讓 TalonFX 碰到開關就停止往那個方向輸出，可以把開關狀態直接塞進控制請求<a class="ref" href="#src12-7">[7]</a>：</p>
   <pre><code>motor.setControl(request.withOutput(volts)
     .withLimitReverseMotion(atBottom()));</code></pre>
 
   <h3>接在 TalonFX 上</h3>
-  <p>開關也可以直接接在 TalonFX 的極限開關接腳上，由控制器自己停止輸出，不經過 roboRIO。讀取狀態用 <code>getForwardLimit()</code> / <code>getReverseLimit()</code>，值為 <code>ClosedToGround</code> 代表開關接通<a class="ref" href="#src12-7">[7]</a>。Phoenix 6 還可以設定碰到開關時，自動把位置設成指定的值（<code>*LimitAutosetPositionValue</code>）<a class="ref" href="#src12-8">[8]</a>，等於控制器自己幫你歸零。</p>
+  <p>開關也可以直接接到 TalonFX 的極限開關接腳，由控制器自己停止輸出，完全不經過 roboRIO。讀狀態用 <code>getForwardLimit()</code> / <code>getReverseLimit()</code>，值是 <code>ClosedToGround</code> 就代表開關接通<a class="ref" href="#src12-7">[7]</a>。Phoenix 6 還可以設定碰到開關時自動把位置設成某個值（<code>*LimitAutosetPositionValue</code>）<a class="ref" href="#src12-8">[8]</a>，等於控制器自己幫你歸零。</p>
 
   <h3>歸零（homing）</h3>
-  <p>只有內建編碼器的升降機構，開機時不知道自己在哪。常見的做法是開機後先慢慢往下，碰到底部開關就把位置設成 0。第 6 章的 <code>ArmIO</code> 已經留好 <code>resetPosition</code>，這章的練習會把它串成一個指令。</p>
-  <div class="note warn"><strong>開關抖動</strong>機械開關在接觸的瞬間會快速通斷好幾次。如果「碰到」會觸發一次性的動作，例如重設位置，可以用 WPILib 的 <code>Debouncer</code>：輸入必須持續改變一段時間，輸出才會跟著變<a class="ref" href="#src12-9">[9]</a>。</div>
+  <p>只有內建編碼器的升降機構，開機的時候不知道自己在哪。常見做法是開機後先慢慢往下，碰到底部開關就把位置設成 0。第 6 章的 <code>ArmIO</code> 已經留好 <code>resetPosition</code> 了，這章的練習會把它串成一個指令。</p>
+  <div class="note warn"><strong>開關會抖</strong>機械開關在接觸的那一瞬間會快速通斷好幾次。如果「碰到」會觸發一次性的動作，像重設位置，可以用 WPILib 的 <code>Debouncer</code>：輸入要持續改變一段時間，輸出才會跟著變<a class="ref" href="#src12-9">[9]</a>。</div>
 
   <h2>CAN 的接法</h2>
-  <p>WPILib 文件建議 CAN 採 daisy-chain 接法：從 roboRIO 出發，依序進出每個裝置，最後接到 PDP；黃線是 CAN-High、綠線是 CAN-Low<a class="ref" href="#src12-10">[10]</a>。CAN 網路兩端必須各有一顆 120 Ω 終端電阻，roboRIO 和 PDP 都內建了，所以建議從 roboRIO 開始、以 PDP 結束<a class="ref" href="#src12-10">[10]</a>。CTRE 文件補充：CANivore 也內建終端電阻，用 CANivore 時就是「CANivore ↔ 裝置 ↔ 120 Ω 電阻」<a class="ref" href="#src12-11">[11]</a>。</p>
-  <p>檢查接線有一個很好用的方法：<strong>斷電</strong>後用電錶量 CAN-H 和 CAN-L 之間的電阻，應該約 60 Ω（兩顆 120 Ω 並聯）。如果量到 120 Ω，代表只有一端有終端<a class="ref" href="#src12-11">[11]</a>。</p>
+  <p>CAN 建議用 daisy-chain 接法：從 roboRIO 出發，一個裝置進、一個裝置出，最後接到 PDP。黃線是 CAN-High、綠線是 CAN-Low<a class="ref" href="#src12-10">[10]</a>。CAN 網路兩端都要有一顆 120 Ω 的終端電阻，roboRIO 和 PDP 都內建了，所以才建議從 roboRIO 開始、PDP 結束<a class="ref" href="#src12-10">[10]</a>。CANivore 也內建終端電阻，用 CANivore 的話就是「CANivore ↔ 裝置 ↔ 120 Ω 電阻」<a class="ref" href="#src12-11">[11]</a>。</p>
+  <p>檢查接線有一個好方法：<strong>斷電</strong>之後拿電錶量 CAN-H 和 CAN-L 之間的電阻，應該大約 60 Ω（兩顆 120 Ω 並聯）。量到 120 Ω 就是只有一端有終端<a class="ref" href="#src12-11">[11]</a>。</p>
 
   <h2>找不到裝置時的除錯順序</h2>
-  <p>CTRE 文件指出，CAN 問題通常只有兩種：同型號裝置用了相同 ID（出廠預設都是 0），或 CAN 接線不正確、不牢靠；最麻煩的是兩種同時發生<a class="ref" href="#src12-11">[11]</a>。依照 CTRE 的建議，按這個順序查：</p>
+  <p>CAN 的問題通常只有兩種：同型號的裝置用了一樣的 ID（出廠預設都是 0），或是 CAN 線接錯、接不牢。最麻煩的是兩種同時發生<a class="ref" href="#src12-11">[11]</a>。照 CTRE 建議的順序查：</p>
   <ol>
-    <li><strong>看 Tuner X。</strong>同型號、同 ID 的裝置會顯示成紅色卡片並標示衝突<a class="ref" href="#src12-11">[11]</a>。注意是「同型號」：TalonFX 21 和 CANcoder 21 不會衝突，但兩顆 TalonFX 21 會。</li>
-    <li><strong>看哪些裝置消失。</strong>daisy-chain 上某一段斷了，斷點之後的裝置全部消失。找到「最後一個還在的」和「第一個不見的」，問題就在兩者之間。</li>
-    <li><strong>逐條拉拉看。</strong>有用接頭的地方，一條一條輕拉每一根壓接的線；壓接不良是時好時壞最常見的原因<a class="ref" href="#src12-11">[11]</a>。</li>
-    <li><strong>檢查顏色。</strong>每個接點都要黃接黃、綠接綠，黃綠接反是新機器人最常見的錯誤之一<a class="ref" href="#src12-11">[11]</a>。</li>
-    <li><strong>斷電量電阻。</strong>約 60 Ω 才對。</li>
-    <li><strong>還是找不到，就縮小範圍。</strong>只接一個裝置，確認它出現、設好 ID、貼上標籤，再一個一個接回去，直到問題出現<a class="ref" href="#src12-11">[11]</a>。</li>
+    <li><strong>看 Tuner X。</strong>同型號、同 ID 的裝置會變成紅色卡片，標示衝突<a class="ref" href="#src12-11">[11]</a>。注意是「同型號」：TalonFX 21 和 CANcoder 21 不會衝突，兩顆 TalonFX 21 才會。</li>
+    <li><strong>看哪些裝置不見了。</strong>daisy-chain 某一段斷掉，斷點後面的裝置會全部消失。找出「最後一個還在的」和「第一個不見的」，問題就在這兩個中間。</li>
+    <li><strong>一條一條拉拉看。</strong>有接頭的地方，每一根壓接的線都輕輕拉一下；壓接不良是「時好時壞」最常見的原因<a class="ref" href="#src12-11">[11]</a>。</li>
+    <li><strong>看顏色。</strong>每個接點都要黃接黃、綠接綠，黃綠接反是新機器人最常見的錯之一<a class="ref" href="#src12-11">[11]</a>。</li>
+    <li><strong>斷電量電阻。</strong>大約 60 Ω 才對。</li>
+    <li><strong>還是找不到，就縮小範圍。</strong>只接一個裝置，確認它出現、設好 ID、貼標籤，再一個一個接回去，接到問題出現為止<a class="ref" href="#src12-11">[11]</a>。</li>
   </ol>
-  <p>燈號也有幫助：CTRE 文件提到，TalonFX 和 Pigeon 2 健康但沒有被控制時通常閃橘燈，CANcoder 則是快速亮閃；LED 偶爾閃紅，通常是接點鬆動，可以搖一搖線看能不能重現<a class="ref" href="#src12-11">[11]</a>。</p>
+  <p>看燈號也有幫助：TalonFX 和 Pigeon 2 正常但沒被控制時通常閃橘燈，CANcoder 是快速亮閃；LED 偶爾閃一下紅，通常是接點鬆了，可以搖一搖線看能不能重現<a class="ref" href="#src12-11">[11]</a>。</p>
 
   <h2>動手試：CAN bus 除錯台</h2>
-  <p>下面是一條接在 CANivore「9427」上的 CAN bus。點裝置之間的線可以剪斷或接回，也可以拿掉末端的終端電阻、故意設錯 ID。每改一次，就「斷電量電阻」和「Tuner X 掃描」看看結果。</p>
+  <p>下面是一條接在 CANivore「9427」上的 CAN bus。點裝置之間的線可以剪斷或接回，也可以拔掉末端的終端電阻、故意把 ID 設錯。每弄壞一個地方，就按「斷電量電阻」和「Tuner X 掃描」看會怎樣。</p>
   <div class="lab">
     <div class="canchain" id="canChain"></div>
     <div class="calls">
@@ -139,7 +139,7 @@ public boolean atBottom() {
   </div>
 
   <h2>在程式裡發現斷線</h2>
-  <p>第 6 章的 <code>ArmIOHardware</code> 已經用 <code>refreshAll(...).isOK()</code> 把 <code>leaderConnected</code> 填進點名表。光是記錄還不夠，要讓操作手在比賽中看得到。WPILib 的 <code>Alert</code> 類別可以發布持續性的警告，儀表板會依嚴重程度與時間排序顯示；文件建議在 periodic 裡呼叫 <code>set</code>，由它內建的變化偵測決定何時啟動<a class="ref" href="#src12-12">[12]</a>。</p>
+  <p>第 6 章的 <code>ArmIOHardware</code> 已經用 <code>refreshAll(...).isOK()</code> 把 <code>leaderConnected</code> 填進點名表了。可是光記錄沒用，要讓操作手在比賽中看得到才行。WPILib 的 <code>Alert</code> 類別可以發持續性的警告，儀表板會照嚴重程度和時間排好；建議的用法是在 periodic 裡呼叫 <code>set</code>，讓它自己偵測變化決定什麼時候亮<a class="ref" href="#src12-12">[12]</a>。</p>
   <pre><code>public class ArmSubsystem extends SubsystemBase {
     private final Alert leaderDisconnected =
         new Alert("手臂主馬達（ID 21）斷線", AlertType.kError);
@@ -153,23 +153,23 @@ public boolean atBottom() {
         // ...其餘同第 6 章
     }
 }</code></pre>
-  <p><code>kFalling</code> 只延遲「從 true 變 false」的變化：恢復連線時立刻清除警告，斷線要持續 0.5 秒才顯示<a class="ref" href="#src12-9">[9]</a>。0.5 秒是示範值，隊上可以依需求調整。</p>
+  <p><code>kFalling</code> 只延遲「true 變 false」的那個方向：恢復連線時警告馬上清掉，斷線要持續 0.5 秒才跳出來<a class="ref" href="#src12-9">[9]</a>。0.5 秒只是示範，可以看需求調。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>以為內建編碼器知道位置</strong>沒有歸零的升降機構，開機時讀到 0，不代表它在底部。如果關機時機構停在半空中，開機後「回到 0」的指令會讓它往下撞。</div>
-  <div class="note warn"><strong>CANcoder 的斷點放在行程中間</strong>手臂經過斷點時讀數跳一整圈，閉迴路會以為誤差突然變得很大，手臂猛然甩動。把斷點放在手臂到不了的角度。</div>
-  <div class="note warn"><strong>SensorDirection 和 Inverted 不一致</strong>馬達往上推，CANcoder 卻說在往下，閉迴路越修越錯，手臂衝到底。上機時先用低電壓手動轉，確認兩邊讀數同方向增加。</div>
-  <div class="note warn"><strong>用常開開關卻沒想過線會掉</strong>比賽中線被撞掉，程式以為還沒到底，機構持續往下推。先想清楚「線掉了讀成什麼」。</div>
-  <div class="note warn"><strong>量電阻時沒斷電</strong>通電時量到的數字不準，還可能傷到電錶。一定要斷電再量。</div>
+  <div class="note warn"><strong>以為內建編碼器知道位置</strong>沒歸零的升降機構，開機讀到 0 不代表它在底部。關機時如果停在半空中，開機後「回到 0」的指令會讓它直接往下撞。</div>
+  <div class="note warn"><strong>CANcoder 的斷點放在行程中間</strong>手臂經過斷點時讀數跳一整圈，閉迴路以為誤差突然暴增，手臂就猛甩一下。斷點要放在手臂到不了的角度。</div>
+  <div class="note warn"><strong>SensorDirection 和 Inverted 不一致</strong>馬達往上推，CANcoder 卻說在往下，閉迴路越修越錯，手臂直接衝到底。上機先用低電壓手動轉，確認兩邊讀數往同一個方向增加。</div>
+  <div class="note warn"><strong>用常開開關，卻沒想過線會掉</strong>比賽中線被撞掉，程式以為還沒到底，機構就一直往下推。先想清楚「線掉了會讀成什麼」。</div>
+  <div class="note warn"><strong>量電阻沒斷電</strong>通電時量到的數字不準，還可能把電錶弄壞。一定要斷電再量。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：升降機構的歸零指令</h2>
-  <p>假設升降機構只有 TalonFX 內建編碼器，底部有一個常閉極限開關接在 DIO 0。請在 <code>ElevatorSubsystem</code> 寫一個 <code>home()</code> 指令：以很小的電壓往下，碰到開關就停止，並把位置重設為 0。為了避免開關壞掉時一直往下推，加上 3 秒的逾時。</p>
+  <p>假設升降機構只有 TalonFX 內建編碼器，底部有一個常閉極限開關接在 DIO 0。在 <code>ElevatorSubsystem</code> 寫一個 <code>home()</code> 指令：用很小的電壓往下，碰到開關就停，然後把位置重設成 0。為了避免開關壞掉時一直往下推，加一個 3 秒逾時。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>先想清楚：常閉開關什麼時候讀到 true？逾時結束時，能不能把位置當成 0？</p>
+      <p>先想清楚：常閉開關什麼時候讀到 true？如果是逾時結束的，可以把位置當成 0 嗎？</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>可以用 startEnd（開始給小電壓、結束停止）加 .until(this::atBottom) 與 .withTimeout(3.0)，最後 andThen(runOnce(...)) 重設位置。</p>
@@ -214,8 +214,8 @@ public boolean atBottom() {
             .withName("Elevator.home");
     }
 }</code></pre>
-    <p>幾個重點。<code>until</code> 與 <code>withTimeout</code> 誰先發生都會結束（第 10 章）；結束後再確認一次 <code>atBottom</code>，逾時結束的情況下就<strong>不</strong>重設位置，否則會把錯的位置當成 0。用常閉開關時，線掉了會讀成「已經到底」，機構會停在原地並被當成 0，所以開機歸零後，還是要目視確認機構真的在底部。</p>
-    <p>這個寫法為了簡短，直接在 <code>startEnd</code> 裡呼叫 IO；如果這個 Subsystem 和第 6 章一樣在 periodic 裡送出輸出，就要改成切換 <code>ControlMode</code>，不然會被 periodic 蓋掉。</p>
+    <p>幾個重點。<code>until</code> 和 <code>withTimeout</code> 誰先發生都會結束（第 10 章）；結束後再確認一次 <code>atBottom</code>，如果是逾時結束的，就<strong>不要</strong>重設位置，不然會把錯的位置當成 0。另外用常閉開關的話，線掉了會讀成「已經到底」，機構會停在原地被當成 0，所以開機歸零之後，還是要用眼睛確認機構真的在底部。</p>
+    <p>這個寫法為了短，直接在 <code>startEnd</code> 裡呼叫 IO。如果你的 Subsystem 跟第 6 章一樣在 periodic 裡送輸出，就要改成切換 <code>ControlMode</code>，不然會被 periodic 蓋掉。</p>
     </div>
   </div>
 

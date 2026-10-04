@@ -1,15 +1,15 @@
   <p class="headline-code">CAN ID 16｜上場</p>
   <h1>自動階段與路徑：校外教學的行程表</h1>
-  <p class="lede">讀完這章，你會知道場地座標怎麼定、里程計怎麼估計機器人位置以及它為什麼會飄、PathPlanner 的路徑和 Auto 怎麼變成指令，以及紅藍聯盟翻轉、Named Commands、自動程式選單這些上場前一定要處理好的細節。</p>
-  <div class="note"><strong>版本說明</strong>本章依據 WPILib 2026 與 PathPlannerLib 2026 的文件。PathPlanner 的 API 每年都可能改，網路上舊的範例（例如 2024 年以前的 <code>HolonomicPathFollowerConfig</code>）已經不能用。本章以 swerve 底盤為例。</div>
+  <p class="lede">自動階段那十幾秒，沒有人能碰搖桿，機器人全靠你事先寫好的程式。這章講場地座標怎麼定、里程計怎麼估位置（還有它為什麼會飄）、PathPlanner 的路徑和 Auto 怎麼變成指令。最後是幾個上場前一定要處理好的細節：紅藍聯盟翻轉、Named Commands、自動程式選單。</p>
+  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 和 PathPlannerLib 2026 的文件寫的。PathPlanner 的 API 幾乎每年都會改，網路上的舊範例（像 2024 年以前的 <code>HolonomicPathFollowerConfig</code>）已經不能用了。這章拿 swerve 底盤當例子。</div>
 
-  <h2>生活比喻：校外教學的行程表</h2>
+  <h2>比喻：校外教學的行程表</h2>
   <div class="story">
-    <p><strong>老師不能跟車，全靠行程表。</strong>校外教學的前 15 分鐘，老師必須留在學校，遊覽車只能照事先寫好的行程表走。路線怎麼開、在哪一站下車做什麼，都要提前寫好。</p>
-    <p><strong>司機靠里程表和方向盤估計位置。</strong>車上沒有 GPS，司機只能記「往北開了多少公里、在哪裡左轉」，推算現在在哪裡。短程很準，但開久了、中途被別的車擦撞一下，推算就會越來越偏。</p>
-    <p><strong>地圖的原點永遠在藍色校門。</strong>學校有紅、藍兩個校門，兩邊的路線剛好左右對稱。地圖只畫一份，原點永遠在藍色校門；從紅色校門出發時，就把整份路線翻過去用。</p>
-    <p><strong>每一站要做的事，用代號寫在行程表上。</strong>行程表上寫「到博物館：活動 A」。活動 A 是什麼，出發前老師要先跟領隊說清楚；如果出發後才說，領隊手上的行程表早就印好了，不會知道活動 A 要做什麼。</p>
-    <p><strong>好幾份行程表，出發前選一份。</strong>老師準備了幾份行程表：天氣好走 A 路線，下雨走 B 路線。出發前在黑板上選好，遊覽車就照那一份走。</p>
+    <p>校外教學的前 15 分鐘，老師得留在學校，不能跟車，遊覽車只能照事先寫好的行程表走。路線怎麼開、哪一站下車做什麼，全部都要提前寫好。</p>
+    <p>車上沒有 GPS，司機只能記「往北開了幾公里、在哪裡左轉」，自己推算現在在哪。短程很準，但開久了，或中途被別的車擦到一下，推算就會越來越偏。</p>
+    <p>學校有紅、藍兩個校門，兩邊的路線剛好左右對稱。地圖只畫一份，原點永遠在藍色校門；從紅色校門出發，就把整份路線翻過去用。</p>
+    <p>行程表上會寫「到博物館：活動 A」。活動 A 是什麼，出發前老師就要先跟領隊講清楚。出發後才講就來不及了，領隊手上的行程表早就印好，根本不知道活動 A 要幹嘛。</p>
+    <p>老師通常會準備好幾份行程表：天氣好走 A 路線，下雨走 B 路線。出發前在黑板上選好一份，遊覽車就照那份走。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>程式</th></tr></thead>
@@ -26,28 +26,28 @@
       <tr><td>黑板上選一份行程表</td><td>儀表板上的自動程式選單（SendableChooser）</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>遊覽車偏了司機會看路標修正；機器人的里程計自己不會修正，要靠第 17 章的視覺定位（AprilTag）才能把位置拉回來。另外，路線「翻過去」的方式取決於當年的場地：WPILib 文件說明，FRC 的場地有「鏡射」和「旋轉」兩種配置，不同年份不一樣<a class="ref" href="#src16-1">[1]</a>。上場前一定要在紅方實際跑一次，確認翻轉後的路徑是對的。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>遊覽車開偏了，司機會看路標修正；機器人的里程計不會自己修正，要靠第 17 章的視覺定位（AprilTag）才拉得回來。還有，路線要怎麼「翻過去」看當年的場地：FRC 場地有「鏡射」和「旋轉」兩種配置，每年不一樣<a class="ref" href="#src16-1">[1]</a>。上場前一定要在紅方實際跑一次，確認翻過去的路徑是對的。</div>
 
   <h2>場地與機器人的座標</h2>
-  <p>WPILib 大多數情況使用 NWU 慣例：X 軸正向朝前、Y 軸正向朝左、Z 軸朝上；角度 0° 對齊 +X，逆時針為正，所以 90° 是 +Y<a class="ref" href="#src16-1">[1]</a>。兩個要特別注意的地方<a class="ref" href="#src16-1">[1]</a>：</p>
+  <p>WPILib 大部分時候用 NWU 慣例：X 往前是正、Y 往左是正、Z 往上；角度 0° 對著 +X，逆時針為正，所以 90° 就是 +Y<a class="ref" href="#src16-1">[1]</a>。有兩個地方特別容易出錯<a class="ref" href="#src16-1">[1]</a>：</p>
   <ul>
-    <li>有些陀螺儀是<strong>順時針為正</strong>，讀值要確認方向，必要時反過來。</li>
-    <li>搖桿用的是另一套座標（NED）：往前推是負的 Y、往右推是正的 X。把搖桿值交給底盤時，常常需要加負號。</li>
+    <li>有些陀螺儀是<strong>順時針為正</strong>，讀值方向要確認，需要的話反過來。</li>
+    <li>搖桿用的是另一套座標（NED）：往前推是負的 Y、往右推是正的 X。所以搖桿值丟給底盤之前，常常要加負號。</li>
   </ul>
 
   <h2>里程計：機器人怎麼知道自己在哪</h2>
-  <p>里程計用輪子的編碼器和陀螺儀，推算機器人在場上的位置（<code>Pose2d</code>：x、y、朝向）。WPILib 文件說明：因為只用編碼器和陀螺儀，估計的位置會隨時間漂移，特別是和其他機器人碰撞時；不過在自動階段通常非常準確<a class="ref" href="#src16-2">[2]</a>。所以自動階段靠里程計跑路徑是可行的，但每次開始前都要把位置設對。</p>
-  <p>用 CTRE Tuner X 產生的 swerve 程式，底盤會自己維護里程計，<code>getState().Pose</code> 就是目前估計的位置<a class="ref" href="#src16-3">[3]</a>。</p>
+  <p>里程計用輪子的編碼器加陀螺儀，推算機器人在場上的位置（<code>Pose2d</code>：x、y、朝向）。因為只靠編碼器和陀螺儀，估出來的位置會隨時間慢慢飄，跟別台機器人撞一下更明顯；不過在自動階段通常很準<a class="ref" href="#src16-2">[2]</a>。所以自動階段靠里程計跑路徑沒問題，前提是每次開始前位置都要設對。</p>
+  <p>如果底盤是用 CTRE Tuner X 產生的 swerve 程式，它會自己維護里程計，<code>getState().Pose</code> 就是目前估計的位置<a class="ref" href="#src16-3">[3]</a>。</p>
 
   <h2>PathPlanner 是什麼</h2>
-  <p>PathPlanner 分成兩部分：電腦上的 GUI，用來畫路徑、組 Auto；機器人程式裡的 PathPlannerLib，負責讀檔並跟隨路徑。PathPlannerLib 可以用 WPILib 的 Vendor Dependency Manager 安裝<a class="ref" href="#src16-4">[4]</a>（第 0 章的 vendordep）。</p>
-  <p>在 GUI 裡，<strong>Path</strong> 是一條路線；<strong>Auto</strong> 是一個 sequential 指令群組，裡面可以放路徑跟隨指令、Named Commands、等待指令和巢狀的指令群組，同一條路徑可以在多個 Auto 裡重複使用<a class="ref" href="#src16-5">[5]</a>。換句話說，Auto 就是第 10 章的組合指令，只是用 GUI 畫出來。</p>
+  <p>PathPlanner 分兩塊：電腦上的 GUI 用來畫路徑、組 Auto；機器人程式裡的 PathPlannerLib 負責讀檔、跟著路徑跑。PathPlannerLib 用 WPILib 的 Vendor Dependency Manager 就能裝<a class="ref" href="#src16-4">[4]</a>（第 0 章講過的 vendordep）。</p>
+  <p>GUI 裡的 <strong>Path</strong> 就是一條路線；<strong>Auto</strong> 則是一個 sequential 指令群組，裡面可以放路徑跟隨指令、Named Commands、等待指令，還有巢狀的指令群組，同一條路徑也可以在好幾個 Auto 裡重複用<a class="ref" href="#src16-5">[5]</a>。換句話說，Auto 就是第 10 章的組合指令，只是用 GUI 畫出來而已。</p>
 
   <h3>Robot Config</h3>
-  <p>GUI 的設定頁要填機器人的質量、轉動慣量（MOI）、輪子與馬達等資料，PathPlanner 用它們限制軌跡的最大速度、加速度。文件提醒這些值要盡量準確：質量要含保險桿和電池；MOI 建議用 SysId 的結果計算，粗估的公式假設質量均勻分布，通常不準<a class="ref" href="#src16-6">[6]</a>。這裡又用到第 15 章的 SysId。</p>
+  <p>GUI 的設定頁要填機器人的質量、轉動慣量（MOI）、輪子和馬達這些資料，PathPlanner 會用它們限制軌跡的最大速度和加速度。這些值要盡量準：質量要包含保險桿和電池；MOI 最好用 SysId 的結果算，粗估的公式假設質量平均分布，通常不準<a class="ref" href="#src16-6">[6]</a>。這裡又用到第 15 章的 SysId。</p>
 
   <h2>設定 AutoBuilder</h2>
-  <p>PathPlannerLib 用 <code>AutoBuilder</code> 把 GUI 裡的 Auto 變成指令，文件建議在底盤 Subsystem 的建構子裡設定<a class="ref" href="#src16-7">[7]</a>。以下是 CTRE 官方 swerve + PathPlanner 範例的寫法<a class="ref" href="#src16-3">[3]</a>：</p>
+  <p>PathPlannerLib 用 <code>AutoBuilder</code> 把 GUI 裡的 Auto 變成指令，建議在底盤 Subsystem 的建構子裡設定<a class="ref" href="#src16-7">[7]</a>。下面是 CTRE 官方 swerve + PathPlanner 範例的寫法<a class="ref" href="#src16-3">[3]</a>：</p>
   <pre><code>private void configureAutoBuilder() {
     try {
         var config = RobotConfig.fromGUISettings();
@@ -69,17 +69,17 @@
         DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
     }
 }</code></pre>
-  <p>逐項看：</p>
+  <p>一項一項看：</p>
   <ul>
-    <li><strong>速度必須是機器人座標</strong>（robot relative），不是場地座標<a class="ref" href="#src16-7">[7]</a>。</li>
-    <li><strong>PID</strong>：路徑跟隨本身有前饋，PID 只修正「實際位置和路徑的差距」，這和第 13 章的觀念一樣。</li>
-    <li><strong>翻轉</strong>：最後一個參數回傳 true 時，路徑會翻到紅方那一側。文件特別強調<strong>原點永遠在藍方</strong>；如果需要其他依聯盟顏色的轉換，要自己處理<a class="ref" href="#src16-7">[7]</a>。</li>
-    <li><strong>最後的 <code>this</code></strong>：讓路徑跟隨指令 require 底盤 Subsystem（第 8 章）。</li>
+    <li><strong>速度一定要是機器人座標</strong>（robot relative），不是場地座標<a class="ref" href="#src16-7">[7]</a>。</li>
+    <li><strong>PID</strong>：路徑跟隨本身就有前饋，PID 只負責修「實際位置跟路徑差多少」，跟第 13 章是同一個觀念。</li>
+    <li><strong>翻轉</strong>：最後一個參數回傳 true，路徑就會翻到紅方那一側。這裡特別強調<strong>原點永遠在藍方</strong>；其他要看聯盟顏色的轉換，要自己處理<a class="ref" href="#src16-7">[7]</a>。</li>
+    <li><strong>最後那個 <code>this</code></strong>：讓路徑跟隨指令 require 底盤 Subsystem（第 8 章）。</li>
   </ul>
-  <div class="note warn"><strong>DriverStation.getAlliance() 可能是空的</strong>它回傳 <code>Optional</code>：還沒連上 Driver Station 或 FMS 時沒有值。上面的寫法用 <code>orElse(Alliance.Blue)</code> 預設藍方。這也是為什麼「是否翻轉」要寫成 lambda，在路徑<strong>開始跑的時候</strong>才判斷，而不是開機時就決定。</div>
+  <div class="note warn"><strong>DriverStation.getAlliance() 可能是空的</strong>它回傳的是 <code>Optional</code>，還沒連上 Driver Station 或 FMS 的時候是空的。上面用 <code>orElse(Alliance.Blue)</code> 預設成藍方。這也是為什麼「要不要翻轉」要寫成 lambda：在路徑<strong>開始跑的那一刻</strong>才判斷，不是開機時就決定。</div>
 
   <h2>Named Commands</h2>
-  <p>Auto 和路徑上的事件標記（event marker）要執行機構動作時，用的是名字。程式裡要用 <code>NamedCommands.registerCommand</code> 把名字和指令對起來，名字必須和 GUI 裡完全一樣<a class="ref" href="#src16-8">[8]</a>。</p>
+  <p>Auto 和路徑上的事件標記（event marker）要讓機構做事的時候，是用名字找指令的。程式裡要用 <code>NamedCommands.registerCommand</code> 把名字跟指令對起來，名字要跟 GUI 裡的一字不差<a class="ref" href="#src16-8">[8]</a>。</p>
   <pre><code>public RobotContainer() {
     // 1. 建立 Subsystem
     // 2. 註冊 Named Commands（一定要在建立任何 Auto 或 Path 之前）
@@ -92,43 +92,43 @@
     // 4. 按鍵綁定
     configureBindings();
 }</code></pre>
-  <div class="note warn"><strong>順序很重要</strong>文件警告：Named Commands 必須在建立任何 PathPlanner Auto 或 Path 之前註冊；之後才註冊的，已經建立的 Auto 不會用到它。建議在 RobotContainer 裡、Subsystem 建立之後、其他指令建立之前註冊<a class="ref" href="#src16-8">[8]</a>。</div>
-  <p>事件標記還有一個容易忽略的規則：路徑跑到終點時，所有由事件標記觸發的指令都會被要求結束。如果想在路徑結束時才啟動某個動作，應該放在 Auto 裡、或放在下一條路徑的開頭<a class="ref" href="#src16-5">[5]</a>。</p>
-  <p><code>intake.intakeUntilHasPiece()</code> 是示範名稱，代表「吸到遊戲物件才結束」的指令。Auto 是 sequential 群組，所以放進去的指令<strong>一定要會結束</strong>，否則後面的步驟永遠不會開始（第 10 章）。第 6 章的 <code>goTo</code> 用 <code>until(this::atGoal)</code> 結束，剛好適合。</p>
+  <div class="note warn"><strong>順序很重要</strong>Named Commands 一定要在建立任何 PathPlanner Auto 或 Path <strong>之前</strong>註冊；晚註冊的話，已經建好的 Auto 根本不會用到它。建議在 RobotContainer 裡、Subsystem 建好之後、其他指令建立之前註冊<a class="ref" href="#src16-8">[8]</a>。</div>
+  <p>事件標記還有一條很容易漏掉的規則：路徑跑到終點時，所有事件標記觸發的指令都會被要求結束。如果你想在路徑結束後才開始某個動作，要放在 Auto 裡，或放到下一條路徑的開頭<a class="ref" href="#src16-5">[5]</a>。</p>
+  <p><code>intake.intakeUntilHasPiece()</code> 只是示範名字，意思是「吸到遊戲物件才結束」的指令。Auto 是 sequential 群組，所以放進去的指令<strong>一定要會結束</strong>，不然後面的步驟永遠輪不到（第 10 章）。第 6 章的 <code>goTo</code> 用 <code>until(this::atGoal)</code> 結束，剛好適合。</p>
 
   <h2>自動程式選單與載入時機</h2>
-  <p><code>AutoBuilder.buildAutoChooser()</code> 會建立一個包含專案中所有 Auto 的 <code>SendableChooser</code>，預設選項是 <code>Commands.none()</code>，也可以傳入名字指定預設的 Auto<a class="ref" href="#src16-7">[7]</a>。然後第 7 章的 <code>getAutonomousCommand()</code> 只要回傳選到的那一個：</p>
+  <p><code>AutoBuilder.buildAutoChooser()</code> 會做出一個包含專案裡所有 Auto 的 <code>SendableChooser</code>，預設選項是 <code>Commands.none()</code>，也可以傳名字指定預設的 Auto<a class="ref" href="#src16-7">[7]</a>。然後第 7 章的 <code>getAutonomousCommand()</code> 回傳選到的那個就好：</p>
   <pre><code>public Command getAutonomousCommand() {
     return autoChooser.getSelected();
 }</code></pre>
   <ul>
-    <li><strong>開機時就載入。</strong>文件強烈建議在程式啟動時就建立所有 Auto，而不是要跑的時候才建立，因為載入複雜的路徑可能造成很大的延遲<a class="ref" href="#src16-7">[7]</a>。<code>buildAutoChooser</code> 在建構子裡呼叫，本身就符合這個建議。</li>
-    <li><strong>刪掉的 Auto 還在選單裡？</strong>它會載入 deploy 資料夾裡的所有 Auto；<code>build.gradle</code> 要有 <code>deleteOldFiles = true</code>，否則刪掉的檔案不會從 roboRIO 上清掉<a class="ref" href="#src16-7">[7]</a>。</li>
+    <li><strong>開機時就載入。</strong>官方很強烈建議在程式啟動時就把所有 Auto 建好，不要等到要跑才建，因為載入複雜的路徑可能卡很久<a class="ref" href="#src16-7">[7]</a>。在建構子裡呼叫 <code>buildAutoChooser</code> 本身就符合這點。</li>
+    <li><strong>刪掉的 Auto 還在選單裡？</strong>它會載入 deploy 資料夾裡所有的 Auto；<code>build.gradle</code> 要有 <code>deleteOldFiles = true</code>，不然你刪掉的檔案不會從 roboRIO 上清掉<a class="ref" href="#src16-7">[7]</a>。</li>
   </ul>
 
   <h2>上場前的自動程式檢查</h2>
   <ol>
-    <li>選單裡選的是這一場要跑的 Auto，而且不是預設的「None」。</li>
-    <li>機器人擺放的位置和 Auto 的起始位置一致（Auto 有設起始位置時，會用 <code>resetPose</code> 重設里程計）。</li>
-    <li>Driver Station 上的聯盟顏色正確，路徑會往正確的一側翻。</li>
+    <li>選單選的是這一場要跑的 Auto，而且不是預設的「None」。</li>
+    <li>機器人擺的位置跟 Auto 的起始位置一樣（Auto 有設起始位置的話，會用 <code>resetPose</code> 重設里程計）。</li>
+    <li>Driver Station 上的聯盟顏色是對的，路徑才會往正確的那邊翻。</li>
     <li>在練習場或模擬（第 6 章 D 部分）裡，紅藍兩邊都實際跑過一次。</li>
   </ol>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>Named Command 名字不一致</strong>GUI 裡叫 <code>ArmScore</code>、程式裡註冊 <code>armScore</code>，大小寫不同就對不上，Auto 跑到那一步什麼都不做。</div>
-  <div class="note warn"><strong>在 Auto 裡放不會結束的指令</strong>例如 <code>run(...)</code> 做成的預設指令，整個 Auto 就卡在那一步。</div>
-  <div class="note warn"><strong>陀螺儀方向相反</strong>順時針為正的陀螺儀沒反過來，里程計的朝向就和實際相反，路徑跟隨一轉彎就走錯方向，場地導向駕駛也會亂掉。</div>
-  <div class="note warn"><strong>開機時判斷聯盟顏色</strong>在 RobotContainer 建構子裡讀 <code>getAlliance()</code>，那時可能還沒連上 FMS，拿到的是空值或錯的顏色。</div>
-  <div class="note warn"><strong>Robot Config 亂填</strong>質量、MOI、輪徑填錯，PathPlanner 產生的軌跡會超過機器人做得到的加速度，路徑越跑越偏。</div>
+  <div class="note warn"><strong>Named Command 名字對不上</strong>GUI 裡叫 <code>ArmScore</code>，程式註冊的是 <code>armScore</code>，大小寫不一樣就對不上，Auto 跑到那一步什麼都不做。</div>
+  <div class="note warn"><strong>Auto 裡放了不會結束的指令</strong>像是用 <code>run(...)</code> 做的預設指令，整個 Auto 就卡死在那一步。</div>
+  <div class="note warn"><strong>陀螺儀方向反了</strong>順時針為正的陀螺儀沒反過來，里程計的朝向就跟實際相反，路徑一轉彎就走錯邊，場地導向駕駛也會亂掉。</div>
+  <div class="note warn"><strong>開機時就判斷聯盟顏色</strong>在 RobotContainer 建構子裡讀 <code>getAlliance()</code>，那時候可能還沒連上 FMS，拿到的是空值或錯的顏色。</div>
+  <div class="note warn"><strong>Robot Config 亂填</strong>質量、MOI、輪徑填錯，PathPlanner 產生的軌跡會超過機器人實際做得到的加速度，路徑越跑越偏。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：兩段式自動程式</h2>
-  <p>不用 GUI，只用程式組出一個 Auto：先把手臂移到 SCORE、等手臂到位後跑一條叫 <code>"Leave"</code> 的路徑，同時把手臂收回 STOW。提示：<code>AutoBuilder.followPath(PathPlannerPath.fromPathFile("Leave"))</code> 會回傳跟隨這條路徑的指令，而 <code>fromPathFile</code> 可能丟出例外。</p>
+  <p>不用 GUI，純用程式組一個 Auto：先把手臂移到 SCORE，手臂到位之後跑一條叫 <code>"Leave"</code> 的路徑，同時把手臂收回 STOW。給你一個線索：<code>AutoBuilder.followPath(PathPlannerPath.fromPathFile("Leave"))</code> 會回傳跟隨這條路徑的指令，而 <code>fromPathFile</code> 可能會丟例外。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>整個動作分兩段：先手臂到位，再同時「走路徑」和「收手臂」。載入路徑可能失敗，要處理例外。</p>
+      <p>整個動作分兩段：先手臂到位，再同時「走路徑」跟「收手臂」。載入路徑可能失敗，例外要處理。</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>用 Commands.sequence 與 Commands.parallel；路徑用 PathPlannerPath.fromPathFile("Leave")，再交給 AutoBuilder.followPath(...)。</p>
@@ -154,8 +154,8 @@
 
 // RobotContainer 建構子裡，buildAutoChooser 之後
 autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
-    <p>幾個重點：<code>sequence</code> 等手臂到位才出發；<code>parallel</code> 讓走路徑和收手臂同時進行，兩者都結束才算完成（第 10 章），手臂和底盤是不同的 Subsystem，不會互相打斷。載入失敗時回傳 <code>Commands.none()</code> 並回報錯誤，比讓整支程式當掉好。這個 Auto 在建構子裡就建好，符合「開機時載入」的建議。</p>
-    <p>注意這條路徑沒有經過 <code>PathPlannerAuto</code>，所以不會自動重設起始位置；實際使用時要確認里程計在出發前已經設對。</p>
+    <p>幾個重點：<code>sequence</code> 等手臂到位才出發；<code>parallel</code> 讓走路徑跟收手臂一起進行，兩個都結束才算完成（第 10 章）；手臂和底盤是不同的 Subsystem，不會互相打斷。載入失敗時回傳 <code>Commands.none()</code> 並回報錯誤，總比整支程式掛掉好。這個 Auto 在建構子裡就建好，符合「開機時載入」的建議。</p>
+    <p>還有，這條路徑沒有經過 <code>PathPlannerAuto</code>，所以不會自動重設起始位置；真的要用的話，要確定出發前里程計已經設對了。</p>
     </div>
   </div>
 

@@ -1,15 +1,15 @@
   <p class="headline-code">CAN ID 08｜WPILib 基礎</p>
   <h1>Subsystem 與 Command：借用體育館</h1>
-  <p class="lede">讀完這章，你會知道 Command 的四個生命週期方法、requirements 怎麼避免兩個指令搶同一個機構、指令被打斷時會發生什麼事，以及預設指令（default command）的用途。</p>
+  <p class="lede">Command-based 這個名字就是從這章來的。這章講一個指令從開始到結束會經過哪四個方法、requirements 怎麼避免兩個指令同時搶一個機構、指令被打斷時會怎樣，還有預設指令（default command）到底拿來幹嘛。</p>
 
-  <h2>生活比喻：體育館借用規則</h2>
+  <h2>比喻：體育館借用規則</h2>
   <div class="story">
-    <p><strong>學校有幾間特別教室。</strong>體育館、音樂教室、實驗室，每一間都只有一間。它們有自己的設備和管理規則，別人要用，必須透過管理的老師。</p>
-    <p><strong>每個活動都要先登記借用。</strong>一個班要在體育館辦活動，必須先在登記簿寫下「這個活動要用體育館」。如果活動同時要用體育館和音樂教室，兩間都要登記。</p>
-    <p><strong>一個活動有固定的流程。</strong>活動開始時先集合、說明規則，這只做一次。活動進行中，每隔一段時間做一輪。每一輪結束時，負責人會看一下「活動結束了沒」。結束時收拾場地、歸還器材；如果活動是被中途趕走的，收拾時會特別記一筆「被打斷」。</p>
-    <p><strong>兩個活動搶同一間教室。</strong>三年二班正在用體育館，三年五班也來登記。學校的預設規則是：後來的人優先，正在進行的活動被請出去，照樣要收拾場地。但如果正在進行的活動門口掛了「請勿打擾」，後來的人就借不到，只能等下次。</p>
-    <p><strong>體育館沒人借的時候。</strong>體育館沒有任何活動登記時，體育股長會帶一個固定的自由活動。一旦有人登記，自由活動就結束；等那個活動結束、體育館又空下來，自由活動會自動重新開始。</p>
-    <p><strong>放假時的規定。</strong>學校放假時，大部分活動自動停止。只有特別註明「放假也可以進行」的活動例外，例如布告欄更新。</p>
+    <p>學校有幾間特別教室：體育館、音樂教室、實驗室，每種都只有一間，各有自己的設備和管理規則。別人要用，就要透過管理的老師。</p>
+    <p>要在體育館辦活動，得先在登記簿寫「這個活動要用體育館」。如果同時要用體育館跟音樂教室，兩間都要登記。</p>
+    <p>活動有固定的流程。開始時先集合、講規則，只做一次。進行中每隔一段時間做一輪，每一輪結束時負責人會看一下「活動結束了沒」。結束時收拾場地、還器材；如果是被中途趕走的，收拾的時候會多記一筆「被打斷」。</p>
+    <p>那兩個班搶同一間呢？三年二班正在用體育館，三年五班也跑來登記。學校預設的規則是<strong>後來的優先</strong>，正在用的被請出去，但場地一樣要收好。除非正在進行的活動門口掛了「請勿打擾」，那後來的就借不到，只能下次再來。</p>
+    <p>體育館沒人借的時候，體育股長會帶一個固定的自由活動。一有人登記，自由活動就收掉；等那個活動結束、體育館又空了，自由活動會自己再開始。</p>
+    <p>放假的時候，大部分活動都自動停。只有特別寫「放假也可以進行」的例外，像布告欄更新。</p>
   </div>
   <table class="map">
     <thead><tr><th>比喻</th><th>Command-based</th></tr></thead>
@@ -27,13 +27,13 @@
       <tr><td>放假時也能進行的活動</td><td><code>ignoringDisable(true)</code></td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>學校的活動可以同時做很多事，但指令的四個方法是由排程器在主迴圈裡依序呼叫的，和第 7 章講的一樣，全部在同一條執行緒上。<code>execute()</code> 裡如果寫了等待迴圈，整台機器人都會卡住。另外，「後來的人優先」只適用於搶同一個 Subsystem 的情況；不同 Subsystem 的指令可以同時執行，互不干擾。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>學校的活動可以真的同時進行，但指令的四個方法是排程器在主迴圈裡一個一個呼叫的，跟第 7 章講的一樣，全部在同一條執行緒上。<code>execute()</code> 裡寫了等待迴圈，整台機器人都會卡住。還有，「後來的優先」只在搶同一個 Subsystem 時才成立，不同 Subsystem 的指令可以同時跑，互不相干。</div>
 
   <h2>Subsystem 的角色</h2>
-  <p>第 2、3、6 章已經分別講過 Subsystem 的封裝、繼承和 IO 架構。這裡只補上排程器的觀點：WPILib 文件說明 Subsystem 是 Command-based 程式組織的基本單位，也是排程器用來管理資源的單位<a class="ref" href="#src8-2">[2]</a>。繼承 <code>SubsystemBase</code> 會在建構時自動向排程器註冊，<code>periodic()</code> 因此每輪被呼叫（第 3 章）。每個實體機構只應該有一個 Subsystem 物件，就像體育館只有一間。</p>
+  <p>Subsystem 的封裝、繼承和 IO 架構，第 2、3、6 章都講過了。這裡從排程器的角度補一句：Subsystem 是 Command-based 程式的基本單位，也是排程器拿來管資源的單位<a class="ref" href="#src8-2">[2]</a><a class="ref" href="#src8-4">[4]</a>。繼承 <code>SubsystemBase</code> 會在建構時自動向排程器註冊，所以 <code>periodic()</code> 每輪都會被叫到（第 3 章）。一個實體機構只能有一個 Subsystem 物件，就像體育館只有一間。</p>
 
   <h2>Command 的生命週期</h2>
-  <p>WPILib 文件說明，指令有四個會被排程器呼叫的方法<a class="ref" href="#src8-1">[1]</a>：</p>
+  <p>指令有四個方法會被排程器呼叫<a class="ref" href="#src8-1">[1]</a>：</p>
   <table class="map">
     <thead><tr><th>方法</th><th>什麼時候被呼叫</th></tr></thead>
     <tbody>
@@ -43,7 +43,7 @@
       <tr><td><code>end(boolean interrupted)</code></td><td>指令結束時呼叫一次；被打斷或取消時 <code>interrupted</code> 為 true</td></tr>
     </tbody>
   </table>
-  <p>延續第 6 章的手臂，一個完整的指令類別：</p>
+  <p>拿第 6 章的手臂來寫一個完整的指令類別：</p>
   <pre><code>public class MoveArmToState extends Command {
     private final ArmSubsystem arm;
     private final ArmState target;
@@ -71,10 +71,10 @@
         }
     }
 }</code></pre>
-  <p>這個指令不需要 <code>execute()</code>，因為目標保存在 Subsystem 裡，由 Subsystem 的 <code>periodic()</code> 每輪送出（第 6 章 A-4）。</p>
+  <p>你會發現它沒有 <code>execute()</code>。因為目標是存在 Subsystem 裡的，Subsystem 的 <code>periodic()</code> 每輪會自己送出去（第 6 章 A-4），指令不用再做什麼。</p>
 
   <h2>Requirements：登記借用</h2>
-  <p>WPILib 文件要求每個指令都要把它控制的 Subsystem 宣告為 requirements；宣告方式包括呼叫 <code>addRequirements()</code>，或在大多數指令 factory 的參數最後傳入 Subsystem<a class="ref" href="#src8-1">[1]</a>。Subsystem 本身提供的 <code>run</code>、<code>runOnce</code>、<code>startEnd</code>、<code>runEnd</code> 等 factory 會自動 require 自己<a class="ref" href="#src8-1">[1]</a>。</p>
+  <p>每個指令都要把它控制的 Subsystem 宣告成 requirements。可以呼叫 <code>addRequirements()</code>，或是在大部分指令 factory 的最後一個參數傳 Subsystem 進去<a class="ref" href="#src8-1">[1]</a>。最省事的是直接用 Subsystem 自己的 <code>run</code>、<code>runOnce</code>、<code>startEnd</code>、<code>runEnd</code>，它們會自動 require 自己<a class="ref" href="#src8-1">[1]</a>。</p>
   <pre><code>// Subsystem 的 factory：自動 require arm
 Command a = arm.runOnce(() -&gt; arm.setGoal(ArmState.STOW));
 
@@ -85,24 +85,24 @@ Command b = Commands.runOnce(() -&gt; arm.setGoal(ArmState.STOW), arm);
 Command bad = Commands.runOnce(() -&gt; arm.setGoal(ArmState.STOW));</code></pre>
 
   <h2>兩個指令搶同一個 Subsystem</h2>
-  <p>當新的指令要借用的 Subsystem 正被另一個指令使用時，結果取決於正在執行的那個指令的中斷行為。WPILib 文件說明：預設是 <code>kCancelSelf</code>，目前的指令會被取消，新指令排程成功；如果是 <code>kCancelIncoming</code>，新指令的排程會被放棄，目前的指令繼續執行<a class="ref" href="#src8-1">[1]</a>。文件也提醒，這個設定只影響 requirements 衝突時的處理，任何指令都還是可以被取消<a class="ref" href="#src8-1">[1]</a>。</p>
+  <p>新指令要用的 Subsystem 正在被別的指令用的時候，結果要看<strong>正在跑的那個</strong>指令的中斷行為。預設是 <code>kCancelSelf</code>：舊的被取消，新的排上去。如果是 <code>kCancelIncoming</code>：新的直接被丟掉，舊的繼續跑<a class="ref" href="#src8-1">[1]</a>。要注意這個設定只管 requirements 衝突的情況，任何指令還是隨時可以被取消<a class="ref" href="#src8-1">[1]</a>。</p>
   <pre><code>// 取件中不准被打斷
 Command intakeNoInterrupt = intake.runState(IntakeState.INTAKING)
     .withInterruptBehavior(Command.InterruptBehavior.kCancelIncoming);</code></pre>
 
   <h2>預設指令</h2>
-  <p>WPILib 文件說明，預設指令會在它的 Subsystem 沒被使用時自動排程<a class="ref" href="#src8-3">[3]</a>。適合用來放「沒人要用時該做的事」，例如滾輪停止、底盤由搖桿控制：</p>
+  <p>預設指令會在它的 Subsystem 沒人用的時候自動排上去<a class="ref" href="#src8-3">[3]</a>。所以它很適合放「沒人用的時候該做的事」，像滾輪停下來、底盤交給搖桿控制：</p>
   <pre><code>// RobotContainer 建構子裡
 intake.setDefaultCommand(intake.run(() -&gt; intake.setState(IntakeState.NONE)));
 drive.setDefaultCommand(
     drive.run(() -&gt; drive.arcadeDrive(-controller.getLeftY(), -controller.getRightX())));</code></pre>
-  <p>預設指令必須 require 它所屬的 Subsystem，而且通常不應該自己結束，否則 Subsystem 空下來時它會一再被重新排程。用 <code>subsystem.run(...)</code> 建立正好兩個條件都滿足。</p>
+  <p>預設指令一定要 require 它所屬的 Subsystem，而且通常不應該自己結束，不然 Subsystem 一空下來它就會一直被重新排程。用 <code>subsystem.run(...)</code> 做，兩個條件剛好都滿足。</p>
 
   <h2>Disabled 時的指令</h2>
-  <p>指令預設在機器人 Disabled 時不會執行。需要在 Disabled 時也運作的（例如更新遙測資料），可以用 <code>ignoringDisable(true)</code><a class="ref" href="#src8-1">[1]</a>。控制馬達的指令不應該這樣做。</p>
+  <p>機器人 Disabled 的時候，指令預設是不跑的。有些東西 Disabled 也要跑（像更新遙測資料），可以加 <code>ignoringDisable(true)</code><a class="ref" href="#src8-1">[1]</a>。但控制馬達的指令絕對不要這樣做。</p>
 
   <h2>動手試：搶體育館</h2>
-  <p>下面的模擬器裡，手臂只有一個。依序排程指令，看誰被打斷、預設指令什麼時候回來。</p>
+  <p>下面的模擬器裡只有一支手臂。照順序排程指令，看誰被打斷、預設指令什麼時候跑回來。</p>
   <div class="lab">
     <div class="calls">
       <button class="call" data-sch="A">排程 A：goTo(SCORE)</button>
@@ -115,19 +115,19 @@ drive.setDefaultCommand(
   </div>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>用 Commands 工具類別卻忘了傳 Subsystem</strong>指令照樣能跑，但排程器不知道它在用機構，兩個指令就可能同時控制同一個馬達。優先使用 Subsystem 自己的 factory，就不會漏。</div>
-  <div class="note warn"><strong>預設指令會自己結束</strong>例如用 <code>runOnce</code> 當預設指令，它結束後 Subsystem 空了，下一輪又被排程，每輪重複執行 <code>initialize</code> 和 <code>end</code>。預設指令用 <code>run</code>。</div>
-  <div class="note warn"><strong>在 execute() 裡等待</strong>和第 7 章一樣：在指令裡寫 while 迴圈或 sleep 會卡住整個主迴圈。要等某件事發生，就讓 <code>isFinished()</code> 回傳那個條件。</div>
-  <div class="note coach"><strong>教練提醒</strong>寫任何指令前，先問自己：「它控制哪些機構？」答案就是它的 requirements。Code review 時，看到控制馬達卻沒有 requirements 的指令，一律退回。</div>
+  <div class="note warn"><strong>用 Commands 工具類別，卻忘了傳 Subsystem</strong>指令一樣會跑，但排程器不知道它在用機構，結果兩個指令可能同時在控制同一顆馬達。盡量用 Subsystem 自己的 factory，就不會漏。</div>
+  <div class="note warn"><strong>預設指令自己會結束</strong>像是拿 <code>runOnce</code> 當預設指令，它一結束 Subsystem 就空了，下一輪又被排上去，變成每輪都在重複 <code>initialize</code> 和 <code>end</code>。預設指令請用 <code>run</code>。</div>
+  <div class="note warn"><strong>在 execute() 裡等東西</strong>跟第 7 章一樣，指令裡寫 while 迴圈或 sleep 會卡死整個主迴圈。要等某件事發生，就讓 <code>isFinished()</code> 回傳那個條件。</div>
+  <div class="note coach"><strong>教練提醒</strong>寫任何指令之前先問自己：「它控制了哪些機構？」答案就是它的 requirements。Code review 看到控制馬達卻沒有 requirements 的指令，一律退回。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：Intake 的指令</h2>
-  <p>替 <code>IntakeSubsystem</code> 寫一個 factory <code>runState(IntakeState state)</code>：執行時把狀態設為 <code>state</code>，結束（包括被打斷）時設回 <code>NONE</code>。再寫出它的預設指令。</p>
+  <p>幫 <code>IntakeSubsystem</code> 寫一個 factory <code>runState(IntakeState state)</code>：執行時把狀態設成 <code>state</code>，結束（包括被打斷）時設回 <code>NONE</code>。然後把它的預設指令也寫出來。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>要「開始時做一件事、結束時做另一件事」，Subsystem 有現成的 factory。</p>
+      <p>「開始做一件事、結束做另一件事」，Subsystem 有現成的 factory 可以用。</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>用 startEnd(開始動作, 結束動作)，被打斷時也會執行結束動作；預設指令要持續執行，用 run。</p>
@@ -143,7 +143,7 @@ public Command runState(IntakeState state) {
 
 // RobotContainer 建構子裡
 intake.setDefaultCommand(intake.run(() -&gt; intake.setState(IntakeState.NONE)));</code></pre>
-    <p><code>startEnd</code> 在開始時執行第一個動作，結束時執行第二個，不管是正常結束還是被打斷。它本身不會自己結束，要靠按鍵放開或其他指令打斷，這點在第 9、10 章會用到。</p>
+    <p><code>startEnd</code> 開始時跑第一個動作，結束時跑第二個，不管是正常結束還是被打斷。它自己不會結束，要靠放開按鍵或被別的指令打斷才會停，第 9、10 章會用到這個特性。</p>
     </div>
   </div>
 

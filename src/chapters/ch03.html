@@ -1,28 +1,28 @@
   <p class="headline-code">CAN ID 03｜Java 與物件導向</p>
   <h1>繼承與介面：導師是一種老師，值日生是一份職責</h1>
-  <p class="lede">讀完這章，你會分得清 extends 和 implements，知道 @Override 和 super 在做什麼，並看懂 <code>Robot extends TimedRobot</code>、<code>IntakeSubsystem extends SubsystemBase</code> 和 <code>RollerIOHardware implements RollerIO</code>。</p>
+  <p class="lede">打開任何一個機器人專案，第一眼就會看到 <code>Robot extends TimedRobot</code>。這章把 extends 和 implements 講清楚，順便講 @Override 和 super，看完你就看得懂 <code>IntakeSubsystem extends SubsystemBase</code>、<code>RollerIOHardware implements RollerIO</code> 這種寫法在幹嘛。</p>
 
-  <h2>生活比喻一：導師也是老師</h2>
+  <h2>比喻一：導師也是老師</h2>
   <div class="story">
-    <p><strong>教師規章只寫一次。</strong>學校有一本教師規章：每位老師都有名字，都要上課、點名、打成績。</p>
-    <p><strong>導師不用重抄一遍。</strong>導師也是老師，所以教師規章裡的每一條都適用。學校不會另外印一本「導師規章」把教師規章整本抄進去，而是寫：「導師適用全部教師規章，另外還要帶班、聯絡家長。」導師多出來的只有那幾條。</p>
-    <p><strong>規章改了，導師自動跟著改。</strong>如果教師規章新增一條「每學期要參加研習」，所有導師也自動要參加，不用另外通知。因為導師不是抄了一份規章，而是「沿用」同一本。</p>
-    <p><strong>體育老師的上課方式不一樣。</strong>體育老師也是老師，也要「上課」，但他的上課是在操場帶暖身和比賽，不是在教室講課。同樣叫「上課」，做法被換掉了。</p>
-    <p><strong>先完成老師的報到，才輪到導師的部分。</strong>新來的導師報到時，要先辦完所有老師都要辦的手續，拿到教師證，才輪到領班級、拿學生名單。順序不能反過來。如果人事室沒特別交代，就走一般老師的標準報到流程。</p>
-    <p><strong>一個人只能有一個「職稱」來源。</strong>在這所學校裡，一個人的身分只能從一本規章延伸出來：導師延伸自教師規章，不能同時又延伸自「工友規章」。</p>
+    <p>學校有一本教師規章，寫著每位老師都有名字，都要上課、點名、打成績。</p>
+    <p>導師也是老師，所以規章裡每一條都適用。學校不會另外印一本「導師規章」把教師規章整本抄一遍，而是寫一句「導師適用全部教師規章，另外還要帶班、聯絡家長」。導師多出來的就只有那幾條。</p>
+    <p>這樣有個好處：哪天教師規章多一條「每學期要參加研習」，所有導師也自動要去，不用另外通知。因為導師沒有抄一份規章，是直接<strong>沿用</strong>同一本。</p>
+    <p>體育老師也是老師，也要「上課」，可是他上課是在操場帶暖身、打比賽，不是在教室講課。名字一樣叫上課，做法被換掉了。</p>
+    <p>新導師報到的時候，要先把所有老師都要辦的手續辦完、拿到教師證，才輪到領班級、拿學生名單，順序不能反過來。人事室沒特別交代的話，就走一般老師的標準流程。</p>
+    <p>還有一條規矩：在這間學校，一個人的身分只能從一本規章延伸出來。導師延伸自教師規章，就不能同時又延伸自「工友規章」。</p>
   </div>
-  <p>這就是<strong>繼承</strong>（inheritance）。子類別用 <code>extends</code> 沿用父類別的欄位和方法，再加上自己的<a class="ref" href="#src3-1">[1]</a>。體育老師換掉上課方式叫<strong>覆寫</strong>（override）<a class="ref" href="#src3-3">[3]</a>；先辦老師報到叫呼叫 <code>super(...)</code><a class="ref" href="#src3-2">[2]</a>；只能有一本規章來源，對應 Java 的單一繼承<a class="ref" href="#src3-1">[1]</a>。</p>
+  <p>這就是<strong>繼承</strong>（inheritance）：子類別用 <code>extends</code> 沿用父類別的欄位和方法，再加上自己的東西<a class="ref" href="#src3-1">[1]</a>。體育老師把上課方式換掉，叫<strong>覆寫</strong>（override）<a class="ref" href="#src3-3">[3]</a>。先辦老師的報到手續，就是呼叫 <code>super(...)</code><a class="ref" href="#src3-2">[2]</a>。只能有一本規章當來源，就是 Java 的單一繼承<a class="ref" href="#src3-1">[1]</a>。</p>
 
-  <h2>生活比喻二：值日生是一份職責</h2>
+  <h2>比喻二：值日生是一份職責</h2>
   <div class="story">
-    <p><strong>值日生不是一種人。</strong>教室後面貼著一張值日生職責表：擦黑板、倒垃圾、關窗關燈。值日生不是「一種學生」，而是一份「輪到誰就要做的事」。</p>
-    <p><strong>職責表只寫要做什麼，不寫怎麼做。</strong>表上寫「擦黑板」，沒規定用板擦還是用濕抹布。每個人用自己的方式做，只要做到就好。</p>
-    <p><strong>衛生股長只看職責有沒有完成。</strong>衛生股長來檢查時，他只問：「今天的值日生，黑板擦了嗎？垃圾倒了嗎？」他不在乎今天輪到的是小明還是小華。</p>
-    <p><strong>學校買了掃地機器人。</strong>後來學校買了一台掃地機器人，設定成能擦黑板、推垃圾桶。機器人不是學生，也不是老師，但它能做職責表上的每一件事，所以它也能擔任值日生。衛生股長的檢查方式完全不用改。</p>
-    <p><strong>一個人可以身兼多職。</strong>小明今天是值日生，同時也是風紀股長。兩份職責表他都簽了，兩邊的事都要做。</p>
-    <p><strong>職責表可以附「預設做法」。</strong>職責表最下面寫著：「做完後在黑板右下角簽名。」這條大家照做就好，但如果有人有更好的回報方式，也可以改用自己的。</p>
+    <p>教室後面貼著一張值日生職責表：擦黑板、倒垃圾、關窗關燈。值日生不是「某一種學生」，而是「輪到誰誰就要做的事」。</p>
+    <p>表上只寫要做什麼，沒寫怎麼做。寫「擦黑板」，沒規定要用板擦還是濕抹布，你用自己的方法，做到就好。</p>
+    <p>衛生股長來檢查的時候只會問：「今天值日生黑板擦了沒？垃圾倒了沒？」他才不管今天輪到小明還是小華。</p>
+    <p>後來學校買了一台掃地機器人，設定成會擦黑板、會推垃圾桶。它不是學生也不是老師，但職責表上的事它都做得到，所以它也可以當值日生，衛生股長的檢查方式一點都不用改。</p>
+    <p>一個人也可以身兼多職。小明今天是值日生，同時也是風紀股長，兩張職責表他都簽了，兩邊的事都要做。</p>
+    <p>職責表最下面還有一行：「做完在黑板右下角簽名。」這條大家照做就好，但如果有人有更好的回報方式，也可以用自己的。</p>
   </div>
-  <p>這就是<strong>介面</strong>（interface）。Oracle 教學把介面描述為類別與外界之間的契約：類別實作介面，就是承諾提供介面裡列出的行為<a class="ref" href="#src3-4">[4]</a>。衛生股長只看職責、不管是誰，這叫<strong>多型</strong>（polymorphism）。職責表上的預設做法，對應 Java 8 起的 <code>default</code> 方法<a class="ref" href="#src3-5">[5]</a>。</p>
+  <p>這就是<strong>介面</strong>（interface）。Oracle 教學把介面形容成類別和外界之間的契約：類別實作一個介面，就是承諾會提供介面裡列出的那些行為<a class="ref" href="#src3-4">[4]</a>。衛生股長只看職責、不管是誰在做，這叫<strong>多型</strong>（polymorphism）。最後那行「做完簽名」，就是 Java 8 開始有的 <code>default</code> 方法<a class="ref" href="#src3-5">[5]</a>。</p>
 
   <table class="map">
     <thead><tr><th>比喻</th><th>Java</th><th>在機器人上</th></tr></thead>
@@ -39,21 +39,21 @@
     </tbody>
   </table>
 
-  <div class="note limit"><strong>這兩個比喻哪裡不準</strong>第一，真實的職責表上可以有空格讓人填，但 Java 介面不能有一般的欄位，只能有常數（自動是 public static final）。介面規定的是「能做什麼」，不存放每個物件的狀態。第二，「導師是一種老師」很好懂，但寫程式時別為了少打幾行就亂用繼承。判斷方式：能自然說出「A 是一種 B」才用 extends；只能說「A 能做 B 規定的事」就用介面。</div>
+  <div class="note limit"><strong>這兩個比喻哪裡不準</strong>第一，真的職責表上可以留空格讓人填，但 Java 介面不能有一般欄位，只能有常數（自動就是 public static final）。介面規定的是「能做什麼」，不負責存每個物件的狀態。第二，「導師是一種老師」很好懂，但寫程式的時候不要為了少打幾行就亂用繼承。判斷方法很簡單：講得出「A 是一種 B」才用 extends；只講得出「A 能做 B 規定的事」，就用介面。</div>
 
   <h2>換成機器人：繼承</h2>
   <h3>Robot extends TimedRobot</h3>
-  <p>每個 WPILib 專案都有這一行。<code>TimedRobot</code> 已經處理好和 Driver Station 溝通、每 20 毫秒跑一次迴圈、切換自動與手動階段這些工作<a class="ref" href="#src3-7">[7]</a>。你沿用它，只要覆寫需要的方法：</p>
+  <p>每個 WPILib 專案都有這行。跟 Driver Station 溝通、每 20 毫秒跑一次迴圈、切換自動和手動階段，這些麻煩事 <code>TimedRobot</code> 都幫你做好了<a class="ref" href="#src3-7">[7]</a>。你繼承它，只要覆寫自己需要的方法就好：</p>
   <pre><code>public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         // 手動階段每 20 毫秒被呼叫一次（第 7 章詳述）
     }
 }</code></pre>
-  <p><code>@Override</code> 不是必要的，但一定要寫。如果你把方法名打錯成 <code>teleopPeriodc()</code>，有 <code>@Override</code> 的話編譯器會報錯；沒有的話，Java 會當成你新增了一個沒人會呼叫的方法，機器人在手動階段就什麼都不做，這種 bug 很難找<a class="ref" href="#src3-3">[3]</a>。</p>
+  <p><code>@Override</code> 不寫也能編譯，但請一定要寫。假設你手滑打成 <code>teleopPeriodc()</code>：有 <code>@Override</code>，編譯器會直接報錯；沒有的話，Java 會以為你新增了一個沒人會呼叫的方法，結果機器人在手動階段什麼都不做，而且你會找很久才發現是少一個 i<a class="ref" href="#src3-3">[3]</a>。</p>
 
   <h3>SubsystemBase 與看不見的 super()</h3>
-  <p>WPILib 文件說明，<code>Subsystem</code> 是一個介面，而建議的做法是繼承抽象類別 <code>SubsystemBase</code>。<code>SubsystemBase</code> 的建構子會自動呼叫 <code>register()</code> 向指令排程器註冊，這是 <code>periodic()</code> 會被呼叫的前提；它同時實作了 <code>Sendable</code> 介面，所以能把狀態送到儀表板<a class="ref" href="#src3-6">[6]</a>。</p>
+  <p>在 WPILib 裡，<code>Subsystem</code> 其實是一個介面，建議的寫法是去繼承抽象類別 <code>SubsystemBase</code>。<code>SubsystemBase</code> 的建構子會自動呼叫 <code>register()</code> 向指令排程器註冊，沒有註冊的話 <code>periodic()</code> 根本不會被呼叫。它也實作了 <code>Sendable</code>，所以狀態可以送到儀表板<a class="ref" href="#src3-6">[6]</a>。</p>
   <pre><code>public class IntakeSubsystem extends SubsystemBase {
     public IntakeSubsystem() {
         // 這裡沒寫 super()，但 Java 會自動在第一行補上
@@ -64,10 +64,10 @@
         // 因為父類別建構子已經註冊，這裡每個週期都會被呼叫
     }
 }</code></pre>
-  <p>Oracle 教學寫明：子類別建構子如果沒有明確呼叫父類別建構子，編譯器會自動插入一個呼叫父類別無參數建構子的 <code>super()</code>；如果要明確呼叫，必須寫在建構子第一行<a class="ref" href="#src3-2">[2]</a>。這就是「先辦老師報到」：你的 <code>IntakeSubsystem</code> 一建立，<code>SubsystemBase</code> 的部分就先完成註冊。</p>
+  <p>規則是這樣：子類別的建構子如果沒有自己呼叫父類別建構子，編譯器會自動在第一行補一個 <code>super()</code>，呼叫父類別的無參數建構子；如果你要自己寫，就一定要寫在第一行<a class="ref" href="#src3-2">[2]</a>。這就是「先辦老師報到」：<code>IntakeSubsystem</code> 一建立，<code>SubsystemBase</code> 那部分就先把註冊做完了。</p>
 
   <h2>換成機器人：介面與多型</h2>
-  <p>第 6 章的 IO 架構完全建立在介面上，這裡先看骨架：</p>
+  <p>第 6 章的 IO 架構整個都是靠介面撐起來的，這裡先看個骨架就好：</p>
   <pre><code>// RollerIO.java：職責表
 public interface RollerIO {
     void setVoltage(double volts);
@@ -110,7 +110,7 @@ public class RollerIOSim implements RollerIO {
         return 0.0; // 第 6 章會換成物理模擬
     }
 }</code></pre>
-  <p>衛生股長的角色由 Subsystem 擔任，它只認得 <code>RollerIO</code>：</p>
+  <p>衛生股長就是 Subsystem，它只認 <code>RollerIO</code>，不管背後是誰：</p>
   <pre><code>RollerIO io = new RollerIOHardware();
 io.setVoltage(8.0); // 執行 RollerIOHardware 的做法：真的送電壓給馬達
 
@@ -119,23 +119,23 @@ io.setVoltage(8.0); // 同一行程式，這次執行 RollerIOSim 的做法
 io.stop();          // 兩個實作都沒寫 stop()，用的是介面的預設做法</code></pre>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>implements 了介面卻沒寫完方法</strong>介面裡沒有 default 的方法，實作的類別都必須寫出來，少一個就編譯失敗。錯誤訊息通常是「is not abstract and does not override abstract method ...」，看到它就去對照介面，找出漏了哪一個。</div>
-  <div class="note coach"><strong>教練提醒</strong>每個覆寫的方法前面都加 <code>@Override</code>，這是隊上的規定，不是選擇。它是編譯器免費幫你做的檢查。</div>
+  <div class="note warn"><strong>implements 了介面，方法卻沒寫完</strong>介面裡沒有 default 的方法，實作的類別全部都要寫出來，少一個就編譯失敗。錯誤訊息通常長這樣：「is not abstract and does not override abstract method ...」。看到就回去對照介面，找漏掉的是哪一個。</div>
+  <div class="note coach"><strong>教練提醒</strong>每個覆寫的方法前面都要加 <code>@Override</code>。這是隊上的規定。編譯器會免費幫你做這個檢查。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：定義一份機構的契約</h2>
-  <p>寫一個介面 <code>Mechanism</code>，規定兩件事：<code>void stop()</code> 和 <code>boolean isAtGoal()</code>。再讓第 1 章練習的 <code>Flywheel</code> 實作它：<code>stop()</code> 把目標轉速設為 0；<code>isAtGoal()</code> 需要知道目前轉速，所以先加一個欄位 <code>currentRpm</code> 和方法 <code>updateCurrentRpm(double rpm)</code>。</p>
+  <p>寫一個介面 <code>Mechanism</code>，規定兩件事：<code>void stop()</code> 和 <code>boolean isAtGoal()</code>。然後讓第 1 章練習寫的 <code>Flywheel</code> 去實作它。<code>stop()</code> 就是把目標轉速設成 0；<code>isAtGoal()</code> 要知道目前轉速，所以先幫它加一個欄位 <code>currentRpm</code> 和方法 <code>updateCurrentRpm(double rpm)</code>。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>介面只寫「要做什麼」，不寫怎麼做；類別用 implements 承諾做到。</p>
+      <p>介面只寫「要做什麼」，不管怎麼做；類別用 implements 承諾自己做得到。</p>
     </div>
     <div class="hint" data-label="提示 2">
       <p>介面裡的方法宣告成 void stop(); 與 boolean isAtGoal();，實作時加 @Override。</p>
     </div>
     <div class="hint" data-label="提示 3">
-      <p>isAtGoal 需要目前轉速：加一個 private double currentRpm 與 updateCurrentRpm(double rpm)，判斷方式和第 1 章的 isAtSpeed 一樣。</p>
+      <p>isAtGoal 需要目前轉速：加一個 private double currentRpm 和 updateCurrentRpm(double rpm)，判斷方法跟第 1 章的 isAtSpeed 一模一樣。</p>
     </div>
     <div class="hint solution" data-label="完整解答">
     <pre><code>// Mechanism.java

@@ -1,16 +1,16 @@
   <p class="headline-code">CAN ID 01｜Java 與物件導向</p>
   <h1>類別與物件：從一張學籍資料表開始</h1>
-  <p class="lede">讀完這章，你會知道類別和物件的差別，看懂 <code>new TalonFX(21)</code> 做了什麼，也能自己寫出一個有欄位、建構子和方法的類別。</p>
+  <p class="lede">你之後每天都會看到 <code>new TalonFX(21)</code> 這種程式。這章要搞懂它到底做了什麼：類別跟物件差在哪、欄位和方法是什麼，最後自己寫一個完整的類別出來。</p>
 
-  <h2>生活比喻：開學報到</h2>
+  <h2>比喻：開學報到</h2>
   <div class="story">
-    <p><strong>教務處先設計表格。</strong>開學前，教務處要決定學籍資料表長什麼樣子：要有姓名、座號、班級這幾格，還要附一份說明，寫清楚學生可以做哪些事，例如交作業、自我介紹、請假。這份「規格」只有一份，放在教務處。它本身不是任何一個學生，它只規定「學生」這種東西該有什麼。</p>
-    <p><strong>報到時，每人拿一張新表。</strong>開學那天，小明走進註冊組，組長照著規格拿出一張全新的表格，當場請他填上姓名和座號。組長不會收一張空白的表，因為規定就是報到時一定要填這兩格。填好的那一張，才是「小明」。</p>
-    <p><strong>每張表各管各的。</strong>三十個同學就有三十張表。小明交了作業，他那張表上的「作業次數」加一，小華那張不會跟著變。大家的表格長得一樣，但內容各自獨立。</p>
-    <p><strong>表格上寫著「本人」。</strong>表格有一格叫「本人姓名」。小明填的時候，「本人」指的是小明；小華填的時候，「本人」指的是小華。同樣兩個字，指的永遠是填這張表的那個人。</p>
-    <p><strong>校名印在表頭。</strong>每張表最上面都印著校名，這不是每個學生自己填的，而是全校共用的一個值。哪天學校改名，只要改一次，所有表格都跟著變。</p>
-    <p><strong>點名冊上的空座號。</strong>點名冊上列到 30 號，但 30 號其實沒人報到。老師如果叫「30 號起來回答問題」，沒有人站起來，這堂課就卡住了。</p>
-    <p><strong>同一個座號發給兩個人。</strong>如果註冊組出錯，把 7 號同時發給兩個人，點名時兩個人都會說「有」，老師叫 7 號做事，兩個人同時跑上台。</p>
+    <p>開學前，教務處要先決定學籍資料表長怎樣：要有姓名、座號、班級這幾格，再附一份說明，寫學生可以做哪些事，像交作業、自我介紹、請假。這份規格只有一份，放在教務處。它不是任何一個學生，它只是規定「學生」這種東西該有哪些東西。</p>
+    <p>開學那天小明去註冊組報到，組長照規格拿出一張新表，叫他當場填姓名和座號。空白的表組長不收，因為規定報到時這兩格一定要填。填好的那一張，才是「小明」。</p>
+    <p>三十個同學就有三十張表。小明交了作業，他那張的「作業次數」加一，小華那張不會跟著變。表格長得一樣，內容各管各的。</p>
+    <p>表格上有一格叫「本人姓名」。小明填的時候「本人」就是小明，小華填的時候就是小華。同樣兩個字，永遠指填這張表的人。</p>
+    <p>每張表最上面都印著校名。這不是學生自己填的，是全校共用的。哪天學校改名，改一次，所有表格就都變了。</p>
+    <p>然後是兩個會出事的狀況。第一個：點名冊列到 30 號，可是 30 號根本沒人報到。老師叫「30 號起來回答」，沒人站起來，整堂課就卡住了。</p>
+    <p>第二個：註冊組出錯，把 7 號同時發給兩個人。點名時兩個人都喊「有」，老師叫 7 號上台，結果兩個人一起衝上去。</p>
   </div>
 
   <table class="map">
@@ -28,12 +28,12 @@
       <tr><td>同一座號發給兩個人</td><td>同一硬體建立兩個物件</td><td>兩處都 <code>new TalonFX(21)</code></td></tr>
     </tbody>
   </table>
-  <p>Oracle 官方教學把物件描述為「相關的狀態與行為」包在一起的軟體單位，把類別描述為建立物件的藍圖<a class="ref" href="#src1-1">[1]</a>。上面故事裡，表格上的格子就是狀態，說明書上寫的「可以做的事」就是行為。</p>
+  <p>Oracle 的 Java 教學是這樣定義的：物件是把相關的「狀態」和「行為」包在一起的東西，類別則是用來做出物件的藍圖<a class="ref" href="#src1-1">[1]</a>。對回故事，表格上的格子是狀態，說明書寫的「可以做的事」是行為。</p>
 
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>紙本表格只能存資料，但物件除了存資料還「會做事」。另外，做事的方式（方法）是寫在類別裡、所有物件共用的一份，並不是每張表格各抄一份說明書；每個物件各自一份的只有欄位的值。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>紙本表格只能存資料，物件除了存資料還「會做事」。另外，做事的方法是寫在類別裡、所有物件共用一份的，不是每張表都抄一份說明書。每個物件自己一份的，只有欄位的值。</div>
 
   <h2>換成機器人：一個模擬的滾輪</h2>
-  <p>先不碰真正的硬體，用純 Java 寫一個滾輪類別。對照上面的故事讀：</p>
+  <p>先不碰真的硬體，用純 Java 寫一個滾輪類別。可以一邊對照上面的故事看：</p>
   <pre><code>public class Roller {
     // 表頭的校名：全部 Roller 共用一份
     public static final double MAX_VOLTS = 12.0;
@@ -64,7 +64,7 @@
         return name;
     }
 }</code></pre>
-  <p>用這個類別建立兩個物件：</p>
+  <p>拿這個類別做出兩個物件：</p>
   <pre><code>Roller intake = new Roller("Intake");
 Roller feeder = new Roller("Feeder");
 
@@ -73,19 +73,19 @@ System.out.println(intake.getVoltage()); // 8.0
 System.out.println(feeder.getVoltage()); // 0.0</code></pre>
 
   <h3>欄位</h3>
-  <p><code>name</code> 和 <code>voltage</code> 是欄位，每個物件各有一份，所以 <code>intake.run(8.0)</code> 不會改到 <code>feeder</code>。<code>final</code> 表示設定後不能再改，名字給了就固定。前面的 <code>private</code> 是第 2 章的主題，現在先記得它代表「只有這個類別自己能直接碰」。</p>
+  <p><code>name</code> 和 <code>voltage</code> 是欄位，每個物件各一份，所以 <code>intake.run(8.0)</code> 不會動到 <code>feeder</code>。<code>final</code> 的意思是設定之後就不能改，名字給了就定了。前面那個 <code>private</code> 是第 2 章要講的，現在先知道它是「只有這個類別自己可以直接碰」就好。</p>
 
   <h3>建構子與 new</h3>
-  <p>建構子的名字和類別相同，而且沒有回傳型別。<code>new Roller("Intake")</code> 會先配置一個新物件，再執行建構子設定欄位<a class="ref" href="#src1-2">[2]</a>。因為唯一的建構子要求傳入名字，所以程式裡不可能出現沒有名字的 <code>Roller</code>，這就是「報到時一定要填」。</p>
+  <p>建構子的名字跟類別一樣，而且沒有回傳型別。<code>new Roller("Intake")</code> 會先生出一個新物件，再跑建構子把欄位設好<a class="ref" href="#src1-2">[2]</a>。因為唯一的建構子規定一定要給名字，程式裡就不可能出現沒名字的 <code>Roller</code>，這就是「報到時一定要填」。</p>
 
   <h3>this</h3>
-  <p>建構子的參數叫 <code>name</code>，欄位也叫 <code>name</code>。在建構子裡直接寫 <code>name</code>，Java 會當成參數；要指欄位就寫 <code>this.name</code>，意思是「這個物件自己的 name」<a class="ref" href="#src1-3">[3]</a>。</p>
+  <p>建構子的參數叫 <code>name</code>，欄位也叫 <code>name</code>，撞名了。在建構子裡直接寫 <code>name</code>，Java 會當成參數；要指欄位就寫 <code>this.name</code>，也就是「這個物件自己的 name」<a class="ref" href="#src1-3">[3]</a>。</p>
 
   <h3>static</h3>
-  <p><code>MAX_VOLTS</code> 加了 <code>static</code>，它屬於類別本身，所有物件共用同一份<a class="ref" href="#src1-4">[4]</a>。再加上 <code>final</code> 就是常數，慣例是全部大寫、單字用底線隔開。</p>
+  <p><code>MAX_VOLTS</code> 有加 <code>static</code>，所以它是屬於類別本身的，所有物件共用同一份<a class="ref" href="#src1-4">[4]</a>。再加上 <code>final</code> 就變成常數。習慣上常數名稱全部大寫，單字中間用底線。</p>
 
   <h2>動手試：兩個物件，各自的狀態</h2>
-  <p>下面兩個物件都是從 <code>Roller</code> 建立的。按按鈕呼叫方法，看欄位怎麼變。最後一個按鈕示範對「空座號」點名。</p>
+  <p>下面兩個物件都是用 <code>Roller</code> 做出來的。按按鈕呼叫方法，看欄位怎麼變。最後一顆紅色按鈕就是對「空座號」點名，按下去看看會怎樣。</p>
   <div class="lab">
     <div class="objs">
       <div class="obj" id="obj-intake"></div>
@@ -101,7 +101,7 @@ System.out.println(feeder.getVoltage()); // 0.0</code></pre>
     </div>
     <div class="console" id="console" aria-live="polite"></div>
   </div>
-  <p>注意 <code>intake.run(20.0)</code>：你要 20V，物件只給 12V。限制寫在方法裡，呼叫的人繞不過去。</p>
+  <p>試試 <code>intake.run(20.0)</code>：你要 20V，它只給你 12V。限制寫在方法裡面，呼叫的人怎樣都繞不過去。</p>
 
   <h2>對照真正的 FRC 程式</h2>
   <pre><code>import com.ctre.phoenix6.controls.VoltageOut;
@@ -117,24 +117,24 @@ public class RollerIOHardware {
         leader.setControl(voltageRequest.withOutput(volts));
     }
 }</code></pre>
-  <p><code>leader</code> 是欄位，裝著一個 <code>TalonFX</code> 物件；<code>voltageRequest</code> 也是物件，代表「用電壓控制」這個請求；<code>setVoltage()</code> 是方法。<code>withOutput(volts)</code> 修改請求物件裡的輸出值後，回傳同一個物件，所以能直接交給 <code>setControl()</code>。CTRE 官方文件的範例就是把控制請求宣告成欄位，再用 <code>withOutput</code> 改數值送出<a class="ref" href="#src1-5">[5]</a>，這樣每 20 毫秒一次的迴圈不必一直建立新物件。</p>
+  <p><code>leader</code> 是欄位，裡面裝一個 <code>TalonFX</code> 物件。<code>voltageRequest</code> 也是物件，代表「用電壓控制」這個請求。<code>setVoltage()</code> 是方法。<code>withOutput(volts)</code> 改掉請求裡的輸出值之後，會把同一個物件回傳，所以可以直接丟給 <code>setControl()</code>。CTRE 文件的範例也是這樣寫：控制請求宣告成欄位，要送的時候用 <code>withOutput</code> 改數字<a class="ref" href="#src1-5">[5]</a>。這樣每 20 毫秒跑一次的迴圈就不用一直 new 新物件。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>空座號：宣告了卻沒有 new</strong>寫了 <code>private TalonFX leader;</code> 卻忘記 <code>= new TalonFX(21)</code>，欄位的值是 <code>null</code>。編譯會過，但執行到 <code>leader.setControl(...)</code> 時丟出 <code>NullPointerException</code>，機器人程式直接崩潰。</div>
-  <div class="note warn"><strong>同一座號發給兩個人：同一顆硬體建立兩次</strong>在兩個不同類別裡各寫一次 <code>new TalonFX(21)</code>，兩個物件都以為自己在控制 21 號馬達，指令會互相覆蓋。一顆硬體只該有一個物件，其他地方要用就把這個物件傳過去。</div>
-  <div class="note coach"><strong>教練提醒</strong>新手最常問「為什麼要 new？」答案就是報到：沒有 new，就只有一個名字，沒有真的人。看到 <code>NullPointerException</code>，第一件事就是找「哪個欄位只宣告沒有 new」。</div>
+  <div class="note warn"><strong>空座號：宣告了卻沒有 new</strong>寫了 <code>private TalonFX leader;</code>，卻忘了 <code>= new TalonFX(21)</code>，這個欄位就是 <code>null</code>。編譯會過，但跑到 <code>leader.setControl(...)</code> 就會丟 <code>NullPointerException</code>，整個機器人程式直接掛掉。</div>
+  <div class="note warn"><strong>同一座號發給兩個人：同一顆硬體 new 兩次</strong>兩個不同的類別裡各寫了一次 <code>new TalonFX(21)</code>，兩個物件都覺得自己在控制 21 號馬達，指令會互相蓋掉。一顆硬體只能有一個物件，別的地方要用，就把那個物件傳過去。</div>
+  <div class="note coach"><strong>教練提醒</strong>新手很常問「為什麼一定要 new？」想想報到就懂了：沒有 new，就只有一個名字，沒有真的人。以後看到 <code>NullPointerException</code>，第一個反應就是去找「哪個欄位只宣告、沒有 new」。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
 
   <h2>練習：寫一個 Flywheel 類別</h2>
-  <p>照著 <code>Roller</code> 的結構，寫一個模擬砲台飛輪的類別：建構子接收名稱；欄位 <code>targetRpm</code> 預設 0；方法 <code>setTargetRpm(double rpm)</code> 把目標限制在 0 到 6000；方法 <code>isAtSpeed(double currentRpm)</code> 在實際轉速與目標相差小於 50 RPM 時回傳 <code>true</code>。上限與容許誤差寫成 static 常數。</p>
+  <p>照 <code>Roller</code> 的寫法，做一個模擬砲台飛輪的類別。建構子收一個名稱；欄位 <code>targetRpm</code> 預設是 0；<code>setTargetRpm(double rpm)</code> 要把目標限制在 0 到 6000；<code>isAtSpeed(double currentRpm)</code> 在實際轉速跟目標差不到 50 RPM 時回傳 <code>true</code>。上限和容許誤差都寫成 static 常數。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
-      <p>先照 Roller 的樣子寫出類別骨架：欄位、建構子、方法。上限與容許誤差是「所有飛輪共用、不會變」的值。</p>
+      <p>先照 Roller 把骨架寫出來：欄位、建構子、方法。上限和容許誤差是「所有飛輪共用、而且不會變」的值。</p>
     </div>
     <div class="hint" data-label="提示 2">
-      <p>共用又不變的值用 public static final；限制範圍可以用 Math.max 與 Math.min；差距用 Math.abs。</p>
+      <p>共用又不會變，就是 public static final。限制範圍可以用 Math.max 和 Math.min，算差距用 Math.abs。</p>
     </div>
     <div class="hint" data-label="提示 3">
       <p>setTargetRpm 的核心是 targetRpm = Math.max(0.0, Math.min(MAX_RPM, rpm));，isAtSpeed 回傳 Math.abs(currentRpm - targetRpm) &lt; TOLERANCE_RPM。</p>
