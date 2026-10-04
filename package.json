@@ -1,7 +1,7 @@
 {
   "name": "frc9427-teaching-website",
   "private": true,
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "FRC 9427 Java 機器人程式課程",
   "type": "module",
   "scripts": {

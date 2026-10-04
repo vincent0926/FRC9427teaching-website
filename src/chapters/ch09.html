@@ -42,7 +42,7 @@ operator.rightTrigger(0.5);
 
 // 任意條件：只要能回答 true 或 false
 Trigger armAtGoal = new Trigger(arm::atGoal);</code></pre>
-  <p>任意條件的 Trigger 收一個 <code>BooleanSupplier</code>，就是第 4 章那張「看一下有沒有下雨」的字條。綁控制器按鍵最常見，但其實任何觸發事件都可以綁<a class="ref" href="#src9-1">[1]</a>。</p>
+  <p>任意條件的 Trigger 收一個 <code>BooleanSupplier</code>，就是第 4 章那張「看一下有沒有下雨」的字條。綁控制器按鍵最常見，但其實任何觸發事件都可以綁<a class="ref" href="#src9-1">[1]</a>。控制器上有哪些按鍵方法，翻 <code>CommandXboxController</code> 的 API 文件最快<a class="ref" href="#src9-3">[3]</a>；<code>and</code>、<code>or</code>、<code>negate</code>、<code>debounce</code> 這些組合方法則在 <code>Trigger</code> 的 API 文件裡<a class="ref" href="#src9-2">[2]</a>。</p>
 
   <h2>三種主要綁定</h2>
   <table class="map">

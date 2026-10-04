@@ -2,7 +2,7 @@
   {
     "type": "recall",
     "q": "IO 架構裡，ArmSubsystem 的 IO 欄位型別應該是？",
-    "e": "Subsystem 只認介面，才能換實作。",
+    "e": "Subsystem 只認介面，所以才能換實作。",
     "o": [
       "TalonFX",
       "Object",
@@ -21,7 +21,7 @@
       ]
     },
     "q": "這個延遲的正確解讀是？",
-    "e": "只在 periodic 呼叫 IO，確保每輪只有一個地方決定輸出；代價是最多一輪的延遲。預期結果：行為可預測，模擬與重播也一致。",
+    "e": "只在 periodic 裡呼叫 IO，每一輪就只有一個地方在決定輸出；代價是最多晚一輪。換來的是行為可以預測，模擬和重播也對得上。",
     "lab": "arch",
     "o": [
       "新目標在下一輪 periodic 才送出，最多晚 20 ms，這是設計上可接受的",
@@ -41,7 +41,7 @@
       ]
     },
     "q": "最可能的原因與修正是？",
-    "e": "模擬和實機用了不同的控制器設定，所以結果不同。這也是為什麼推薦模擬時用 TalonFXSimState 跑同一份設定。預期結果：手臂在各角度都撐得住。",
+    "e": "模擬跟實機用的是不同的控制器設定，結果當然不一樣。這也是為什麼我們推薦模擬時用 TalonFXSimState 跑同一份設定。改成同一份設定、把 kG 調對，手臂在每個角度都撐得住。",
     "o": [
       "把 kP 調大十倍",
       "實機的 TalonFX 用了錯的重力模型；GravityType 設成 Arm_Cosine，並確認 0 度是水平",
@@ -60,7 +60,7 @@
       ]
     },
     "q": "下一步怎麼修正？",
-    "e": "Aligned／Opposed 是相對於 leader 的 Invert 設定，不看 follower 自己的 Inverted。面對面裝通常要 Opposed。預期結果：兩顆同向出力，電流下降。",
+    "e": "Aligned／Opposed 是相對於 leader 的 Invert 設定，跟 follower 自己的 Inverted 無關。面對面裝的通常要用 Opposed，改對之後兩顆往同一邊出力，電流也會降下來。",
     "o": [
       "把 follower 的 Inverted 設反就好",
       "改成 MotorAlignmentValue.Opposed，並先用低電壓確認方向",
@@ -78,7 +78,7 @@
       ]
     },
     "q": "應該怎麼改？",
-    "e": "IO 只該在 periodic 呼叫，否則會被下一輪蓋掉，重播也無法重現。預期結果：模式切換後 periodic 穩定送出 3 V。",
+    "e": "IO 只能在 periodic 裡呼叫，不然下一輪就被蓋掉，重播也重現不出來。改成切換模式之後，periodic 會穩定送出 3 V。",
     "lab": "arch",
     "o": [
       "讓 Command 也每輪呼叫 IO",

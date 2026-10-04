@@ -30,7 +30,7 @@
   <div class="note limit"><strong>這個比喻哪裡不準</strong>學校的活動可以真的同時進行，但指令的四個方法是排程器在主迴圈裡一個一個呼叫的，跟第 7 章講的一樣，全部在同一條執行緒上。<code>execute()</code> 裡寫了等待迴圈，整台機器人都會卡住。還有，「後來的優先」只在搶同一個 Subsystem 時才成立，不同 Subsystem 的指令可以同時跑，互不相干。</div>
 
   <h2>Subsystem 的角色</h2>
-  <p>Subsystem 的封裝、繼承和 IO 架構，第 2、3、6 章都講過了。這裡從排程器的角度補一句：Subsystem 是 Command-based 程式的基本單位，也是排程器拿來管資源的單位<a class="ref" href="#src8-2">[2]</a>。繼承 <code>SubsystemBase</code> 會在建構時自動向排程器註冊，所以 <code>periodic()</code> 每輪都會被叫到（第 3 章）。一個實體機構只能有一個 Subsystem 物件，就像體育館只有一間。</p>
+  <p>Subsystem 的封裝、繼承和 IO 架構，第 2、3、6 章都講過了。這裡從排程器的角度補一句：Subsystem 是 Command-based 程式的基本單位，也是排程器拿來管資源的單位<a class="ref" href="#src8-2">[2]</a><a class="ref" href="#src8-4">[4]</a>。繼承 <code>SubsystemBase</code> 會在建構時自動向排程器註冊，所以 <code>periodic()</code> 每輪都會被叫到（第 3 章）。一個實體機構只能有一個 Subsystem 物件，就像體育館只有一間。</p>
 
   <h2>Command 的生命週期</h2>
   <p>指令有四個方法會被排程器呼叫<a class="ref" href="#src8-1">[1]</a>：</p>

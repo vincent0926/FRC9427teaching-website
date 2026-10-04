@@ -1,17 +1,17 @@
   <p class="headline-code">FINAL｜最終程式能力評量</p>
   <h1>最終評量：資格賽第 23 場，手臂掉下來了</h1>
-  <p class="lede">這是一題沒看過的除錯題。你會拿到症狀、日誌、程式和 Pit 裡的檢查結果，要用文字回答七個問題。評分看的是推理、證據和除錯流程，不只是最後答案對不對。</p>
-  <div class="note"><strong>作答規則</strong>先把七題都寫完再送出。送出後會出現參考解答與評分表，你（或教練）逐項勾選答案有沒有涵蓋。可以翻課程，但不要先看參考解答。答案存在這台瀏覽器，可以匯出給教練。</div>
-  <div class="note limit"><strong>關於題目資料</strong>下面的日誌是為了這題編的教學資料，不是真實比賽的紀錄；數值只用來呈現現象，不代表任何機構的實際參數。</div>
+  <p class="lede">這題你之前沒看過。你會拿到症狀、日誌、程式和 Pit 裡的檢查結果，用文字回答七個問題。我們看的是你怎麼推理、拿什麼當證據、除錯的順序對不對，不是只看最後猜中沒有。</p>
+  <div class="note"><strong>作答規則</strong>七題都寫完再送出。送出後會出現參考解答和評分表，你（或教練）一項一項勾答案有沒有講到。可以翻課程，但不要先偷看解答，那樣就沒意義了。答案存在這台瀏覽器裡，可以匯出給教練。</div>
+  <div class="note limit"><strong>關於題目資料</strong>下面的日誌是為了這題編出來的教學資料，不是真的比賽紀錄；數字只是用來呈現現象，不代表任何機構的實際參數。</div>
 
   <h2>狀況</h2>
   <div class="story">
-    <p><strong>資格賽第 23 場。</strong>自動階段第 6 秒，手臂剛舉到得分位置，機器人被對手撞了一下。手臂接著往下掉，停在接近收起的位置。之後整場 Teleop，操作手怎麼按手臂都不動；底盤、Intake、射球都正常。</p>
-    <p><strong>上一場還好好的。</strong>第 22 場打完之後，程式沒有改過，也沒有重新部署。機構組在兩場之間換了手臂的一根軸，有拆裝過手臂附近的線。</p>
+    <p>資格賽第 23 場，自動階段第 6 秒，手臂剛舉到得分位置，機器人就被對手撞了一下。手臂接著往下掉，停在快要收起來的位置。之後整場 Teleop，操作手怎麼按手臂都不動，但底盤、Intake、射球都正常。</p>
+    <p>上一場明明還好好的。第 22 場打完之後程式沒改、也沒重新部署。不過機構組在兩場之間換了手臂的一根軸，有拆裝過手臂附近的線。</p>
   </div>
 
   <h2>證據一：AdvantageKit 日誌</h2>
-  <p>上圖：手臂目標角度（<span class="lg goal">虛線</span>）與實際角度（<span class="lg act">實線</span>）。下圖：leader 記錄到的輸出電壓（<span class="lg act">實線</span>）與 follower 的輸出電壓（<span class="lg goal">虛線</span>）。橫軸是比賽時間（秒）。</p>
+  <p>上圖是手臂的目標角度（<span class="lg goal">虛線</span>）和實際角度（<span class="lg act">實線</span>）。下圖是 leader 記到的輸出電壓（<span class="lg act">實線</span>）和 follower 的輸出電壓（<span class="lg goal">虛線</span>）。橫軸是比賽時間（秒）。</p>
   <canvas id="finalPlotPos" class="pidplot" width="640" height="240" role="img" aria-label="手臂目標與實際角度"></canvas>
   <canvas id="finalPlotDev" class="pidplot" width="640" height="240" role="img" aria-label="兩顆馬達的輸出電壓與連線狀態"></canvas>
   <table class="map">
@@ -57,4 +57,4 @@ follower.setControl(new Follower(leader.getDeviceID(), MotorAlignmentValue.Oppos
   <div id="finalReview"></div>
 
   <h2>之後</h2>
-  <p>負責機構控制的人，建議再做工具站 4F 的「單元四：期末檢核」，它考的是調參與日誌診斷，和這一題互補：<a id="finalToolLink" target="_blank" rel="noopener">打開工具站單元四</a>。</p>
+  <p>管機構控制的人，做完這題建議再去做工具站 4F 的「單元四：期末檢核」，它考的是調參和日誌診斷，剛好跟這題互補：<a id="finalToolLink" target="_blank" rel="noopener">打開工具站單元四</a>。</p>
