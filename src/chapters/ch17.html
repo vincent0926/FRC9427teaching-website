@@ -1,9 +1,9 @@
   <p class="headline-code">CAN ID 17｜上場</p>
   <h1>視覺與定位：看門牌校正位置</h1>
-  <p class="lede">第 16 章說里程計會飄，這章就來把它拉回來。我們會講 AprilTag 是什麼、為什麼視覺量測要「融合」進里程計而不是直接取代它、標準差代表什麼，然後用 Limelight 的 MegaTag2 更新 CTRE swerve 的位置，最後比較兩種瞄準的做法。</p>
+  <p class="lede">第 16 章說里程計會飄，這章講怎麼把它拉回來：AprilTag 是什麼、為什麼視覺量測要「融合」進里程計而不是直接取代它、標準差代表什麼，然後用 Limelight 的 MegaTag2 更新 CTRE swerve 的位置，最後比較兩種瞄準的做法。</p>
   <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 文件和 CTRE Phoenix6-Examples 附的 LimelightHelpers 寫的。Limelight 和 PhotonVision 的韌體、函式庫每年都會更新，用之前對一下當年的版本。延續第 16 章，一樣拿 CTRE swerve 當例子。</div>
 
-  <h2>先講個比喻：看門牌校正位置</h2>
+  <h2>比喻：看門牌校正位置</h2>
   <div class="story">
     <p>回到第 16 章的校外教學：司機靠里程表推算位置，開越久、被擦撞越多次，就偏越多。</p>
     <p>好在路邊有門牌。每棟建築門口都釘著一塊，門牌在地圖上的位置早就標好了。看到門牌，量一下自己離它多遠、在它哪一邊，就能算出自己在地圖上的哪裡。</p>
@@ -52,7 +52,7 @@
     <div class="fuse" id="fuBar" aria-hidden="true"></div>
     <div class="console" id="fuConsole" aria-live="polite"></div>
   </div>
-  <p>這個實驗裡，視覺的標準差是用「0.05 m × 距離²，看到多個標籤就除以標籤數」算的。這只是我拿來示範的經驗式，不是官方公式，實際要用隊上的資料去調。</p>
+  <p>這個實驗裡，視覺的標準差是用「0.05 m × 距離²，看到多個標籤就除以標籤數」算的。這只是示範用的經驗式，不是官方公式，實際要用隊上的資料去調。</p>
 
   <h2>用 Limelight 更新位置</h2>
   <p>CTRE 的 swerve 範例附了一段 Limelight 整合程式，用的是 <code>LimelightHelpers</code> 的 MegaTag2 位置估計<a class="ref" href="#src17-4">[4]</a>。MegaTag2 要先告訴 Limelight 機器人朝哪：呼叫 <code>getBotPoseEstimate_wpiBlue_MegaTag2</code> 之前要先呼叫 <code>SetRobotOrientation</code>，而且 yaw 為 0 代表機器人面向紅方牆面，就是第 16 章「原點在藍方」的場地座標<a class="ref" href="#src17-5">[5]</a>。</p>
@@ -84,7 +84,7 @@ public void robotPeriodic() {
   <p>幾個重點：</p>
   <ul>
     <li><strong>轉太快就丟掉。</strong>CTRE 範例的門檻是每秒 2 圈<a class="ref" href="#src17-4">[4]</a>。範例自己的註解也講了，這段只是示範「可以整合視覺」，一般還要看距離和標籤數去調標準差，實際怎麼做看隊伍需求<a class="ref" href="#src17-4">[4]</a>。</li>
-    <li><strong>時間戳的時基。</strong>範例裡覆寫了 CTRE swerve 的 <code>addVisionMeasurement</code>，用 <code>Utils.fpgaToCurrentTime</code> 把 FPGA 時間轉成 Phoenix 的時基再交給底盤<a class="ref" href="#src17-3">[3]</a>。Tuner X 產生的 <code>CommandSwerveDrivetrain</code> 已經有這段；自己寫的話千萬別漏。</li>
+    <li><strong>時間戳的時基。</strong>範例裡覆寫了 CTRE swerve 的 <code>addVisionMeasurement</code>，用 <code>Utils.fpgaToCurrentTime</code> 把 FPGA 時間轉成 Phoenix 的時基再交給底盤<a class="ref" href="#src17-3">[3]</a>。Tuner X 產生的 <code>CommandSwerveDrivetrain</code> 已經有這段；自己寫的話不能漏掉。</li>
     <li><strong>朝向交給陀螺儀。</strong>第三個標準差設超大，就是照 WPILib 的建議<a class="ref" href="#src17-2">[2]</a>。</li>
   </ul>
   <div class="note"><strong>放進 IO 架構</strong>這章為了跟 CTRE 範例對照，把程式寫在 <code>robotPeriodic</code>。照第 6 章的架構，比較好的寫法是做一個 <code>VisionIO</code>（硬體版讀 Limelight、模擬版回傳空結果；重播時跟第 6 章一樣用空實作，資料由日誌填回），讓 Vision Subsystem 在 periodic 裡拿結果再交給底盤，這樣視覺資料也能被記錄、重播（第 18 章）。</div>
@@ -116,7 +116,7 @@ public Command aimWithTx(DoubleSupplier forward, DoubleSupplier strafe) {
   <p>第二種做法用第 16 章的座標：目標在場上的座標減掉機器人的座標，得到一個向量，它的角度就是機器人該面對的方向，再交給 CTRE 的 <code>FieldCentricFacingAngle</code> 這類「朝向固定角度」的請求。這種做法在紅方時，記得目標座標也要換成紅方那一個。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>看到標籤就直接 resetPose</strong>視覺量測偶爾會跳，直接把位置重設成它，機器人在場上會瞬間「瞬移」，路徑跟隨也跟著亂跑。要用 <code>addVisionMeasurement</code> 融合。</div>
+  <div class="note warn"><strong>看到標籤就直接 resetPose</strong>視覺量測偶爾會跳，直接把位置重設成它，機器人在場上會瞬間跳到別的位置，路徑跟隨也跟著亂跑。要用 <code>addVisionMeasurement</code> 融合。</div>
   <div class="note warn"><strong>時間戳時基用錯</strong>FPGA 時間沒轉換就直接丟給 CTRE swerve，估計器會把量測對到錯的時間點，位置被拉來拉去。</div>
   <div class="note warn"><strong>相機位置沒量準</strong>Limelight 要知道相機裝在機器人哪裡、朝什麼角度。這組數字錯了，所有視覺位置都會偏。</div>
   <div class="note warn"><strong>忘了呼叫 SetRobotOrientation</strong>MegaTag2 需要機器人的朝向，沒給的話結果不能信。</div>

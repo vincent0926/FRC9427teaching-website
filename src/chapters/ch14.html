@@ -1,9 +1,9 @@
   <p class="headline-code">CAN ID 14｜控制</p>
   <h1>MotionMagic：校車司機怎麼開到下一站</h1>
-  <p class="lede">第 6 章其實已經偷偷用了 <code>MotionMagicVoltage</code>，這章來解釋它到底在做什麼。為什麼不能直接把目標丟給 PID？梯形和 S-curve 軌跡長怎樣？巡航速度、加速度、jerk 要怎麼設？最後順便比較 MotionMagic Expo 和 Dynamic MotionMagic。</p>
+  <p class="lede">第 6 章其實已經用過 <code>MotionMagicVoltage</code>，這章來解釋它到底在做什麼。為什麼不能直接把目標丟給 PID？梯形和 S-curve 軌跡長怎樣？巡航速度、加速度、jerk 要怎麼設？最後順便比較 MotionMagic Expo 和 Dynamic MotionMagic。</p>
   <div class="note"><strong>版本說明</strong>這章是照 Phoenix 6 的 2026 版（26.x）文件寫的。</div>
 
-  <h2>先講個比喻：校車開到下一站</h2>
+  <h2>比喻：校車開到下一站</h2>
   <div class="story">
     <p>新手校車司機只看距離：下一站還很遠，油門就踩到底；快到了才猛踩煞車。車上同學一下往後倒、一下往前撲，書包掉滿地。這就是第 13 章只用 P 的樣子：一開始誤差很大，輸出直接衝到最大。</p>
     <p>老司機不一樣，他出發前就有一張行車計畫：用固定的加速度慢慢起步，到速限就維持巡航，算好距離提早減速，剛好停在站牌前。每一秒車子該在哪、該開多快，全都在計畫裡。</p>
@@ -90,13 +90,13 @@ public void setPositionGoal(double positionRot) {
     </tbody>
   </table>
   <p><strong>MotionMagic Expo</strong>：它產生的是指數型軌跡，最貼近系統本身的動態，跟梯形比，過衝和到位時間都可以一起變少。它有自己的 <code>MotionMagicExpo_kV</code> 和 <code>MotionMagicExpo_kA</code>（單位固定是伏特），供電電壓除以 kV 就是軌跡的最高速度；巡航速度設 0 的話，會往系統的最高速度加速<a class="ref" href="#src14-2">[2]</a>。這兩個值可以直接拿第 15 章 SysId 算出來的 kV、kA 當起點。</p>
-  <div class="note warn"><strong>Dynamic MotionMagic 沒有 Pro 會直接停止輸出</strong>這點跟 EnableFOC 不一樣（第 11 章）：沒授權的 TalonFX 用 Dynamic MotionMagic，會<strong>直接關掉輸出</strong>，還觸發 <code>UnlicensedFeatureInUse</code> 故障<a class="ref" href="#src14-2">[2]</a>。我們沒有 Pro，所以不要用它。</div>
+  <div class="note warn"><strong>Dynamic MotionMagic 沒有 Pro 會直接停止輸出</strong>這點跟 EnableFOC 不一樣（第 11 章）：沒授權的 TalonFX 用 Dynamic MotionMagic，會<strong>直接關掉輸出</strong>，還觸發 <code>UnlicensedFeatureInUse</code> 故障<a class="ref" href="#src14-2">[2]</a>。沒有 Pro 就不要用它。</div>
 
   <h2>在 roboRIO 上做同樣的事</h2>
   <p>如果馬達控制器沒有內建軌跡功能，或是像第 6 章 D-3 那樣在模擬裡自己算，WPILib 有 <code>TrapezoidProfile</code> 可以產生軌跡，<code>ProfiledPIDController</code> 則是把軌跡跟 PID 包在一起<a class="ref" href="#src14-1">[1]</a><a class="ref" href="#src14-3">[3]</a>。CTRE 也示範過用 <code>TrapezoidProfile</code> 每 20 ms 算一個點，再把位置和速度丟給 <code>PositionVoltage</code><a class="ref" href="#src14-4">[4]</a>。不過能用 MotionMagic 的話，讓控制器自己跑（1 kHz）比較簡單，也比較不會被 roboRIO 迴圈延遲影響。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>單位填錯</strong>設了 <code>SensorToMechanismRatio</code> 之後，巡航速度和加速度都是<strong>機構端</strong>的 rot/s、rot/s²。把馬達端的數字填進去，手臂會快上幾十倍，很恐怖。</div>
+  <div class="note warn"><strong>單位填錯</strong>設了 <code>SensorToMechanismRatio</code> 之後，巡航速度和加速度都是<strong>機構端</strong>的 rot/s、rot/s²。把馬達端的數字填進去，手臂會快上幾十倍。</div>
   <div class="note warn"><strong>巡航速度超過機構能力</strong>軌跡跑得比馬達給得出來的還快，輸出飽和，實際位置越落越後，到終點附近很容易衝過頭。先用 12 ÷ kV 估一下上限。</div>
   <div class="note warn"><strong>每一輪都 new 請求物件</strong><code>new MotionMagicVoltage(...)</code> 放在 periodic 裡會一直產生垃圾物件。建一次，用 <code>withPosition</code> 改目標就好。</div>
   <div class="note warn"><strong>以為 jerk 越大越好</strong>jerk 是 S-curve 的「圓滑程度」，數字<strong>越小</strong>越圓滑、也越慢；設 0 是完全不限制（梯形）。很多人以為反過來。</div>
@@ -105,7 +105,7 @@ public void setPositionGoal(double positionRot) {
   <div class="quiz"></div>
 
   <h2>練習：升降機構的兩種速度</h2>
-  <p>升降機構平常用正常速度，但機器人夾著遊戲物件的時候要慢一點，免得甩掉。我們沒有 Pro，不能用 Dynamic MotionMagic。你會怎麼做？寫出關鍵的程式。</p>
+  <p>升降機構平常用正常速度，但機器人夾著遊戲物件的時候要慢一點，免得甩掉。假設沒有 Pro，不能用 Dynamic MotionMagic。你會怎麼做？寫出關鍵的程式。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
       <p>不能用 Dynamic MotionMagic，就只剩「改設定」這條路。想想看：設定要在什麼時候改、多久改一次？</p>

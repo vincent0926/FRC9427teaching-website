@@ -64,7 +64,7 @@
         // 因為父類別建構子已經註冊，這裡每個週期都會被呼叫
     }
 }</code></pre>
-  <p>規則是這樣：子類別的建構子如果沒有自己呼叫父類別建構子，編譯器會偷偷在第一行補一個 <code>super()</code>，呼叫父類別的無參數建構子；如果你要自己寫，就一定要寫在第一行<a class="ref" href="#src3-2">[2]</a>。這就是「先辦老師報到」：<code>IntakeSubsystem</code> 一建立，<code>SubsystemBase</code> 那部分就先把註冊做完了。</p>
+  <p>規則是這樣：子類別的建構子如果沒有自己呼叫父類別建構子，編譯器會自動在第一行補一個 <code>super()</code>，呼叫父類別的無參數建構子；如果你要自己寫，就一定要寫在第一行<a class="ref" href="#src3-2">[2]</a>。這就是「先辦老師報到」：<code>IntakeSubsystem</code> 一建立，<code>SubsystemBase</code> 那部分就先把註冊做完了。</p>
 
   <h2>換成機器人：介面與多型</h2>
   <p>第 6 章的 IO 架構整個都是靠介面撐起來的，這裡先看個骨架就好：</p>
@@ -120,7 +120,7 @@ io.stop();          // 兩個實作都沒寫 stop()，用的是介面的預設�
 
   <h2>常見錯誤</h2>
   <div class="note warn"><strong>implements 了介面，方法卻沒寫完</strong>介面裡沒有 default 的方法，實作的類別全部都要寫出來，少一個就編譯失敗。錯誤訊息通常長這樣：「is not abstract and does not override abstract method ...」。看到就回去對照介面，找漏掉的是哪一個。</div>
-  <div class="note coach"><strong>教練提醒</strong>每個覆寫的方法前面都要加 <code>@Override</code>。這是隊上的規定，不是看心情。編譯器免費幫你檢查，不用白不用。</div>
+  <div class="note coach"><strong>教練提醒</strong>每個覆寫的方法前面都要加 <code>@Override</code>。這是隊上的規定。編譯器會免費幫你做這個檢查。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>

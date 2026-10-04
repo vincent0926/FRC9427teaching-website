@@ -2,7 +2,7 @@
   <h1>封裝：成績簿不能放在講台上</h1>
   <p class="lede">你會發現隊上的程式裡，欄位幾乎都寫成 <code>private</code>。這章講為什麼要這樣，順便把四種存取層級講清楚，最後回到機器人：為什麼 Subsystem 不能讓外面直接碰馬達。</p>
 
-  <h2>先講個比喻：一本成績簿的遭遇</h2>
+  <h2>比喻：一本成績簿的遭遇</h2>
   <div class="story">
     <p>有一班把成績簿放在講台上，誰都能翻、誰都能寫。一開始沒事，後來有人把自己的數學改成 150 分，又有人不小心把別人的分數寫進自己那格。期末算成績的時候，導師發現分數兜不起來，但根本查不出是誰、什麼時候改的。</p>
     <p>學校只好訂新規定：成績簿鎖進導師的抽屜，學生拿不到。要登記成績只有一個管道，就是交給任課老師，由老師寫進去。老師每次登記前都會檢查分數是不是在 0 到 100 之間，不對就直接退回。</p>
@@ -34,7 +34,7 @@
       <tr><td><code>public</code></td><td>可以</td><td>可以</td><td>可以</td><td>可以</td><td>公布欄</td></tr>
     </tbody>
   </table>
-  <p>第二列不是我漏寫。欄位或方法前面<strong>什麼都不加</strong>，本身就是一種存取層級，叫 package-private（Oracle 文件叫它 no modifier），例如 <code>int seatNumber;</code>。因為它是預設值，很容易不知不覺就用到了<a class="ref" href="#src2-2">[2]</a>。</p>
+  <p>第二列不是漏寫。欄位或方法前面<strong>什麼都不加</strong>，本身就是一種存取層級，叫 package-private（Oracle 文件叫它 no modifier），例如 <code>int seatNumber;</code>。因為它是預設值，很容易不知不覺就用到了<a class="ref" href="#src2-2">[2]</a>。</p>
   <p>「套件」第 5 章才會講，「子類別」是第 3 章。現在只要記住 Oracle 教學給的原則：沒有好理由的話，就用最嚴格的那一層；除了常數以外，不要有 public 欄位<a class="ref" href="#src2-2">[2]</a>。</p>
 
   <div class="note limit"><strong>這個比喻哪裡不準</strong>日記是「每個人」各自的，但 Java 的 <code>private</code> 是以「類別」為單位，不是以物件為單位。同一個類別裡的程式碼，可以讀寫另一個同類別物件的 private 欄位。換句話說，在 <code>Roller</code> 類別裡面，<code>intake</code> 的方法其實看得到 <code>feeder</code> 的 <code>voltage</code>。</div>
@@ -82,7 +82,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   <h2>常見錯誤</h2>
   <div class="note warn"><strong>把整本成績簿交出去</strong>欄位寫了 <code>private TalonFX roller</code>，結果又加一個 <code>public TalonFX getRoller()</code>。外面拿到物件一樣可以直接 <code>setControl</code>，等於白封裝。getter 應該回傳資料（轉速、位置），不要回傳可以被操作的硬體物件。</div>
-  <div class="note coach"><strong>教練提醒</strong>Code review 的時候，我第一眼就是看 Subsystem 裡有沒有 public 的硬體欄位，或是會回傳硬體的 getter。有的話，這個 Subsystem 的規則遲早會被某個 Command 繞過去。</div>
+  <div class="note coach"><strong>教練提醒</strong>Code review 時，第一個要看的就是 Subsystem 裡有沒有 public 的硬體欄位，或是會回傳硬體的 getter。有的話，這個 Subsystem 的規則遲早會被某個 Command 繞過去。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>

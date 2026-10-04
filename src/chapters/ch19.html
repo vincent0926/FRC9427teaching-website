@@ -3,7 +3,7 @@
   <p class="lede">最後一章，講的是比賽當天。程式寫得再好，上場前忘了檢查一樣會出事。這章整理出發前、每場比賽前、每場比賽後要檢查什麼，怎麼從 Driver Station 看出 brownout、roboRIO 重開或網路問題，還有兩場比賽之間那一點點時間，要照什麼順序找問題、改程式要守哪些規矩。</p>
   <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 文件（roboRIO 和 NI Driver Station）寫的。2027 年起控制系統會換成 SystemCore，Driver Station 和一些檢查項目會不一樣。這裡的檢查清單是官方文件加上很多隊伍常見的做法，請依隊上的機器人自己調整。</div>
 
-  <h2>先講個比喻：考試當天</h2>
+  <h2>比喻：考試當天</h2>
   <div class="story">
     <p>准考證、2B 鉛筆、橡皮擦、手錶，前一晚就要放進袋子。考試當天早上才發現鉛筆沒削，就來不及了。</p>
     <p>每節考試進場前再摸一下：准考證在嗎？座位號碼對嗎？手機關了嗎？這些檢查很無聊，但一節考試就只有一次機會。</p>
@@ -42,7 +42,7 @@
   </ul>
 
   <h2>每場比賽前</h2>
-  <p>Driver Station 這邊要做的<a class="ref" href="#src19-2">[2]</a><a class="ref" href="#src19-1">[1]</a>：前一場還沒結束就先把筆電開機登入；關掉用不到的程式；<strong>一定要帶筆電充電器</strong>上場，因為插著電的時候 Windows 的電源管理比較不會亂來，Driver Station 比較穩；用魔鬼氈把筆電黏在操作台上。現場要關掉 Windows 防火牆和 Wi-Fi<a class="ref" href="#src19-2">[2]</a>。</p>
+  <p>Driver Station 這邊要做的<a class="ref" href="#src19-2">[2]</a><a class="ref" href="#src19-1">[1]</a>：前一場還沒結束就先把筆電開機登入；關掉用不到的程式；<strong>一定要帶筆電充電器</strong>上場，因為插著電的時候 Windows 的電源管理比較不激進，Driver Station 比較穩；用魔鬼氈把筆電黏在操作台上。現場要關掉 Windows 防火牆和 Wi-Fi<a class="ref" href="#src19-2">[2]</a>。</p>
   <p>下面是程式組可以直接拿去用的檢查清單：</p>
   <table class="map">
     <thead><tr><th>項目</th><th>怎麼確認</th><th>相關章節</th></tr></thead>
@@ -115,7 +115,7 @@
   <div class="note warn"><strong>比賽中 Windows 開始更新</strong>出發前沒暫停更新、沒設使用時段，結果要上場了筆電還在重開機。</div>
   <div class="note warn"><strong>把 brownout 當成程式 bug</strong>機構突然停一下又恢復，先看 12V fault 計數和 DS Log 的電壓，不要急著改程式。</div>
   <div class="note warn"><strong>用 USB 線測線材</strong>搖線測試要用網路線連，不是 USB，不然測不到機器人上真正的通訊路徑<a class="ref" href="#src19-1">[1]</a>。</div>
-  <div class="note warn"><strong>在 Pit 大改程式</strong>兩場之間重寫一整個指令、沒時間測就上場，結果常常比原本的問題還慘。</div>
+  <div class="note warn"><strong>在 Pit 大改程式</strong>兩場之間重寫一整個指令、沒時間測就上場，結果常常比原本的問題更嚴重。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
@@ -155,7 +155,7 @@ public void updatePreMatchAlerts() {
         &amp;&amp; batteryDebounce.calculate(RobotController.getBatteryVoltage() &lt; LOW_BATTERY_VOLTS));
     noAuto.set(disabled &amp;&amp; autoChooser.getSelected() == doNothing);
 }</code></pre>
-    <p>講幾個重點：電壓會跳，所以用 <code>Debouncer</code> 要求持續 1 秒低於門檻才警告（第 12 章）；只在 Disabled 時檢查，因為比賽中大電流時電壓本來就會掉。<code>buildAutoChooser()</code> 的預設選項是它裡面自己 new 的 <code>Commands.none()</code>，程式拿不到那個物件；所以這裡自己建選單，把自己的 <code>doNothing</code> 當預設，就能用 <code>==</code> 判斷有沒有換過。用 AdvantageKit 的話，選單換成第 18 章的 <code>LoggedDashboardChooser</code>，判斷方式一樣。Alert 會自動被 AdvantageKit 記下來（第 18 章），賽後也查得到。</p>
+    <p>幾個重點：電壓會跳，所以用 <code>Debouncer</code> 要求持續 1 秒低於門檻才警告（第 12 章）；只在 Disabled 時檢查，因為比賽中大電流時電壓本來就會掉。<code>buildAutoChooser()</code> 的預設選項是它裡面自己 new 的 <code>Commands.none()</code>，程式拿不到那個物件；所以這裡自己建選單，把自己的 <code>doNothing</code> 當預設，就能用 <code>==</code> 判斷有沒有換過。用 AdvantageKit 的話，選單換成第 18 章的 <code>LoggedDashboardChooser</code>，判斷方式一樣。Alert 會自動被 AdvantageKit 記下來（第 18 章），賽後也查得到。</p>
     </div>
   </div>
 

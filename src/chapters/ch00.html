@@ -3,9 +3,9 @@
   <p class="lede">寫程式之前，電腦要先準備好。這章會帶你裝軟體、建第一個專案、認識專案裡那一堆檔案，順便學會用 Git 把程式存好，最後把程式送上機器人。東西有點雜，但每一步都會用到，跳過的話後面一定會卡。</p>
   <div class="note"><strong>版本說明</strong>這章是照 2026 賽季的官方文件寫的（WPILib 2026.2.1、Phoenix 6 2026 版）。WPILib 已經在做 2027 年的 Systemcore 控制系統<a class="ref" href="#src0-9">[9]</a>，到時候安裝流程和套件名稱大概會變，看到這裡的時候如果已經是 2027 年，請以當年的文件為準。</div>
 
-  <h2>先講個比喻：開學前的準備</h2>
+  <h2>比喻：開學前的準備</h2>
   <div class="story">
-    <p>想像程式組每年都會分到一間專用教室，門牌上寫著年份，像是「2026 程式教室」。上課就是要進這間，不能在自己家的書桌上課，因為家裡的書桌堆了一堆別的東西，習慣也不一樣，拿來上這門課很容易出包。去年的教室也不用拆，新舊兩間可以同時存在。</p>
+    <p>想像程式組每年都會分到一間專用教室，門牌上寫著年份，像是「2026 程式教室」。上課就是要進這間，不能在自己家的書桌上課，因為家裡的書桌堆了一堆別的東西，習慣也不一樣，拿來上這門課很容易出錯。去年的教室也不用拆，新舊兩間可以同時存在。</p>
     <p>教室裡的課本、字典、計算機、印表機，學校一次幫你配好，而且跟你家裡的東西分開放。你不用自己去買，學校發了新字典也不會把你家那本換掉。</p>
     <p>課本以外的參考書，例如某家出版社的馬達專書，不是塞在書包裡就算數，要寫進<strong>班級書單</strong>。書單是跟著班級走的，誰拿到這個班的書單，就知道要準備哪幾本、哪個版本。換新學年，書單上的版本也要重新確認一次。</p>
     <p>教室的配置是固定的。門口有警衛室，負責開門讓大家進來，學生不用、也不該進去亂改。黑板旁邊貼著課表和鐘聲時間，決定每節課什麼時候開始和結束。講桌上有座位表和幹部名單，寫清楚誰坐哪、誰負責什麼。後面有公布欄，貼著全班都要遵守的規定。角落還有一個置物櫃，裡面的東西會跟著全班一起帶去校外教學。</p>
@@ -46,18 +46,18 @@
   <p>2026 賽季的 WPILib 是 2026.2.1 版（2026 年 1 月 16 日發布）。另外 2026 年的 roboRIO 要刷新的映像檔，映像檔要從 2026 版的 FRC Game Tools 拿<a class="ref" href="#src0-1">[1]</a>，用舊的不行。</p>
 
   <h3>安裝時容易踩的雷</h3>
-  <p>WPILib 會<strong>另外</strong>裝一份 VS Code，不會用你電腦原本那份。每年各一份，名稱會帶年份，像 <code>WPILib VS Code 2026</code>。打開專案的時候要開這一份，不是系統原本的 VS Code<a class="ref" href="#src0-1">[1]</a>，這個新手超常搞錯。</p>
+  <p>WPILib 會<strong>另外</strong>裝一份 VS Code，不會用你電腦原本那份。每年各一份，名稱會帶年份，像 <code>WPILib VS Code 2026</code>。打開專案的時候要開這一份，不是系統原本的 VS Code<a class="ref" href="#src0-1">[1]</a>，新手常常在這裡搞錯。</p>
   <p>它附的 JDK 會和你電腦裡其他 JDK 共存，不會去動 <code>JAVA_HOME</code><a class="ref" href="#src0-1">[1]</a>，所以你之前裝過 Java 也不用擔心。</p>
   <p>不要用 VS Code 的設定同步功能，在一般 VS Code 和 WPILib VS Code 之間同步設定，官方說這樣可能會讓其中一邊壞掉<a class="ref" href="#src0-1">[1]</a>。</p>
   <p>WPILib 每年都裝在不同資料夾，去年的版本不用先移除<a class="ref" href="#src0-1">[1]</a>。不過去年的專案要用匯入功能轉成今年的格式，vendor 函式庫也要重新加一次，因為去年的版本跟今年的專案不相容<a class="ref" href="#src0-1">[1]</a>。</p>
 
   <h2>建一個新專案</h2>
-  <p>在 WPILib VS Code 按 <code>Ctrl+Shift+P</code>，打 WPILib，選 Create a new project<a class="ref" href="#src0-3">[3]</a>。專案類型選 Template、語言選 Java、範本選 Command Robot。Command-based 範本是建在 <code>TimedRobot</code> 上的，官方也很推薦新隊伍用這個<a class="ref" href="#src0-3">[3]</a>，我們隊上也是用這個。</p>
+  <p>在 WPILib VS Code 按 <code>Ctrl+Shift+P</code>，打 WPILib，選 Create a new project<a class="ref" href="#src0-3">[3]</a>。專案類型選 Template、語言選 Java、範本選 Command Robot。Command-based 範本是建在 <code>TimedRobot</code> 上的，官方也很推薦新隊伍用這個<a class="ref" href="#src0-3">[3]</a>。</p>
   <p>建立的時候要填隊號。隊號會拿來當專案的套件名稱，部署時也是靠它找到機器人<a class="ref" href="#src0-3">[3]</a>，它存在專案的 <code>.wpilib/wpilib_preferences.json</code> 裡。</p>
   <div class="note warn"><strong>專案不要放在 OneDrive</strong>官方直接講明不支援在 OneDrive 上建專案，因為 OneDrive 的快取會干擾建置系統。麻煩的是有些 Windows 預設就把「文件」和「桌面」放在 OneDrive 上<a class="ref" href="#src0-3">[3]</a>，你可能自己都沒發現。最簡單的做法是開一個 <code>C:\frc\</code> 之類的資料夾，機器人專案全部放那邊。</div>
 
   <h2>專案裡有什麼</h2>
-  <p>Command-based 專案建好之後大概長這樣，我只列你現在需要知道的：</p>
+  <p>Command-based 專案建好之後大概長這樣，這裡只列出現在需要知道的部分：</p>
   <pre><code>MyRobot/
 ├── build.gradle                  // 建置設定（GradleRIO），一般不需要改
 ├── .wpilib/
@@ -97,7 +97,7 @@
   <p>放在 <code>src/main/deploy</code> 裡的檔案，部署的時候會一起傳到 roboRIO 的 <code>/home/lvuser/deploy</code><a class="ref" href="#src0-8">[8]</a>。第 16 章的自動路徑檔就是放這裡。程式裡要拿這個資料夾的位置，用 <code>Filesystem.getDeployDirectory()</code>，不要自己把路徑寫死<a class="ref" href="#src0-8">[8]</a>。</p>
 
   <h2>編譯與部署</h2>
-  <p>在 WPILib 選單選 Deploy Robot Code，或直接按 <code>Shift+F5</code>。它會視需要先編譯，再把程式送到 roboRIO。成功的話會看到 Build Successful，接著跳出 RioLog 顯示機器人程式的輸出<a class="ref" href="#src0-7">[7]</a>。部署到一半千萬不要把機器人電源關掉<a class="ref" href="#src0-7">[7]</a>。</p>
+  <p>在 WPILib 選單選 Deploy Robot Code，或直接按 <code>Shift+F5</code>。它會視需要先編譯，再把程式送到 roboRIO。成功的話會看到 Build Successful，接著跳出 RioLog 顯示機器人程式的輸出<a class="ref" href="#src0-7">[7]</a>。部署到一半不要關掉機器人電源<a class="ref" href="#src0-7">[7]</a>。</p>
   <p>Build 和 Deploy 有個差別要知道：Build Robot Code 會上網下載依賴、跑單元測試，Deploy Robot Code 不會<a class="ref" href="#src0-7">[7]</a>。所以你新增或更新 vendordep 之後，要找有網路的地方先 Build 一次。</p>
   <div class="note coach"><strong>教練提醒：出發比賽前，在家 Build 一次</strong>比賽場館的網路很不可靠，而且機器人連的是場地的無線網路。出發前一定要在有網路的地方把專案完整 Build 過，確定依賴都下載到筆電上了，不然到現場你會發現怎麼樣都部署不上去。</div>
 
@@ -138,7 +138,7 @@
     </tbody>
   </table>
   <p>要注意，比賽時連上 FMS 之後，這些 Enable、Disable、E-Stop 快捷鍵通通沒用，要停只能按場地操作台上的 E-Stop 按鈕<a class="ref" href="#src0-10">[10]</a>。</p>
-  <div class="note coach"><strong>教練提醒：Enable 前一定要喊</strong>每次 Enable 前都大聲喊「Enable！」，確定機器人旁邊沒有人、沒有人的手在機構裡，手指隨時放在空白鍵或 Enter 上。這是隊上的安全規定，沒有例外，學長姐也一樣要喊。</div>
+  <div class="note coach"><strong>教練提醒：Enable 前一定要喊</strong>每次 Enable 前都大聲喊「Enable！」，確定機器人旁邊沒有人、沒有人的手在機構裡，手指隨時放在空白鍵或 Enter 上。這是隊上的安全規定，沒有例外。</div>
 
   <h2>常見錯誤</h2>
   <div class="note warn"><strong>開錯 VS Code</strong>用系統原本的 VS Code 開機器人專案，會找不到 WPILib 選單，也沒辦法建置。看一下標題列或開始選單，確定開的是 <code>WPILib VS Code 2026</code>。</div>

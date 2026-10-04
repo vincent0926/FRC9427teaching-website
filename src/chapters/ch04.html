@@ -2,7 +2,7 @@
   <h1>Lambda 與方法參考：給代課老師的字條</h1>
   <p class="lede">Command-based 的程式裡到處都是 <code>() -&gt;</code> 和 <code>::</code>，第一次看會覺得很像亂碼。這章把它們拆開講，重點是分清楚「把做法交出去」跟「當場執行」的差別。搞懂這個，你就不會踩到那個每屆都有人踩的搖桿 bug。</p>
 
-  <h2>先講個比喻：導師出差前留的字條</h2>
+  <h2>比喻：導師出差前留的字條</h2>
   <div class="story">
     <p>導師明天要出差，放學前在講桌上留了一疊字條給代課老師。重點是：導師在寫字條的當下，什麼事都沒發生，沒有人被叫去做事。字條裡裝的是「做法」，要等代課老師在對的時間拿起來照做。</p>
     <p>字條大概有四種。第一種單純交代一件事：「第一節下課請值日生擦黑板。」照做就好，不用回報。第二種是查一個數字：「看一下教室幾度。」查完會拿到一個數字。第三種是判斷是或否：「看一下外面有沒有下雨。」答案只有有或沒有。第四種是對某個人做事：「把這份考卷發給＿＿＿。」代課老師要在空格填一個人再照做。</p>
@@ -64,7 +64,7 @@ drive.setDefaultCommand(
     drive.run(() -&gt; drive.arcadeDrive(-controller.getLeftY(), -controller.getRightX())));</code></pre>
   <p>讀搖桿那段寫在 lambda 裡面，所以指令每次執行（每 20 毫秒）都會重讀一次。前面加負號，是因為搖桿往前推的時候 Y 軸讀到的是負的。</p>
 
-  <div class="note"><strong>字條上的名字不能改</strong>Lambda 裡只能用 final 或「實際上沒被改過」（effectively final）的區域變數<a class="ref" href="#src4-4">[4]</a>。上面錯誤範例的 <code>speed</code> 剛好就是 effectively final，所以編譯器一聲不吭。這也是這個 bug 難抓的原因：程式完全合法，只是邏輯錯了。</div>
+  <div class="note"><strong>字條上的名字不能改</strong>Lambda 裡只能用 final 或「實際上沒被改過」（effectively final）的區域變數<a class="ref" href="#src4-4">[4]</a>。上面錯誤範例的 <code>speed</code> 剛好就是 effectively final，所以編譯器不會報錯。這也是這個 bug 難抓的原因：程式完全合法，只是邏輯錯了。</div>
 
   <h2>BooleanSupplier 與 Trigger</h2>
   <pre><code>// 按住 A 鍵時吸入
@@ -75,7 +75,7 @@ new Trigger(() -&gt; controller.getRightTriggerAxis() &gt; 0.5)
     .whileTrue(intake.runRoller(-6.0));</code></pre>
   <p><code>Trigger</code> 的建構子收一個 <code>BooleanSupplier</code>，就是「看一下有沒有下雨」那種字條，排程器每個週期都會拿起來看一次。</p>
 
-  <div class="note coach"><strong>教練提醒</strong>只要聽到「搖桿推了機器人沒反應」或「數值永遠是 0」，先去看讀搖桿的那行是不是寫在 lambda 外面。這個 bug 每一屆新生都會遇到，真的每一屆。</div>
+  <div class="note coach"><strong>教練提醒</strong>只要聽到「搖桿推了機器人沒反應」或「數值永遠是 0」，先去看讀搖桿的那行是不是寫在 lambda 外面。這個 bug 幾乎每一屆新生都會遇到。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>

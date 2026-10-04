@@ -1,9 +1,9 @@
   <p class="headline-code">CAN ID 12｜硬體</p>
   <h1>感測器與 CAN 除錯：計步器、刻度尺和廣播線</h1>
-  <p class="lede">機器人要知道自己在哪，靠的是感測器；感測器要能讀到，靠的是 CAN。這章講 TalonFX 內建編碼器和 CANcoder 差在哪、CANcoder 零點怎麼設、極限開關怎麼接、怎麼歸零。最後是我覺得最實用的部分：CAN 上找不到裝置的時候，照什麼順序查。</p>
+  <p class="lede">機器人要知道自己在哪，靠的是感測器；感測器要能讀到，靠的是 CAN。這章講 TalonFX 內建編碼器和 CANcoder 差在哪、CANcoder 零點怎麼設、極限開關怎麼接、怎麼歸零。最後是最實用的部分：CAN 上找不到裝置的時候，照什麼順序查。</p>
   <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 和 Phoenix 6 的 2026 版（26.x）文件寫的。CANcoder 的 <code>AbsoluteSensorRange</code> 從 2025 年起改名叫 <code>AbsoluteSensorDiscontinuityPoint</code>，網路上舊範例還會看到舊名字。</div>
 
-  <h2>先講個比喻：班長的計步器、牆上的刻度尺</h2>
+  <h2>比喻：班長的計步器、牆上的刻度尺</h2>
   <div class="story">
     <p>班長身上戴著一個計步器，走一步就加一，很靈敏、反應很快。但它只知道「從早上戴上到現在走了幾步」，每天早上都從 0 開始算。昨天放學班長停在走廊中間，今天早上計步器一樣從 0 開始，它根本不知道自己在哪。</p>
     <p>走廊牆上則有一把刻度尺，什麼時候看都能直接讀出「現在在第幾公尺」，一大早看也是對的。只是刻度尺裝上去的時候，0 不一定剛好對準走廊起點，所以要記一個「校正值」，讀到的數字加上校正值才是真的位置。</p>
@@ -65,7 +65,7 @@ config.Feedback.SensorToMechanismRatio = 1.0; // TODO: CANcoder 轉數 / 手臂�
 config.Feedback.RotorToSensorRatio = 1.0;     // TODO: 馬達轉數 / CANcoder 轉數
 // ...其他設定同第 6 章
 armLeader.getConfigurator().apply(config);</code></pre>
-  <p>注意，這時候「sensor」換人了：用遠端 CANcoder 時，<code>SensorToMechanismRatio</code> 是 <strong>CANcoder 到手臂</strong>的比例。CANcoder 直接裝在手臂轉軸上就是 1.0，不是馬達的齒輪比。這個超容易填錯。</p>
+  <p>注意，這時候「sensor」換人了：用遠端 CANcoder 時，<code>SensorToMechanismRatio</code> 是 <strong>CANcoder 到手臂</strong>的比例。CANcoder 直接裝在手臂轉軸上就是 1.0，不是馬達的齒輪比。這裡很容易填錯。</p>
   <table class="map">
     <thead><tr><th>FeedbackSensorSource</th><th>做什麼</th><th>需要 Pro</th></tr></thead>
     <tbody>
@@ -87,7 +87,7 @@ armLeader.getConfigurator().apply(config);</code></pre>
       <tr><td>常閉（NC），接地</td><td><code>false</code></td><td><code>true</code></td><td><code>true</code>（看起來像碰到）</td></tr>
     </tbody>
   </table>
-  <p>用常開開關，線掉了程式會以為「還沒到底」，繼續往下推；用常閉開關，線掉了程式會以為「已經到底」，機構就停住了。後者比較安全，因為壞掉的時候是停，不是撞。這是我們選接法的理由，不是唯一答案，但不管怎麼接，這張表一定要寫在程式註解裡。</p>
+  <p>用常開開關，線掉了程式會以為「還沒到底」，繼續往下推；用常閉開關，線掉了程式會以為「已經到底」，機構就停住了。後者比較安全，因為壞掉的時候是停，不是撞。這是選接法的理由，不是唯一答案，但不管怎麼接，這張表一定要寫在程式註解裡。</p>
   <pre><code>/** 常閉開關接 DIO 0：碰到或線掉了都回傳 true。 */
 private final DigitalInput bottomLimit = new DigitalInput(0); // TODO: 依接線
 
@@ -107,10 +107,10 @@ public boolean atBottom() {
 
   <h2>CAN 的接法</h2>
   <p>CAN 建議用 daisy-chain 接法：從 roboRIO 出發，一個裝置進、一個裝置出，最後接到 PDP。黃線是 CAN-High、綠線是 CAN-Low<a class="ref" href="#src12-10">[10]</a>。CAN 網路兩端都要有一顆 120 Ω 的終端電阻，roboRIO 和 PDP 都內建了，所以才建議從 roboRIO 開始、PDP 結束<a class="ref" href="#src12-10">[10]</a>。CANivore 也內建終端電阻，用 CANivore 的話就是「CANivore ↔ 裝置 ↔ 120 Ω 電阻」<a class="ref" href="#src12-11">[11]</a>。</p>
-  <p>檢查接線有一招很好用：<strong>斷電</strong>之後拿電錶量 CAN-H 和 CAN-L 之間的電阻，應該大約 60 Ω（兩顆 120 Ω 並聯）。量到 120 Ω 就是只有一端有終端<a class="ref" href="#src12-11">[11]</a>。</p>
+  <p>檢查接線有一個好方法：<strong>斷電</strong>之後拿電錶量 CAN-H 和 CAN-L 之間的電阻，應該大約 60 Ω（兩顆 120 Ω 並聯）。量到 120 Ω 就是只有一端有終端<a class="ref" href="#src12-11">[11]</a>。</p>
 
   <h2>找不到裝置時的除錯順序</h2>
-  <p>CAN 的問題說穿了通常只有兩種：同型號的裝置用了一樣的 ID（出廠預設都是 0），或是 CAN 線接錯、接不牢。最麻煩的是兩種同時發生<a class="ref" href="#src12-11">[11]</a>。照 CTRE 建議的順序查：</p>
+  <p>CAN 的問題通常只有兩種：同型號的裝置用了一樣的 ID（出廠預設都是 0），或是 CAN 線接錯、接不牢。最麻煩的是兩種同時發生<a class="ref" href="#src12-11">[11]</a>。照 CTRE 建議的順序查：</p>
   <ol>
     <li><strong>看 Tuner X。</strong>同型號、同 ID 的裝置會變成紅色卡片，標示衝突<a class="ref" href="#src12-11">[11]</a>。注意是「同型號」：TalonFX 21 和 CANcoder 21 不會衝突，兩顆 TalonFX 21 才會。</li>
     <li><strong>看哪些裝置不見了。</strong>daisy-chain 某一段斷掉，斷點後面的裝置會全部消失。找出「最後一個還在的」和「第一個不見的」，問題就在這兩個中間。</li>
@@ -122,7 +122,7 @@ public boolean atBottom() {
   <p>看燈號也有幫助：TalonFX 和 Pigeon 2 正常但沒被控制時通常閃橘燈，CANcoder 是快速亮閃；LED 偶爾閃一下紅，通常是接點鬆了，可以搖一搖線看能不能重現<a class="ref" href="#src12-11">[11]</a>。</p>
 
   <h2>動手試：CAN bus 除錯台</h2>
-  <p>下面是一條接在 CANivore「9427」上的 CAN bus。點裝置之間的線可以剪斷或接回，也可以拔掉末端的終端電阻、故意把 ID 設錯。每弄壞一個地方，就按「斷電量電阻」和「Tuner X 掃描」看會怎樣。多玩幾次，比賽時你會感謝自己。</p>
+  <p>下面是一條接在 CANivore「9427」上的 CAN bus。點裝置之間的線可以剪斷或接回，也可以拔掉末端的終端電阻、故意把 ID 設錯。每弄壞一個地方，就按「斷電量電阻」和「Tuner X 掃描」看會怎樣。</p>
   <div class="lab">
     <div class="canchain" id="canChain"></div>
     <div class="calls">
@@ -214,7 +214,7 @@ public boolean atBottom() {
             .withName("Elevator.home");
     }
 }</code></pre>
-    <p>講幾個重點。<code>until</code> 和 <code>withTimeout</code> 誰先發生都會結束（第 10 章）；結束後再確認一次 <code>atBottom</code>，如果是逾時結束的，就<strong>不要</strong>重設位置，不然會把錯的位置當成 0。另外用常閉開關的話，線掉了會讀成「已經到底」，機構會停在原地被當成 0，所以開機歸零之後，還是要用眼睛確認機構真的在底部。</p>
+    <p>幾個重點。<code>until</code> 和 <code>withTimeout</code> 誰先發生都會結束（第 10 章）；結束後再確認一次 <code>atBottom</code>，如果是逾時結束的，就<strong>不要</strong>重設位置，不然會把錯的位置當成 0。另外用常閉開關的話，線掉了會讀成「已經到底」，機構會停在原地被當成 0，所以開機歸零之後，還是要用眼睛確認機構真的在底部。</p>
     <p>這個寫法為了短，直接在 <code>startEnd</code> 裡呼叫 IO。如果你的 Subsystem 跟第 6 章一樣在 periodic 裡送輸出，就要改成切換 <code>ControlMode</code>，不然會被 periodic 蓋掉。</p>
     </div>
   </div>

@@ -1,12 +1,12 @@
   <p class="headline-code">CAN ID 18｜上場</p>
   <h1>模擬、日誌與重播：比賽錄影和賽後檢討</h1>
-  <p class="lede">比賽中機器人出包，賽後你只能靠記憶猜嗎？不用，只要有日誌。這章講模擬、日誌、重播三個差在哪，怎麼從機器人拿出日誌、在 AdvantageScope 裡看資料，重播怎麼做，哪些寫法會讓重播不準，還有怎麼讓每一場比賽的程式版本都找得回來。</p>
+  <p class="lede">比賽中機器人出問題，賽後不必只靠記憶猜，有日誌就能查。這章講模擬、日誌、重播三個差在哪，怎麼從機器人拿出日誌、在 AdvantageScope 裡看資料，重播怎麼做，哪些寫法會讓重播不準，還有怎麼讓每一場比賽的程式版本都找得回來。</p>
   <div class="note"><strong>版本說明</strong>這章是照 AdvantageKit 2026 版（v26.0.2）的文件寫的。AdvantageKit 網站和 GitHub main 分支已經開始出現 2027 版的東西（像類別改名），查資料要確認版本。<code>@AutoLog</code>、<code>Logger.processInputs</code> 和三種模式在第 6 章 E 部分講過了，這章講怎麼用。</div>
 
-  <h2>先講個比喻：比賽錄影和賽後檢討</h2>
+  <h2>比喻：比賽錄影和賽後檢討</h2>
   <div class="story">
     <p>體育課的每一場練習賽都全程錄影，攝影機把場上發生的事完整錄下來：誰在哪、球往哪飛、裁判吹了什麼哨。另外每個球員也會把「自己當時怎麼想、決定做什麼」寫在筆記上。</p>
-    <p>賽後教練把錄影跟筆記放在同一條時間軸上，一格一格看：第 12 秒他為什麼沒傳球？喔，原來他以為隊友被擋住了。</p>
+    <p>賽後教練把錄影跟筆記放在同一條時間軸上，一格一格看：第 12 秒他為什麼沒傳球？原來他以為隊友被擋住了。</p>
     <p>教練還可以說：「用同一段錄影，照新戰術重想一次，每一格你會怎麼決定？」因為看到的畫面完全一樣，新的決定可以跟原本的逐格比較。</p>
     <p>但推演改變不了錄影。你在推演裡決定「這時候往左跑」，錄影裡的你還是往右跑了，後面的畫面也不會變。推演只能回答「看到這些畫面，新想法會怎麼決定」，回答不了「照新想法打，比賽會變怎樣」。</p>
     <p>最後，戰術本每場之間都在改，錄影如果沒標當時用的是哪一版，事後就不知道該拿哪一版來推演。</p>
@@ -37,7 +37,7 @@
 
   <h2>取得日誌</h2>
   <p>在 roboRIO 上，<code>WPILOGWriter</code> 預設寫到 USB 隨身碟（<code>/U/logs</code>），所以 roboRIO 上<strong>一定要插一支 FAT32 的隨身碟</strong><a class="ref" href="#src18-1">[1]</a>。拿日誌最方便的是用 AdvantageScope：在偏好設定填好機器人位址和日誌資料夾，再用 File → Download Logs 下載，最新的會排在最上面<a class="ref" href="#src18-2">[2]</a>。</p>
-  <p>AdvantageScope 開得了 WPILib 和 AdvantageKit 產生的 <code>.wpilog</code>，也開得了 Phoenix 6 SignalLogger 的 <code>.hoot</code>（第 15 章）。同時開好幾個檔案時間會自動對齊<a class="ref" href="#src18-2">[2]</a>，所以 AdvantageKit 日誌和 hoot 可以放在一起看，超方便。</p>
+  <p>AdvantageScope 開得了 WPILib 和 AdvantageKit 產生的 <code>.wpilog</code>，也開得了 Phoenix 6 SignalLogger 的 <code>.hoot</code>（第 15 章）。同時開好幾個檔案時間會自動對齊<a class="ref" href="#src18-2">[2]</a>，所以 AdvantageKit 日誌和 hoot 可以放在一起看。</p>
 
   <h2>在 AdvantageScope 裡看什麼</h2>
   <table class="map">
@@ -69,7 +69,7 @@ Logger.recordOutput("Vision/Accepted", acceptedCount);  // 第 17 章的練習</
     <li><strong>用模擬模式跑。</strong>WPILib 的 Simulate Robot Code，<strong>不要開模擬 GUI</strong>（範本預設已經關了）<a class="ref" href="#src18-7">[7]</a>。</li>
     <li><strong>看結果。</strong>新產生的日誌會自動在 AdvantageScope 打開。重播算出來的輸出在 <code>ReplayOutputs</code> 表，原本的輸入和輸出都還在，可以直接對照<a class="ref" href="#src18-7">[7]</a>。</li>
   </ol>
-  <p>第 6 章 E-5 的 <code>setUseTiming(false)</code> 讓重播用最快速度跑完，這<strong>不會影響</strong>重播的準確度<a class="ref" href="#src18-7">[7]</a>，放心用。</p>
+  <p>第 6 章 E-5 的 <code>setUseTiming(false)</code> 讓重播用最快速度跑完，這<strong>不會影響</strong>重播的準確度<a class="ref" href="#src18-7">[7]</a>，可以放心使用。</p>
   <div class="note"><strong>Replay Watch</strong>調位置估計這種要一直試的工作，可以用 <code>./gradlew replayWatch</code>（Windows 是 <code>gradle.bat replayWatch</code>）：只要改了 <code>src</code> 裡的程式，重播就自動再跑一次，AdvantageScope 的時間範圍和畫面也會保留。它每次會蓋掉上一次的重播結果，但不會動原始日誌；日誌越短、電腦單核越快，越好用<a class="ref" href="#src18-8">[8]</a>。</div>
   <div class="note warn"><strong>重播的限制</strong>重播時改程式，輸出<strong>不能影響</strong>重播的輸入<a class="ref" href="#src18-7">[7]</a>。比如把手臂的 kP 調大再重播，記錄裡的手臂位置還是當時的位置，因為那是從日誌讀回來的輸入。重播適合回答「看到同樣的資料，新邏輯會怎麼決定」，回答不了「照新邏輯，機器人會怎麼動」；後者要用模擬。</div>
 
@@ -90,7 +90,7 @@ Logger.recordOutput("Vision/Accepted", acceptedCount);  // 第 17 章的練習</
 
   <h3>第 16、17 章的 CTRE swerve 怎麼辦</h3>
   <p>表格第四條要特別講一下：第 16、17 章用的是 Tuner X 產生的 CTRE swerve，它直接操作硬體，沒經過 IO 層，所以<strong>底盤這部分沒辦法準確重播</strong><a class="ref" href="#src18-9">[9]</a>。手臂、Intake 這些照第 6 章寫的 Subsystem 則不受影響。</p>
-  <p>如果隊上希望底盤也能重播，AdvantageKit 有 TalonFX swerve 範本專案：一樣可以用 Tuner X 的 swerve 產生器設定，還有高頻里程計、斷線警告、位置估計器整合、模擬，以及保證準確的重播<a class="ref" href="#src18-12">[12]</a>。要不要換是賽季開始前就要決定的事，千萬不要比賽前才換。</p>
+  <p>如果隊上希望底盤也能重播，AdvantageKit 有 TalonFX swerve 範本專案：一樣可以用 Tuner X 的 swerve 產生器設定，還有高頻里程計、斷線警告、位置估計器整合、模擬，以及保證準確的重播<a class="ref" href="#src18-12">[12]</a>。要不要換是賽季開始前就要決定的事，不要比賽前才換。</p>
 
   <h3>自動程式選單也是輸入</h3>
   <p>第 16 章用 <code>SmartDashboard.putData</code> 放的自動程式選單是從 NetworkTables 讀值的，重播時讀不到當時選了哪個。AdvantageKit 有 <code>LoggedDashboardChooser</code>，可以直接包住 PathPlanner 的 <code>buildAutoChooser()</code><a class="ref" href="#src18-13">[13]</a>：</p>

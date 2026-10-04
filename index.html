@@ -436,9 +436,9 @@ body.on-landing .layout, body.on-landing .menu-btn{display:none}
   <p class="lede">寫程式之前，電腦要先準備好。這章會帶你裝軟體、建第一個專案、認識專案裡那一堆檔案，順便學會用 Git 把程式存好，最後把程式送上機器人。東西有點雜，但每一步都會用到，跳過的話後面一定會卡。</p>
   <div class="note"><strong>版本說明</strong>這章是照 2026 賽季的官方文件寫的（WPILib 2026.2.1、Phoenix 6 2026 版）。WPILib 已經在做 2027 年的 Systemcore 控制系統<a class="ref" href="#src0-9">[9]</a>，到時候安裝流程和套件名稱大概會變，看到這裡的時候如果已經是 2027 年，請以當年的文件為準。</div>
 
-  <h2>先講個比喻：開學前的準備</h2>
+  <h2>比喻：開學前的準備</h2>
   <div class="story">
-    <p>想像程式組每年都會分到一間專用教室，門牌上寫著年份，像是「2026 程式教室」。上課就是要進這間，不能在自己家的書桌上課，因為家裡的書桌堆了一堆別的東西，習慣也不一樣，拿來上這門課很容易出包。去年的教室也不用拆，新舊兩間可以同時存在。</p>
+    <p>想像程式組每年都會分到一間專用教室，門牌上寫著年份，像是「2026 程式教室」。上課就是要進這間，不能在自己家的書桌上課，因為家裡的書桌堆了一堆別的東西，習慣也不一樣，拿來上這門課很容易出錯。去年的教室也不用拆，新舊兩間可以同時存在。</p>
     <p>教室裡的課本、字典、計算機、印表機，學校一次幫你配好，而且跟你家裡的東西分開放。你不用自己去買，學校發了新字典也不會把你家那本換掉。</p>
     <p>課本以外的參考書，例如某家出版社的馬達專書，不是塞在書包裡就算數，要寫進<strong>班級書單</strong>。書單是跟著班級走的，誰拿到這個班的書單，就知道要準備哪幾本、哪個版本。換新學年，書單上的版本也要重新確認一次。</p>
     <p>教室的配置是固定的。門口有警衛室，負責開門讓大家進來，學生不用、也不該進去亂改。黑板旁邊貼著課表和鐘聲時間，決定每節課什麼時候開始和結束。講桌上有座位表和幹部名單，寫清楚誰坐哪、誰負責什麼。後面有公布欄，貼著全班都要遵守的規定。角落還有一個置物櫃，裡面的東西會跟著全班一起帶去校外教學。</p>
@@ -479,18 +479,18 @@ body.on-landing .layout, body.on-landing .menu-btn{display:none}
   <p>2026 賽季的 WPILib 是 2026.2.1 版（2026 年 1 月 16 日發布）。另外 2026 年的 roboRIO 要刷新的映像檔，映像檔要從 2026 版的 FRC Game Tools 拿<a class="ref" href="#src0-1">[1]</a>，用舊的不行。</p>
 
   <h3>安裝時容易踩的雷</h3>
-  <p>WPILib 會<strong>另外</strong>裝一份 VS Code，不會用你電腦原本那份。每年各一份，名稱會帶年份，像 <code>WPILib VS Code 2026</code>。打開專案的時候要開這一份，不是系統原本的 VS Code<a class="ref" href="#src0-1">[1]</a>，這個新手超常搞錯。</p>
+  <p>WPILib 會<strong>另外</strong>裝一份 VS Code，不會用你電腦原本那份。每年各一份，名稱會帶年份，像 <code>WPILib VS Code 2026</code>。打開專案的時候要開這一份，不是系統原本的 VS Code<a class="ref" href="#src0-1">[1]</a>，新手常常在這裡搞錯。</p>
   <p>它附的 JDK 會和你電腦裡其他 JDK 共存，不會去動 <code>JAVA_HOME</code><a class="ref" href="#src0-1">[1]</a>，所以你之前裝過 Java 也不用擔心。</p>
   <p>不要用 VS Code 的設定同步功能，在一般 VS Code 和 WPILib VS Code 之間同步設定，官方說這樣可能會讓其中一邊壞掉<a class="ref" href="#src0-1">[1]</a>。</p>
   <p>WPILib 每年都裝在不同資料夾，去年的版本不用先移除<a class="ref" href="#src0-1">[1]</a>。不過去年的專案要用匯入功能轉成今年的格式，vendor 函式庫也要重新加一次，因為去年的版本跟今年的專案不相容<a class="ref" href="#src0-1">[1]</a>。</p>
 
   <h2>建一個新專案</h2>
-  <p>在 WPILib VS Code 按 <code>Ctrl+Shift+P</code>，打 WPILib，選 Create a new project<a class="ref" href="#src0-3">[3]</a>。專案類型選 Template、語言選 Java、範本選 Command Robot。Command-based 範本是建在 <code>TimedRobot</code> 上的，官方也很推薦新隊伍用這個<a class="ref" href="#src0-3">[3]</a>，我們隊上也是用這個。</p>
+  <p>在 WPILib VS Code 按 <code>Ctrl+Shift+P</code>，打 WPILib，選 Create a new project<a class="ref" href="#src0-3">[3]</a>。專案類型選 Template、語言選 Java、範本選 Command Robot。Command-based 範本是建在 <code>TimedRobot</code> 上的，官方也很推薦新隊伍用這個<a class="ref" href="#src0-3">[3]</a>。</p>
   <p>建立的時候要填隊號。隊號會拿來當專案的套件名稱，部署時也是靠它找到機器人<a class="ref" href="#src0-3">[3]</a>，它存在專案的 <code>.wpilib/wpilib_preferences.json</code> 裡。</p>
   <div class="note warn"><strong>專案不要放在 OneDrive</strong>官方直接講明不支援在 OneDrive 上建專案，因為 OneDrive 的快取會干擾建置系統。麻煩的是有些 Windows 預設就把「文件」和「桌面」放在 OneDrive 上<a class="ref" href="#src0-3">[3]</a>，你可能自己都沒發現。最簡單的做法是開一個 <code>C:\frc\</code> 之類的資料夾，機器人專案全部放那邊。</div>
 
   <h2>專案裡有什麼</h2>
-  <p>Command-based 專案建好之後大概長這樣，我只列你現在需要知道的：</p>
+  <p>Command-based 專案建好之後大概長這樣，這裡只列出現在需要知道的部分：</p>
   <pre><code>MyRobot/
 ├── build.gradle                  // 建置設定（GradleRIO），一般不需要改
 ├── .wpilib/
@@ -530,7 +530,7 @@ body.on-landing .layout, body.on-landing .menu-btn{display:none}
   <p>放在 <code>src/main/deploy</code> 裡的檔案，部署的時候會一起傳到 roboRIO 的 <code>/home/lvuser/deploy</code><a class="ref" href="#src0-8">[8]</a>。第 16 章的自動路徑檔就是放這裡。程式裡要拿這個資料夾的位置，用 <code>Filesystem.getDeployDirectory()</code>，不要自己把路徑寫死<a class="ref" href="#src0-8">[8]</a>。</p>
 
   <h2>編譯與部署</h2>
-  <p>在 WPILib 選單選 Deploy Robot Code，或直接按 <code>Shift+F5</code>。它會視需要先編譯，再把程式送到 roboRIO。成功的話會看到 Build Successful，接著跳出 RioLog 顯示機器人程式的輸出<a class="ref" href="#src0-7">[7]</a>。部署到一半千萬不要把機器人電源關掉<a class="ref" href="#src0-7">[7]</a>。</p>
+  <p>在 WPILib 選單選 Deploy Robot Code，或直接按 <code>Shift+F5</code>。它會視需要先編譯，再把程式送到 roboRIO。成功的話會看到 Build Successful，接著跳出 RioLog 顯示機器人程式的輸出<a class="ref" href="#src0-7">[7]</a>。部署到一半不要關掉機器人電源<a class="ref" href="#src0-7">[7]</a>。</p>
   <p>Build 和 Deploy 有個差別要知道：Build Robot Code 會上網下載依賴、跑單元測試，Deploy Robot Code 不會<a class="ref" href="#src0-7">[7]</a>。所以你新增或更新 vendordep 之後，要找有網路的地方先 Build 一次。</p>
   <div class="note coach"><strong>教練提醒：出發比賽前，在家 Build 一次</strong>比賽場館的網路很不可靠，而且機器人連的是場地的無線網路。出發前一定要在有網路的地方把專案完整 Build 過，確定依賴都下載到筆電上了，不然到現場你會發現怎麼樣都部署不上去。</div>
 
@@ -571,7 +571,7 @@ body.on-landing .layout, body.on-landing .menu-btn{display:none}
     </tbody>
   </table>
   <p>要注意，比賽時連上 FMS 之後，這些 Enable、Disable、E-Stop 快捷鍵通通沒用，要停只能按場地操作台上的 E-Stop 按鈕<a class="ref" href="#src0-10">[10]</a>。</p>
-  <div class="note coach"><strong>教練提醒：Enable 前一定要喊</strong>每次 Enable 前都大聲喊「Enable！」，確定機器人旁邊沒有人、沒有人的手在機構裡，手指隨時放在空白鍵或 Enter 上。這是隊上的安全規定，沒有例外，學長姐也一樣要喊。</div>
+  <div class="note coach"><strong>教練提醒：Enable 前一定要喊</strong>每次 Enable 前都大聲喊「Enable！」，確定機器人旁邊沒有人、沒有人的手在機構裡，手指隨時放在空白鍵或 Enter 上。這是隊上的安全規定，沒有例外。</div>
 
   <h2>常見錯誤</h2>
   <div class="note warn"><strong>開錯 VS Code</strong>用系統原本的 VS Code 開機器人專案，會找不到 WPILib 選單，也沒辦法建置。看一下標題列或開始選單，確定開的是 <code>WPILib VS Code 2026</code>。</div>
@@ -620,7 +620,7 @@ body.on-landing .layout, body.on-landing .menu-btn{display:none}
   <h1>類別與物件：從一張學籍資料表開始</h1>
   <p class="lede">你之後每天都會看到 <code>new TalonFX(21)</code> 這種程式。這章要搞懂它到底做了什麼：類別跟物件差在哪、欄位和方法是什麼，最後自己寫一個完整的類別出來。</p>
 
-  <h2>先講個比喻：開學報到</h2>
+  <h2>比喻：開學報到</h2>
   <div class="story">
     <p>開學前，教務處要先決定學籍資料表長怎樣：要有姓名、座號、班級這幾格，再附一份說明，寫學生可以做哪些事，像交作業、自我介紹、請假。這份規格只有一份，放在教務處。它不是任何一個學生，它只是規定「學生」這種東西該有哪些東西。</p>
     <p>開學那天小明去註冊組報到，組長照規格拿出一張新表，叫他當場填姓名和座號。空白的表組長不收，因為規定報到時這兩格一定要填。填好的那一張，才是「小明」。</p>
@@ -628,7 +628,7 @@ body.on-landing .layout, body.on-landing .menu-btn{display:none}
     <p>表格上有一格叫「本人姓名」。小明填的時候「本人」就是小明，小華填的時候就是小華。同樣兩個字，永遠指填這張表的人。</p>
     <p>每張表最上面都印著校名。這不是學生自己填的，是全校共用的。哪天學校改名，改一次，所有表格就都變了。</p>
     <p>然後是兩個會出事的狀況。第一個：點名冊列到 30 號，可是 30 號根本沒人報到。老師叫「30 號起來回答」，沒人站起來，整堂課就卡住了。</p>
-    <p>第二個：註冊組出包，把 7 號同時發給兩個人。點名時兩個人都喊「有」，老師叫 7 號上台，結果兩個人一起衝上去。</p>
+    <p>第二個：註冊組出錯，把 7 號同時發給兩個人。點名時兩個人都喊「有」，老師叫 7 號上台，結果兩個人一起衝上去。</p>
   </div>
 
   <table class="map">
@@ -697,7 +697,7 @@ System.out.println(feeder.getVoltage()); // 0.0</code></pre>
   <p>建構子的名字跟類別一樣，而且沒有回傳型別。<code>new Roller("Intake")</code> 會先生出一個新物件，再跑建構子把欄位設好<a class="ref" href="#src1-2">[2]</a>。因為唯一的建構子規定一定要給名字，程式裡就不可能出現沒名字的 <code>Roller</code>，這就是「報到時一定要填」。</p>
 
   <h3>this</h3>
-  <p>建構子的參數叫 <code>name</code>，欄位也叫 <code>name</code>，撞名了。在建構子裡直接寫 <code>name</code>，Java 會當成參數；要指欄位就寫 <code>this.name</code>，也就是「我這個物件自己的 name」<a class="ref" href="#src1-3">[3]</a>。</p>
+  <p>建構子的參數叫 <code>name</code>，欄位也叫 <code>name</code>，撞名了。在建構子裡直接寫 <code>name</code>，Java 會當成參數；要指欄位就寫 <code>this.name</code>，也就是「這個物件自己的 name」<a class="ref" href="#src1-3">[3]</a>。</p>
 
   <h3>static</h3>
   <p><code>MAX_VOLTS</code> 有加 <code>static</code>，所以它是屬於類別本身的，所有物件共用同一份<a class="ref" href="#src1-4">[4]</a>。再加上 <code>final</code> 就變成常數。習慣上常數名稱全部大寫，單字中間用底線。</p>
@@ -800,7 +800,7 @@ public class RollerIOHardware {
   <h1>封裝：成績簿不能放在講台上</h1>
   <p class="lede">你會發現隊上的程式裡，欄位幾乎都寫成 <code>private</code>。這章講為什麼要這樣，順便把四種存取層級講清楚，最後回到機器人：為什麼 Subsystem 不能讓外面直接碰馬達。</p>
 
-  <h2>先講個比喻：一本成績簿的遭遇</h2>
+  <h2>比喻：一本成績簿的遭遇</h2>
   <div class="story">
     <p>有一班把成績簿放在講台上，誰都能翻、誰都能寫。一開始沒事，後來有人把自己的數學改成 150 分，又有人不小心把別人的分數寫進自己那格。期末算成績的時候，導師發現分數兜不起來，但根本查不出是誰、什麼時候改的。</p>
     <p>學校只好訂新規定：成績簿鎖進導師的抽屜，學生拿不到。要登記成績只有一個管道，就是交給任課老師，由老師寫進去。老師每次登記前都會檢查分數是不是在 0 到 100 之間，不對就直接退回。</p>
@@ -832,7 +832,7 @@ public class RollerIOHardware {
       <tr><td><code>public</code></td><td>可以</td><td>可以</td><td>可以</td><td>可以</td><td>公布欄</td></tr>
     </tbody>
   </table>
-  <p>第二列不是我漏寫。欄位或方法前面<strong>什麼都不加</strong>，本身就是一種存取層級，叫 package-private（Oracle 文件叫它 no modifier），例如 <code>int seatNumber;</code>。因為它是預設值，很容易不知不覺就用到了<a class="ref" href="#src2-2">[2]</a>。</p>
+  <p>第二列不是漏寫。欄位或方法前面<strong>什麼都不加</strong>，本身就是一種存取層級，叫 package-private（Oracle 文件叫它 no modifier），例如 <code>int seatNumber;</code>。因為它是預設值，很容易不知不覺就用到了<a class="ref" href="#src2-2">[2]</a>。</p>
   <p>「套件」第 5 章才會講，「子類別」是第 3 章。現在只要記住 Oracle 教學給的原則：沒有好理由的話，就用最嚴格的那一層；除了常數以外，不要有 public 欄位<a class="ref" href="#src2-2">[2]</a>。</p>
 
   <div class="note limit"><strong>這個比喻哪裡不準</strong>日記是「每個人」各自的，但 Java 的 <code>private</code> 是以「類別」為單位，不是以物件為單位。同一個類別裡的程式碼，可以讀寫另一個同類別物件的 private 欄位。換句話說，在 <code>Roller</code> 類別裡面，<code>intake</code> 的方法其實看得到 <code>feeder</code> 的 <code>voltage</code>。</div>
@@ -880,7 +880,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   <h2>常見錯誤</h2>
   <div class="note warn"><strong>把整本成績簿交出去</strong>欄位寫了 <code>private TalonFX roller</code>，結果又加一個 <code>public TalonFX getRoller()</code>。外面拿到物件一樣可以直接 <code>setControl</code>，等於白封裝。getter 應該回傳資料（轉速、位置），不要回傳可以被操作的硬體物件。</div>
-  <div class="note coach"><strong>教練提醒</strong>Code review 的時候，我第一眼就是看 Subsystem 裡有沒有 public 的硬體欄位，或是會回傳硬體的 getter。有的話，這個 Subsystem 的規則遲早會被某個 Command 繞過去。</div>
+  <div class="note coach"><strong>教練提醒</strong>Code review 時，第一個要看的就是 Subsystem 裡有沒有 public 的硬體欄位，或是會回傳硬體的 getter。有的話，這個 Subsystem 的規則遲早會被某個 Command 繞過去。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
@@ -991,7 +991,7 @@ public class IntakeSubsystem extends SubsystemBase {
         // 因為父類別建構子已經註冊，這裡每個週期都會被呼叫
     }
 }</code></pre>
-  <p>規則是這樣：子類別的建構子如果沒有自己呼叫父類別建構子，編譯器會偷偷在第一行補一個 <code>super()</code>，呼叫父類別的無參數建構子；如果你要自己寫，就一定要寫在第一行<a class="ref" href="#src3-2">[2]</a>。這就是「先辦老師報到」：<code>IntakeSubsystem</code> 一建立，<code>SubsystemBase</code> 那部分就先把註冊做完了。</p>
+  <p>規則是這樣：子類別的建構子如果沒有自己呼叫父類別建構子，編譯器會自動在第一行補一個 <code>super()</code>，呼叫父類別的無參數建構子；如果你要自己寫，就一定要寫在第一行<a class="ref" href="#src3-2">[2]</a>。這就是「先辦老師報到」：<code>IntakeSubsystem</code> 一建立，<code>SubsystemBase</code> 那部分就先把註冊做完了。</p>
 
   <h2>換成機器人：介面與多型</h2>
   <p>第 6 章的 IO 架構整個都是靠介面撐起來的，這裡先看個骨架就好：</p>
@@ -1047,7 +1047,7 @@ io.stop();          // 兩個實作都沒寫 stop()，用的是介面的預設�
 
   <h2>常見錯誤</h2>
   <div class="note warn"><strong>implements 了介面，方法卻沒寫完</strong>介面裡沒有 default 的方法，實作的類別全部都要寫出來，少一個就編譯失敗。錯誤訊息通常長這樣：「is not abstract and does not override abstract method ...」。看到就回去對照介面，找漏掉的是哪一個。</div>
-  <div class="note coach"><strong>教練提醒</strong>每個覆寫的方法前面都要加 <code>@Override</code>。這是隊上的規定，不是看心情。編譯器免費幫你檢查，不用白不用。</div>
+  <div class="note coach"><strong>教練提醒</strong>每個覆寫的方法前面都要加 <code>@Override</code>。這是隊上的規定。編譯器會免費幫你做這個檢查。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
@@ -1118,7 +1118,7 @@ public class Flywheel implements Mechanism {
   <h1>Lambda 與方法參考：給代課老師的字條</h1>
   <p class="lede">Command-based 的程式裡到處都是 <code>() -&gt;</code> 和 <code>::</code>，第一次看會覺得很像亂碼。這章把它們拆開講，重點是分清楚「把做法交出去」跟「當場執行」的差別。搞懂這個，你就不會踩到那個每屆都有人踩的搖桿 bug。</p>
 
-  <h2>先講個比喻：導師出差前留的字條</h2>
+  <h2>比喻：導師出差前留的字條</h2>
   <div class="story">
     <p>導師明天要出差，放學前在講桌上留了一疊字條給代課老師。重點是：導師在寫字條的當下，什麼事都沒發生，沒有人被叫去做事。字條裡裝的是「做法」，要等代課老師在對的時間拿起來照做。</p>
     <p>字條大概有四種。第一種單純交代一件事：「第一節下課請值日生擦黑板。」照做就好，不用回報。第二種是查一個數字：「看一下教室幾度。」查完會拿到一個數字。第三種是判斷是或否：「看一下外面有沒有下雨。」答案只有有或沒有。第四種是對某個人做事：「把這份考卷發給＿＿＿。」代課老師要在空格填一個人再照做。</p>
@@ -1180,7 +1180,7 @@ drive.setDefaultCommand(
     drive.run(() -&gt; drive.arcadeDrive(-controller.getLeftY(), -controller.getRightX())));</code></pre>
   <p>讀搖桿那段寫在 lambda 裡面，所以指令每次執行（每 20 毫秒）都會重讀一次。前面加負號，是因為搖桿往前推的時候 Y 軸讀到的是負的。</p>
 
-  <div class="note"><strong>字條上的名字不能改</strong>Lambda 裡只能用 final 或「實際上沒被改過」（effectively final）的區域變數<a class="ref" href="#src4-4">[4]</a>。上面錯誤範例的 <code>speed</code> 剛好就是 effectively final，所以編譯器一聲不吭。這也是這個 bug 難抓的原因：程式完全合法，只是邏輯錯了。</div>
+  <div class="note"><strong>字條上的名字不能改</strong>Lambda 裡只能用 final 或「實際上沒被改過」（effectively final）的區域變數<a class="ref" href="#src4-4">[4]</a>。上面錯誤範例的 <code>speed</code> 剛好就是 effectively final，所以編譯器不會報錯。這也是這個 bug 難抓的原因：程式完全合法，只是邏輯錯了。</div>
 
   <h2>BooleanSupplier 與 Trigger</h2>
   <pre><code>// 按住 A 鍵時吸入
@@ -1191,7 +1191,7 @@ new Trigger(() -&gt; controller.getRightTriggerAxis() &gt; 0.5)
     .whileTrue(intake.runRoller(-6.0));</code></pre>
   <p><code>Trigger</code> 的建構子收一個 <code>BooleanSupplier</code>，就是「看一下有沒有下雨」那種字條，排程器每個週期都會拿起來看一次。</p>
 
-  <div class="note coach"><strong>教練提醒</strong>只要聽到「搖桿推了機器人沒反應」或「數值永遠是 0」，先去看讀搖桿的那行是不是寫在 lambda 外面。這個 bug 每一屆新生都會遇到，真的每一屆。</div>
+  <div class="note coach"><strong>教練提醒</strong>只要聽到「搖桿推了機器人沒反應」或「數值永遠是 0」，先去看讀搖桿的那行是不是寫在 lambda 外面。這個 bug 幾乎每一屆新生都會遇到。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
@@ -1238,7 +1238,7 @@ controller.b().whileTrue(drive.run(() -&gt; drive.arcadeDrive(0.0, turn)));</cod
   <h2>比喻一：學校的鐘聲只有幾種</h2>
   <div class="story">
     <p>學校的鐘聲系統只設了四種：上課鐘、下課鐘、午休鐘、放學鐘。值班老師按按鈕的時候，只能從這四個裡面挑。</p>
-    <p>如果改成輸入數字呢？1 是上課、2 是下課、3 是午休、4 是放學。哪天新老師輸入 5，系統照收，但沒人知道 5 是什麼鈴，全校愣在那邊。更慘的是有人記錯，把 2 當成上課，學生在上課時間衝去福利社。</p>
+    <p>如果改成輸入數字呢？1 是上課、2 是下課、3 是午休、4 是放學。哪天新老師輸入 5，系統照收，但沒人知道 5 是什麼鈴，全校愣在那邊。更糟的是有人記錯，把 2 當成上課，學生在上課時間衝去福利社。</p>
     <p>每種鈴聲還可以帶一點資訊：上課鐘後面是 50 分鐘，下課鐘後面是 10 分鐘。長度跟著鈴聲走，不用另外查表。</p>
   </div>
   <p>這就是<strong>列舉</strong>（enum）：一份固定的清單，變數只能是清單上的值，寫錯編譯器馬上抓到。而且 Java 的 enum 其實是一種特別的類別，可以有欄位、建構子和方法<a class="ref" href="#src5-1">[1]</a>。</p>
@@ -1291,7 +1291,7 @@ public void periodic() {
         case SCORING -&gt; setRollerVoltage(-6.0);  // TODO: 實測調整
     }
 }</code></pre>
-  <p>這種 <code>case X -&gt;</code> 的寫法從 Java 14 開始就是正式語法了，WPILib 用的是 Java 17，放心用<a class="ref" href="#src5-2">[2]</a>。</p>
+  <p>這種 <code>case X -&gt;</code> 的寫法從 Java 14 開始就是正式語法了，WPILib 用的是 Java 17，可以直接用<a class="ref" href="#src5-2">[2]</a>。</p>
   <p>enum 也可以把資料帶在身上，就像鈴聲帶著時間長度。下面只是示範語法，不是說隊上的 <code>IntakeState</code> 要改成這樣：</p>
   <pre><code>public enum IntakeState {
     NONE(0.0),
@@ -1334,10 +1334,10 @@ import frc.robot.Constants.IntakeConstants;           // 向自己專案的 Cons
 public class IntakeSubsystem extends SubsystemBase {
     // ...
 }</code></pre>
-  <p><code>package</code> 那行是在說「我在哪一班」，<code>import</code> 那幾行就是「跨班借人的登記」。不 import 也可以用，只是每次都要打全名，像 <code>com.ctre.phoenix6.hardware.TalonFX</code>，打到手會酸。</p>
+  <p><code>package</code> 那行是在說「我在哪一班」，<code>import</code> 那幾行就是「跨班借人的登記」。不 import 也可以用，只是每次都要打全名，像 <code>com.ctre.phoenix6.hardware.TalonFX</code>，很冗長。</p>
 
   <div class="note warn"><strong>檔名、類別名、套件名要對上</strong>public 類別的名字要跟檔名一樣（<code>IntakeSubsystem.java</code> 裡面是 <code>public class IntakeSubsystem</code>），<code>package</code> 宣告要跟檔案所在的資料夾一樣。只要有一個對不上，javac 就編譯失敗。在 VS Code 裡搬檔案或改檔名之後，第一件事就是檢查這兩行。</div>
-  <div class="note coach"><strong>教練提醒</strong>Code review 時看到程式中間冒出 <code>21</code>、<code>0.35</code>、<code>8.0</code> 這種沒名字的數字，我一定會請你搬進 Constants，順便標上單位。比賽當天在 pit 急著改參數的時候，你會很感謝當初的自己。</div>
+  <div class="note coach"><strong>教練提醒</strong>Code review 時看到程式中間冒出 <code>21</code>、<code>0.35</code>、<code>8.0</code> 這種沒名字的數字，就要搬進 Constants，順便標上單位。比賽當天在 pit 急著改參數的時候，這會省下很多時間。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
@@ -1391,7 +1391,7 @@ public static String describe(ArmPosition p) {
 <template id="tpl-ch6">
   <p class="headline-code">CAN ID 06｜架構</p>
   <h1>IO 架構：導師只看點名表</h1>
-  <p class="lede">這章是整個課程最長的一章，也是隊上程式最核心的部分。我們拿一支手臂（Arm）從頭走到尾：每一層管什麼、資料怎麼流、硬體跟模擬怎麼互換，最後升級成 AdvantageKit 的寫法。內容切成六塊，不用一口氣讀完，A 先讀，其他看需要。</p>
+  <p class="lede">這章是整個課程最長的一章，也是隊上程式最核心的部分。這裡拿一支手臂（Arm）從頭走到尾：每一層管什麼、資料怎麼流、硬體跟模擬怎麼互換，最後升級成 AdvantageKit 的寫法。內容切成六塊，不用一口氣讀完，A 先讀，其他看需要。</p>
 
   <div class="partmap">
     <button class="pcard" data-part="A"><b>A　觀念與全貌</b><span>比喻、分層圖、各層職責、每 20 ms 資料流。所有人先讀這部分。</span></button>
@@ -1402,7 +1402,7 @@ public static String describe(ArmPosition p) {
     <button class="pcard" data-part="F"><b>F　測試與常見錯誤</b><span>用假的 IO 寫單元測試、模擬、重播，以及十一個常見錯誤。</span></button>
   </div>
 
-  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026.2.2、Phoenix 6 26.3.0、AdvantageKit 2026 的文件寫的。有個坑先講：WPILib 和 CTRE 網站上標 latest 的文件已經是 2027 年版了（WPILib 的 Java 套件名稱也改了），查資料記得切到 stable。程式裡要實測的數字我都標了 TODO，拜託不要照抄。</div>
+  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026.2.2、Phoenix 6 26.3.0、AdvantageKit 2026 的文件寫的。先注意一件事：WPILib 和 CTRE 網站上標 latest 的文件已經是 2027 年版了（WPILib 的 Java 套件名稱也改了），查資料記得切到 stable。程式裡要實測的數字都標了 TODO，不要照抄。</div>
 
   <div class="parttabs" role="tablist" aria-label="本章部分">
     <button role="tab" data-part="A">A 觀念</button>
@@ -1415,7 +1415,7 @@ public static String describe(ArmPosition p) {
 
   <!-- ===== PART A ===== -->
   <section class="cpart" data-part="A" role="tabpanel">
-    <h2>A-1　先講個比喻：導師、班長和點名表</h2>
+    <h2>A-1　比喻：導師、班長和點名表</h2>
     <div class="story">
       <p>每節課開始前，導師會決定全班要去哪：回教室、去操場，還是到禮堂。導師只要說一句「去禮堂」，這就是班級的目標。</p>
       <p>至於怎麼走、走多快、轉彎要不要放慢，是班長在現場自己處理的，導師不會跟在旁邊每一步都下指令。班長手上有一本「帶隊守則」，寫著最快能走多快、起步跟停下要多平順。這本守則開學就交給班長了，不會每節課重發一次。</p>
@@ -1480,7 +1480,7 @@ public static String describe(ArmPosition p) {
     </table>
 
     <h3>閉迴路要放在哪裡</h3>
-    <p>IO 的輸出可以是電壓、設定點，也可以是 PID 常數，每種用一個簡單的方法表示就好<a class="ref" href="#src6-1">[1]</a>。AdvantageKit 官方的 TalonFX swerve 範本是把回授放在馬達控制器裡跑，齒輪比也交給 TalonFX 韌體處理，不在 roboRIO 上算<a class="ref" href="#src6-4">[4]</a>。我們的手臂偏好用 MotionMagic，它本來就是在 TalonFX 裡面產生軌跡、跑閉迴路，所以這章的 <code>ArmIO</code> 主要輸出是 <code>setPositionGoal(弧度)</code>，<code>setVoltage</code> 只留給 SysId 和手動測試。</p>
+    <p>IO 的輸出可以是電壓、設定點，也可以是 PID 常數，每種用一個簡單的方法表示就好<a class="ref" href="#src6-1">[1]</a>。AdvantageKit 官方的 TalonFX swerve 範本是把回授放在馬達控制器裡跑，齒輪比也交給 TalonFX 韌體處理，不在 roboRIO 上算<a class="ref" href="#src6-4">[4]</a>。隊上的手臂偏好用 MotionMagic，它本來就是在 TalonFX 裡面產生軌跡、跑閉迴路，所以這章的 <code>ArmIO</code> 主要輸出是 <code>setPositionGoal(弧度)</code>，<code>setVoltage</code> 只留給 SysId 和手動測試。</p>
     <p>當然也可以反過來，在 roboRIO 上用 <code>ProfiledPIDController</code> 加 <code>ArmFeedforward</code> 算電壓，再呼叫 <code>setVoltage</code>。好處是連控制邏輯都能被 AdvantageKit 重播；壞處是少了控制器內部那個高頻迴路，增益也要另外調。兩種都有人用，這是取捨，官方沒有說哪個才對。</p>
 
     <h3>單位在哪裡換算</h3>
@@ -1499,7 +1499,7 @@ public static String describe(ArmPosition p) {
       </tbody>
     </table>
     <p>所以指令設的新目標，最多大概晚 20 ms 才送出去。對手臂來說這點延遲可以忽略，換來的好處是「所有 IO 呼叫都集中在 periodic、每輪只讀一次輸入」，AdvantageKit 重播要能對得上，靠的就是這個<a class="ref" href="#src6-1">[1]</a>。</p>
-    <div class="note limit"><strong>哪些是推論</strong>「按鍵排程的指令，同一輪就會跑 execute」是我從 WPILib 原始碼的順序推出來的，官方文件沒有明講，不要把它當成保證。</div>
+    <div class="note limit"><strong>哪些是推論</strong>「按鍵排程的指令，同一輪就會跑 execute」是從 WPILib 原始碼的順序推出來的，官方文件沒有明講，不要把它當成保證。</div>
   </section>
 
   <!-- ===== PART B ===== -->
@@ -1630,7 +1630,7 @@ public class ArmSubsystem extends SubsystemBase {
             () -&gt; manualVolts = 0.0);
     }
 }</code></pre>
-    <p>講幾個重點。<code>run</code>、<code>runOnce</code>、<code>startEnd</code> 是 WPILib <code>Subsystem</code> 提供的 factory，用它們做出來的指令會自動 require 這個 Subsystem<a class="ref" href="#src6-19">[19]</a>。<code>ControlMode</code> 是為了讓 IO 只在 periodic 裡被呼叫：如果 <code>manualVoltage</code> 直接去呼叫 <code>io.setVoltage</code>，下一輪 periodic 的 <code>setPositionGoal</code> 馬上就把它蓋掉了。</p>
+    <p>幾個重點。<code>run</code>、<code>runOnce</code>、<code>startEnd</code> 是 WPILib <code>Subsystem</code> 提供的 factory，用它們做出來的指令會自動 require 這個 Subsystem<a class="ref" href="#src6-19">[19]</a>。<code>ControlMode</code> 是為了讓 IO 只在 periodic 裡被呼叫：如果 <code>manualVoltage</code> 直接去呼叫 <code>io.setVoltage</code>，下一輪 periodic 的 <code>setPositionGoal</code> 馬上就把它蓋掉了。</p>
     <div class="note coach"><strong>教練提醒：重新 Enable 的瞬間手臂會動</strong>這個寫法在 Disabled 時會停止輸出，但目標還留著。所以重新 Enable 的那一刻，手臂會直接往那個目標衝過去。要改成 Disabled 時把目標設回 <code>STOW</code> 也可以，看隊上需求，但不管怎麼寫，Enable 前都要喊。</div>
 
     <h2>B-4　兩種 Command 寫法</h2>
@@ -1841,12 +1841,12 @@ public class ArmIOHardware implements ArmIO {
 
     <h2>C-2　逐項說明</h2>
     <h3>CANivore：用 CANBus 物件</h3>
-    <p>Phoenix 6 2026 年把「用字串指定 CAN bus」的建構子標成 deprecated 了，預計 2027 年移除，要改用傳 <code>CANBus</code> 物件的版本<a class="ref" href="#src6-8">[8]</a>。所以我們的 CANivore「9427」寫成 <code>new CANBus("9427")</code>，而且集中宣告在一個地方，不要到處 new。</p>
+    <p>Phoenix 6 2026 年把「用字串指定 CAN bus」的建構子標成 deprecated 了，預計 2027 年移除，要改用傳 <code>CANBus</code> 物件的版本<a class="ref" href="#src6-8">[8]</a>。所以隊上的 CANivore「9427」寫成 <code>new CANBus("9427")</code>，而且集中宣告在一個地方，不要到處 new。</p>
 
     <h3>Follower：2026 年改用 MotorAlignmentValue</h3>
     <p>Phoenix 6 26.3.0 的 <code>Follower</code> 只剩一個建構子：<code>Follower(int LeaderID, MotorAlignmentValue MotorAlignment)</code>。<code>Aligned</code> 是方向跟 leader 設定的 Invert 一樣，<code>Opposed</code> 是相反<a class="ref" href="#src6-9">[9]</a>。重點來了：follower 的方向是<strong>相對於 leader 的 Invert</strong> 來決定的，跟 follower 自己的 <code>Inverted</code> 無關。以前那個 boolean 參數已經被換掉了<a class="ref" href="#src6-8">[8]</a>，看到舊範例別照抄。</p>
     <p>另外，leader 對應輸出類型的狀態訊號（DutyCycle、MotorVoltage 這些）一定要開著，它的更新頻率就是 follower 輸出的更新速度，不能低於 20 Hz<a class="ref" href="#src6-9">[9]</a>。所以程式在 <code>optimizeBusUtilizationForAll</code> 之前，先把 leader 的 <code>getMotorVoltage()</code> 和 <code>getDutyCycle()</code> 設成 50 Hz。</p>
-    <div class="note"><strong>設定要不要也套到 follower 上？</strong>Follower 在跟隨的時候不會用自己的 PID 增益。不過 CTRE 員工在 Chief Delphi 回覆過（社群來源，2026-02-25），至少 neutral mode 和電流限制還是要套。我們「同一份設定兩顆都套、兩顆都重設編碼器」的做法剛好符合，兩顆的位置讀數也會一致。</div>
+    <div class="note"><strong>設定要不要也套到 follower 上？</strong>Follower 在跟隨的時候不會用自己的 PID 增益。不過 CTRE 員工在 Chief Delphi 回覆過（社群來源，2026-02-25），至少 neutral mode 和電流限制還是要套。「同一份設定兩顆都套、兩顆都重設編碼器」的做法剛好符合，兩顆的位置讀數也會一致。</div>
 
     <h3>重力補償：kG 與 Arm_Cosine</h3>
     <p>重力補償會隨角度變的機構（像手臂），<code>GravityType</code> 要選 <code>Arm_Cosine</code>。預設值是 <code>Elevator_Static</code>，忘了改就是錯的<a class="ref" href="#src6-10">[10]</a>。kG 是讓手臂水平向前停住所需要的輸出，這也是 0 度一定要是水平的原因。重心有偏的話，可以用 <code>GravityArmPositionOffset</code> 修正<a class="ref" href="#src6-10">[10]</a>。</p>
@@ -1858,10 +1858,10 @@ public class ArmIOHardware implements ArmIO {
     <p>這個設定是「感測器轉數對機構輸出的比例」，大於 1 就是減速。CTRE 明講<strong>不建議</strong>拿它來做別的單位換算，單位換算應該在程式裡用單位函式庫做<a class="ref" href="#src6-12">[12]</a>。所以這裡只放齒輪比，轉數換弧度在 Java 這邊做。</p>
 
     <h3>訊號刷新：refreshAll</h3>
-    <p>多個訊號用 <code>BaseStatusSignal.refreshAll(...)</code> 一次刷新，不要一個一個 refresh。timeout 設 0 的 <code>waitForAll()</code> 跟 <code>refreshAll()</code> 其實一樣，而 CANivore 的時間同步要 Pro 授權<a class="ref" href="#src6-13">[13]</a>。我們沒有 Pro，就用不會卡住的 <code>refreshAll</code>，免得拖慢主迴圈。</p>
+    <p>多個訊號用 <code>BaseStatusSignal.refreshAll(...)</code> 一次刷新，不要一個一個 refresh。timeout 設 0 的 <code>waitForAll()</code> 跟 <code>refreshAll()</code> 其實一樣，而 CANivore 的時間同步要 Pro 授權<a class="ref" href="#src6-13">[13]</a>。沒有 Pro 的話，就用不會卡住的 <code>refreshAll</code>，免得拖慢主迴圈。</p>
 
     <h3>設定只在建構時套用</h3>
-    <p>套用設定會卡住等回應（範例的 timeout 是 0.25 秒），所以只能在建構子裡做。<code>setBrakeMode</code> 這種執行中切換的方法，也只在狀態改變時呼叫一次，千萬不要放進 periodic。至於要重試幾次：CTRE 員工在同一則回覆說重試一次（總共兩次）沒問題，第二次還失敗的話，再多試通常也沒用（社群來源），所以 <code>retry</code> 只重試一次。</p>
+    <p>套用設定會卡住等回應（範例的 timeout 是 0.25 秒），所以只能在建構子裡做。<code>setBrakeMode</code> 這種執行中切換的方法，也只在狀態改變時呼叫一次，不要放進 periodic。至於要重試幾次：CTRE 員工在同一則回覆說重試一次（總共兩次）沒問題，第二次還失敗的話，再多試通常也沒用（社群來源），所以 <code>retry</code> 只重試一次。</p>
   </section>
 
   <!-- ===== PART D ===== -->
@@ -1877,7 +1877,7 @@ public class ArmIOHardware implements ArmIO {
         <tr><td>官方範本</td><td>—</td><td>AdvantageKit TalonFX swerve 範本的模擬增益放在 <code>ModuleIOSim.java</code><a class="ref" href="#src6-4">[4]</a></td></tr>
       </tbody>
     </table>
-    <p>我們手臂要驗證的就是 MotionMagic 和 kG 這些設定本身，所以推薦 (b)。</p>
+    <p>這支手臂要驗證的就是 MotionMagic 和 kG 這些設定本身，所以推薦 (b)。</p>
 
     <h2>D-2　做法 (b)：Phoenix 模擬</h2>
     <pre><code>package frc.robot.subsystems.arm;
@@ -1929,8 +1929,8 @@ public class ArmIOSim extends ArmIOHardware {
 }</code></pre>
     <h3>依據與注意事項</h3>
     <p>模擬裡的 PID 和電流限制要正常運作，一定要設 <code>RawRotorPosition</code> 和 <code>RotorVelocity</code>，而且給的是齒輪比之前的轉子數值。CTRE 範例的流程就是：設供電電壓 → 讀馬達電壓 → 更新物理模型 → 寫回轉子位置和速度<a class="ref" href="#src6-14">[14]</a>。</p>
-    <p>有一個限制要特別注意：模擬目前不支援多條 CAN bus，所有裝置都會跑到同一條 bus 上，所以 CAN ID 在所有 bus 之間都不能重複<a class="ref" href="#src6-14">[14]</a>。如果 CANivore 和 roboRIO bus 上剛好有同 ID 的裝置，模擬時就會打架。</p>
-    <p><code>SingleJointedArmSim</code> 在 WPILib 2026.2.2 的建構子參數順序是：馬達模型、齒輪比、轉動慣量、手臂長度、最小角度、最大角度、要不要模擬重力、起始角度<a class="ref" href="#src6-16">[16]</a>。它會照手臂角度去算重力<a class="ref" href="#src6-17">[17]</a>。CTRE 範例用的是 <code>getKrakenX60Foc</code>，我們沒有 Pro、不用 FOC，所以用 <code>getKrakenX60</code>。</p>
+    <p>有一個限制要特別注意：模擬目前不支援多條 CAN bus，所有裝置都會跑到同一條 bus 上，所以 CAN ID 在所有 bus 之間都不能重複<a class="ref" href="#src6-14">[14]</a>。如果 CANivore 和 roboRIO bus 上剛好有同 ID 的裝置，模擬時就會衝突。</p>
+    <p><code>SingleJointedArmSim</code> 在 WPILib 2026.2.2 的建構子參數順序是：馬達模型、齒輪比、轉動慣量、手臂長度、最小角度、最大角度、要不要模擬重力、起始角度<a class="ref" href="#src6-16">[16]</a>。它會照手臂角度去算重力<a class="ref" href="#src6-17">[17]</a>。CTRE 範例用的是 <code>getKrakenX60Foc</code>；沒有 Pro、不用 FOC 的話，用 <code>getKrakenX60</code>。</p>
     <p>SimState 更新得越頻繁，模擬的 PID 就越接近實機，CTRE 的建議是用 WPILib 的 <code>Notifier</code> 另外開一個比較快的迴圈<a class="ref" href="#src6-14">[14]</a>。這章為了簡單，就每 20 ms 更新一次。</p>
     <div class="note limit"><strong>這個模擬沒有模擬到的</strong>Follower 的 SimState 沒有更新，所以模擬裡 follower 的電流和溫度都是 0。不影響手臂位置就是了，因為位置只從 leader 讀。</div>
 
@@ -1962,7 +1962,7 @@ public void updateInputs(ArmIOInputs inputs) {
     inputs.leaderConnected = true;
     inputs.followerConnected = true;
 }</code></pre>
-    <div class="note warn"><strong>ArmFeedforward 有幾個方法被棄用了</strong>WPILib 2026.2.2 裡，<code>ArmFeedforward</code> 帶加速度的三參數 <code>calculate</code>，和帶 dt 的四參數版本，都從 2025 年起標成棄用、之後會移除，要改用 <code>calculateWithVelocities</code><a class="ref" href="#src6-22">[22]</a>。上面用的兩參數 <code>calculate(位置, 速度)</code> 沒被棄用，可以放心。</div>
+    <div class="note warn"><strong>ArmFeedforward 有幾個方法被棄用了</strong>WPILib 2026.2.2 裡，<code>ArmFeedforward</code> 帶加速度的三參數 <code>calculate</code>，和帶 dt 的四參數版本，都從 2025 年起標成棄用、之後會移除，要改用 <code>calculateWithVelocities</code><a class="ref" href="#src6-22">[22]</a>。上面用的兩參數 <code>calculate(位置, 速度)</code> 沒被棄用。</div>
   </section>
 
   <!-- ===== PART E ===== -->
@@ -1979,7 +1979,7 @@ public void updateInputs(ArmIOInputs inputs) {
         <tr><td>選擇 IO</td><td><code>RobotBase.isReal()</code></td><td><code>Constants.currentMode</code>：REAL、SIM、REPLAY</td></tr>
       </tbody>
     </table>
-    <p><code>ArmIOHardware</code> 和 <code>ArmIOSim</code> 一行都不用改，這就是 IO 架構爽的地方。</p>
+    <p><code>ArmIOHardware</code> 和 <code>ArmIOSim</code> 一行都不用改，這就是 IO 架構的好處。</p>
 
     <h2>E-2　@AutoLog</h2>
     <pre><code>import org.littletonrobotics.junction.AutoLog;
@@ -1991,7 +1991,7 @@ public interface ArmIO {
     }
     // 方法和簡易版完全相同
 }</code></pre>
-    <p>加上 <code>@AutoLog</code> 之後，AdvantageKit 會自動幫你產生寫入和讀回日誌的程式，類別名稱就是原名後面加 <code>AutoLogged</code><a class="ref" href="#src6-2">[2]</a>。這個類別是 build 的時候由 annotation processor 生出來的，所以 <code>build.gradle</code> 要照官方安裝步驟加設定<a class="ref" href="#src6-6">[6]</a>。找不到 <code>ArmIOInputsAutoLogged</code> 的話，九成是 build 設定沒弄好。</p>
+    <p>加上 <code>@AutoLog</code> 之後，AdvantageKit 會自動幫你產生寫入和讀回日誌的程式，類別名稱就是原名後面加 <code>AutoLogged</code><a class="ref" href="#src6-2">[2]</a>。這個類別是 build 的時候由 annotation processor 生出來的，所以 <code>build.gradle</code> 要照官方安裝步驟加設定<a class="ref" href="#src6-6">[6]</a>。找不到 <code>ArmIOInputsAutoLogged</code> 的話，通常是 build 設定沒弄好。</p>
 
     <h2>E-3　Subsystem 的變化</h2>
     <pre><code>import org.littletonrobotics.junction.Logger;
@@ -2247,7 +2247,7 @@ public void periodic() {
   <h1>機器人程式的生命週期：學校的一天</h1>
   <p class="lede">程式部署上去之後，到底是誰在呼叫你寫的方法？這章講機器人程式怎麼啟動、四種模式怎麼切換、每 20 毫秒裡哪些方法照什麼順序跑，順便比較 <code>TimedRobot</code> 跟 AdvantageKit 的 <code>LoggedRobot</code>。最後會解釋為什麼在 periodic 裡寫一個 while 迴圈，整台機器人就會「當機」。</p>
 
-  <h2>先講個比喻：學校的一天</h2>
+  <h2>比喻：學校的一天</h2>
   <div class="story">
     <p>每天早上學校開門前，工友會先把教室的燈打開、桌椅排好、設備檢查一遍。這件事一天只做一次，而且在任何人進教室之前就做完了。</p>
     <p>一天分成幾種時段。早自習的時候學生都到了，但還不能開始活動，只能乖乖坐好。第一節是自主學習，老師不在，學生照前一天寫好的計畫自己做事。接下來是一般上課，老師站在台上，學生照老師的指令動。偶爾還有實驗課，用來檢查器材能不能正常運作。</p>
@@ -2277,14 +2277,14 @@ public void periodic() {
     </tbody>
   </table>
 
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>學校的鐘一定準時響，但 20 毫秒只是「設定的週期」，不是保證。程式跑超過 20 毫秒，那一輪就叫 overrun，控制就會延遲。另外，我在故事裡特別強調老師和警衛是同一個人，這點真的很重要：<code>TimedRobot</code> 主迴圈裡的 periodic 方法，全部是在同一條執行緒上「一個接一個」跑的，不是同時跑。所以只要有一個卡住，後面全部被拖住。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>學校的鐘一定準時響，但 20 毫秒只是「設定的週期」，不是保證。程式跑超過 20 毫秒，那一輪就叫 overrun，控制就會延遲。另外，故事裡特別強調老師和警衛是同一個人，這點很重要：<code>TimedRobot</code> 主迴圈裡的 periodic 方法，全部是在同一條執行緒上「一個接一個」跑的，不是同時跑。所以只要有一個卡住，後面全部被拖住。</div>
 
   <h2>程式怎麼啟動</h2>
   <p>roboRIO 啟動程式的時候，先跑 <code>Main.java</code>，它把 <code>Robot</code> 類別交給 WPILib 啟動，然後 <code>Robot</code> 的建構子跑一次。從 2025 年開始，WPILib 範本把初始化寫在建構子裡，註解是「機器人第一次啟動時執行，用來放初始化程式」<a class="ref" href="#src7-1">[1]</a>。你在網路上看到舊範例用 <code>robotInit()</code>，那是以前的寫法。</p>
   <p>Command-based 專案的 <code>RobotContainer</code> 要在 <code>Robot</code> 的建構子裡建立，因為大部分設定都寫在 <code>RobotContainer</code> 的建構子裡<a class="ref" href="#src7-3">[3]</a>。所以「工友開門整理」這一步，實際上就是把所有 Subsystem 建好、按鍵綁好。</p>
 
   <h2>四種模式與誰來切換</h2>
-  <p>Driver Station 的 Operation 分頁可以選 Teleoperated、Autonomous、Practice、Test。Practice 很好用：按下 Enable 之後，它會照 Setup 分頁設的時間，自動跑一遍跟正式比賽一樣的模式切換<a class="ref" href="#src7-5">[5]</a>。正式比賽時，模式是場地系統（FMS）在控制。</p>
+  <p>Driver Station 的 Operation 分頁可以選 Teleoperated、Autonomous、Practice、Test。Practice 模式按下 Enable 之後，它會照 Setup 分頁設的時間，自動跑一遍跟正式比賽一樣的模式切換<a class="ref" href="#src7-5">[5]</a>。正式比賽時，模式是場地系統（FMS）在控制。</p>
   <p>自動和手動階段各有多長，每年規則不一樣，看當年的 Game Manual。</p>
 
   <h2>init、periodic、exit</h2>
@@ -2420,7 +2420,7 @@ public void periodic() {
   <div class="quiz"></div>
 
   <h2>練習：預測呼叫順序</h2>
-  <p>機器人剛開機（Disabled），然後依序：切到 Autonomous 跑兩輪，再切到 Teleop 跑一輪。從開機後第一輪開始，寫出每一輪會被呼叫的方法（Dashboard 更新不用寫）。寫完再用上面的模擬器對答案，先不要偷看。</p>
+  <p>機器人剛開機（Disabled），然後依序：切到 Autonomous 跑兩輪，再切到 Teleop 跑一輪。從開機後第一輪開始，寫出每一輪會被呼叫的方法（Dashboard 更新不用寫）。寫完再用上面的模擬器對答案。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
       <p>先把三種方法分清楚：init 只出現在「進入模式的那一輪」，exit 出現在「離開模式的那一輪」，periodic 每一輪都有。</p>
@@ -2475,9 +2475,9 @@ robotPeriodic()</code></pre>
 <template id="tpl-ch8">
   <p class="headline-code">CAN ID 08｜WPILib 基礎</p>
   <h1>Subsystem 與 Command：借用體育館</h1>
-  <p class="lede">Command-based 這個名字就是從這章來的。我們要講一個指令從開始到結束會經過哪四個方法、requirements 怎麼避免兩個指令同時搶一個機構、指令被打斷時會怎樣，還有預設指令（default command）到底拿來幹嘛。</p>
+  <p class="lede">Command-based 這個名字就是從這章來的。這章講一個指令從開始到結束會經過哪四個方法、requirements 怎麼避免兩個指令同時搶一個機構、指令被打斷時會怎樣，還有預設指令（default command）到底拿來幹嘛。</p>
 
-  <h2>先講個比喻：體育館借用規則</h2>
+  <h2>比喻：體育館借用規則</h2>
   <div class="story">
     <p>學校有幾間特別教室：體育館、音樂教室、實驗室，每種都只有一間，各有自己的設備和管理規則。別人要用，就要透過管理的老師。</p>
     <p>要在體育館辦活動，得先在登記簿寫「這個活動要用體育館」。如果同時要用體育館跟音樂教室，兩間都要登記。</p>
@@ -2593,7 +2593,7 @@ drive.setDefaultCommand(
   <div class="note warn"><strong>用 Commands 工具類別，卻忘了傳 Subsystem</strong>指令一樣會跑，但排程器不知道它在用機構，結果兩個指令可能同時在控制同一顆馬達。盡量用 Subsystem 自己的 factory，就不會漏。</div>
   <div class="note warn"><strong>預設指令自己會結束</strong>像是拿 <code>runOnce</code> 當預設指令，它一結束 Subsystem 就空了，下一輪又被排上去，變成每輪都在重複 <code>initialize</code> 和 <code>end</code>。預設指令請用 <code>run</code>。</div>
   <div class="note warn"><strong>在 execute() 裡等東西</strong>跟第 7 章一樣，指令裡寫 while 迴圈或 sleep 會卡死整個主迴圈。要等某件事發生，就讓 <code>isFinished()</code> 回傳那個條件。</div>
-  <div class="note coach"><strong>教練提醒</strong>寫任何指令之前先問自己：「它控制了哪些機構？」答案就是它的 requirements。Code review 看到控制馬達卻沒有 requirements 的指令，我一律退回。</div>
+  <div class="note coach"><strong>教練提醒</strong>寫任何指令之前先問自己：「它控制了哪些機構？」答案就是它的 requirements。Code review 看到控制馬達卻沒有 requirements 的指令，一律退回。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
@@ -2636,7 +2636,7 @@ intake.setDefaultCommand(intake.run(() -&gt; intake.setState(IntakeState.NONE)))
   <h1>Trigger 與按鍵綁定：對講機、門鈴和電燈開關</h1>
   <p class="lede">指令寫好了，接下來要決定「什麼時候跑」。這章講 onTrue、whileTrue、toggleOnTrue 三種綁定差在哪，怎麼用感測器或任意條件做 Trigger、怎麼把條件組起來，還有為什麼按鍵綁定只能在 RobotContainer 裡寫一次。</p>
 
-  <h2>先講個比喻：學校裡的三種按鈕</h2>
+  <h2>比喻：學校裡的三種按鈕</h2>
   <div class="story">
     <p>學校裡至少有三種按鈕。第一種是警衛室的門鈴：按一下警衛就出來開門，你按完放手，他照樣把門開完；按住不放也不會讓他開比較久。</p>
     <p>第二種是廣播的對講機：要按住才能講話，一放開聲音就斷，不管你話講完了沒。</p>
@@ -2772,7 +2772,7 @@ new Trigger(limitSwitch::get).debounce(0.1).onTrue(arm.goTo(ArmState.STOW));</co
   <h1>組合指令：運動會的節目表</h1>
   <p class="lede">比賽裡的動作很少只有一步，像「手臂下去、邊走邊吸、吸到了再收回來」。這章教你用 sequence、parallel、race、deadline 把小指令組成大動作，再加上各種結束條件。還有一條很多人會撞到的規則：同一個指令物件不能用兩次。</p>
 
-  <h2>先講個比喻：運動會的節目表</h2>
+  <h2>比喻：運動會的節目表</h2>
   <div class="story">
     <p>運動會的節目大概可以分成四種。接力賽是一棒接一棒，第一棒跑完第二棒才出發，最後一棒到終點才算結束。</p>
     <p>大掃除是各組同時掃不同區域，快的組掃完可以休息，但要等最後一組也掃完，大掃除才算結束。</p>
@@ -2919,16 +2919,16 @@ operator.y().onTrue(SuperstructureCommands.score(arm, intake));</code></pre>
 <template id="tpl-ch11">
   <p class="headline-code">CAN ID 11｜硬體</p>
   <h1>Phoenix 6 與 TalonFX：班長的工作手冊</h1>
-  <p class="lede">隊上的馬達幾乎都是 TalonFX，所以這章很實用。我們會講怎麼在 CANivore「9427」上建立 TalonFX、怎麼寫一份完整的設定、各種控制請求差在哪、沒有 Pro 授權的時候 FOC 會怎樣，最後介紹 Phoenix Tuner X 這個好用的工具。</p>
+  <p class="lede">隊上的馬達幾乎都是 TalonFX，所以這章會常常用到。內容包括怎麼在 CANivore「9427」上建立 TalonFX、怎麼寫一份完整的設定、各種控制請求差在哪、沒有 Pro 授權的時候 FOC 會怎樣，最後介紹 Phoenix Tuner X。</p>
   <div class="note"><strong>版本說明</strong>這章是照 Phoenix 6 的 2026 版（26.x）文件寫的。CTRE 網站上標 latest 的已經是 2027 年版了，查資料記得切到 stable。</div>
 
-  <h2>先講個比喻：班長的工作手冊</h2>
+  <h2>比喻：班長的工作手冊</h2>
   <div class="story">
     <p>第 6 章說過，班長（TalonFX）自己會處理怎麼帶隊。導師只要講「去禮堂」，走多快、怎麼轉彎都是班長的事，而且他反應比導師快很多。</p>
     <p>班長上任的時候，導師會發一整本工作手冊給他：哪個方向算前進、休息時要站好還是可以放鬆、最多能讓同學跑多累、帶隊速度的規定。手冊沒寫到的，就照學校的預設。所以不用先把舊手冊撕掉再發新的，直接發一本完整的新手冊，舊規定就全部被換掉了。</p>
     <p>平常導師交代事情，是用學校統一格式的交辦單：「用這個力道帶隊」、「帶到這個位置」、「用這個速度走」。同一種單子印一張就夠了，每次改上面的數字再交出去，不用每次重印。</p>
     <p>講力道有好幾種說法。「用全力的六成」會受當天體力影響，同學累的時候六成就沒那麼快。「用固定的力氣」就不管累不累都一樣，比較穩。還有一種最精準的「直接控制出多少力」，不過只有拿到進階證照的班長能用。</p>
-    <p>交辦單上如果勾了「用進階技巧」，可是班長沒有進階證照，他會自己改用一般的方法做完，不會因此罷工。</p>
+    <p>交辦單上如果勾了「用進階技巧」，可是班長沒有進階證照，他會自己改用一般的方法做完，不會因此拒絕做事。</p>
     <p>學校的舊大樓有一條共用的廣播線，新大樓另外拉了一條更快的專線，名字叫「9427」。導師找班長的時候要講清楚他在哪一條線上。同一條線上每個班長的代號不能重複，不然一叫號兩個人會同時回應。</p>
     <p>另外學務處有一套幹部管理系統，可以幫班長設定代號和名字、叫某個班長舉手讓你找到他、更新他的訓練、做健康檢查、畫出他最近的表現，也可以直接下指令測試。</p>
   </div>
@@ -2951,7 +2951,7 @@ operator.y().onTrue(SuperstructureCommands.score(arm, intake));</code></pre>
       <tr><td>學務處的幹部管理系統</td><td>Phoenix Tuner X</td></tr>
     </tbody>
   </table>
-  <div class="note limit"><strong>這個比喻哪裡不準</strong>班長累了會變慢，但 TalonFX 的 <code>DutyCycleOut</code> 受影響的是電池電壓：電池電壓一掉，同樣的百分比輸出的電壓就變低。另外，工作手冊發下去就存在班長身上，重開機也還在；可是如果程式每次開機都套用一次完整設定，程式裡的版本就會蓋掉你在 Tuner X 裡手動改的設定。我們的做法是一律以程式裡的設定為準，比較不會出錯。</div>
+  <div class="note limit"><strong>這個比喻哪裡不準</strong>班長累了會變慢，但 TalonFX 的 <code>DutyCycleOut</code> 受影響的是電池電壓：電池電壓一掉，同樣的百分比輸出的電壓就變低。另外，工作手冊發下去就存在班長身上，重開機也還在；可是如果程式每次開機都套用一次完整設定，程式裡的版本就會蓋掉你在 Tuner X 裡手動改的設定。一律以程式裡的設定為準，比較不會出錯。</div>
 
   <h2>建立 TalonFX：指定 CAN bus</h2>
   <p>Phoenix 6 在 2026 年把「用字串指定 CAN bus」的建構子標成 deprecated，預計 2027 年拿掉，要改用傳 <code>CANBus</code> 物件的版本<a class="ref" href="#src11-4">[4]</a>。如果只給 CAN ID、不給 bus，就會用系統預設的 CAN bus，在 roboRIO 上就是內建那條<a class="ref" href="#src11-5">[5]</a>。</p>
@@ -3020,7 +3020,7 @@ armLeader.getConfigurator().apply(config);</code></pre>
 
   <h2>Phoenix Tuner X</h2>
   <p>Tuner X 可以做的事很多：設定裝置的名稱和 ID、讓裝置閃燈好在機器人上找到它、把所有裝置的韌體更新到最新、在 Windows 或 Android 上直接控制單顆馬達、畫出速度和位置這些訊號，還有對裝置做 Self Test<a class="ref" href="#src11-7">[7]</a>。</p>
-  <p>新機器人第一次通電，我建議照這個順序：</p>
+  <p>新機器人第一次通電，建議照這個順序：</p>
   <ol>
     <li>用 Tuner X 找到所有裝置，逐一閃燈，確認每一顆在機器人上的位置。</li>
     <li>設定 CAN ID，同一條 bus 上不可重複；隊上可以約定編號規則，例如手臂用 20 幾號。</li>
@@ -3083,7 +3083,7 @@ armLeader.getConfigurator().apply(config);</code></pre>
         motor.setControl(request.withOutput(volts));
     }
 }</code></pre>
-    <p>滾輪用 Coast：停的時候讓它自己慢慢停，不會卡住遊戲物件。手臂則用 Brake（第 6 章），因為要撐住重力。這是我們看機構決定的，不是什麼固定規則。</p>
+    <p>滾輪用 Coast：停的時候讓它自己慢慢停，不會卡住遊戲物件。手臂則用 Brake（第 6 章），因為要撐住重力。這是依機構決定的，不是固定規則。</p>
     </div>
   </div>
 
@@ -3104,10 +3104,10 @@ armLeader.getConfigurator().apply(config);</code></pre>
 <template id="tpl-ch12">
   <p class="headline-code">CAN ID 12｜硬體</p>
   <h1>感測器與 CAN 除錯：計步器、刻度尺和廣播線</h1>
-  <p class="lede">機器人要知道自己在哪，靠的是感測器；感測器要能讀到，靠的是 CAN。這章講 TalonFX 內建編碼器和 CANcoder 差在哪、CANcoder 零點怎麼設、極限開關怎麼接、怎麼歸零。最後是我覺得最實用的部分：CAN 上找不到裝置的時候，照什麼順序查。</p>
+  <p class="lede">機器人要知道自己在哪，靠的是感測器；感測器要能讀到，靠的是 CAN。這章講 TalonFX 內建編碼器和 CANcoder 差在哪、CANcoder 零點怎麼設、極限開關怎麼接、怎麼歸零。最後是最實用的部分：CAN 上找不到裝置的時候，照什麼順序查。</p>
   <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 和 Phoenix 6 的 2026 版（26.x）文件寫的。CANcoder 的 <code>AbsoluteSensorRange</code> 從 2025 年起改名叫 <code>AbsoluteSensorDiscontinuityPoint</code>，網路上舊範例還會看到舊名字。</div>
 
-  <h2>先講個比喻：班長的計步器、牆上的刻度尺</h2>
+  <h2>比喻：班長的計步器、牆上的刻度尺</h2>
   <div class="story">
     <p>班長身上戴著一個計步器，走一步就加一，很靈敏、反應很快。但它只知道「從早上戴上到現在走了幾步」，每天早上都從 0 開始算。昨天放學班長停在走廊中間，今天早上計步器一樣從 0 開始，它根本不知道自己在哪。</p>
     <p>走廊牆上則有一把刻度尺，什麼時候看都能直接讀出「現在在第幾公尺」，一大早看也是對的。只是刻度尺裝上去的時候，0 不一定剛好對準走廊起點，所以要記一個「校正值」，讀到的數字加上校正值才是真的位置。</p>
@@ -3169,7 +3169,7 @@ config.Feedback.SensorToMechanismRatio = 1.0; // TODO: CANcoder 轉數 / 手臂�
 config.Feedback.RotorToSensorRatio = 1.0;     // TODO: 馬達轉數 / CANcoder 轉數
 // ...其他設定同第 6 章
 armLeader.getConfigurator().apply(config);</code></pre>
-  <p>注意，這時候「sensor」換人了：用遠端 CANcoder 時，<code>SensorToMechanismRatio</code> 是 <strong>CANcoder 到手臂</strong>的比例。CANcoder 直接裝在手臂轉軸上就是 1.0，不是馬達的齒輪比。這個超容易填錯。</p>
+  <p>注意，這時候「sensor」換人了：用遠端 CANcoder 時，<code>SensorToMechanismRatio</code> 是 <strong>CANcoder 到手臂</strong>的比例。CANcoder 直接裝在手臂轉軸上就是 1.0，不是馬達的齒輪比。這裡很容易填錯。</p>
   <table class="map">
     <thead><tr><th>FeedbackSensorSource</th><th>做什麼</th><th>需要 Pro</th></tr></thead>
     <tbody>
@@ -3191,7 +3191,7 @@ armLeader.getConfigurator().apply(config);</code></pre>
       <tr><td>常閉（NC），接地</td><td><code>false</code></td><td><code>true</code></td><td><code>true</code>（看起來像碰到）</td></tr>
     </tbody>
   </table>
-  <p>用常開開關，線掉了程式會以為「還沒到底」，繼續往下推；用常閉開關，線掉了程式會以為「已經到底」，機構就停住了。後者比較安全，因為壞掉的時候是停，不是撞。這是我們選接法的理由，不是唯一答案，但不管怎麼接，這張表一定要寫在程式註解裡。</p>
+  <p>用常開開關，線掉了程式會以為「還沒到底」，繼續往下推；用常閉開關，線掉了程式會以為「已經到底」，機構就停住了。後者比較安全，因為壞掉的時候是停，不是撞。這是選接法的理由，不是唯一答案，但不管怎麼接，這張表一定要寫在程式註解裡。</p>
   <pre><code>/** 常閉開關接 DIO 0：碰到或線掉了都回傳 true。 */
 private final DigitalInput bottomLimit = new DigitalInput(0); // TODO: 依接線
 
@@ -3211,10 +3211,10 @@ public boolean atBottom() {
 
   <h2>CAN 的接法</h2>
   <p>CAN 建議用 daisy-chain 接法：從 roboRIO 出發，一個裝置進、一個裝置出，最後接到 PDP。黃線是 CAN-High、綠線是 CAN-Low<a class="ref" href="#src12-10">[10]</a>。CAN 網路兩端都要有一顆 120 Ω 的終端電阻，roboRIO 和 PDP 都內建了，所以才建議從 roboRIO 開始、PDP 結束<a class="ref" href="#src12-10">[10]</a>。CANivore 也內建終端電阻，用 CANivore 的話就是「CANivore ↔ 裝置 ↔ 120 Ω 電阻」<a class="ref" href="#src12-11">[11]</a>。</p>
-  <p>檢查接線有一招很好用：<strong>斷電</strong>之後拿電錶量 CAN-H 和 CAN-L 之間的電阻，應該大約 60 Ω（兩顆 120 Ω 並聯）。量到 120 Ω 就是只有一端有終端<a class="ref" href="#src12-11">[11]</a>。</p>
+  <p>檢查接線有一個好方法：<strong>斷電</strong>之後拿電錶量 CAN-H 和 CAN-L 之間的電阻，應該大約 60 Ω（兩顆 120 Ω 並聯）。量到 120 Ω 就是只有一端有終端<a class="ref" href="#src12-11">[11]</a>。</p>
 
   <h2>找不到裝置時的除錯順序</h2>
-  <p>CAN 的問題說穿了通常只有兩種：同型號的裝置用了一樣的 ID（出廠預設都是 0），或是 CAN 線接錯、接不牢。最麻煩的是兩種同時發生<a class="ref" href="#src12-11">[11]</a>。照 CTRE 建議的順序查：</p>
+  <p>CAN 的問題通常只有兩種：同型號的裝置用了一樣的 ID（出廠預設都是 0），或是 CAN 線接錯、接不牢。最麻煩的是兩種同時發生<a class="ref" href="#src12-11">[11]</a>。照 CTRE 建議的順序查：</p>
   <ol>
     <li><strong>看 Tuner X。</strong>同型號、同 ID 的裝置會變成紅色卡片，標示衝突<a class="ref" href="#src12-11">[11]</a>。注意是「同型號」：TalonFX 21 和 CANcoder 21 不會衝突，兩顆 TalonFX 21 才會。</li>
     <li><strong>看哪些裝置不見了。</strong>daisy-chain 某一段斷掉，斷點後面的裝置會全部消失。找出「最後一個還在的」和「第一個不見的」，問題就在這兩個中間。</li>
@@ -3226,7 +3226,7 @@ public boolean atBottom() {
   <p>看燈號也有幫助：TalonFX 和 Pigeon 2 正常但沒被控制時通常閃橘燈，CANcoder 是快速亮閃；LED 偶爾閃一下紅，通常是接點鬆了，可以搖一搖線看能不能重現<a class="ref" href="#src12-11">[11]</a>。</p>
 
   <h2>動手試：CAN bus 除錯台</h2>
-  <p>下面是一條接在 CANivore「9427」上的 CAN bus。點裝置之間的線可以剪斷或接回，也可以拔掉末端的終端電阻、故意把 ID 設錯。每弄壞一個地方，就按「斷電量電阻」和「Tuner X 掃描」看會怎樣。多玩幾次，比賽時你會感謝自己。</p>
+  <p>下面是一條接在 CANivore「9427」上的 CAN bus。點裝置之間的線可以剪斷或接回，也可以拔掉末端的終端電阻、故意把 ID 設錯。每弄壞一個地方，就按「斷電量電阻」和「Tuner X 掃描」看會怎樣。</p>
   <div class="lab">
     <div class="canchain" id="canChain"></div>
     <div class="calls">
@@ -3318,7 +3318,7 @@ public boolean atBottom() {
             .withName("Elevator.home");
     }
 }</code></pre>
-    <p>講幾個重點。<code>until</code> 和 <code>withTimeout</code> 誰先發生都會結束（第 10 章）；結束後再確認一次 <code>atBottom</code>，如果是逾時結束的，就<strong>不要</strong>重設位置，不然會把錯的位置當成 0。另外用常閉開關的話，線掉了會讀成「已經到底」，機構會停在原地被當成 0，所以開機歸零之後，還是要用眼睛確認機構真的在底部。</p>
+    <p>幾個重點。<code>until</code> 和 <code>withTimeout</code> 誰先發生都會結束（第 10 章）；結束後再確認一次 <code>atBottom</code>，如果是逾時結束的，就<strong>不要</strong>重設位置，不然會把錯的位置當成 0。另外用常閉開關的話，線掉了會讀成「已經到底」，機構會停在原地被當成 0，所以開機歸零之後，還是要用眼睛確認機構真的在底部。</p>
     <p>這個寫法為了短，直接在 <code>startEnd</code> 裡呼叫 IO。如果你的 Subsystem 跟第 6 章一樣在 periodic 裡送輸出，就要改成切換 <code>ControlMode</code>，不然會被 periodic 蓋掉。</p>
     </div>
   </div>
@@ -3346,7 +3346,7 @@ public boolean atBottom() {
   <p class="lede">進階控制從這章開始。你大概聽過 PID，但只用 PID 的手臂常常會「差一點點就是到不了」。這章講 P、I、D 各自在幹嘛，kS、kV、kA、kG 這些前饋又是什麼，最後照順序手動調出第一組能用的參數。</p>
   <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 和 Phoenix 6 的 2026 版（26.x）文件寫的。裡面出現的增益數字都只是示範，你的機構一定要自己調，不要抄。</div>
 
-  <h2>先講個比喻：推書車上斜坡</h2>
+  <h2>比喻：推書車上斜坡</h2>
   <div class="story">
     <p>圖書股長要把書車推到坡道中間的一個記號。坡道通往圖書館，記號畫在半路上，書車很重，一放手就會滑下來。</p>
     <p>最直覺的推法是：離記號越遠推越用力，快到了就輕輕推。問題是快到記號的時候「差很少」，他就只推一點點，可是坡道一直在把車往下拉。結果書車停在記號下面一點點：推的力剛好等於往下滑的力，就是永遠差那一點。</p>
@@ -3391,7 +3391,7 @@ public boolean atBottom() {
     </tbody>
   </table>
   <p>「軟體彈簧」和「軟體阻尼」是 WPILib 自己用的比喻：P 就像彈簧的 F = −kx，D 就像門的緩衝器，速度越快阻力越大<a class="ref" href="#src13-2">[2]</a>。</p>
-  <p>至於 I，kI 太大會造成積分飽和（windup）。處理方式照順序是：先把 kI 調小，能調到 0 最好；誤差太大的時候把積分歸零（<code>setIZone</code>）；限制積分的上下限（<code>setIntegratorRange</code>）<a class="ref" href="#src13-3">[3]</a>。老實說，前饋做好之後，大部分時候根本用不到 I。</p>
+  <p>至於 I，kI 太大會造成積分飽和（windup）。處理方式照順序是：先把 kI 調小，能調到 0 最好；誤差太大的時候把積分歸零（<code>setIZone</code>）；限制積分的上下限（<code>setIntegratorRange</code>）<a class="ref" href="#src13-3">[3]</a>。前饋做好之後，大部分時候其實用不到 I。</p>
 
   <h2>前饋：kS、kV、kA、kG</h2>
   <p>WPILib 是用永磁直流馬達的「電壓平衡方程式」來描述前饋的<a class="ref" href="#src13-4">[4]</a>：</p>
@@ -3404,7 +3404,7 @@ public boolean atBottom() {
     <li><strong>kA</strong>：產生某個加速度要的電壓。</li>
     <li><strong>kG</strong>：抵銷重力。升降機構是定值，手臂要乘 cos(θ)，因為重力不是直接作用在馬達上的。</li>
   </ul>
-  <p>這幾個定義都出自 WPILib 文件<a class="ref" href="#src13-4">[4]</a>。注意 cos(θ) 的 θ 是「跟水平的夾角」，所以第 6 章和第 12 章才會一直碎念「0 度一定要是水平」。</p>
+  <p>這幾個定義都出自 WPILib 文件<a class="ref" href="#src13-4">[4]</a>。注意 cos(θ) 的 θ 是「跟水平的夾角」，所以第 6 章和第 12 章才會一再強調「0 度一定要是水平」。</p>
 
   <h2>在 TalonFX 上設定</h2>
   <p>第 6 章的手臂已經把這些增益放在 TalonFX 的 Slot0 裡了。在控制器裡跑閉迴路沒有感測延遲，更新頻率是 1 kHz，反應比在 roboRIO 上跑快<a class="ref" href="#src13-5">[5]</a>。</p>
@@ -3563,10 +3563,10 @@ public boolean atSpeed() {
 <template id="tpl-ch14">
   <p class="headline-code">CAN ID 14｜控制</p>
   <h1>MotionMagic：校車司機怎麼開到下一站</h1>
-  <p class="lede">第 6 章其實已經偷偷用了 <code>MotionMagicVoltage</code>，這章來解釋它到底在做什麼。為什麼不能直接把目標丟給 PID？梯形和 S-curve 軌跡長怎樣？巡航速度、加速度、jerk 要怎麼設？最後順便比較 MotionMagic Expo 和 Dynamic MotionMagic。</p>
+  <p class="lede">第 6 章其實已經用過 <code>MotionMagicVoltage</code>，這章來解釋它到底在做什麼。為什麼不能直接把目標丟給 PID？梯形和 S-curve 軌跡長怎樣？巡航速度、加速度、jerk 要怎麼設？最後順便比較 MotionMagic Expo 和 Dynamic MotionMagic。</p>
   <div class="note"><strong>版本說明</strong>這章是照 Phoenix 6 的 2026 版（26.x）文件寫的。</div>
 
-  <h2>先講個比喻：校車開到下一站</h2>
+  <h2>比喻：校車開到下一站</h2>
   <div class="story">
     <p>新手校車司機只看距離：下一站還很遠，油門就踩到底；快到了才猛踩煞車。車上同學一下往後倒、一下往前撲，書包掉滿地。這就是第 13 章只用 P 的樣子：一開始誤差很大，輸出直接衝到最大。</p>
     <p>老司機不一樣，他出發前就有一張行車計畫：用固定的加速度慢慢起步，到速限就維持巡航，算好距離提早減速，剛好停在站牌前。每一秒車子該在哪、該開多快，全都在計畫裡。</p>
@@ -3653,13 +3653,13 @@ public void setPositionGoal(double positionRot) {
     </tbody>
   </table>
   <p><strong>MotionMagic Expo</strong>：它產生的是指數型軌跡，最貼近系統本身的動態，跟梯形比，過衝和到位時間都可以一起變少。它有自己的 <code>MotionMagicExpo_kV</code> 和 <code>MotionMagicExpo_kA</code>（單位固定是伏特），供電電壓除以 kV 就是軌跡的最高速度；巡航速度設 0 的話，會往系統的最高速度加速<a class="ref" href="#src14-2">[2]</a>。這兩個值可以直接拿第 15 章 SysId 算出來的 kV、kA 當起點。</p>
-  <div class="note warn"><strong>Dynamic MotionMagic 沒有 Pro 會直接停止輸出</strong>這點跟 EnableFOC 不一樣（第 11 章）：沒授權的 TalonFX 用 Dynamic MotionMagic，會<strong>直接關掉輸出</strong>，還觸發 <code>UnlicensedFeatureInUse</code> 故障<a class="ref" href="#src14-2">[2]</a>。我們沒有 Pro，所以不要用它。</div>
+  <div class="note warn"><strong>Dynamic MotionMagic 沒有 Pro 會直接停止輸出</strong>這點跟 EnableFOC 不一樣（第 11 章）：沒授權的 TalonFX 用 Dynamic MotionMagic，會<strong>直接關掉輸出</strong>，還觸發 <code>UnlicensedFeatureInUse</code> 故障<a class="ref" href="#src14-2">[2]</a>。沒有 Pro 就不要用它。</div>
 
   <h2>在 roboRIO 上做同樣的事</h2>
   <p>如果馬達控制器沒有內建軌跡功能，或是像第 6 章 D-3 那樣在模擬裡自己算，WPILib 有 <code>TrapezoidProfile</code> 可以產生軌跡，<code>ProfiledPIDController</code> 則是把軌跡跟 PID 包在一起<a class="ref" href="#src14-1">[1]</a><a class="ref" href="#src14-3">[3]</a>。CTRE 也示範過用 <code>TrapezoidProfile</code> 每 20 ms 算一個點，再把位置和速度丟給 <code>PositionVoltage</code><a class="ref" href="#src14-4">[4]</a>。不過能用 MotionMagic 的話，讓控制器自己跑（1 kHz）比較簡單，也比較不會被 roboRIO 迴圈延遲影響。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>單位填錯</strong>設了 <code>SensorToMechanismRatio</code> 之後，巡航速度和加速度都是<strong>機構端</strong>的 rot/s、rot/s²。把馬達端的數字填進去，手臂會快上幾十倍，很恐怖。</div>
+  <div class="note warn"><strong>單位填錯</strong>設了 <code>SensorToMechanismRatio</code> 之後，巡航速度和加速度都是<strong>機構端</strong>的 rot/s、rot/s²。把馬達端的數字填進去，手臂會快上幾十倍。</div>
   <div class="note warn"><strong>巡航速度超過機構能力</strong>軌跡跑得比馬達給得出來的還快，輸出飽和，實際位置越落越後，到終點附近很容易衝過頭。先用 12 ÷ kV 估一下上限。</div>
   <div class="note warn"><strong>每一輪都 new 請求物件</strong><code>new MotionMagicVoltage(...)</code> 放在 periodic 裡會一直產生垃圾物件。建一次，用 <code>withPosition</code> 改目標就好。</div>
   <div class="note warn"><strong>以為 jerk 越大越好</strong>jerk 是 S-curve 的「圓滑程度」，數字<strong>越小</strong>越圓滑、也越慢；設 0 是完全不限制（梯形）。很多人以為反過來。</div>
@@ -3668,7 +3668,7 @@ public void setPositionGoal(double positionRot) {
   <div class="quiz"></div>
 
   <h2>練習：升降機構的兩種速度</h2>
-  <p>升降機構平常用正常速度，但機器人夾著遊戲物件的時候要慢一點，免得甩掉。我們沒有 Pro，不能用 Dynamic MotionMagic。你會怎麼做？寫出關鍵的程式。</p>
+  <p>升降機構平常用正常速度，但機器人夾著遊戲物件的時候要慢一點，免得甩掉。假設沒有 Pro，不能用 Dynamic MotionMagic。你會怎麼做？寫出關鍵的程式。</p>
   <div class="hints">
     <div class="hint" data-label="提示 1">
       <p>不能用 Dynamic MotionMagic，就只剩「改設定」這條路。想想看：設定要在什麼時候改、多久改一次？</p>
@@ -3713,10 +3713,10 @@ public void setSlowMode(boolean slow) {
 <template id="tpl-ch15">
   <p class="headline-code">CAN ID 15｜控制</p>
   <h1>SysId 系統鑑別：體適能檢測</h1>
-  <p class="lede">第 13 章的參數是用「試」的，這章要改成用「量」的。我們會講 SysId 在量什麼、四項測試在做什麼、資料怎麼變成 kS、kV、kA、kG，還有怎麼判斷資料能不能信。後半段是實作：在手臂上用 <code>SysIdRoutine</code> 配 Phoenix 的 SignalLogger 收資料、把 hoot 檔轉成 SysId 看得懂的格式，最後把結果填回程式。</p>
+  <p class="lede">第 13 章的參數是用「試」的，這章要改成用「量」的。內容包括 SysId 在量什麼、四項測試在做什麼、資料怎麼變成 kS、kV、kA、kG，還有怎麼判斷資料能不能信。後半段是實作：在手臂上用 <code>SysIdRoutine</code> 配 Phoenix 的 SignalLogger 收資料、把 hoot 檔轉成 SysId 看得懂的格式，最後把結果填回程式。</p>
   <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 和 Phoenix 6 的 2026 版（26.x）文件寫的。SysId 不用另外裝，WPILib 安裝程式就附了。</div>
 
-  <h2>先講個比喻：體適能檢測</h2>
+  <h2>比喻：體適能檢測</h2>
   <div class="story">
     <p>體育老師要幫每個同學排訓練課表，可以憑感覺猜「他大概跑多快」，但更好的方法是做體適能檢測，讓數據說話。第 13 章的手動調參就是憑感覺猜，這章要做的是檢測。</p>
     <p>檢測有兩種項目。第一種是「漸速跑」：跑步機的速度一點一點慢慢調高，同學幾乎沒有在「加速」，所以量到的主要是「維持某個速度要花多少力」。第二種是「起跑衝刺」：槍一響就全力衝，量的是「身體要加速有多吃力」。</p>
@@ -3749,7 +3749,7 @@ public void setSlowMode(boolean slow) {
       <tr><td>Arm</td><td>V = kG·cos(θ) + kS·sgn(ω) + kV·ω + kA·α</td><td>手臂</td></tr>
     </tbody>
   </table>
-  <p>有沒有很眼熟？這三條就是第 13 章的前饋方程式。SysId 做的事，就是幫你的機構把式子裡的係數找出來。</p>
+  <p>這三條就是第 13 章的前饋方程式。SysId 做的事，就是幫你的機構把式子裡的係數找出來。</p>
 
   <h2>四項測試</h2>
   <p>標準流程有兩種測試<a class="ref" href="#src15-2">[2]</a>：</p>
@@ -3955,10 +3955,10 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
 <template id="tpl-ch16">
   <p class="headline-code">CAN ID 16｜上場</p>
   <h1>自動階段與路徑：校外教學的行程表</h1>
-  <p class="lede">自動階段那十幾秒，沒有人能碰搖桿，機器人全靠你事先寫好的程式。這章講場地座標怎麼定、里程計怎麼估位置（還有它為什麼會飄）、PathPlanner 的路徑和 Auto 怎麼變成指令。最後是幾個上場前一定要搞定的細節：紅藍聯盟翻轉、Named Commands、自動程式選單。</p>
+  <p class="lede">自動階段那十幾秒，沒有人能碰搖桿，機器人全靠你事先寫好的程式。這章講場地座標怎麼定、里程計怎麼估位置（還有它為什麼會飄）、PathPlanner 的路徑和 Auto 怎麼變成指令。最後是幾個上場前一定要處理好的細節：紅藍聯盟翻轉、Named Commands、自動程式選單。</p>
   <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 和 PathPlannerLib 2026 的文件寫的。PathPlanner 的 API 幾乎每年都會改，網路上的舊範例（像 2024 年以前的 <code>HolonomicPathFollowerConfig</code>）已經不能用了。這章拿 swerve 底盤當例子。</div>
 
-  <h2>先講個比喻：校外教學的行程表</h2>
+  <h2>比喻：校外教學的行程表</h2>
   <div class="story">
     <p>校外教學的前 15 分鐘，老師得留在學校，不能跟車，遊覽車只能照事先寫好的行程表走。路線怎麼開、哪一站下車做什麼，全部都要提前寫好。</p>
     <p>車上沒有 GPS，司機只能記「往北開了幾公里、在哪裡左轉」，自己推算現在在哪。短程很準，但開久了，或中途被別的車擦到一下，推算就會越來越偏。</p>
@@ -3996,10 +3996,10 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
 
   <h2>PathPlanner 是什麼</h2>
   <p>PathPlanner 分兩塊：電腦上的 GUI 用來畫路徑、組 Auto；機器人程式裡的 PathPlannerLib 負責讀檔、跟著路徑跑。PathPlannerLib 用 WPILib 的 Vendor Dependency Manager 就能裝<a class="ref" href="#src16-4">[4]</a>（第 0 章講過的 vendordep）。</p>
-  <p>GUI 裡的 <strong>Path</strong> 就是一條路線；<strong>Auto</strong> 則是一個 sequential 指令群組，裡面可以放路徑跟隨指令、Named Commands、等待指令，還有巢狀的指令群組，同一條路徑也可以在好幾個 Auto 裡重複用<a class="ref" href="#src16-5">[5]</a>。說白了，Auto 就是第 10 章的組合指令，只是用 GUI 畫出來而已。</p>
+  <p>GUI 裡的 <strong>Path</strong> 就是一條路線；<strong>Auto</strong> 則是一個 sequential 指令群組，裡面可以放路徑跟隨指令、Named Commands、等待指令，還有巢狀的指令群組，同一條路徑也可以在好幾個 Auto 裡重複用<a class="ref" href="#src16-5">[5]</a>。換句話說，Auto 就是第 10 章的組合指令，只是用 GUI 畫出來而已。</p>
 
   <h3>Robot Config</h3>
-  <p>GUI 的設定頁要填機器人的質量、轉動慣量（MOI）、輪子和馬達這些資料，PathPlanner 會用它們限制軌跡的最大速度和加速度。這些值要盡量準：質量要包含保險桿和電池；MOI 最好用 SysId 的結果算，粗估的公式假設質量平均分布，通常不準<a class="ref" href="#src16-6">[6]</a>。你看，第 15 章的 SysId 又出現了。</p>
+  <p>GUI 的設定頁要填機器人的質量、轉動慣量（MOI）、輪子和馬達這些資料，PathPlanner 會用它們限制軌跡的最大速度和加速度。這些值要盡量準：質量要包含保險桿和電池；MOI 最好用 SysId 的結果算，粗估的公式假設質量平均分布，通常不準<a class="ref" href="#src16-6">[6]</a>。這裡又用到第 15 章的 SysId。</p>
 
   <h2>設定 AutoBuilder</h2>
   <p>PathPlannerLib 用 <code>AutoBuilder</code> 把 GUI 裡的 Auto 變成指令，建議在底盤 Subsystem 的建構子裡設定<a class="ref" href="#src16-7">[7]</a>。下面是 CTRE 官方 swerve + PathPlanner 範例的寫法<a class="ref" href="#src16-3">[3]</a>：</p>
@@ -4063,7 +4063,7 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
 
   <h2>上場前的自動程式檢查</h2>
   <ol>
-    <li>選單選的是這一場要跑的 Auto，而且不是預設的「None」。（真的有隊伍這樣上場過。）</li>
+    <li>選單選的是這一場要跑的 Auto，而且不是預設的「None」。</li>
     <li>機器人擺的位置跟 Auto 的起始位置一樣（Auto 有設起始位置的話，會用 <code>resetPose</code> 重設里程計）。</li>
     <li>Driver Station 上的聯盟顏色是對的，路徑才會往正確的那邊翻。</li>
     <li>在練習場或模擬（第 6 章 D 部分）裡，紅藍兩邊都實際跑過一次。</li>
@@ -4109,7 +4109,7 @@ controller.x().and(testMode).whileTrue(arm.sysIdDynamic(SysIdRoutine.Direction.k
 
 // RobotContainer 建構子裡，buildAutoChooser 之後
 autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
-    <p>講幾個重點：<code>sequence</code> 等手臂到位才出發；<code>parallel</code> 讓走路徑跟收手臂一起進行，兩個都結束才算完成（第 10 章）；手臂和底盤是不同的 Subsystem，不會互相打斷。載入失敗時回傳 <code>Commands.none()</code> 並回報錯誤，總比整支程式掛掉好。這個 Auto 在建構子裡就建好，符合「開機時載入」的建議。</p>
+    <p>幾個重點：<code>sequence</code> 等手臂到位才出發；<code>parallel</code> 讓走路徑跟收手臂一起進行，兩個都結束才算完成（第 10 章）；手臂和底盤是不同的 Subsystem，不會互相打斷。載入失敗時回傳 <code>Commands.none()</code> 並回報錯誤，總比整支程式掛掉好。這個 Auto 在建構子裡就建好，符合「開機時載入」的建議。</p>
     <p>還有，這條路徑沒有經過 <code>PathPlannerAuto</code>，所以不會自動重設起始位置；真的要用的話，要確定出發前里程計已經設對了。</p>
     </div>
   </div>
@@ -4130,10 +4130,10 @@ autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
 <template id="tpl-ch17">
   <p class="headline-code">CAN ID 17｜上場</p>
   <h1>視覺與定位：看門牌校正位置</h1>
-  <p class="lede">第 16 章說里程計會飄，這章就來把它拉回來。我們會講 AprilTag 是什麼、為什麼視覺量測要「融合」進里程計而不是直接取代它、標準差代表什麼，然後用 Limelight 的 MegaTag2 更新 CTRE swerve 的位置，最後比較兩種瞄準的做法。</p>
+  <p class="lede">第 16 章說里程計會飄，這章講怎麼把它拉回來：AprilTag 是什麼、為什麼視覺量測要「融合」進里程計而不是直接取代它、標準差代表什麼，然後用 Limelight 的 MegaTag2 更新 CTRE swerve 的位置，最後比較兩種瞄準的做法。</p>
   <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 文件和 CTRE Phoenix6-Examples 附的 LimelightHelpers 寫的。Limelight 和 PhotonVision 的韌體、函式庫每年都會更新，用之前對一下當年的版本。延續第 16 章，一樣拿 CTRE swerve 當例子。</div>
 
-  <h2>先講個比喻：看門牌校正位置</h2>
+  <h2>比喻：看門牌校正位置</h2>
   <div class="story">
     <p>回到第 16 章的校外教學：司機靠里程表推算位置，開越久、被擦撞越多次，就偏越多。</p>
     <p>好在路邊有門牌。每棟建築門口都釘著一塊，門牌在地圖上的位置早就標好了。看到門牌，量一下自己離它多遠、在它哪一邊，就能算出自己在地圖上的哪裡。</p>
@@ -4182,7 +4182,7 @@ autoChooser.addOption("Leave（程式）", buildLeaveAuto());</code></pre>
     <div class="fuse" id="fuBar" aria-hidden="true"></div>
     <div class="console" id="fuConsole" aria-live="polite"></div>
   </div>
-  <p>這個實驗裡，視覺的標準差是用「0.05 m × 距離²，看到多個標籤就除以標籤數」算的。這只是我拿來示範的經驗式，不是官方公式，實際要用隊上的資料去調。</p>
+  <p>這個實驗裡，視覺的標準差是用「0.05 m × 距離²，看到多個標籤就除以標籤數」算的。這只是示範用的經驗式，不是官方公式，實際要用隊上的資料去調。</p>
 
   <h2>用 Limelight 更新位置</h2>
   <p>CTRE 的 swerve 範例附了一段 Limelight 整合程式，用的是 <code>LimelightHelpers</code> 的 MegaTag2 位置估計<a class="ref" href="#src17-4">[4]</a>。MegaTag2 要先告訴 Limelight 機器人朝哪：呼叫 <code>getBotPoseEstimate_wpiBlue_MegaTag2</code> 之前要先呼叫 <code>SetRobotOrientation</code>，而且 yaw 為 0 代表機器人面向紅方牆面，就是第 16 章「原點在藍方」的場地座標<a class="ref" href="#src17-5">[5]</a>。</p>
@@ -4214,7 +4214,7 @@ public void robotPeriodic() {
   <p>幾個重點：</p>
   <ul>
     <li><strong>轉太快就丟掉。</strong>CTRE 範例的門檻是每秒 2 圈<a class="ref" href="#src17-4">[4]</a>。範例自己的註解也講了，這段只是示範「可以整合視覺」，一般還要看距離和標籤數去調標準差，實際怎麼做看隊伍需求<a class="ref" href="#src17-4">[4]</a>。</li>
-    <li><strong>時間戳的時基。</strong>範例裡覆寫了 CTRE swerve 的 <code>addVisionMeasurement</code>，用 <code>Utils.fpgaToCurrentTime</code> 把 FPGA 時間轉成 Phoenix 的時基再交給底盤<a class="ref" href="#src17-3">[3]</a>。Tuner X 產生的 <code>CommandSwerveDrivetrain</code> 已經有這段；自己寫的話千萬別漏。</li>
+    <li><strong>時間戳的時基。</strong>範例裡覆寫了 CTRE swerve 的 <code>addVisionMeasurement</code>，用 <code>Utils.fpgaToCurrentTime</code> 把 FPGA 時間轉成 Phoenix 的時基再交給底盤<a class="ref" href="#src17-3">[3]</a>。Tuner X 產生的 <code>CommandSwerveDrivetrain</code> 已經有這段；自己寫的話不能漏掉。</li>
     <li><strong>朝向交給陀螺儀。</strong>第三個標準差設超大，就是照 WPILib 的建議<a class="ref" href="#src17-2">[2]</a>。</li>
   </ul>
   <div class="note"><strong>放進 IO 架構</strong>這章為了跟 CTRE 範例對照，把程式寫在 <code>robotPeriodic</code>。照第 6 章的架構，比較好的寫法是做一個 <code>VisionIO</code>（硬體版讀 Limelight、模擬版回傳空結果；重播時跟第 6 章一樣用空實作，資料由日誌填回），讓 Vision Subsystem 在 periodic 裡拿結果再交給底盤，這樣視覺資料也能被記錄、重播（第 18 章）。</div>
@@ -4246,7 +4246,7 @@ public Command aimWithTx(DoubleSupplier forward, DoubleSupplier strafe) {
   <p>第二種做法用第 16 章的座標：目標在場上的座標減掉機器人的座標，得到一個向量，它的角度就是機器人該面對的方向，再交給 CTRE 的 <code>FieldCentricFacingAngle</code> 這類「朝向固定角度」的請求。這種做法在紅方時，記得目標座標也要換成紅方那一個。</p>
 
   <h2>常見錯誤</h2>
-  <div class="note warn"><strong>看到標籤就直接 resetPose</strong>視覺量測偶爾會跳，直接把位置重設成它，機器人在場上會瞬間「瞬移」，路徑跟隨也跟著亂跑。要用 <code>addVisionMeasurement</code> 融合。</div>
+  <div class="note warn"><strong>看到標籤就直接 resetPose</strong>視覺量測偶爾會跳，直接把位置重設成它，機器人在場上會瞬間跳到別的位置，路徑跟隨也跟著亂跑。要用 <code>addVisionMeasurement</code> 融合。</div>
   <div class="note warn"><strong>時間戳時基用錯</strong>FPGA 時間沒轉換就直接丟給 CTRE swerve，估計器會把量測對到錯的時間點，位置被拉來拉去。</div>
   <div class="note warn"><strong>相機位置沒量準</strong>Limelight 要知道相機裝在機器人哪裡、朝什麼角度。這組數字錯了，所有視覺位置都會偏。</div>
   <div class="note warn"><strong>忘了呼叫 SetRobotOrientation</strong>MegaTag2 需要機器人的朝向，沒給的話結果不能信。</div>
@@ -4300,13 +4300,13 @@ SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
 <template id="tpl-ch18">
   <p class="headline-code">CAN ID 18｜上場</p>
   <h1>模擬、日誌與重播：比賽錄影和賽後檢討</h1>
-  <p class="lede">比賽中機器人出包，賽後你只能靠記憶猜嗎？不用，只要有日誌。這章講模擬、日誌、重播三個差在哪，怎麼從機器人拿出日誌、在 AdvantageScope 裡看資料，重播怎麼做，哪些寫法會讓重播不準，還有怎麼讓每一場比賽的程式版本都找得回來。</p>
+  <p class="lede">比賽中機器人出問題，賽後不必只靠記憶猜，有日誌就能查。這章講模擬、日誌、重播三個差在哪，怎麼從機器人拿出日誌、在 AdvantageScope 裡看資料，重播怎麼做，哪些寫法會讓重播不準，還有怎麼讓每一場比賽的程式版本都找得回來。</p>
   <div class="note"><strong>版本說明</strong>這章是照 AdvantageKit 2026 版（v26.0.2）的文件寫的。AdvantageKit 網站和 GitHub main 分支已經開始出現 2027 版的東西（像類別改名），查資料要確認版本。<code>@AutoLog</code>、<code>Logger.processInputs</code> 和三種模式在第 6 章 E 部分講過了，這章講怎麼用。</div>
 
-  <h2>先講個比喻：比賽錄影和賽後檢討</h2>
+  <h2>比喻：比賽錄影和賽後檢討</h2>
   <div class="story">
     <p>體育課的每一場練習賽都全程錄影，攝影機把場上發生的事完整錄下來：誰在哪、球往哪飛、裁判吹了什麼哨。另外每個球員也會把「自己當時怎麼想、決定做什麼」寫在筆記上。</p>
-    <p>賽後教練把錄影跟筆記放在同一條時間軸上，一格一格看：第 12 秒他為什麼沒傳球？喔，原來他以為隊友被擋住了。</p>
+    <p>賽後教練把錄影跟筆記放在同一條時間軸上，一格一格看：第 12 秒他為什麼沒傳球？原來他以為隊友被擋住了。</p>
     <p>教練還可以說：「用同一段錄影，照新戰術重想一次，每一格你會怎麼決定？」因為看到的畫面完全一樣，新的決定可以跟原本的逐格比較。</p>
     <p>但推演改變不了錄影。你在推演裡決定「這時候往左跑」，錄影裡的你還是往右跑了，後面的畫面也不會變。推演只能回答「看到這些畫面，新想法會怎麼決定」，回答不了「照新想法打，比賽會變怎樣」。</p>
     <p>最後，戰術本每場之間都在改，錄影如果沒標當時用的是哪一版，事後就不知道該拿哪一版來推演。</p>
@@ -4337,7 +4337,7 @@ SmartDashboard.putNumber("Vision/RejectedSpin", rejectedSpinCount);</code></pre>
 
   <h2>取得日誌</h2>
   <p>在 roboRIO 上，<code>WPILOGWriter</code> 預設寫到 USB 隨身碟（<code>/U/logs</code>），所以 roboRIO 上<strong>一定要插一支 FAT32 的隨身碟</strong><a class="ref" href="#src18-1">[1]</a>。拿日誌最方便的是用 AdvantageScope：在偏好設定填好機器人位址和日誌資料夾，再用 File → Download Logs 下載，最新的會排在最上面<a class="ref" href="#src18-2">[2]</a>。</p>
-  <p>AdvantageScope 開得了 WPILib 和 AdvantageKit 產生的 <code>.wpilog</code>，也開得了 Phoenix 6 SignalLogger 的 <code>.hoot</code>（第 15 章）。同時開好幾個檔案時間會自動對齊<a class="ref" href="#src18-2">[2]</a>，所以 AdvantageKit 日誌和 hoot 可以放在一起看，超方便。</p>
+  <p>AdvantageScope 開得了 WPILib 和 AdvantageKit 產生的 <code>.wpilog</code>，也開得了 Phoenix 6 SignalLogger 的 <code>.hoot</code>（第 15 章）。同時開好幾個檔案時間會自動對齊<a class="ref" href="#src18-2">[2]</a>，所以 AdvantageKit 日誌和 hoot 可以放在一起看。</p>
 
   <h2>在 AdvantageScope 裡看什麼</h2>
   <table class="map">
@@ -4369,7 +4369,7 @@ Logger.recordOutput("Vision/Accepted", acceptedCount);  // 第 17 章的練習</
     <li><strong>用模擬模式跑。</strong>WPILib 的 Simulate Robot Code，<strong>不要開模擬 GUI</strong>（範本預設已經關了）<a class="ref" href="#src18-7">[7]</a>。</li>
     <li><strong>看結果。</strong>新產生的日誌會自動在 AdvantageScope 打開。重播算出來的輸出在 <code>ReplayOutputs</code> 表，原本的輸入和輸出都還在，可以直接對照<a class="ref" href="#src18-7">[7]</a>。</li>
   </ol>
-  <p>第 6 章 E-5 的 <code>setUseTiming(false)</code> 讓重播用最快速度跑完，這<strong>不會影響</strong>重播的準確度<a class="ref" href="#src18-7">[7]</a>，放心用。</p>
+  <p>第 6 章 E-5 的 <code>setUseTiming(false)</code> 讓重播用最快速度跑完，這<strong>不會影響</strong>重播的準確度<a class="ref" href="#src18-7">[7]</a>，可以放心使用。</p>
   <div class="note"><strong>Replay Watch</strong>調位置估計這種要一直試的工作，可以用 <code>./gradlew replayWatch</code>（Windows 是 <code>gradle.bat replayWatch</code>）：只要改了 <code>src</code> 裡的程式，重播就自動再跑一次，AdvantageScope 的時間範圍和畫面也會保留。它每次會蓋掉上一次的重播結果，但不會動原始日誌；日誌越短、電腦單核越快，越好用<a class="ref" href="#src18-8">[8]</a>。</div>
   <div class="note warn"><strong>重播的限制</strong>重播時改程式，輸出<strong>不能影響</strong>重播的輸入<a class="ref" href="#src18-7">[7]</a>。比如把手臂的 kP 調大再重播，記錄裡的手臂位置還是當時的位置，因為那是從日誌讀回來的輸入。重播適合回答「看到同樣的資料，新邏輯會怎麼決定」，回答不了「照新邏輯，機器人會怎麼動」；後者要用模擬。</div>
 
@@ -4390,7 +4390,7 @@ Logger.recordOutput("Vision/Accepted", acceptedCount);  // 第 17 章的練習</
 
   <h3>第 16、17 章的 CTRE swerve 怎麼辦</h3>
   <p>表格第四條要特別講一下：第 16、17 章用的是 Tuner X 產生的 CTRE swerve，它直接操作硬體，沒經過 IO 層，所以<strong>底盤這部分沒辦法準確重播</strong><a class="ref" href="#src18-9">[9]</a>。手臂、Intake 這些照第 6 章寫的 Subsystem 則不受影響。</p>
-  <p>如果隊上希望底盤也能重播，AdvantageKit 有 TalonFX swerve 範本專案：一樣可以用 Tuner X 的 swerve 產生器設定，還有高頻里程計、斷線警告、位置估計器整合、模擬，以及保證準確的重播<a class="ref" href="#src18-12">[12]</a>。要不要換是賽季開始前就要決定的事，千萬不要比賽前才換。</p>
+  <p>如果隊上希望底盤也能重播，AdvantageKit 有 TalonFX swerve 範本專案：一樣可以用 Tuner X 的 swerve 產生器設定，還有高頻里程計、斷線警告、位置估計器整合、模擬，以及保證準確的重播<a class="ref" href="#src18-12">[12]</a>。要不要換是賽季開始前就要決定的事，不要比賽前才換。</p>
 
   <h3>自動程式選單也是輸入</h3>
   <p>第 16 章用 <code>SmartDashboard.putData</code> 放的自動程式選單是從 NetworkTables 讀值的，重播時讀不到當時選了哪個。AdvantageKit 有 <code>LoggedDashboardChooser</code>，可以直接包住 PathPlanner 的 <code>buildAutoChooser()</code><a class="ref" href="#src18-13">[13]</a>：</p>
@@ -4477,7 +4477,7 @@ public Command getAutonomousCommand() {
   <p class="lede">最後一章，講的是比賽當天。程式寫得再好，上場前忘了檢查一樣會出事。這章整理出發前、每場比賽前、每場比賽後要檢查什麼，怎麼從 Driver Station 看出 brownout、roboRIO 重開或網路問題，還有兩場比賽之間那一點點時間，要照什麼順序找問題、改程式要守哪些規矩。</p>
   <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026 文件（roboRIO 和 NI Driver Station）寫的。2027 年起控制系統會換成 SystemCore，Driver Station 和一些檢查項目會不一樣。這裡的檢查清單是官方文件加上很多隊伍常見的做法，請依隊上的機器人自己調整。</div>
 
-  <h2>先講個比喻：考試當天</h2>
+  <h2>比喻：考試當天</h2>
   <div class="story">
     <p>准考證、2B 鉛筆、橡皮擦、手錶，前一晚就要放進袋子。考試當天早上才發現鉛筆沒削，就來不及了。</p>
     <p>每節考試進場前再摸一下：准考證在嗎？座位號碼對嗎？手機關了嗎？這些檢查很無聊，但一節考試就只有一次機會。</p>
@@ -4516,7 +4516,7 @@ public Command getAutonomousCommand() {
   </ul>
 
   <h2>每場比賽前</h2>
-  <p>Driver Station 這邊要做的<a class="ref" href="#src19-2">[2]</a><a class="ref" href="#src19-1">[1]</a>：前一場還沒結束就先把筆電開機登入；關掉用不到的程式；<strong>一定要帶筆電充電器</strong>上場，因為插著電的時候 Windows 的電源管理比較不會亂來，Driver Station 比較穩；用魔鬼氈把筆電黏在操作台上。現場要關掉 Windows 防火牆和 Wi-Fi<a class="ref" href="#src19-2">[2]</a>。</p>
+  <p>Driver Station 這邊要做的<a class="ref" href="#src19-2">[2]</a><a class="ref" href="#src19-1">[1]</a>：前一場還沒結束就先把筆電開機登入；關掉用不到的程式；<strong>一定要帶筆電充電器</strong>上場，因為插著電的時候 Windows 的電源管理比較不激進，Driver Station 比較穩；用魔鬼氈把筆電黏在操作台上。現場要關掉 Windows 防火牆和 Wi-Fi<a class="ref" href="#src19-2">[2]</a>。</p>
   <p>下面是程式組可以直接拿去用的檢查清單：</p>
   <table class="map">
     <thead><tr><th>項目</th><th>怎麼確認</th><th>相關章節</th></tr></thead>
@@ -4589,7 +4589,7 @@ public Command getAutonomousCommand() {
   <div class="note warn"><strong>比賽中 Windows 開始更新</strong>出發前沒暫停更新、沒設使用時段，結果要上場了筆電還在重開機。</div>
   <div class="note warn"><strong>把 brownout 當成程式 bug</strong>機構突然停一下又恢復，先看 12V fault 計數和 DS Log 的電壓，不要急著改程式。</div>
   <div class="note warn"><strong>用 USB 線測線材</strong>搖線測試要用網路線連，不是 USB，不然測不到機器人上真正的通訊路徑<a class="ref" href="#src19-1">[1]</a>。</div>
-  <div class="note warn"><strong>在 Pit 大改程式</strong>兩場之間重寫一整個指令、沒時間測就上場，結果常常比原本的問題還慘。</div>
+  <div class="note warn"><strong>在 Pit 大改程式</strong>兩場之間重寫一整個指令、沒時間測就上場，結果常常比原本的問題更嚴重。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>
@@ -4629,7 +4629,7 @@ public void updatePreMatchAlerts() {
         &amp;&amp; batteryDebounce.calculate(RobotController.getBatteryVoltage() &lt; LOW_BATTERY_VOLTS));
     noAuto.set(disabled &amp;&amp; autoChooser.getSelected() == doNothing);
 }</code></pre>
-    <p>講幾個重點：電壓會跳，所以用 <code>Debouncer</code> 要求持續 1 秒低於門檻才警告（第 12 章）；只在 Disabled 時檢查，因為比賽中大電流時電壓本來就會掉。<code>buildAutoChooser()</code> 的預設選項是它裡面自己 new 的 <code>Commands.none()</code>，程式拿不到那個物件；所以這裡自己建選單，把自己的 <code>doNothing</code> 當預設，就能用 <code>==</code> 判斷有沒有換過。用 AdvantageKit 的話，選單換成第 18 章的 <code>LoggedDashboardChooser</code>，判斷方式一樣。Alert 會自動被 AdvantageKit 記下來（第 18 章），賽後也查得到。</p>
+    <p>幾個重點：電壓會跳，所以用 <code>Debouncer</code> 要求持續 1 秒低於門檻才警告（第 12 章）；只在 Disabled 時檢查，因為比賽中大電流時電壓本來就會掉。<code>buildAutoChooser()</code> 的預設選項是它裡面自己 new 的 <code>Commands.none()</code>，程式拿不到那個物件；所以這裡自己建選單，把自己的 <code>doNothing</code> 當預設，就能用 <code>==</code> 判斷有沒有換過。用 AdvantageKit 的話，選單換成第 18 章的 <code>LoggedDashboardChooser</code>，判斷方式一樣。Alert 會自動被 AdvantageKit 記下來（第 18 章），賽後也查得到。</p>
     </div>
   </div>
 
@@ -4656,8 +4656,8 @@ public void updatePreMatchAlerts() {
 <template id="tpl-final">
   <p class="headline-code">FINAL｜最終程式能力評量</p>
   <h1>最終評量：資格賽第 23 場，手臂掉下來了</h1>
-  <p class="lede">這題你之前沒看過。你會拿到症狀、日誌、程式和 Pit 裡的檢查結果，用文字回答七個問題。我們看的是你怎麼推理、拿什麼當證據、除錯的順序對不對，不是只看最後猜中沒有。</p>
-  <div class="note"><strong>作答規則</strong>七題都寫完再送出。送出後會出現參考解答和評分表，你（或教練）一項一項勾答案有沒有講到。可以翻課程，但不要先偷看解答，那樣就沒意義了。答案存在這台瀏覽器裡，可以匯出給教練。</div>
+  <p class="lede">這題你之前沒看過。你會拿到症狀、日誌、程式和 Pit 裡的檢查結果，用文字回答七個問題。評分看的是你怎麼推理、拿什麼當證據、除錯的順序對不對，不是只看最後猜中沒有。</p>
+  <div class="note"><strong>作答規則</strong>七題都寫完再送出。送出後會出現參考解答和評分表，你（或教練）一項一項勾答案有沒有講到。可以翻課程，但不要先看解答。答案存在這台瀏覽器裡，可以匯出給教練。</div>
   <div class="note limit"><strong>關於題目資料</strong>下面的日誌是為了這題編出來的教學資料，不是真的比賽紀錄；數字只是用來呈現現象，不代表任何機構的實際參數。</div>
 
   <h2>狀況</h2>
@@ -4719,10 +4719,10 @@ follower.setControl(new Follower(leader.getDeviceID(), MotorAlignmentValue.Oppos
 <template id="tpl-home">
   <p class="headline-code">TalonFX motor = <b>new</b> TalonFX(1);</p>
   <h1>從 new 一個物件，<br>到按下 Enable</h1>
-  <p class="lede">這是 9427 程式組自己整理的課程，從 Java 基礎一路帶到能上場的機器人程式，用的都是隊上真的在用的東西：Java、WPILib Command-based、CTRE Phoenix 6 和 Kraken X60。</p>
+  <p class="lede">這是 FRC 9427 程式組的課程，從 Java 基礎一路帶到能上場的機器人程式，用的都是隊上真的在用的東西：Java、WPILib Command-based、CTRE Phoenix 6 和 Kraken X60。</p>
   <p>課程分成三條路。<strong>核心路徑</strong>每個程式組的人都要走完，目標是你能自己寫出、部署、除錯一個機構的子系統。另外兩條看你負責什麼：管機構控制的走<strong>進階控制路徑</strong>，搭配電梯／手臂調參工作站實際練；準備上場的走<strong>競賽實務路徑</strong>。</p>
-  <p>說真的，每一章都「讀過」沒什麼用，把核心路徑每一章的「學完要能做到」真的做到比較重要。每章開頭的學習卡會告訴你要先讀哪幾章、要做到什麼，還有哪些東西知道就好、不用鑽。</p>
-  <div class="note"><strong>內容是照哪個版本寫的</strong>WPILib 2026（Java 17）、CTRE Phoenix 6（2026 版文件）、AdvantageKit 2026 文件。每章最後都有資料來源，2026 年 9 月查證過。Oracle Java Tutorials 雖然是用 JDK 8 寫的，但課程裡用到的語法在 Java 17 都一樣能用。發現有錯或過時的地方，請直接跟程式組講。</div>
+  <p>每一章都「讀過」不代表學會，把核心路徑每一章的「學完要能做到」真的做到比較重要。每章開頭的學習卡會告訴你要先讀哪幾章、要做到什麼，還有哪些東西知道就好、不用鑽。</p>
+  <div class="note"><strong>內容是照哪個版本寫的</strong>WPILib 2026（Java 17）、CTRE Phoenix 6（2026 版文件）、AdvantageKit 2026 文件。每章最後都有資料來源，2026 年 9 月查證過。Oracle Java Tutorials 雖然是用 JDK 8 寫的，但課程裡用到的語法在 Java 17 都一樣能用。發現有錯或過時的地方，請回報給程式組。</div>
   <div id="outline"></div>
 </template>
 
@@ -4736,7 +4736,7 @@ follower.setControl(new Follower(leader.getDeviceID(), MotorAlignmentValue.Oppos
 
 <script>
 const COURSE_DATA = {"parts":[{"name":"準備","chapters":[0]},{"name":"Java 與物件導向（以學校為例）","chapters":[1,2,3,4,5]},{"name":"架構","chapters":[6]},{"name":"WPILib 基礎","chapters":[7,8,9,10]},{"name":"硬體","chapters":[11,12]},{"name":"控制","chapters":[13,14,15]},{"name":"上場","chapters":[16,17,18,19]}],"chapters":[{"id":0,"title":"開發環境與專案結構","desc":"開學前的準備：要裝哪些軟體、專案裡每個檔案的角色、vendordep、編譯與部署、Driver Station。","part":"準備","path":"core","difficulty":1,"prereqs":[],"objectives":["建立 WPILib Command-based 專案並部署到機器人","用 Git commit 與 push 保存程式","看懂專案裡 Robot、RobotContainer、Constants、vendordeps 各自的角色"],"awareness":["Driver Station 各分頁的用途","build.gradle 的細節"],"tools":[],"labs":[],"stack":["wpilib","java"],"verified":"2026-09","legacy":[]},{"id":1,"title":"類別與物件","desc":"學籍資料表與填好的每一份：欄位、方法、建構子、this、static。","part":"Java 與物件導向（以學校為例）","path":"core","difficulty":1,"prereqs":[0],"objectives":["寫出有欄位、建構子和方法的類別","分辨類別和物件，說出 new 做了什麼","看到 NullPointerException 時找出哪個物件沒有 new"],"awareness":["static 欄位的進階用法"],"tools":[],"labs":[{"id":"roller","title":"兩個物件，各自的狀態","objective":"看出兩個物件的欄位各自獨立，以及沒有 new 的變數會發生什麼。","kind":"logic"}],"stack":["java"],"verified":"2026-09","legacy":[]},{"id":2,"title":"封裝與存取修飾詞","desc":"成績簿不能放在講台上：private、public、getter，以及為什麼 Subsystem 不讓外面碰馬達。","part":"Java 與物件導向（以學校為例）","path":"core","difficulty":1,"prereqs":[1],"objectives":["把欄位設成 private，只開放必要的 public 方法","說明為什麼 Subsystem 不讓外面直接碰馬達"],"awareness":["protected 與套件存取的細節"],"tools":[],"labs":[],"stack":["java"],"verified":"2026-09","legacy":[]},{"id":3,"title":"繼承與介面","desc":"導師是一種老師，值日生是一份職責：extends、implements、@Override、多型。","part":"Java 與物件導向（以學校為例）","path":"core","difficulty":2,"prereqs":[2],"objectives":["分辨 extends 和 implements，並寫出實作介面的類別","看懂 Robot extends TimedRobot、XxxSubsystem extends SubsystemBase","正確使用 @Override"],"awareness":["default 方法的進階用法"],"tools":[],"labs":[],"stack":["java","wpilib"],"verified":"2026-09","legacy":[]},{"id":4,"title":"Lambda 與方法參考","desc":"給代課老師的字條：() -> 與 ::，傳遞和呼叫的差別。","part":"Java 與物件導向（以學校為例）","path":"core","difficulty":2,"prereqs":[3],"objectives":["寫出 lambda 與方法參考","分辨「交出一個做法」和「當場執行」，避開搖桿只讀一次的 bug"],"awareness":["java.util.function 其他介面"],"tools":[],"labs":[],"stack":["java","wpilib"],"verified":"2026-09","legacy":[]},{"id":5,"title":"列舉、常數與套件","desc":"時段、校規和年級班級：enum、Constants、package 與 import。","part":"Java 與物件導向（以學校為例）","path":"core","difficulty":1,"prereqs":[2],"objectives":["用 enum 表示機構狀態","把魔術數字整理進 Constants","看懂 package 與 import 的錯誤訊息"],"awareness":["enum 帶欄位與方法的進階寫法"],"tools":[],"labs":[],"stack":["java"],"verified":"2026-09","legacy":[]},{"id":6,"title":"IO 架構","desc":"導師只看點名表：以手臂為例，分六部分講觀念、簡易版、硬體層、模擬層、AdvantageKit 與測試。","part":"架構","path":"core","difficulty":3,"prereqs":[3,5],"objectives":["照 IO 架構寫出 Subsystem、IO 介面與硬體實作","說明每一層該做和不該做的事","讓同一個 Subsystem 換成模擬 IO 執行"],"awareness":["Command 與排程器的細節（第 8 章）","TalonFX 設定與控制請求的細節（第 11 章）","AdvantageKit 重播的完整流程（第 18 章）","用假的 IO 寫單元測試"],"tools":[{"track":"elevator","page":"calc","title":"下載一份完整的電梯子系統","do":"在 1F 按「下載完整子系統 .zip」，對照本章的 IO 架構找出 IO 介面、硬體實作和 Subsystem 各在哪個檔案。","check":"哪一層負責換算單位？哪一層決定目標？"}],"labs":[{"id":"arch","title":"分層全貌","objective":"點每一層，說出它該做和不該做的事。","kind":"logic"},{"id":"env","title":"換一個人點名","objective":"確認 Subsystem 不變、只換 IO 實作，就能在實機、模擬、重播之間切換。","kind":"logic"}],"stack":["wpilib-exact","phoenix6-exact","akit"],"verified":"2026-09","legacy":["Phoenix 6 的 Follower 原本的 boolean 參數已改用 MotorAlignmentValue（Aligned／Opposed）。"]},{"id":7,"title":"機器人程式的生命週期","desc":"學校的一天：程式啟動、四種模式、init / periodic / exit 的呼叫順序、loop overrun。","part":"WPILib 基礎","path":"core","difficulty":2,"prereqs":[3],"objectives":["說出四種模式與 init／periodic／exit 的呼叫順序","判斷一段程式會不會造成 loop overrun"],"awareness":["LoggedRobot 與 TimedRobot 的細部差異"],"tools":[],"labs":[{"id":"loop","title":"一步一步跑 20 毫秒","objective":"預測每一輪哪些方法依什麼順序被呼叫。","kind":"logic"}],"stack":["wpilib","akit"],"verified":"2026-09","legacy":[]},{"id":8,"title":"Subsystem 與 Command","desc":"借用體育館：指令的生命週期、requirements、中斷行為、預設指令。","part":"WPILib 基礎","path":"core","difficulty":2,"prereqs":[4,6,7],"objectives":["寫出有正確 requirements 的 Command","預測兩個指令搶同一個 Subsystem 時會發生什麼","設定預設指令"],"awareness":["Disabled 時執行指令的細節"],"tools":[],"labs":[{"id":"scheduler","title":"搶體育館","objective":"預測兩個指令搶同一個 Subsystem 時誰會被取消。","kind":"logic"}],"stack":["wpilib"],"verified":"2026-09","legacy":[]},{"id":9,"title":"Trigger 與按鍵綁定","desc":"門鈴、對講機和電燈開關：onTrue、whileTrue、toggleOnTrue、條件組合與防連按。","part":"WPILib 基礎","path":"core","difficulty":2,"prereqs":[4,8],"objectives":["依需求選擇 onTrue、whileTrue、toggleOnTrue","用感測器或條件建立 Trigger 並組合條件"],"awareness":["防連按（debounce）的參數選擇"],"tools":[],"labs":[{"id":"bindings","title":"三種按鈕","objective":"分辨 onTrue、whileTrue、toggleOnTrue 在按下與放開時的差別。","kind":"logic"}],"stack":["wpilib"],"verified":"2026-09","legacy":[]},{"id":10,"title":"組合指令","desc":"運動會的節目表：sequence、parallel、race、deadline、結束條件與兩條重要規則。","part":"WPILib 基礎","path":"core","difficulty":2,"prereqs":[6,8],"objectives":["用 sequence、parallel、race、deadline 組出完整動作","說明同一個指令物件為什麼不能用兩次"],"awareness":["各種修飾方法的完整清單"],"tools":[],"labs":[],"stack":["wpilib"],"verified":"2026-09","legacy":["deadlineWith 在 2025 年改名為 deadlineFor。"]},{"id":11,"title":"Phoenix 6 與 TalonFX","desc":"班長的工作手冊：CANivore 與 CANBus、完整設定、控制請求、EnableFOC 與 Pro、Tuner X。","part":"硬體","path":"core","difficulty":2,"prereqs":[5,6],"objectives":["在 CANivore 上建立 TalonFX 並寫一份完整設定","選擇合適的控制請求（Voltage 類）","用 Tuner X 設定 ID、確認方向"],"awareness":["EnableFOC 與 Pro 授權的細節","TorqueCurrentFOC"],"tools":[{"track":"elevator","page":"sim","scenario":"currentLimit","title":"3F 情境：超過電流限制","do":"看電流被限制時，電梯為什麼跟不上軌跡。","check":"本章的 StatorCurrentLimit 設太低會出現什麼症狀？"},{"track":"elevator","page":"sim","scenario":"supplyLimit","title":"3F 情境：Supply 電流限制設太低","do":"比較 Stator 與 Supply 電流限制造成的差別。","check":"Supply 限制太低時，高速段和起步段哪個先受影響？"}],"labs":[],"stack":["phoenix6"],"verified":"2026-09","legacy":["用字串指定 CAN bus 的建構子已標為 deprecated，預計 2027 年移除，改用 CANBus 物件。","CTRE 網站標示 latest 的文件已是 2027 版，查資料請看 stable。"]},{"id":12,"title":"感測器與 CAN 除錯","desc":"計步器、刻度尺和廣播線：內建編碼器與 CANcoder、極限開關與歸零、CAN 接法與除錯順序。","part":"硬體","path":"core","difficulty":2,"prereqs":[6],"objectives":["設定 CANcoder 的零點與方向","選擇極限開關接法並寫出歸零指令","CAN 找不到裝置時照順序除錯"],"awareness":["FusedCANcoder／SyncCANcoder（需要 Pro）"],"tools":[{"track":"arm","page":"sim","scenario":"wrongZero","title":"手臂 3F 情境：編碼器零點不在水平","do":"看零點偏掉時 kG·cos θ 算錯的樣子，對照本章 MagnetOffset 的量法。","check":"零點偏了 10 度，手臂在哪個角度最撐不住？"}],"labs":[{"id":"can","title":"CAN bus 除錯台","objective":"從掃描結果和電阻值推斷是斷線、少終端還是 ID 重複。","kind":"model","modeled":["daisy-chain 斷點之後的裝置消失","兩端終端電阻並聯約 60 Ω","同型號同 ID 衝突、不同型號不衝突"],"approximated":["少一端終端時「可能時好時壞」只是文字提示"],"omitted":["訊號反射與波形","匯流排負載與錯誤訊框","接觸不良造成的間歇斷線"]}],"stack":["wpilib","phoenix6"],"verified":"2026-09-27","legacy":["CANcoder 的 AbsoluteSensorRange 在 2025 年改成 AbsoluteSensorDiscontinuityPoint。"]},{"id":13,"title":"PID 與前饋","desc":"推書車上斜坡：P、I、D 各自做什麼，kS、kV、kA、kG 前饋，手動調參的順序。","part":"控制","path":"controls","difficulty":3,"prereqs":[6,11],"objectives":["說明 P、I、D 與 kS、kV、kA、kG 各自的作用","判斷機構停在目標下方時缺的是 kG 而不是 kI","照 kG → kS → kV → kP → kD 的順序手動調參"],"awareness":["積分防飽和的各種做法"],"tools":[{"track":"elevator","page":"calc","title":"1F 教學關卡","do":"用隊上機構的資料算出 kG、kV、kA，完成五個教學關卡（含純 PID 對前饋＋PID）。","check":"哪些參數可以算、哪些一定要量？"},{"track":"elevator","page":"sim","scenario":"noKg","title":"3F 情境：沒有 kG","do":"看電梯停在目標下方，再把 kP 加倍、把 kG 填回，比較誤差變化。","check":"為什麼加大 kP 只能讓誤差變小，不會變成 0？"},{"track":"elevator","page":"sim","scenario":"whyNoKi","title":"3F 情境：為什麼不用 kI","do":"用 kI 補重力，觀察反應速度與過衝。","check":"本章說前饋做好後通常不需要 I，這個情境的證據是什麼？"},{"track":"arm","page":"sim","scenario":"armAsElevator","title":"手臂 3F 情境：把手臂當電梯","do":"kG 沒乘 cos θ 時，手臂在不同角度的表現。","check":"為什麼手臂要選 Arm_Cosine？"}],"labs":[{"id":"pid","title":"調一支手臂","objective":"用證據判斷缺的是 kG、kP 還是 kD，而不是亂猜參數。","kind":"model","modeled":["重力（kG·cos θ，真實值 0.6 V）","庫侖摩擦（kS 0.1 V）","反電動勢（kV）與慣性（kA）","±12 V 輸出飽和","10 ms 量測延遲","1 kHz 控制週期"],"approximated":["手臂的動態直接用 WPILib ArmFeedforward 的電壓平衡式代替","摩擦只有固定大小，靜止時小於 kS 的輸出不會動"],"omitted":["電流限制與電池壓降","感測器雜訊與量化","齒輪背隙與彈性","TalonFX 韌體的實際演算法細節"]}],"stack":["wpilib","phoenix6"],"verified":"2026-09-27","legacy":[]},{"id":14,"title":"MotionMagic","desc":"校車開到下一站：梯形、三角形與 S-curve 軌跡，巡航速度、加速度與 jerk 怎麼設。","part":"控制","path":"controls","difficulty":2,"prereqs":[13],"objectives":["說明為什麼需要運動軌跡","依機構能力設定巡航速度與加速度","判斷何時需要 jerk（S-curve）"],"awareness":["MotionMagic Expo","Dynamic MotionMagic（需要 Pro）"],"tools":[{"track":"elevator","page":"calc","title":"1F Motion Magic 參數","do":"看工具站怎麼從馬達能力算出巡航速度與加速度的上限（扣掉 kG、kS）。","check":"工具站算出的巡航速度上限，和本章「12 ÷ kV」的粗估差在哪裡？"},{"track":"elevator","page":"sim","scenario":"controlPeriod","title":"3F 情境：控制週期 TalonFX 對 roboRIO","do":"比較 1 kHz 與 50 Hz 控制同一組參數的結果。","check":"為什麼本章建議讓 MotionMagic 在控制器內跑？"}],"labs":[{"id":"profile","title":"畫出速度曲線","objective":"看出距離、巡航速度、加速度如何決定梯形或三角形軌跡與總時間。","kind":"model","modeled":["理想梯形與三角形速度曲線"],"approximated":[],"omitted":["jerk（S-curve）","機構實際的跟隨誤差","馬達飽和時跟不上軌跡"]}],"stack":["phoenix6","wpilib"],"verified":"2026-09-27","legacy":[]},{"id":15,"title":"SysId 系統鑑別","desc":"體適能檢測：四項測試、SysIdRoutine 搭配 SignalLogger、轉檔分析、把參數填回程式。","part":"控制","path":"controls","difficulty":3,"prereqs":[9,13],"objectives":["說明 SysId 在量什麼、四項測試的目的","安全地跑完測試並取出資料","判斷一份 SysId 結果能不能信，再填回程式"],"awareness":["LQR 回饋增益的推導"],"tools":[{"track":"elevator","page":"learn","section":"unit2","title":"4F 單元二：用 SysId 量測參數","do":"照單元二跑一次（或用範例資料），把結果和 1F 理論值比較。","check":"SysId 的 kV 比理論值大很多，可能是哪個機構資料填錯？"},{"track":"elevator","page":"learn","section":"measure-ks","title":"4F 兩點法量 kS、kG","do":"用兩個定速量出 kS 與 kG，填回 1F。","check":"兩點法和 SysId 各自需要哪些假設？"},{"track":"arm","page":"learn","section":"unit2","title":"手臂 4F 單元二：用 SysId 量手臂","do":"看手臂的 SysId 和升降機構差在哪裡（kG 乘 cos θ、0 度必須水平）。","check":"手臂的 kG 為什麼一定要在水平附近量？"}],"labs":[{"id":"fit","title":"用資料擬合 kS、kG、kV","objective":"看出正反向資料怎麼分開 kS 與 kG，以及壞資料怎麼讓擬合結果偏掉。","kind":"model","modeled":["升降機構 quasistatic 測試的電壓與速度（真實值 kS 0.15 V、kG 0.45 V、kV 2.0 V/(m/s)，只在模擬中有意義）","速度量測雜訊","速度門檻太低、撞到極限、只做正向四種狀況"],"approximated":["加速度當作 0（只擬合 quasistatic）","擬合品質用電壓的 r² 與 RMSE，不是 SysId 實際使用的模擬速度 r²"],"omitted":["dynamic 測試與 kA","SysId 的資料濾波與切段","手臂的 cos θ 項"]}],"stack":["wpilib","phoenix6"],"verified":"2026-09-27","legacy":[]},{"id":16,"title":"自動階段與路徑","desc":"校外教學的行程表：座標與里程計、PathPlanner、紅藍翻轉、Named Commands 與自動程式選單。","part":"上場","path":"competition","difficulty":2,"prereqs":[6,10],"objectives":["設定 AutoBuilder 與紅藍翻轉","註冊 Named Commands 並組出自動程式","上場前檢查自動程式"],"awareness":["PathPlanner 的即時路徑產生（pathfinding）"],"tools":[],"labs":[],"stack":["wpilib","pathplanner","phoenix6"],"verified":"2026-09-27","legacy":["2024 年以前的 HolonomicPathFollowerConfig 已不能用，改用 RobotConfig 與 PPHolonomicDriveController。"]},{"id":17,"title":"視覺與定位","desc":"看門牌校正位置：AprilTag、融合與標準差、Limelight MegaTag2、兩種瞄準做法。","part":"上場","path":"competition","difficulty":3,"prereqs":[16],"objectives":["用 addVisionMeasurement 融合視覺，並依距離調整標準差","丟掉不可靠的視覺量測","選擇合適的瞄準做法"],"awareness":["PhotonVision 的設定細節"],"tools":[],"labs":[{"id":"fusion","title":"信誰多一點","objective":"看出標準差如何決定融合時信誰比較多。","kind":"model","modeled":["一維的變異數倒數加權"],"approximated":["視覺標準差用「0.05 m × 距離² ÷ 標籤數」的示範經驗式"],"omitted":["卡爾曼濾波的時間推進","量測延遲與時間戳","朝向與二維位置"]}],"stack":["wpilib","limelight","phoenix6"],"verified":"2026-09-27","legacy":[]},{"id":18,"title":"模擬、日誌與重播","desc":"比賽錄影和賽後檢討：取得日誌、AdvantageScope、重播步驟、確定性、版本追蹤。","part":"上場","path":"competition","difficulty":3,"prereqs":[6],"objectives":["從機器人取出日誌並用 AdvantageScope 找問題","完成一次重播並補記錄輸出","避開讓重播失準的寫法"],"awareness":["Replay Watch","AdvantageKit swerve 範本的細節"],"tools":[{"track":"elevator","page":"learn","section":"unit1","title":"4F 單元一：用 AdvantageKit 錄日誌","do":"對照單元一的欄位與記錄頻率，檢查隊上的 Logger.recordOutput 有沒有漏。","check":"調參需要哪些欄位是輸入、哪些是輸出？"},{"track":"elevator","page":"tune","title":"2F 用範例日誌練習診斷","do":"載入一份範例日誌，照步驟 0 到步驟 3 找第一優先問題。","check":"為什麼一次只改一個參數？"},{"track":"arm","page":"tune","title":"手臂 2F：用範例日誌練習診斷","do":"載入手臂的範例日誌，看工具站怎麼從日誌偵測 GravityType 設錯。","check":"日誌裡哪個現象代表 kG 沒有乘 cos θ？"}],"labs":[],"stack":["akit"],"verified":"2026-09-27","legacy":["AdvantageKit 網站與 main 分支已出現 2027 版內容（例如 LoggedDashboardChooser 改名），查資料請看 v26。"]},{"id":19,"title":"上場檢查與 Pit 除錯","desc":"考試當天：出發前與每場前後的檢查、brownout、DS Log、Pit 分診與改程式的規矩。","part":"上場","path":"competition","difficulty":1,"prereqs":[12],"objectives":["照清單完成賽前與賽後檢查","從 DS Log 判斷 brownout、roboRIO 重開","在 Pit 依分診順序找問題，並遵守改程式的規矩"],"awareness":["Driver Station 筆電的完整設定"],"tools":[{"track":"elevator","page":"sim","scenario":"lowBattery","title":"3F 情境：電池電壓太低","do":"看電壓不足時機構的反應，對照本章 brownout 的症狀。","check":"比賽中看到機構變慢，怎麼分辨是電池還是參數？"}],"labs":[{"id":"triage","title":"Pit 分診","objective":"遇到症狀時，照從簡單到困難的順序列出檢查項目。","kind":"logic"}],"stack":["wpilib"],"verified":"2026-09-27","legacy":["2027 年起控制系統換成 SystemCore，Driver Station 與部分檢查項目會不同。"]}],"paths":[{"id":"core","name":"核心路徑","required":true,"goal":"能寫出、部署並除錯一個機構的子系統。每位程式組成員都要完成。","chapters":[0,1,2,3,4,5,6,7,8,9,10,11,12]},{"id":"controls","name":"進階控制路徑","required":false,"goal":"能量出、調好並驗證一個有重力的機構（手臂或升降）。負責機構控制的人必修。","chapters":[13,14,15]},{"id":"competition","name":"競賽實務路徑","required":false,"goal":"能寫自動程式、用日誌找問題，並在比賽中處理狀況。上場前每位程式組成員都要讀第 19 章。","chapters":[16,17,18,19]}],"mastery":"精通標準：學習目標都做得到、小測驗答對 80% 以上、練習先自己寫過再看提示。只需知道的部分，看得懂、需要時查得到就好。","tool":{"name":"電梯／手臂調參工作站","url":"https://vincent0926.github.io/FRC-elevator-PID-Teaching-website/","repo":"vincent0926/FRC-elevator-PID-Teaching-website","minVersion":"0.13","pages":["home","calc","tune","sim","learn"],"scenarios":{"elevator":["onlyKp","noKg","kPTooBig","kDTooBig","whyNoKi","antiWindup","controlPeriod","sensorDelay","lowBattery","currentLimit","asymFriction","stageJump","softLimit","supplyLimit","sparkNoComp"],"arm":["armAsElevator","noKg","crossVertical","heavyPayload","wrongZero","armWindup","armKpTooBig"]},"sections":["unit0","unit1","unit2","unit3","unit4","measure-ks"],"note":"scenarios 與 sections 要和工具站的 simScenarios.ts、armScenarios.ts、LearnPage.tsx、ArmLearnPage.tsx 一致；電梯與手臂的 4F 都有 measure-ks、unit1～unit4。","armPages":["home","calc","tune","sim","learn"]},"stack":{"java":"Java 17","wpilib":"WPILib 2026","wpilib-exact":"WPILib 2026.2.2","phoenix6":"Phoenix 6 26.x（2026）","phoenix6-exact":"Phoenix 6 26.3.0","akit":"AdvantageKit 2026（v26）","pathplanner":"PathPlannerLib 2026","limelight":"LimelightHelpers v1.10（CTRE 範例附帶）"},"version":"2.0.2"};
-const QUIZ_DATA = {"0":[{"type":"recall","q":"專案加入 Phoenix 6 後，描述這個函式庫的 JSON 檔放在哪裡？","e":"vendordep 的 JSON 放在 vendordeps 資料夾，WPILib 就是看它來下載函式庫的。","o":["專案的 vendordeps 資料夾","build 資料夾","src/main/deploy","C:\\Users\\Public"],"a":0},{"type":"scenario","s":{"symptom":"隊友拉下你的程式後編譯失敗，錯誤是找不到 com.ctre.phoenix6。","evidence":["你的電腦可以編譯","隊友的專案裡 vendordeps 資料夾沒有 Phoenix6 的 JSON","你最後一次 commit 只加了 .java 檔"]},"q":"最可能的原因和修正是？","e":"要下載哪些函式庫是看 vendordeps 裡的 JSON 決定的。你沒 commit 那個檔案，隊友的專案根本不知道要裝 Phoenix 6。補上 commit 之後，隊友 pull 下來 WPILib 就會自己下載，編譯就會過。","o":["隊友的 VS Code 版本太舊，重裝就好","vendordep 的 JSON 沒被 commit；把 vendordeps 裡的檔案加進 commit 並 push","把 import 改成 phoenix5","Phoenix 6 不支援隊友的電腦"],"a":1},{"type":"scenario","s":{"symptom":"你改了程式也按了 commit，但隊友在 GitHub 上看不到修改。","evidence":["VS Code 的原始碼控制顯示 commit 成功","GitHub 網頁上的最新 commit 是昨天的"]},"q":"下一步做什麼？","e":"commit 只存在你自己的電腦上，要 push 才會上傳。push 完 GitHub 上就看得到了。","o":["push 到 GitHub","刪掉 .git 資料夾重來","再 commit 一次","叫隊友重新 clone"],"a":0},{"type":"scenario","s":{"symptom":"把路徑檔放在專案根目錄的 paths 資料夾，部署後程式讀不到檔案。","evidence":["部署成功，沒有錯誤","程式在 roboRIO 上找不到檔案"]},"q":"應該怎麼修正？","e":"src/main/deploy 裡的檔案部署時會一起傳到 roboRIO 的 /home/lvuser/deploy，程式裡用 deploy 目錄的路徑去讀就讀得到。","o":["把檔案放到 src/main/deploy，部署時才會一起上傳到 roboRIO","把檔案內容貼進 Constants.java","改用 USB 手動複製到 roboRIO 的任意位置","把檔案放進 vendordeps"],"a":0},{"type":"scenario","s":{"symptom":"新同學修改了 Main.java，之後機器人程式啟動就當掉。","evidence":["修改前一切正常","錯誤訊息指向 Main.java"]},"q":"最好的處理方式是？","e":"Command-based 專案的 Main 只負責把 Robot 叫起來，新手不要去動它。還原之後程式就能正常啟動了。","o":["把 Main.java 刪掉","重灌 roboRIO","還原 Main.java，把要加的程式放到 Robot 或 RobotContainer","在 Main.java 裡多加 try-catch"],"a":2}],"1":[{"type":"recall","q":"建構子在什麼時候執行？","e":"建構子在 new 的時候跑一次，用來把物件的初始狀態設好。","o":["每次呼叫方法時","用 new 建立物件時","物件被刪除時","程式編譯時"],"a":1},{"type":"scenario","s":{"symptom":"程式一 Enable 就當掉，Console 出現例外。","evidence":["例外是 NullPointerException","堆疊指向 shooter.run(6.0) 那一行","欄位宣告是 private Roller shooter;"]},"q":"原因是什麼？","e":"只宣告沒 new，變數就是 null，一呼叫方法就丟 NullPointerException。在建構子裡把物件 new 出來就好，之後 shooter 就能正常呼叫。","lab":"roller","o":["Roller 類別沒有 run 方法","6.0 超過電壓上限","shooter 只有宣告、沒有 new，所以是 null","shooter 應該宣告成 public"],"a":2},{"type":"scenario","s":{"symptom":"你讓 intake 跑 8 V，卻發現 feeder 也顯示 8 V。","evidence":["intake 和 feeder 都是 Roller","voltage 欄位宣告成 private static double voltage"]},"q":"問題出在哪？","e":"static 欄位是屬於類別的，所有物件共用同一份。每個物件要有自己的狀態，就不能加 static。拿掉之後兩個物件就各管各的了。","lab":"roller","o":["feeder 沒有 new","intake 和 feeder 用了同一個 CAN ID","voltage 是 static，所有 Roller 共用同一個值","run 方法沒有 this"],"a":2},{"type":"scenario","s":{"symptom":"你寫了 this.name = name; 這行，但印出來的 name 永遠是 null。","evidence":["建構子參數叫 nam（少一個 e）","欄位叫 name"]},"q":"原因是什麼？","e":"參數打成 nam 的話，右邊的 name 指的就是欄位自己，等於 name = name，什麼事都沒做。把參數名字改回來，欄位就會拿到建構時傳進來的值。","o":["要先呼叫 super()","字串不能存在欄位裡","右邊的 name 其實是欄位自己，參數名稱打錯了，所以是把 null 設給自己","this 不能用在建構子裡"],"a":2},{"type":"recall","q":"下面哪一個最適合寫成 static final 常數？","e":"所有物件共用、而且不會變的值，才適合用 static final。","o":["目前按下的按鍵","所有滾輪共用的電壓上限 12.0","每個滾輪目前的電壓","手臂現在的角度"],"a":1}],"2":[{"type":"recall","q":"沒寫任何存取修飾詞的欄位，誰可以存取？","e":"什麼都不寫，就是套件存取（package-private）。","o":["只有子類別","只有自己","同一個套件裡的類別","所有類別"],"a":2},{"type":"scenario","s":{"symptom":"比賽中 Intake 的電壓偶爾超過 10 V 的上限。","evidence":["IntakeSubsystem 的 setVoltage 會把電壓限制在 ±10 V","有一個 Command 用 intake.getRoller().setControl(...) 直接送電壓"]},"q":"根本原因與修正是？","e":"只要外面拿得到馬達物件，你封裝裡寫的規則就能被繞過。讓所有輸出都走同一個入口，電壓就不會超過上限。","o":["getRoller() 把馬達交出去，繞過了限制；拿掉它，所有輸出都走 setVoltage","上限應該改成 12 V","要把 setVoltage 改成 static","Command 應該改成 public"],"a":0},{"type":"scenario","s":{"symptom":"RobotContainer 裡寫了 intake.roller.setControl(...)，編譯失敗。","evidence":["roller 在 IntakeSubsystem 裡是 private"]},"q":"正確的修正是？","e":"private 欄位本來就是不給外面碰的；外面需要的功能，就開 public 方法給它。這樣編譯會過，限制的規則也還是只寫在一個地方。","o":["把 IntakeSubsystem 整個複製到 RobotContainer","在 IntakeSubsystem 加一個 public 方法（例如 setVoltage）讓外面呼叫","在 RobotContainer 裡再 new 一個同 ID 的 TalonFX","把 roller 改成 public"],"a":1},{"type":"scenario","s":{"symptom":"兩個 Command 都在改手臂的目標角度，但其中一個把角度設成了機構到不了的 200 度。","evidence":["ArmSubsystem 的 goal 欄位是 public","沒有任何地方檢查範圍"]},"q":"最好的設計修正是？","e":"範圍檢查集中寫在 Subsystem 裡，不管從哪個入口進來都會被擋。任何 Command 設超過範圍的值，都會被限制住。","o":["把上限寫在註解裡提醒大家","讓每個 Command 自己檢查範圍","goal 改成 private，只能用會限制範圍的 setGoal 設定","把 goal 改成 static"],"a":2}],"3":[{"type":"recall","q":"RollerIO io = new RollerIOSim(); io.setVoltage(8.0); 會執行誰的 setVoltage()？","e":"這就是多型：實際跑的是物件真正那個類別的實作。","o":["RollerIOSim 的","都不執行","RollerIO 介面的 default","編譯失敗"],"a":0},{"type":"scenario","s":{"symptom":"你在 Robot 裡寫了 teleopPeriodc()（打錯字），Teleop 時什麼都不會發生，也沒有任何錯誤。","evidence":["方法上面沒有 @Override","程式編譯成功"]},"q":"怎麼讓這種錯誤在編譯時就被抓到？","e":"@Override 會叫編譯器確認父類別真的有這個方法。名字打錯就直接編譯失敗，改對之後 Teleop 就正常了。","o":["在覆寫的方法上加 @Override，打錯字時編譯器會報錯","把方法改成 static","改用 extends Object","在方法裡加 System.out.println"],"a":0},{"type":"scenario","s":{"symptom":"IntakeSubsystem 繼承 SubsystemBase，但它的 periodic() 從來沒被呼叫。","evidence":["建構子第一行寫了 super();","periodic() 的簽章是 public void periodic(int n)"]},"q":"原因是什麼？","e":"參數不一樣就不算覆寫。加上 @Override 會直接編譯失敗，提醒你簽章寫錯了。改成 periodic() 之後，每 20 ms 就會被呼叫。","o":["periodic 必須是 static","SubsystemBase 不會自動註冊","periodic(int n) 是新的多載方法，不是覆寫；排程器呼叫的是沒有參數的 periodic()","super() 讓 periodic 失效"],"a":2},{"type":"scenario","s":{"symptom":"隊上想讓同一個 IntakeSubsystem 在實機用 TalonFX、在模擬用假的馬達。","evidence":["目前 IntakeSubsystem 裡直接 new TalonFX"]},"q":"哪個設計最合適？","e":"介面描述的是「能做什麼」，實作可以抽換，這就是第 6 章 IO 架構的基礎。Subsystem 一行都不用改就能換實作。","o":["寫兩個不同的 IntakeSubsystem","在 IntakeSubsystem 裡用 if 判斷是不是模擬","讓 TalonFX 繼承模擬類別","定義 RollerIO 介面，實機與模擬各自 implements，Subsystem 只認介面"],"a":3}],"4":[{"type":"recall","q":"controller::getLeftY 和 controller.getLeftY() 的差別是？","e":"方法參考是「之後再叫」的做法；加了括號就是當場呼叫。","o":["前者交出方法本身，後者立刻呼叫並得到一個數字","後者只能用在 Trigger","兩者完全一樣","前者比較快"],"a":0},{"type":"scenario","s":{"symptom":"底盤在 Teleop 一開始就以固定速度往前開，推搖桿完全沒反應。","evidence":["程式寫 double s = -controller.getLeftY(); drive.setDefaultCommand(drive.run(() -> drive.arcadeDrive(s, 0.0)));","Enable 的瞬間搖桿剛好有一點往前"]},"q":"原因與修正是？","e":"lambda 抓到的是一個早就算好的數字，之後不會更新。把讀搖桿那段放進 lambda 裡，每次執行才會重讀，推搖桿速度才會跟著變。","o":["要改成 runOnce","搖桿壞了","s 只在綁定時讀了一次；改成在 lambda 裡呼叫 controller.getLeftY()","arcadeDrive 參數順序錯了"],"a":2},{"type":"scenario","s":{"symptom":"一按下按鍵，Intake 就轉了一下，放開後沒有持續。你的綁定是 onTrue(Commands.runOnce(() -> intake.setVoltage(8)))。","evidence":["IntakeSubsystem.periodic 每一輪都把電壓設回 0"]},"q":"要讓它按著持續轉、放開停止，最合適的是？","e":"runOnce 跑一次就結束了；要持續的動作就用會持續的指令，並在結束時歸零。這樣按住會一直給 8 V，放開回到 0。","o":["把 periodic 刪掉","whileTrue 搭配會持續執行、結束時歸零的指令（例如 startEnd）","onTrue 綁兩次","把 runOnce 改成直接呼叫 intake.setVoltage(8)"],"a":1},{"type":"scenario","s":{"symptom":"編譯錯誤：local variables referenced from a lambda expression must be final or effectively final。","evidence":["lambda 前面有 int count = 0;，lambda 裡寫 count++"]},"q":"正確的理解是？","e":"lambda 抓的區域變數一定要是 effectively final。會變的狀態要放在物件的欄位裡，改成欄位編譯就過了。","o":["要把 lambda 改成方法參考","Java 17 不支援 lambda","lambda 只能讀取不會再改的區域變數；要累加就改用欄位","要加 @Override"],"a":2}],"5":[{"type":"recall","q":"Java 常數的命名慣例是？","e":"常數全部大寫，單字中間用底線。","o":["MaxVolts","maxVolts","max_volts","MAX_VOLTS"],"a":3},{"type":"scenario","s":{"symptom":"編譯錯誤：class RollerIO is public, should be declared in a file named RollerIO.java。","evidence":["檔名是 Roller.java"]},"q":"怎麼修正？","e":"public 類別的名字一定要跟檔名一樣，改名之後就會編譯過。","o":["把檔案移到 deploy 資料夾","把 public 刪掉就好，永遠不用管","重開 VS Code","把檔案改名成 RollerIO.java（或類別改名成 Roller）"],"a":3},{"type":"scenario","s":{"symptom":"手臂程式裡到處寫 setGoal(95.0)、setGoal(15.0)，某次改了得分角度，結果只改到一半。","evidence":["同一個角度出現在四個檔案"]},"q":"最好的整理方式是？","e":"enum 讓狀態只能是清單上那幾個，角度也只寫在一個地方，之後要改角度只要改一處。","o":["用 enum ArmState 帶角度欄位，全部改成 setGoal(ArmState.SCORE)","把數字改成字串","在每個數字旁邊加註解","把四個檔案合併成一個"],"a":0},{"type":"scenario","s":{"symptom":"把 IntakeSubsystem.java 從 subsystems 資料夾拖到 subsystems/intake 之後，出現一堆編譯錯誤。","evidence":["檔案第一行仍是 package frc.robot.subsystems;"]},"q":"要修正什麼？","e":"package 宣告要跟資料夾一致，用到它的地方 import 也要跟著改，這樣才會編譯過。","o":["把資料夾改回來就永遠不能再分資料夾","刪掉所有 import","把 package 改成 frc.robot.subsystems.intake，並更新其他檔案的 import","把類別改成 private"],"a":2}],"6":[{"type":"recall","q":"IO 架構裡，ArmSubsystem 的 IO 欄位型別應該是？","e":"Subsystem 只認介面，所以才能換實作。","o":["TalonFX","Object","ArmIOHardware","ArmIO（介面）"],"a":3},{"type":"scenario","s":{"symptom":"Command 在 initialize() 裡呼叫 arm.setGoal(SCORE)，你懷疑新目標晚了一輪才送到 TalonFX。","evidence":["排程器每一輪先跑所有 Subsystem 的 periodic，再執行指令","setGoal 只改欄位，periodic 才呼叫 io.setPositionGoal"]},"q":"這個延遲的正確解讀是？","e":"只在 periodic 裡呼叫 IO，每一輪就只有一個地方在決定輸出；代價是最多晚一輪。換來的是行為可以預測，模擬和重播也對得上。","lab":"arch","o":["新目標在下一輪 periodic 才送出，最多晚 20 ms，這是設計上可接受的","要改用 while 迴圈等待","要把 periodic 移到 Command 裡","這是 bug，要在 setGoal 裡直接呼叫 IO"],"a":0},{"type":"scenario","s":{"symptom":"模擬時手臂動作正常，實機上手臂一動就往下掉。","evidence":["實機的 GravityType 沒設定（預設 Elevator_Static）","模擬用的是 roboRIO 上的 ArmFeedforward"]},"q":"最可能的原因與修正是？","e":"模擬跟實機用的是不同的控制器設定，結果當然不一樣。這也是為什麼我們推薦模擬時用 TalonFXSimState 跑同一份設定。改成同一份設定、把 kG 調對，手臂在每個角度都撐得住。","o":["把 kP 調大十倍","實機的 TalonFX 用了錯的重力模型；GravityType 設成 Arm_Cosine，並確認 0 度是水平","模擬器壞了","實機要用 DutyCycleOut"],"a":1},{"type":"scenario","s":{"symptom":"兩顆手臂馬達互相對抗、發熱，手臂幾乎不動。","evidence":["follower 用 Follower(leaderId, MotorAlignmentValue.Aligned)","兩顆馬達在機構上是面對面裝的"]},"q":"下一步怎麼修正？","e":"Aligned／Opposed 是相對於 leader 的 Invert 設定，跟 follower 自己的 Inverted 無關。面對面裝的通常要用 Opposed，改對之後兩顆往同一邊出力，電流也會降下來。","o":["把 follower 的 Inverted 設反就好","改成 MotorAlignmentValue.Opposed，並先用低電壓確認方向","把兩顆都設成 leader","提高電流限制"],"a":1},{"type":"scenario","s":{"symptom":"一個 Command 直接呼叫 io.setVoltage(3)，結果手臂抖一下就回到原本的目標。","evidence":["ArmSubsystem.periodic 每一輪都呼叫 io.setPositionGoal(goal)"]},"q":"應該怎麼改？","e":"IO 只能在 periodic 裡呼叫，不然下一輪就被蓋掉，重播也重現不出來。改成切換模式之後，periodic 會穩定送出 3 V。","lab":"arch","o":["讓 Command 也每輪呼叫 IO","Command 只呼叫 Subsystem 的公開方法（例如切換成電壓模式），讓 periodic 送出輸出","把 periodic 刪掉","把 IO 改成 public static"],"a":1}],"7":[{"type":"recall","q":"robotPeriodic() 在哪些模式會執行？","e":"robotPeriodic 在每一種模式、每一輪都會被呼叫。","lab":"loop","o":["只有 Disabled","所有模式，而且排在該模式的 periodic 之後","只有 Teleop","只有有 Enable 的時候"],"a":1},{"type":"scenario","s":{"symptom":"Enable 後整台機器人卡住，按鍵沒反應，Console 一直出現 Loop time of 0.02s overrun。","evidence":["teleopPeriodic 裡寫了 while (!limit.get()) { }","卡住前一刻剛按下歸零鍵"]},"q":"原因與修正是？","e":"periodic 一定要很快就回傳，要等的東西交給指令架構每輪去檢查。這樣 overrun 就會消失，其他 Subsystem 也能繼續更新。","lab":"loop","o":["把 20 ms 改成 100 ms","把 while 改成 for","while 迴圈讓主迴圈卡住；改成用 Trigger 或指令的 until 條件，每一輪檢查一次","roboRIO 太慢，要換新的"],"a":2},{"type":"scenario","s":{"symptom":"Command-based 專案裡，所有按鍵綁定都沒反應，Subsystem 的 periodic 也從沒執行。","evidence":["程式可以部署，也沒有例外","Robot.java 的 robotPeriodic() 是空的"]},"q":"下一步檢查什麼？","e":"排程器每輪 run() 才會去呼叫 Subsystem 的 periodic、檢查按鍵、跑指令。把那一行補回去，綁定就有反應了。","lab":"loop","o":["robotPeriodic() 裡有沒有 CommandScheduler.getInstance().run()","搖桿的 USB 順序","CAN ID 有沒有重複","vendordep 版本"],"a":0},{"type":"scenario","s":{"symptom":"使用 AdvantageKit 時，某個 Subsystem 在建構子裡讀了 Timer.getTimestamp()，重播時結果和實機不同。","evidence":["Robot 的欄位直接寫 private final Intake intake = new Intake();","Logger.start() 寫在 Robot 建構子裡"]},"q":"原因是什麼？","e":"Logger.start() 之前讀到的時間和 DS 資料不是確定的。改成在 Logger.start() 之後才建 RobotContainer，重播才會跟實機一樣。","o":["Logger.start() 要放在 robotPeriodic","欄位初始化比建構子先執行，Intake 在 Logger.start() 之前就讀了時間","重播不支援 Timer","Intake 應該改成 static"],"a":1},{"type":"scenario","s":{"symptom":"自動階段結束進入 Teleop 後，駕駛怎麼推搖桿手臂都不理，要等幾秒才正常。","evidence":["自動指令在自動階段結束前還沒跑完","teleopInit() 是空的"]},"q":"應該怎麼改？","e":"沒跑完的自動指令會一直佔著 Subsystem，駕駛的指令搶不到。在 teleopInit 取消它，進 Teleop 駕駛就能馬上接手。","o":["把自動階段縮短","在 teleopInit() 取消還在執行的自動指令","把手臂的預設指令刪掉","在 disabledInit() 什麼都不做"],"a":1}],"8":[{"type":"recall","q":"A 被 B 打斷時，A 的 end(interrupted) 收到什麼？","e":"被打斷或被取消時一樣會呼叫 end，而且參數是 true。","lab":"scheduler","o":["不會呼叫 end","會丟出例外","interrupted = false","interrupted = true"],"a":3},{"type":"scenario","s":{"symptom":"按下得分鍵後手臂開始動，操作手接著按了收回鍵，手臂立刻改去收回位置，得分動作沒做完。","evidence":["兩個指令都 require arm","得分指令使用預設的中斷行為"]},"q":"這個結果是？","e":"預設是 kCancelSelf，所以這是正常行為。如果得分動作不該被打斷，可以用 withInterruptBehavior(kCancelIncoming)。要誰優先，看你們的需求決定。","lab":"scheduler","o":["預期行為：新指令排程時，正在執行、require 同一個 Subsystem 的指令會被取消","bug：兩個指令應該同時執行","CAN 延遲造成","bug：新指令應該排隊等待"],"a":0},{"type":"scenario","s":{"symptom":"一個 Command 把手臂設到 STOW，但同時執行的另一個手臂指令沒有被取消，兩個一起改目標。","evidence":["第一個指令寫成 Commands.runOnce(() -> arm.setGoal(ArmState.STOW))"]},"q":"少了什麼？","e":"Commands 工具類別的 factory 要自己把 Subsystem 傳進去；Subsystem 自己的 runOnce 才會自動 require。補上之後，排程時衝突的指令就會被正確取消。","lab":"scheduler","o":["isFinished","withTimeout","requirements：沒有把 arm 傳進 Commands.runOnce","defaultCommand"],"a":2},{"type":"scenario","s":{"symptom":"程式一啟動就丟出例外，訊息是 Default commands must require their subsystem!","evidence":["RobotContainer 裡寫 intake.setDefaultCommand(Commands.run(() -> intake.stop()));"]},"q":"應該怎麼改？","e":"預設指令一定要 require 它所屬的 Subsystem；Commands.run 沒傳 Subsystem 就沒有 requirements。改用 Subsystem 自己的 run 就會自動 require，例外會消失，沒有其他指令時就跑預設指令。","o":["讓預設指令 require intake，例如改成 intake.run(() -> intake.stop())","改用 onTrue 綁定","把 intake 改成 static","把 setDefaultCommand 放進 periodic"],"a":0},{"type":"scenario","s":{"symptom":"機器人 Disable 再 Enable 之後，手臂立刻衝向上一次的目標，差點打到人。","evidence":["ArmSubsystem 在 Disabled 時停止輸出，但保留 goal","沒有人在 Enable 前檢查目標"]},"q":"比較安全的改法是？","e":"保留目標本身不是錯，但你要想清楚 Enable 那一刻機構會做什麼。可以讓手臂停在安全位置，或慢慢回去。","o":["在 Disabled 時把目標設回安全位置（例如 STOW），並且 Enable 前喊出來","把 kP 調小","把 Brake 改成 Coast","在 Enable 後等 5 秒"],"a":0}],"9":[{"type":"recall","q":"按住才吸入、放開就停，應該用哪種綁定？","e":"whileTrue 在條件變 true 時排程，變 false 時取消。","lab":"bindings","o":["whileTrue","onFalse","toggleOnTrue","onTrue"],"a":0},{"type":"scenario","s":{"symptom":"操作手按一下吸入鍵，Intake 就一直轉，放開也不停，直到按了別的鍵。","evidence":["綁定是 onTrue(intake.run(...))","run 建立的指令不會自己結束"]},"q":"要做到「按著轉、放開停」，應該改成？","e":"onTrue 只管開始，放開時不會取消；whileTrue 會。還要注意 run 沒有結束動作，想讓放開時停下，指令要在結束時把電壓設回 0（像 startEnd）。這樣放開時指令被取消，滾輪就停了。","lab":"bindings","o":["再加一個 onTrue","toggleOnTrue","onFalse","whileTrue"],"a":3},{"type":"scenario","s":{"symptom":"射球鍵只有在手臂到位時才應該作用，但操作手太早按就射歪了。","evidence":["目前綁定是 operator.rightTrigger(0.5).onTrue(shoot())"]},"q":"最合適的改法是？","e":"用 Trigger 把兩個條件組起來，兩個都成立才排程。手臂沒到位時按下去就不會射。","lab":"bindings","o":["new Trigger(arm::atGoal).and(operator.rightTrigger(0.5)).onTrue(shoot())","在 shoot() 裡用 while 等手臂到位","把綁定放進 periodic 每輪建立一次","叫操作手不要太早按"],"a":0},{"type":"scenario","s":{"symptom":"按一下按鍵，一個指令被排程了好幾次，Console 顯示同一個指令一直重新開始。","evidence":["綁定寫在 ArmSubsystem.periodic() 裡","每一輪都執行 controller.a().onTrue(...)"]},"q":"原因與修正是？","e":"綁定是一次性的宣告，重複宣告會一直疊上去。搬到 configureBindings 之後，按一次就只會排程一次。","o":["onTrue 本來就會重複排程","要加 withTimeout","要改用 toggleOnTrue","每一輪都新增一個綁定；綁定只在 RobotContainer 建構時宣告一次"],"a":3}],"10":[{"type":"recall","q":"Commands.parallel(a, b) 什麼時候結束？","e":"parallel 要等全部成員結束；race 是誰先結束就全部結束。","o":["任一個結束時","兩個都結束時","a 結束時","永遠不會結束"],"a":1},{"type":"scenario","s":{"symptom":"取件動作 sequence(arm.goTo(INTAKE), intake.intakeUntilHasPiece(), arm.goTo(STOW)) 卡在第一步不動。","evidence":["手臂已經停在 INTAKE 附近，但 atGoal() 一直是 false","TOLERANCE_RAD 設成 0.0001"]},"q":"最可能的原因是？","e":"sequence 要前一步結束才會進下一步；結束條件太嚴，整個組合就卡在那。把容許誤差調到合理的值（照實測），就能順利進到下一步。","o":["容許誤差太小，goTo 的 until(atGoal) 永遠不成立","手臂的預設指令搶走控制","sequence 不支援三個指令","Intake 沒有 require"],"a":0},{"type":"scenario","s":{"symptom":"程式一執行到自動程式就丟出例外，訊息提到指令已經被組合使用過。","evidence":["同一個 Command 物件 score 被放進兩個不同的 sequence"]},"q":"應該怎麼改？","e":"同一個指令物件不能放進兩個組合。用 factory 方法每次 new 一個新的，例外就沒了。","o":["用 parallel 包起來","每次都呼叫 factory 產生新的指令物件","加 withTimeout","把 score 改成 static"],"a":1},{"type":"scenario","s":{"symptom":"得分序列執行期間，日誌顯示手臂的預設指令完全沒有執行。","evidence":["score = sequence(arm.goTo(SCORE), intake.eject().withTimeout(0.5), arm.goTo(STOW))","你原本以為吐球的那 0.5 秒會由手臂的預設指令接手"]},"q":"正確的解讀是？","e":"組合指令在跑的時候，成員的預設指令不會跑。照第 6 章「目標存在 Subsystem、由 periodic 送出」的寫法，手臂還是會停在最後的目標；但預設指令裡的其他動作不會發生，需要的話用 deadline 把它放進組合。重點是你要清楚那段時間是誰在控制手臂。","o":["Intake 沒有 require 手臂","組合在整段期間佔住所有成員的 requirements，所以預設指令不會被排程；那段時間手臂需要做的事要放進組合裡","withTimeout 取消了手臂","預設指令應該自動插入，這是 bug"],"a":1},{"type":"scenario","s":{"symptom":"你想「手臂移到位，同時 Intake 一直吸，手臂到了就一起停」。","evidence":["手臂的 goTo 會在到位時結束","Intake 的吸入指令不會自己結束"]},"q":"該用哪個組合？","e":"deadline 看第一個指令，它一結束其他成員就被取消；parallel 會等那個不會結束的吸入指令，永遠不會結束。改成 deadline，手臂到位吸入就停了。","o":["Commands.race(intake.intake())","Commands.sequence(arm.goTo(INTAKE), intake.intake())","Commands.parallel(arm.goTo(INTAKE), intake.intake())","Commands.deadline(arm.goTo(INTAKE), intake.intake())"],"a":3}],"11":[{"type":"recall","q":"config 的 apply() 應該放在哪裡？","e":"apply 會卡住等裝置回應。","o":["periodic()","每個指令的 execute()","robotPeriodic()","建構子裡，只執行一次"],"a":3},{"type":"scenario","s":{"symptom":"程式部署後，CANivore 上所有 TalonFX 都沒反應，roboRIO CAN 上的裝置正常。","evidence":["Tuner X 看得到 CANivore「9427」上的所有裝置","程式裡寫 new CANBus(\"9247\")"]},"q":"問題在哪？","e":"名字打錯不會編譯失敗，但所有讀值都失敗、馬達也不動。改對名字裝置就有反應了。把名字集中放在一個常數裡，就不會再發生。","o":["TalonFX 沒有 Pro 授權","CAN ID 重複","CAN bus 名稱打錯，程式找不到裝置；改成和 Tuner X 一致的「9427」","CANivore 韌體太舊"],"a":2},{"type":"scenario","s":{"symptom":"同一組 PID 在充飽的電池上調得很好，電池用到一半後機構變慢、到不了位。","evidence":["控制請求是 DutyCycleOut 為基礎的閉迴路"]},"q":"最根本的改法是？","e":"DutyCycle 是供電電壓的比例，電池一掉電輸出就跟著變小。Voltage 類的請求會補償（上限還是受電池限制），不同電量下行為才會一致。","o":["把 kP 加大","電池充更飽","改成 Coast","改用 Voltage 類的控制請求，輸出不受電池電壓變化影響"],"a":3},{"type":"scenario","s":{"symptom":"每一輪都在 periodic 裡 apply 一次完整設定之後，Console 出現 loop overrun，機構反應變慢。","evidence":["apply 是等待裝置回應的呼叫"]},"q":"應該怎麼改？","e":"會卡住的呼叫放在 periodic，每一輪都被拖慢。搬到建構子之後 overrun 就沒了。","o":["把 periodic 改成 100 ms","只在建構子套用一次；執行中需要切換的設定只在狀態改變時套用一次","改用 Tuner X 設定就不用程式","把 timeout 設成 0"],"a":1},{"type":"scenario","s":{"symptom":"隊上沒有 Phoenix Pro，程式用 MotionMagicVoltage，EnableFOC 維持預設 true。有人擔心馬達不會動。","evidence":["Tuner X 顯示裝置未授權"]},"q":"正確的判斷是？","e":"沒授權的裝置會自動退回非 FOC 換相，所以馬達照樣會動。只有 TorqueCurrentFOC 這種本身就靠 FOC 的請求才一定要 Pro。","o":["要改用 TorqueCurrentFOC","不用改：未授權時會自動退回一般換相，正常運作，只是沒有 FOC 的效能提升","要買 Pro 才能用 MotionMagic","一定要把 EnableFOC 設成 false，不然馬達不動"],"a":1}],"12":[{"type":"recall","q":"roboRIO 的 DigitalInput 什麼都沒接時，get() 回傳什麼？","e":"內部上拉電阻讓沒接東西的輸入讀到 high。","o":["true","丟出例外","隨機","false"],"a":0},{"type":"scenario","s":{"symptom":"Tuner X 顯示 TalonFX 21、22 正常，但之後的 CANcoder 23 和 Pigeon 2 都不見了。","evidence":["接線是 CANivore → 21 → 22 → CANcoder 23 → Pigeon 2 → 120 Ω","斷電量 CAN-H 與 CAN-L 是 120 Ω"]},"q":"問題最可能在哪？","e":"daisy-chain 斷在哪，後面的裝置就全部消失；量到 120 Ω 也代表從量的地方只看得到一端終端。修好那段線之後應該量到大約 60 Ω，裝置也會全部出現。","lab":"can","o":["Pigeon 2 的韌體","TalonFX 22 到 CANcoder 23 之間的線","CANivore 的名稱","TalonFX 21 的 ID"],"a":1},{"type":"scenario","s":{"symptom":"升降機構開機後，按下「回到底部」，它反而往下撞到底。","evidence":["只有 TalonFX 內建編碼器","關機時機構停在半空中","沒有歸零程序"]},"q":"根本原因與修正是？","e":"相對編碼器不知道開機時實際在哪。先歸零，位置讀值才會跟實際一樣。","o":["內建編碼器開機從 0 算起，程式以為已經在底部；開機後先執行歸零（碰到極限開關再 setPosition）","要改用 Coast","kP 太大","編碼器壞了"],"a":0},{"type":"scenario","s":{"symptom":"手臂在經過某個角度時突然猛甩一下。","evidence":["手臂用 RemoteCANcoder","CANcoder 讀數在那個角度從 0.5 跳到 -0.5","AbsoluteSensorDiscontinuityPoint 設 0.5"]},"q":"應該怎麼修正？","e":"讀數跳了一整圈，閉迴路以為誤差突然暴增。把斷點移到行程外面，讀數就連續了，不會再猛甩。","o":["把 CANcoder 裝到馬達軸上","調整斷點（和 MagnetOffset），讓讀數跳躍的位置落在手臂到不了的角度","改用 DutyCycleOut","把 kD 調大"],"a":1},{"type":"scenario","s":{"symptom":"常開極限開關的線在比賽中被撞掉，升降機構一路往下推到底。","evidence":["開關接地，DIO 有內部上拉","程式用 get() == false 判斷「碰到了」"]},"q":"比較安全的設計是？","e":"常開接法線掉了會讀成「沒碰到」；常閉接法壞掉時是停，不是撞。用常閉的話，斷線時機構會停下來。","o":["把上拉電阻剪掉","改用常閉開關：線掉了會讀成「碰到了」，機構停下來而不是撞下去","拿掉極限開關，只靠軟體極限","在程式裡把 get() 反過來就好"],"a":1},{"type":"scenario","s":{"symptom":"Tuner X 裡兩顆 TalonFX 顯示紅色卡片，其他裝置正常。","evidence":["兩顆都是 TalonFX","兩顆的 ID 都是 21"]},"q":"下一步怎麼做？","e":"同型號、同 ID 才會衝突；不同型號（像 TalonFX 21 跟 CANcoder 21）不會。所以兩顆都正常出現。","lab":"can","o":["更新 CANivore 韌體","換一條 CAN 線","只接其中一顆，把 ID 改成唯一的值並貼上標籤，再接回另一顆","把其中一顆改成 CANcoder"],"a":2}],"13":[{"type":"recall","q":"機構有 100:1 減速，Phoenix 6 的 kP = 1 代表？","e":"Phoenix 6 的增益是機構單位，等於馬達要差 100 圈才輸出 1 V。","o":["機構誤差 1 度輸出 1 V","輸出 1% duty cycle","機構誤差 1 圈輸出 1 V","馬達誤差 1 圈輸出 1 V"],"a":2},{"type":"scenario","s":{"symptom":"手臂每次都停在目標下方約 6 度，不會再往上。","evidence":["只用 kP = 20，kG = 0","誤差停住時，輸出電壓大約等於撐住手臂需要的電壓","把 kP 加倍後誤差變成約一半"]},"q":"下一步應該調哪個參數？","e":"純 P 要有誤差才有輸出，誤差 × kP 剛好撐住重力的時候就停住了；kP 加大只會讓誤差變小，永遠不會是 0。kG 調到接近真實值，停止誤差就會大幅縮小。","lab":"pid","o":["加 kD","加上 kG（重力前饋）","加 kI","繼續加大 kP 直到誤差消失"],"a":1},{"type":"scenario","s":{"symptom":"手臂到位時會衝過頭約 14 度，再慢慢回來。","evidence":["kG 已經接近真實值","kP 很大，輸出在移動初期飽和在 12 V","kD = 0"]},"q":"下一步先試什麼？","e":"kD 像阻尼，速度越快就越往反方向出力；kP 太大也會過衝。加 kD 之後過衝變小，到位可能會稍微慢一點。","lab":"pid","o":["把 kG 加倍","加一點 kD，或降低 kP","把輸出上限改成 24 V","加 kI"],"a":1},{"type":"scenario","s":{"symptom":"手臂加了 kI 之後，大幅移動時先衝過頭很多，好幾秒才回到目標。","evidence":["小幅移動時看起來沒問題","kG = 0"]},"q":"最好的處理是？","e":"誤差大的時候積分累積太多，這就是積分飽和。真正缺的是 kG，不是 I。拿掉 kI、補上 kG，就不會有那種拖很久的過衝。","o":["把 kI 再加大讓它更快回來","降低或拿掉 kI，改用 kG 處理重力","把 kD 設成負的","把控制週期改成 50 Hz"],"a":1},{"type":"scenario","s":{"symptom":"手臂在水平附近撐得住，抬到接近垂直時卻被往上推過頭。","evidence":["kG 是用手臂水平時量的","GravityType 是 Elevator_Static（預設值）"]},"q":"問題在哪？","e":"Elevator_Static 在任何角度都給一樣的 kG；但手臂快垂直的時候，需要的重力補償趨近 0。改成 Arm_Cosine 各角度才撐得住。","o":["GravityType 要設成 Arm_Cosine，讓 kG 隨 cos θ 變小","kG 量錯了，要量垂直時的值","手臂太輕","kP 太小"],"a":0},{"type":"scenario","s":{"symptom":"你把網路上別隊的 kP = 30 填進 Slot0，手臂一動就劇烈振盪。","evidence":["那一隊的 kP 是在 WPILib PIDController 裡用弧度調的","Slot0 的誤差單位是機構端的圈數"]},"q":"原因是什麼？","e":"1 圈 = 2π 弧度，同樣的誤差用圈數算，數字小了 2π 倍，所以 kP 要大 2π 倍才等效，直接照抄會差很多。用你們自己機構量出來、調出來的值。","o":["Slot0 不支援 kP","別隊的機構比較重","單位不同：同一個 kP，在圈數單位下比弧度大約 2π 倍","要改成 DutyCycle"],"a":2}],"14":[{"type":"recall","q":"MotionMagicJerk 設為 0 代表？","e":"jerk 不是 0 才是 S-curve；數字越小越圓滑，也越慢。","o":["使用預設 jerk","機構不會動","不限制 jerk，軌跡是梯形","最圓滑的 S-curve"],"a":2},{"type":"scenario","s":{"symptom":"手臂用 MotionMagic，每次移動結束前都跟不上軌跡，最後衝過目標。","evidence":["實際位置在加速段就開始落後","移動中輸出電壓一直在 12 V","巡航速度設成 12 ÷ kV 的 1.2 倍"]},"q":"下一步怎麼改？","e":"軌跡比機構給得出來的還快，輸出一飽和就跟不上了。把巡航速度降下來，實際位置就會貼著軌跡走，不再衝過頭。","lab":"profile","o":["把 kP 加大","把 jerk 設成 0","把巡航速度降到機構能力以下，留餘裕給 PID 與電壓下降","改用 DutyCycleOut"],"a":2},{"type":"scenario","s":{"symptom":"升降機構只移動 3 公分，卻發現速度從來沒達到設定的巡航速度。","evidence":["巡航速度與加速度設定正確","到位時間正常"]},"q":"這代表什麼？","e":"加速跟減速要的距離加起來超過總距離，還沒到巡航速度就得開始減速。這是正常的，不用改。","lab":"profile","o":["正常：距離太短，走的是三角形軌跡","MotionMagic 壞了","巡航速度的單位錯了","加速度設太大"],"a":0},{"type":"scenario","s":{"symptom":"你把 MotionMagicCruiseVelocity 填 80（馬達在規格表上的轉速），手臂一動就猛衝。","evidence":["SensorToMechanismRatio = 50","80 是馬達端 rot/s"]},"q":"問題在哪？","e":"設了之後所有讀值和設定都變成機構端單位。把數字換算成手臂端的速度，動作就正常了。","o":["要改成 rad/s","設了 SensorToMechanismRatio 之後，速度是機構端單位；80 rot/s 對手臂來說快了約 50 倍","MotionMagic 不能用在手臂","要把 jerk 設成 80"],"a":1},{"type":"scenario","s":{"symptom":"隊上沒有 Pro 授權，程式改用 DynamicMotionMagicVoltage 後，機構完全不動。","evidence":["Tuner X 顯示 UnlicensedFeatureInUse 故障"]},"q":"該怎麼處理？","e":"這點跟 EnableFOC 不一樣：Dynamic MotionMagic 沒授權會直接關掉輸出。改回一般 MotionMagic 就恢復了。","o":["把 EnableFOC 關掉","改用 CANivore 以外的 bus","改回 MotionMagicVoltage；需要兩種速度就在狀態改變時套用不同的 MotionMagicConfigs","把 jerk 設成 0"],"a":2}],"15":[{"type":"recall","q":"SysId 的 Quasistatic 測試在量什麼？","e":"Dynamic 測試才是突然給一個固定電壓，量加速的表現。","o":["最高速度","電壓緩慢上升，量維持速度所需的電壓（加速度可忽略）","電池內阻","加速時的行為"],"a":1},{"type":"scenario","s":{"symptom":"SysId 分析直接失敗，無法載入資料。","evidence":["同一次開機裡，先測了手臂，接著測了升降","SignalLogger 從頭到尾沒有 stop 過"]},"q":"原因與修正是？","e":"只有裡面只有一個 routine 的日誌才能分析。分開記錄之後就能各自載入了。","o":["一份日誌裡有兩個 routine；每測完一個機構就 stop，重新 start 開新檔","資料太少","要改用 DutyCycleOut","SysId 不支援升降"],"a":0},{"type":"scenario","s":{"symptom":"手臂的 SysId 結果裡 kG 看起來完全不合理，手臂在某些角度撐不住。","evidence":["CANcoder 的 0 度對應手臂往下 20 度","分析類型選 Arm"]},"q":"最可能的原因是？","e":"先把 MagnetOffset 修好讓 0 度是水平，再重測一次，kG 就會合理，各角度都撐得住。","o":["SysId 不適合手臂","電池太滿","Arm 模型用 cos θ，0 度必須是水平；零點錯了 kG 就算錯","測試時間太長"],"a":2},{"type":"scenario","s":{"symptom":"Dynamic 測試時手臂撞到機械極限，之後算出的 kA 很怪。","evidence":["dynamic 步階電壓用預設值","沒有開軟體極限"]},"q":"下一次測試應該怎麼做？","e":"SysIdRoutine 不會幫你停；撞到極限那段資料會讓擬合跑掉。快到極限就放開，資料乾淨了，kA 也會合理。","o":["把 kA 直接設成 0","只做 quasistatic","降低步階電壓、開啟軟體極限，並在接近極限前放開按鍵","延長測試時間"],"a":2},{"type":"scenario","s":{"symptom":"用 SysId 建議的 kP、kD 上機，手臂到位時會輕微振盪。","evidence":["kS、kG、kV 來自同一次 SysId，看起來合理"]},"q":"正確的看法是？","e":"WPILib 自己都說這些增益是 educated guesses。上機微調 kP、kD 到不會晃為止。","o":["回饋增益只是有根據的起點，照第 13 章的順序上機微調","SysId 算錯了，整份結果都不能用","要重新跑 SysId 直到不振盪","要把 kG 調大"],"a":0},{"type":"scenario","s":{"symptom":"升降機構只跑了正向的 quasistatic 與 dynamic，SysId 算出的 kG 和隊友手動量的差很多。","evidence":["反向兩項測試沒有跑","kV 看起來合理"]},"q":"最可能的原因是？","e":"往上時截距是 kG + kS，往下時是 kG − kS；少了反向就只看得到兩個加起來。補跑反向測試，kS 和 kG 就分得開了。","lab":"fit","o":["kV 算錯了","電池電量不足","SysId 不支援升降機構","只有一個方向時，摩擦和重力都是同一個方向，kS 與 kG 分不開"],"a":3},{"type":"scenario","s":{"symptom":"SysId 的 quasistatic 速度對時間圖前面有一段速度幾乎是 0、電壓卻在上升的「尾巴」，算出的 kS 偏小。","evidence":["Velocity Threshold 設得很低"]},"q":"下一步做什麼？","e":"那條尾巴代表門檻設太低，把還沒開始動的資料也算進去了。重新分析就好，不用重跑測試，尾巴消失後 kS 就回到合理的值。","lab":"fit","o":["重新跑測試並把電壓上升速率加快","把 kS 手動乘兩倍","調高 Velocity Threshold 重新分析，排除還沒開始動的點","忽略它，kS 不重要"],"a":2}],"16":[{"type":"recall","q":"紅方時 PathPlanner 翻轉路徑，場地座標原點在哪？","e":"原點永遠在藍方。","o":["藍方","紅方","機器人起始位置","場地中央"],"a":0},{"type":"scenario","s":{"symptom":"在紅方時，自動程式的路徑一開始就往錯的方向走。","evidence":["在藍方測試都正常","翻轉判斷寫在 RobotContainer 建構子裡，存成一個 boolean"]},"q":"原因與修正是？","e":"DriverStation.getAlliance() 在連上之前可能是空的。寫成 lambda 在路徑開始時才讀，顏色就會是對的。","o":["PathPlanner 不支援紅方","路徑要畫兩份","要把原點移到紅方","開機時可能還沒連上 FMS，顏色讀錯；翻轉判斷要寫成 lambda，在路徑開始時才判斷"],"a":3},{"type":"scenario","s":{"symptom":"自動程式跑到 armScore 那一步什麼都沒做，接著直接走下一條路徑。","evidence":["GUI 裡的名稱是 ArmScore","程式註冊的是 NamedCommands.registerCommand(\"armScore\", ...)"]},"q":"問題在哪？","e":"名字要跟 GUI 裡一字不差，改成一樣之後那一步就會做得分動作。","o":["名稱大小寫不一致，對不上","armScore 沒有 require","要先執行 GUI","Named Commands 只能用在事件標記"],"a":0},{"type":"scenario","s":{"symptom":"自動程式在 intake 那一步後就停住，後面的路徑都沒跑。","evidence":["intake 的 Named Command 是 intake.run(...) 做的","Auto 是 sequential 群組"]},"q":"應該怎麼改？","e":"sequential 群組要前一步結束才會進下一步。換成吸到物件就結束的指令，自動程式就會繼續往下跑。","o":["在 intake 後面加 waitSeconds","放進 Auto 的指令要會結束，例如改成吸到物件就結束","把 Auto 改成 parallel","把 intake 刪掉"],"a":1},{"type":"scenario","s":{"symptom":"自動路徑一轉彎，機器人就往反方向轉，越走越偏。","evidence":["直線段正常","陀螺儀是順時針為正"]},"q":"下一步檢查什麼？","e":"朝向反了的話，走直線看不出來，一轉彎就錯。把方向修正過來轉彎就對了。","o":["陀螺儀方向：WPILib 是逆時針為正，順時針為正的讀值要反過來","輪子直徑","PathPlanner 的 PID","路徑檔有沒有部署"],"a":0}],"17":[{"type":"recall","q":"WPILib 對 AprilTag 視覺量測的朝向標準差建議怎麼設？","e":"陀螺儀的朝向標準差要小，視覺的朝向標準差要大。","o":["設為 0","和 x、y 一樣","非常小","非常大，把朝向交給陀螺儀"],"a":3},{"type":"scenario","s":{"symptom":"看到標籤時，機器人在場上的估計位置會瞬間跳動，路徑跟隨跟著亂跑。","evidence":["程式每次看到標籤就 resetPose(視覺位置)"]},"q":"應該怎麼改？","e":"視覺量測偶爾會跳，直接重設位置也會跟著跳。用融合的話，會照標準差決定信多少，位置就會平順地被修正。","lab":"fusion","o":["改用 addVisionMeasurement 融合，並依距離設定標準差","只在自動階段用視覺","把相機拿掉","提高相機解析度"],"a":0},{"type":"scenario","s":{"symptom":"機器人在遠處看到一個標籤時，估計位置被拉偏了將近半公尺。","evidence":["和標籤的距離約 5 m","只看到 1 個標籤","視覺標準差固定是 0.05 m"]},"q":"下一步怎麼改？","e":"遠處的量測誤差本來就大，給它固定的小標準差等於太相信它了。讓標準差隨距離變大，遠處的影響變小，近處還是能有效修正。","lab":"fusion","o":["把里程計的標準差調大","只相信遠的標籤","把視覺標準差調成 0","讓 x、y 標準差隨距離放大（看到多個標籤時可以縮小）"],"a":3},{"type":"scenario","s":{"symptom":"機器人邊轉邊移動時，視覺修正後的位置常常錯得離譜；靜止時很準。","evidence":["使用 MegaTag2","每一輪都有呼叫 SetRobotOrientation"]},"q":"比較合理的處理是？","e":"轉很快的時候，影像跟時間很容易對不上。把這些不可靠的量測丟掉，位置就不會亂跳。","o":["把朝向標準差調小","旋轉太快時丟掉這筆量測（例如 CTRE 範例的每秒 2 圈門檻）","把旋轉速度限制為 0","改成每 5 秒才讀一次"],"a":1},{"type":"scenario","s":{"symptom":"整場比賽下來，儀表板上的 Vision/Accepted 幾乎沒增加。","evidence":["相機有畫面","程式裡 Limelight 名稱是 \"limelight\"，網頁設定的名稱是 \"limelight-front\""]},"q":"最可能的原因是？","e":"名字錯了就讀不到任何估計，est 會是空的或沒有標籤。改成一致之後計數就會開始增加。","o":["旋轉門檻太嚴","名稱不一致，程式讀不到 Limelight 的資料","機器人都沒看到標籤","標準差太大"],"a":1}],"18":[{"type":"recall","q":"重播時 setUseTiming(false) 會？","e":"AdvantageKit 明講了這不會影響準確度。","o":["只重播前 15 秒","讓重播盡快跑完，不影響準確度","讓重播結果不準","關閉日誌"],"a":1},{"type":"scenario","s":{"symptom":"你在重播時把手臂的 kP 改大，想看手臂會不會少一點過衝，結果日誌裡的手臂位置完全沒變。","evidence":["手臂照第 6 章的 IO 架構寫"]},"q":"正確的解讀是？","e":"改了輸出也影響不了重播的輸入。想看新參數下會怎麼動，要用模擬（第 6 章 D 部分）。","o":["kP 沒有部署","重播壞了","要把 setUseTiming 設成 true","重播改變不了輸入：位置是從日誌讀回的；要看新的動作請用模擬"],"a":3},{"type":"scenario","s":{"symptom":"重播出來的 Arm/AtGoal 和比賽時操作手看到的完全對不上。","evidence":["Metadata 的 GitSHA 是上週的 commit","你用的是今天的程式重播","BuildConstants 的 dirty 是 true"]},"q":"正確的判斷和下一步是？","e":"重播需要當時那份程式。GitSHA 可以找回 commit，但 dirty 的修改沒被記下來。Event Deploy 會在每次部署前自動 commit，以後就不會這樣。這次就先用最接近的版本重播，註明可能不準，下次比賽改用 event 分支。","o":["要 checkout 回那個 GitSHA；但 dirty 代表當時有沒 commit 的修改，重播可能無法完全還原，以後比賽要用 event 分支讓部署前自動 commit","直接相信重播結果","把 kP 調回去再重播","把日誌刪掉"],"a":0},{"type":"scenario","s":{"symptom":"比賽後才發現某場的日誌是空的。","evidence":["roboRIO 上沒有插隨身碟","程式用 WPILOGWriter 預設路徑"]},"q":"要怎麼避免下次再發生？","e":"WPILOGWriter 在 roboRIO 上預設寫到 USB 隨身碟。插好隨身碟，每場就都有日誌可以查。","o":["把「FAT32 隨身碟有插、有空間」放進賽前檢查，或在程式裡偵測後發 Alert","只用 DS Log","改用 SmartDashboard 記錄","在 Pit 手動複製"],"a":0},{"type":"scenario","s":{"symptom":"重播時自動程式選到的和比賽時不一樣。","evidence":["自動程式選單用 SmartDashboard.putData(AutoBuilder.buildAutoChooser())"]},"q":"應該怎麼改？","e":"從 NetworkTables 讀的值沒被記錄，重播時讀不到當時選了什麼。換成 LoggedDashboardChooser，重播就會用當時選的那個自動程式。","o":["重播時手動選","把選單放在 Constants","改用 LoggedDashboardChooser 包住選單，讓選擇被記錄成輸入","把選單刪掉，只用一個自動程式"],"a":2}],"19":[{"type":"recall","q":"roboRIO 1.0 在電壓低於多少時進入 brownout 保護（第 2 階段）？","e":"6.8 V 是第 1 階段，低於 4.5 V 可能會斷電；roboRIO 2.0 的預設是 6.75 V。","o":["6.3 V","7.5 V","6.8 V","4.5 V"],"a":0},{"type":"scenario","s":{"symptom":"比賽中機構動作偶爾停一下又恢復，駕駛覺得「程式當了」。","evidence":["DS 的 CAN/Power 分頁 12V fault 計數增加","DS Log 在那幾個時間點電壓掉到 6 V 附近"]},"q":"最可能的原因和下一步是？","e":"brownout 時 roboRIO 會停掉 CAN 馬達控制器的輸出，電壓回來才恢復。換電池、設好電流限制，就不會再發生。","lab":"triage","o":["brownout；先換充飽的電池、檢查接頭，並確認各機構的電流限制","CAN 斷線，換線","程式 bug，馬上改程式","無線電重開"],"a":0},{"type":"scenario","s":{"symptom":"上場後 Driver Station 顯示「No robot code is currently running」。","evidence":["Communications 是綠的","剛剛在 Pit 部署了新程式"]},"q":"下一步做什麼？","e":"通訊正常但程式沒在跑，可能是掛了、還在開機，或是部署失敗。修好之後 Robot Code 燈會變綠。","lab":"triage","o":["看 Console 有沒有例外；來不及查就部署已知可以動的版本","換無線電","重開 Driver Station","換電池"],"a":0},{"type":"scenario","s":{"symptom":"DS Log 顯示斷線期間其他裝置都 ping 得到，只有 roboRIO 不回應，接著出現「Time since robot boot」事件。","evidence":["斷線約 30 秒"]},"q":"判斷是什麼問題？","e":"這就是 roboRIO 重開的典型樣子。把電源接頭鎖緊、避免 brownout，就不會再重開。","lab":"triage","o":["無線電重開","roboRIO 重開：檢查 roboRIO 的電源線與 brownout","Driver Station 筆電睡眠","網路線卡榫斷了"],"a":1},{"type":"scenario","s":{"symptom":"兩場比賽之間發現自動程式有 bug，只剩時間改，來不及在練習場測。","evidence":["上一個版本在比賽中可以正常動"]},"q":"最好的做法是？","e":"沒測過的修改，風險通常比原本的問題還大。這場先用穩定版本打完，下一段空檔再修、再測。","o":["同時改好幾個地方碰運氣","直接部署修改後的版本","把自動程式關掉並不告訴隊友","用已知可以動的版本上場，比賽後再修"],"a":3}]};
+const QUIZ_DATA = {"0":[{"type":"recall","q":"專案加入 Phoenix 6 後，描述這個函式庫的 JSON 檔放在哪裡？","e":"vendordep 的 JSON 放在 vendordeps 資料夾，WPILib 就是看它來下載函式庫的。","o":["專案的 vendordeps 資料夾","build 資料夾","src/main/deploy","C:\\Users\\Public"],"a":0},{"type":"scenario","s":{"symptom":"隊友拉下你的程式後編譯失敗，錯誤是找不到 com.ctre.phoenix6。","evidence":["你的電腦可以編譯","隊友的專案裡 vendordeps 資料夾沒有 Phoenix6 的 JSON","你最後一次 commit 只加了 .java 檔"]},"q":"最可能的原因和修正是？","e":"要下載哪些函式庫是看 vendordeps 裡的 JSON 決定的。你沒 commit 那個檔案，隊友的專案根本不知道要裝 Phoenix 6。補上 commit 之後，隊友 pull 下來 WPILib 就會自己下載，編譯就會過。","o":["隊友的 VS Code 版本太舊，重裝就好","vendordep 的 JSON 沒被 commit；把 vendordeps 裡的檔案加進 commit 並 push","把 import 改成 phoenix5","Phoenix 6 不支援隊友的電腦"],"a":1},{"type":"scenario","s":{"symptom":"你改了程式也按了 commit，但隊友在 GitHub 上看不到修改。","evidence":["VS Code 的原始碼控制顯示 commit 成功","GitHub 網頁上的最新 commit 是昨天的"]},"q":"下一步做什麼？","e":"commit 只存在你自己的電腦上，要 push 才會上傳。push 完 GitHub 上就看得到了。","o":["push 到 GitHub","刪掉 .git 資料夾重來","再 commit 一次","叫隊友重新 clone"],"a":0},{"type":"scenario","s":{"symptom":"把路徑檔放在專案根目錄的 paths 資料夾，部署後程式讀不到檔案。","evidence":["部署成功，沒有錯誤","程式在 roboRIO 上找不到檔案"]},"q":"應該怎麼修正？","e":"src/main/deploy 裡的檔案部署時會一起傳到 roboRIO 的 /home/lvuser/deploy，程式裡用 deploy 目錄的路徑去讀就讀得到。","o":["把檔案放到 src/main/deploy，部署時才會一起上傳到 roboRIO","把檔案內容貼進 Constants.java","改用 USB 手動複製到 roboRIO 的任意位置","把檔案放進 vendordeps"],"a":0},{"type":"scenario","s":{"symptom":"新同學修改了 Main.java，之後機器人程式啟動就當掉。","evidence":["修改前一切正常","錯誤訊息指向 Main.java"]},"q":"最好的處理方式是？","e":"Command-based 專案的 Main 只負責把 Robot 叫起來，新手不要去動它。還原之後程式就能正常啟動了。","o":["把 Main.java 刪掉","重灌 roboRIO","還原 Main.java，把要加的程式放到 Robot 或 RobotContainer","在 Main.java 裡多加 try-catch"],"a":2}],"1":[{"type":"recall","q":"建構子在什麼時候執行？","e":"建構子在 new 的時候跑一次，用來把物件的初始狀態設好。","o":["每次呼叫方法時","用 new 建立物件時","物件被刪除時","程式編譯時"],"a":1},{"type":"scenario","s":{"symptom":"程式一 Enable 就當掉，Console 出現例外。","evidence":["例外是 NullPointerException","堆疊指向 shooter.run(6.0) 那一行","欄位宣告是 private Roller shooter;"]},"q":"原因是什麼？","e":"只宣告沒 new，變數就是 null，一呼叫方法就丟 NullPointerException。在建構子裡把物件 new 出來就好，之後 shooter 就能正常呼叫。","lab":"roller","o":["Roller 類別沒有 run 方法","6.0 超過電壓上限","shooter 只有宣告、沒有 new，所以是 null","shooter 應該宣告成 public"],"a":2},{"type":"scenario","s":{"symptom":"你讓 intake 跑 8 V，卻發現 feeder 也顯示 8 V。","evidence":["intake 和 feeder 都是 Roller","voltage 欄位宣告成 private static double voltage"]},"q":"問題出在哪？","e":"static 欄位是屬於類別的，所有物件共用同一份。每個物件要有自己的狀態，就不能加 static。拿掉之後兩個物件就各管各的了。","lab":"roller","o":["feeder 沒有 new","intake 和 feeder 用了同一個 CAN ID","voltage 是 static，所有 Roller 共用同一個值","run 方法沒有 this"],"a":2},{"type":"scenario","s":{"symptom":"你寫了 this.name = name; 這行，但印出來的 name 永遠是 null。","evidence":["建構子參數叫 nam（少一個 e）","欄位叫 name"]},"q":"原因是什麼？","e":"參數打成 nam 的話，右邊的 name 指的就是欄位自己，等於 name = name，什麼事都沒做。把參數名字改回來，欄位就會拿到建構時傳進來的值。","o":["要先呼叫 super()","字串不能存在欄位裡","右邊的 name 其實是欄位自己，參數名稱打錯了，所以是把 null 設給自己","this 不能用在建構子裡"],"a":2},{"type":"recall","q":"下面哪一個最適合寫成 static final 常數？","e":"所有物件共用、而且不會變的值，才適合用 static final。","o":["目前按下的按鍵","所有滾輪共用的電壓上限 12.0","每個滾輪目前的電壓","手臂現在的角度"],"a":1}],"2":[{"type":"recall","q":"沒寫任何存取修飾詞的欄位，誰可以存取？","e":"什麼都不寫，就是套件存取（package-private）。","o":["只有子類別","只有自己","同一個套件裡的類別","所有類別"],"a":2},{"type":"scenario","s":{"symptom":"比賽中 Intake 的電壓偶爾超過 10 V 的上限。","evidence":["IntakeSubsystem 的 setVoltage 會把電壓限制在 ±10 V","有一個 Command 用 intake.getRoller().setControl(...) 直接送電壓"]},"q":"根本原因與修正是？","e":"只要外面拿得到馬達物件，你封裝裡寫的規則就能被繞過。讓所有輸出都走同一個入口，電壓就不會超過上限。","o":["getRoller() 把馬達交出去，繞過了限制；拿掉它，所有輸出都走 setVoltage","上限應該改成 12 V","要把 setVoltage 改成 static","Command 應該改成 public"],"a":0},{"type":"scenario","s":{"symptom":"RobotContainer 裡寫了 intake.roller.setControl(...)，編譯失敗。","evidence":["roller 在 IntakeSubsystem 裡是 private"]},"q":"正確的修正是？","e":"private 欄位本來就是不給外面碰的；外面需要的功能，就開 public 方法給它。這樣編譯會過，限制的規則也還是只寫在一個地方。","o":["把 IntakeSubsystem 整個複製到 RobotContainer","在 IntakeSubsystem 加一個 public 方法（例如 setVoltage）讓外面呼叫","在 RobotContainer 裡再 new 一個同 ID 的 TalonFX","把 roller 改成 public"],"a":1},{"type":"scenario","s":{"symptom":"兩個 Command 都在改手臂的目標角度，但其中一個把角度設成了機構到不了的 200 度。","evidence":["ArmSubsystem 的 goal 欄位是 public","沒有任何地方檢查範圍"]},"q":"最好的設計修正是？","e":"範圍檢查集中寫在 Subsystem 裡，不管從哪個入口進來都會被擋。任何 Command 設超過範圍的值，都會被限制住。","o":["把上限寫在註解裡提醒大家","讓每個 Command 自己檢查範圍","goal 改成 private，只能用會限制範圍的 setGoal 設定","把 goal 改成 static"],"a":2}],"3":[{"type":"recall","q":"RollerIO io = new RollerIOSim(); io.setVoltage(8.0); 會執行誰的 setVoltage()？","e":"這就是多型：實際跑的是物件真正那個類別的實作。","o":["RollerIOSim 的","都不執行","RollerIO 介面的 default","編譯失敗"],"a":0},{"type":"scenario","s":{"symptom":"你在 Robot 裡寫了 teleopPeriodc()（打錯字），Teleop 時什麼都不會發生，也沒有任何錯誤。","evidence":["方法上面沒有 @Override","程式編譯成功"]},"q":"怎麼讓這種錯誤在編譯時就被抓到？","e":"@Override 會叫編譯器確認父類別真的有這個方法。名字打錯就直接編譯失敗，改對之後 Teleop 就正常了。","o":["在覆寫的方法上加 @Override，打錯字時編譯器會報錯","把方法改成 static","改用 extends Object","在方法裡加 System.out.println"],"a":0},{"type":"scenario","s":{"symptom":"IntakeSubsystem 繼承 SubsystemBase，但它的 periodic() 從來沒被呼叫。","evidence":["建構子第一行寫了 super();","periodic() 的簽章是 public void periodic(int n)"]},"q":"原因是什麼？","e":"參數不一樣就不算覆寫。加上 @Override 會直接編譯失敗，提醒你簽章寫錯了。改成 periodic() 之後，每 20 ms 就會被呼叫。","o":["periodic 必須是 static","SubsystemBase 不會自動註冊","periodic(int n) 是新的多載方法，不是覆寫；排程器呼叫的是沒有參數的 periodic()","super() 讓 periodic 失效"],"a":2},{"type":"scenario","s":{"symptom":"隊上想讓同一個 IntakeSubsystem 在實機用 TalonFX、在模擬用假的馬達。","evidence":["目前 IntakeSubsystem 裡直接 new TalonFX"]},"q":"哪個設計最合適？","e":"介面描述的是「能做什麼」，實作可以抽換，這就是第 6 章 IO 架構的基礎。Subsystem 一行都不用改就能換實作。","o":["寫兩個不同的 IntakeSubsystem","在 IntakeSubsystem 裡用 if 判斷是不是模擬","讓 TalonFX 繼承模擬類別","定義 RollerIO 介面，實機與模擬各自 implements，Subsystem 只認介面"],"a":3}],"4":[{"type":"recall","q":"controller::getLeftY 和 controller.getLeftY() 的差別是？","e":"方法參考是「之後再叫」的做法；加了括號就是當場呼叫。","o":["前者交出方法本身，後者立刻呼叫並得到一個數字","後者只能用在 Trigger","兩者完全一樣","前者比較快"],"a":0},{"type":"scenario","s":{"symptom":"底盤在 Teleop 一開始就以固定速度往前開，推搖桿完全沒反應。","evidence":["程式寫 double s = -controller.getLeftY(); drive.setDefaultCommand(drive.run(() -> drive.arcadeDrive(s, 0.0)));","Enable 的瞬間搖桿剛好有一點往前"]},"q":"原因與修正是？","e":"lambda 抓到的是一個早就算好的數字，之後不會更新。把讀搖桿那段放進 lambda 裡，每次執行才會重讀，推搖桿速度才會跟著變。","o":["要改成 runOnce","搖桿壞了","s 只在綁定時讀了一次；改成在 lambda 裡呼叫 controller.getLeftY()","arcadeDrive 參數順序錯了"],"a":2},{"type":"scenario","s":{"symptom":"一按下按鍵，Intake 就轉了一下，放開後沒有持續。你的綁定是 onTrue(Commands.runOnce(() -> intake.setVoltage(8)))。","evidence":["IntakeSubsystem.periodic 每一輪都把電壓設回 0"]},"q":"要讓它按著持續轉、放開停止，最合適的是？","e":"runOnce 跑一次就結束了；要持續的動作就用會持續的指令，並在結束時歸零。這樣按住會一直給 8 V，放開回到 0。","o":["把 periodic 刪掉","whileTrue 搭配會持續執行、結束時歸零的指令（例如 startEnd）","onTrue 綁兩次","把 runOnce 改成直接呼叫 intake.setVoltage(8)"],"a":1},{"type":"scenario","s":{"symptom":"編譯錯誤：local variables referenced from a lambda expression must be final or effectively final。","evidence":["lambda 前面有 int count = 0;，lambda 裡寫 count++"]},"q":"正確的理解是？","e":"lambda 抓的區域變數一定要是 effectively final。會變的狀態要放在物件的欄位裡，改成欄位編譯就過了。","o":["要把 lambda 改成方法參考","Java 17 不支援 lambda","lambda 只能讀取不會再改的區域變數；要累加就改用欄位","要加 @Override"],"a":2}],"5":[{"type":"recall","q":"Java 常數的命名慣例是？","e":"常數全部大寫，單字中間用底線。","o":["MaxVolts","maxVolts","max_volts","MAX_VOLTS"],"a":3},{"type":"scenario","s":{"symptom":"編譯錯誤：class RollerIO is public, should be declared in a file named RollerIO.java。","evidence":["檔名是 Roller.java"]},"q":"怎麼修正？","e":"public 類別的名字一定要跟檔名一樣，改名之後就會編譯過。","o":["把檔案移到 deploy 資料夾","把 public 刪掉就好，永遠不用管","重開 VS Code","把檔案改名成 RollerIO.java（或類別改名成 Roller）"],"a":3},{"type":"scenario","s":{"symptom":"手臂程式裡到處寫 setGoal(95.0)、setGoal(15.0)，某次改了得分角度，結果只改到一半。","evidence":["同一個角度出現在四個檔案"]},"q":"最好的整理方式是？","e":"enum 讓狀態只能是清單上那幾個，角度也只寫在一個地方，之後要改角度只要改一處。","o":["用 enum ArmState 帶角度欄位，全部改成 setGoal(ArmState.SCORE)","把數字改成字串","在每個數字旁邊加註解","把四個檔案合併成一個"],"a":0},{"type":"scenario","s":{"symptom":"把 IntakeSubsystem.java 從 subsystems 資料夾拖到 subsystems/intake 之後，出現一堆編譯錯誤。","evidence":["檔案第一行仍是 package frc.robot.subsystems;"]},"q":"要修正什麼？","e":"package 宣告要跟資料夾一致，用到它的地方 import 也要跟著改，這樣才會編譯過。","o":["把資料夾改回來就永遠不能再分資料夾","刪掉所有 import","把 package 改成 frc.robot.subsystems.intake，並更新其他檔案的 import","把類別改成 private"],"a":2}],"6":[{"type":"recall","q":"IO 架構裡，ArmSubsystem 的 IO 欄位型別應該是？","e":"Subsystem 只認介面，所以才能換實作。","o":["TalonFX","Object","ArmIOHardware","ArmIO（介面）"],"a":3},{"type":"scenario","s":{"symptom":"Command 在 initialize() 裡呼叫 arm.setGoal(SCORE)，你懷疑新目標晚了一輪才送到 TalonFX。","evidence":["排程器每一輪先跑所有 Subsystem 的 periodic，再執行指令","setGoal 只改欄位，periodic 才呼叫 io.setPositionGoal"]},"q":"這個延遲的正確解讀是？","e":"只在 periodic 裡呼叫 IO，每一輪就只有一個地方在決定輸出；代價是最多晚一輪。換來的是行為可以預測，模擬和重播也對得上。","lab":"arch","o":["新目標在下一輪 periodic 才送出，最多晚 20 ms，這是設計上可接受的","要改用 while 迴圈等待","要把 periodic 移到 Command 裡","這是 bug，要在 setGoal 裡直接呼叫 IO"],"a":0},{"type":"scenario","s":{"symptom":"模擬時手臂動作正常，實機上手臂一動就往下掉。","evidence":["實機的 GravityType 沒設定（預設 Elevator_Static）","模擬用的是 roboRIO 上的 ArmFeedforward"]},"q":"最可能的原因與修正是？","e":"模擬跟實機用的是不同的控制器設定，結果當然不一樣。這也是為什麼推薦模擬時用 TalonFXSimState 跑同一份設定。改成同一份設定、把 kG 調對，手臂在每個角度都撐得住。","o":["把 kP 調大十倍","實機的 TalonFX 用了錯的重力模型；GravityType 設成 Arm_Cosine，並確認 0 度是水平","模擬器壞了","實機要用 DutyCycleOut"],"a":1},{"type":"scenario","s":{"symptom":"兩顆手臂馬達互相對抗、發熱，手臂幾乎不動。","evidence":["follower 用 Follower(leaderId, MotorAlignmentValue.Aligned)","兩顆馬達在機構上是面對面裝的"]},"q":"下一步怎麼修正？","e":"Aligned／Opposed 是相對於 leader 的 Invert 設定，跟 follower 自己的 Inverted 無關。面對面裝的通常要用 Opposed，改對之後兩顆往同一邊出力，電流也會降下來。","o":["把 follower 的 Inverted 設反就好","改成 MotorAlignmentValue.Opposed，並先用低電壓確認方向","把兩顆都設成 leader","提高電流限制"],"a":1},{"type":"scenario","s":{"symptom":"一個 Command 直接呼叫 io.setVoltage(3)，結果手臂抖一下就回到原本的目標。","evidence":["ArmSubsystem.periodic 每一輪都呼叫 io.setPositionGoal(goal)"]},"q":"應該怎麼改？","e":"IO 只能在 periodic 裡呼叫，不然下一輪就被蓋掉，重播也重現不出來。改成切換模式之後，periodic 會穩定送出 3 V。","lab":"arch","o":["讓 Command 也每輪呼叫 IO","Command 只呼叫 Subsystem 的公開方法（例如切換成電壓模式），讓 periodic 送出輸出","把 periodic 刪掉","把 IO 改成 public static"],"a":1}],"7":[{"type":"recall","q":"robotPeriodic() 在哪些模式會執行？","e":"robotPeriodic 在每一種模式、每一輪都會被呼叫。","lab":"loop","o":["只有 Disabled","所有模式，而且排在該模式的 periodic 之後","只有 Teleop","只有有 Enable 的時候"],"a":1},{"type":"scenario","s":{"symptom":"Enable 後整台機器人卡住，按鍵沒反應，Console 一直出現 Loop time of 0.02s overrun。","evidence":["teleopPeriodic 裡寫了 while (!limit.get()) { }","卡住前一刻剛按下歸零鍵"]},"q":"原因與修正是？","e":"periodic 一定要很快就回傳，要等的東西交給指令架構每輪去檢查。這樣 overrun 就會消失，其他 Subsystem 也能繼續更新。","lab":"loop","o":["把 20 ms 改成 100 ms","把 while 改成 for","while 迴圈讓主迴圈卡住；改成用 Trigger 或指令的 until 條件，每一輪檢查一次","roboRIO 太慢，要換新的"],"a":2},{"type":"scenario","s":{"symptom":"Command-based 專案裡，所有按鍵綁定都沒反應，Subsystem 的 periodic 也從沒執行。","evidence":["程式可以部署，也沒有例外","Robot.java 的 robotPeriodic() 是空的"]},"q":"下一步檢查什麼？","e":"排程器每輪 run() 才會去呼叫 Subsystem 的 periodic、檢查按鍵、跑指令。把那一行補回去，綁定就有反應了。","lab":"loop","o":["robotPeriodic() 裡有沒有 CommandScheduler.getInstance().run()","搖桿的 USB 順序","CAN ID 有沒有重複","vendordep 版本"],"a":0},{"type":"scenario","s":{"symptom":"使用 AdvantageKit 時，某個 Subsystem 在建構子裡讀了 Timer.getTimestamp()，重播時結果和實機不同。","evidence":["Robot 的欄位直接寫 private final Intake intake = new Intake();","Logger.start() 寫在 Robot 建構子裡"]},"q":"原因是什麼？","e":"Logger.start() 之前讀到的時間和 DS 資料不是確定的。改成在 Logger.start() 之後才建 RobotContainer，重播才會跟實機一樣。","o":["Logger.start() 要放在 robotPeriodic","欄位初始化比建構子先執行，Intake 在 Logger.start() 之前就讀了時間","重播不支援 Timer","Intake 應該改成 static"],"a":1},{"type":"scenario","s":{"symptom":"自動階段結束進入 Teleop 後，駕駛怎麼推搖桿手臂都不理，要等幾秒才正常。","evidence":["自動指令在自動階段結束前還沒跑完","teleopInit() 是空的"]},"q":"應該怎麼改？","e":"沒跑完的自動指令會一直佔著 Subsystem，駕駛的指令搶不到。在 teleopInit 取消它，進 Teleop 駕駛就能馬上接手。","o":["把自動階段縮短","在 teleopInit() 取消還在執行的自動指令","把手臂的預設指令刪掉","在 disabledInit() 什麼都不做"],"a":1}],"8":[{"type":"recall","q":"A 被 B 打斷時，A 的 end(interrupted) 收到什麼？","e":"被打斷或被取消時一樣會呼叫 end，而且參數是 true。","lab":"scheduler","o":["不會呼叫 end","會丟出例外","interrupted = false","interrupted = true"],"a":3},{"type":"scenario","s":{"symptom":"按下得分鍵後手臂開始動，操作手接著按了收回鍵，手臂立刻改去收回位置，得分動作沒做完。","evidence":["兩個指令都 require arm","得分指令使用預設的中斷行為"]},"q":"這個結果是？","e":"預設是 kCancelSelf，所以這是正常行為。如果得分動作不該被打斷，可以用 withInterruptBehavior(kCancelIncoming)。要誰優先，看你們的需求決定。","lab":"scheduler","o":["預期行為：新指令排程時，正在執行、require 同一個 Subsystem 的指令會被取消","bug：兩個指令應該同時執行","CAN 延遲造成","bug：新指令應該排隊等待"],"a":0},{"type":"scenario","s":{"symptom":"一個 Command 把手臂設到 STOW，但同時執行的另一個手臂指令沒有被取消，兩個一起改目標。","evidence":["第一個指令寫成 Commands.runOnce(() -> arm.setGoal(ArmState.STOW))"]},"q":"少了什麼？","e":"Commands 工具類別的 factory 要自己把 Subsystem 傳進去；Subsystem 自己的 runOnce 才會自動 require。補上之後，排程時衝突的指令就會被正確取消。","lab":"scheduler","o":["isFinished","withTimeout","requirements：沒有把 arm 傳進 Commands.runOnce","defaultCommand"],"a":2},{"type":"scenario","s":{"symptom":"程式一啟動就丟出例外，訊息是 Default commands must require their subsystem!","evidence":["RobotContainer 裡寫 intake.setDefaultCommand(Commands.run(() -> intake.stop()));"]},"q":"應該怎麼改？","e":"預設指令一定要 require 它所屬的 Subsystem；Commands.run 沒傳 Subsystem 就沒有 requirements。改用 Subsystem 自己的 run 就會自動 require，例外會消失，沒有其他指令時就跑預設指令。","o":["讓預設指令 require intake，例如改成 intake.run(() -> intake.stop())","改用 onTrue 綁定","把 intake 改成 static","把 setDefaultCommand 放進 periodic"],"a":0},{"type":"scenario","s":{"symptom":"機器人 Disable 再 Enable 之後，手臂立刻衝向上一次的目標，差點打到人。","evidence":["ArmSubsystem 在 Disabled 時停止輸出，但保留 goal","沒有人在 Enable 前檢查目標"]},"q":"比較安全的改法是？","e":"保留目標本身不是錯，但你要想清楚 Enable 那一刻機構會做什麼。可以讓手臂停在安全位置，或慢慢回去。","o":["在 Disabled 時把目標設回安全位置（例如 STOW），並且 Enable 前喊出來","把 kP 調小","把 Brake 改成 Coast","在 Enable 後等 5 秒"],"a":0}],"9":[{"type":"recall","q":"按住才吸入、放開就停，應該用哪種綁定？","e":"whileTrue 在條件變 true 時排程，變 false 時取消。","lab":"bindings","o":["whileTrue","onFalse","toggleOnTrue","onTrue"],"a":0},{"type":"scenario","s":{"symptom":"操作手按一下吸入鍵，Intake 就一直轉，放開也不停，直到按了別的鍵。","evidence":["綁定是 onTrue(intake.run(...))","run 建立的指令不會自己結束"]},"q":"要做到「按著轉、放開停」，應該改成？","e":"onTrue 只管開始，放開時不會取消；whileTrue 會。還要注意 run 沒有結束動作，想讓放開時停下，指令要在結束時把電壓設回 0（像 startEnd）。這樣放開時指令被取消，滾輪就停了。","lab":"bindings","o":["再加一個 onTrue","toggleOnTrue","onFalse","whileTrue"],"a":3},{"type":"scenario","s":{"symptom":"射球鍵只有在手臂到位時才應該作用，但操作手太早按就射歪了。","evidence":["目前綁定是 operator.rightTrigger(0.5).onTrue(shoot())"]},"q":"最合適的改法是？","e":"用 Trigger 把兩個條件組起來，兩個都成立才排程。手臂沒到位時按下去就不會射。","lab":"bindings","o":["new Trigger(arm::atGoal).and(operator.rightTrigger(0.5)).onTrue(shoot())","在 shoot() 裡用 while 等手臂到位","把綁定放進 periodic 每輪建立一次","叫操作手不要太早按"],"a":0},{"type":"scenario","s":{"symptom":"按一下按鍵，一個指令被排程了好幾次，Console 顯示同一個指令一直重新開始。","evidence":["綁定寫在 ArmSubsystem.periodic() 裡","每一輪都執行 controller.a().onTrue(...)"]},"q":"原因與修正是？","e":"綁定是一次性的宣告，重複宣告會一直疊上去。搬到 configureBindings 之後，按一次就只會排程一次。","o":["onTrue 本來就會重複排程","要加 withTimeout","要改用 toggleOnTrue","每一輪都新增一個綁定；綁定只在 RobotContainer 建構時宣告一次"],"a":3}],"10":[{"type":"recall","q":"Commands.parallel(a, b) 什麼時候結束？","e":"parallel 要等全部成員結束；race 是誰先結束就全部結束。","o":["任一個結束時","兩個都結束時","a 結束時","永遠不會結束"],"a":1},{"type":"scenario","s":{"symptom":"取件動作 sequence(arm.goTo(INTAKE), intake.intakeUntilHasPiece(), arm.goTo(STOW)) 卡在第一步不動。","evidence":["手臂已經停在 INTAKE 附近，但 atGoal() 一直是 false","TOLERANCE_RAD 設成 0.0001"]},"q":"最可能的原因是？","e":"sequence 要前一步結束才會進下一步；結束條件太嚴，整個組合就卡在那。把容許誤差調到合理的值（照實測），就能順利進到下一步。","o":["容許誤差太小，goTo 的 until(atGoal) 永遠不成立","手臂的預設指令搶走控制","sequence 不支援三個指令","Intake 沒有 require"],"a":0},{"type":"scenario","s":{"symptom":"程式一執行到自動程式就丟出例外，訊息提到指令已經被組合使用過。","evidence":["同一個 Command 物件 score 被放進兩個不同的 sequence"]},"q":"應該怎麼改？","e":"同一個指令物件不能放進兩個組合。用 factory 方法每次 new 一個新的，例外就沒了。","o":["用 parallel 包起來","每次都呼叫 factory 產生新的指令物件","加 withTimeout","把 score 改成 static"],"a":1},{"type":"scenario","s":{"symptom":"得分序列執行期間，日誌顯示手臂的預設指令完全沒有執行。","evidence":["score = sequence(arm.goTo(SCORE), intake.eject().withTimeout(0.5), arm.goTo(STOW))","你原本以為吐球的那 0.5 秒會由手臂的預設指令接手"]},"q":"正確的解讀是？","e":"組合指令在跑的時候，成員的預設指令不會跑。照第 6 章「目標存在 Subsystem、由 periodic 送出」的寫法，手臂還是會停在最後的目標；但預設指令裡的其他動作不會發生，需要的話用 deadline 把它放進組合。重點是你要清楚那段時間是誰在控制手臂。","o":["Intake 沒有 require 手臂","組合在整段期間佔住所有成員的 requirements，所以預設指令不會被排程；那段時間手臂需要做的事要放進組合裡","withTimeout 取消了手臂","預設指令應該自動插入，這是 bug"],"a":1},{"type":"scenario","s":{"symptom":"你想「手臂移到位，同時 Intake 一直吸，手臂到了就一起停」。","evidence":["手臂的 goTo 會在到位時結束","Intake 的吸入指令不會自己結束"]},"q":"該用哪個組合？","e":"deadline 看第一個指令，它一結束其他成員就被取消；parallel 會等那個不會結束的吸入指令，永遠不會結束。改成 deadline，手臂到位吸入就停了。","o":["Commands.race(intake.intake())","Commands.sequence(arm.goTo(INTAKE), intake.intake())","Commands.parallel(arm.goTo(INTAKE), intake.intake())","Commands.deadline(arm.goTo(INTAKE), intake.intake())"],"a":3}],"11":[{"type":"recall","q":"config 的 apply() 應該放在哪裡？","e":"apply 會卡住等裝置回應。","o":["periodic()","每個指令的 execute()","robotPeriodic()","建構子裡，只執行一次"],"a":3},{"type":"scenario","s":{"symptom":"程式部署後，CANivore 上所有 TalonFX 都沒反應，roboRIO CAN 上的裝置正常。","evidence":["Tuner X 看得到 CANivore「9427」上的所有裝置","程式裡寫 new CANBus(\"9247\")"]},"q":"問題在哪？","e":"名字打錯不會編譯失敗，但所有讀值都失敗、馬達也不動。改對名字裝置就有反應了。把名字集中放在一個常數裡，就不會再發生。","o":["TalonFX 沒有 Pro 授權","CAN ID 重複","CAN bus 名稱打錯，程式找不到裝置；改成和 Tuner X 一致的「9427」","CANivore 韌體太舊"],"a":2},{"type":"scenario","s":{"symptom":"同一組 PID 在充飽的電池上調得很好，電池用到一半後機構變慢、到不了位。","evidence":["控制請求是 DutyCycleOut 為基礎的閉迴路"]},"q":"最根本的改法是？","e":"DutyCycle 是供電電壓的比例，電池一掉電輸出就跟著變小。Voltage 類的請求會補償（上限還是受電池限制），不同電量下行為才會一致。","o":["把 kP 加大","電池充更飽","改成 Coast","改用 Voltage 類的控制請求，輸出不受電池電壓變化影響"],"a":3},{"type":"scenario","s":{"symptom":"每一輪都在 periodic 裡 apply 一次完整設定之後，Console 出現 loop overrun，機構反應變慢。","evidence":["apply 是等待裝置回應的呼叫"]},"q":"應該怎麼改？","e":"會卡住的呼叫放在 periodic，每一輪都被拖慢。搬到建構子之後 overrun 就沒了。","o":["把 periodic 改成 100 ms","只在建構子套用一次；執行中需要切換的設定只在狀態改變時套用一次","改用 Tuner X 設定就不用程式","把 timeout 設成 0"],"a":1},{"type":"scenario","s":{"symptom":"隊上沒有 Phoenix Pro，程式用 MotionMagicVoltage，EnableFOC 維持預設 true。有人擔心馬達不會動。","evidence":["Tuner X 顯示裝置未授權"]},"q":"正確的判斷是？","e":"沒授權的裝置會自動退回非 FOC 換相，所以馬達照樣會動。只有 TorqueCurrentFOC 這種本身就靠 FOC 的請求才一定要 Pro。","o":["要改用 TorqueCurrentFOC","不用改：未授權時會自動退回一般換相，正常運作，只是沒有 FOC 的效能提升","要買 Pro 才能用 MotionMagic","一定要把 EnableFOC 設成 false，不然馬達不動"],"a":1}],"12":[{"type":"recall","q":"roboRIO 的 DigitalInput 什麼都沒接時，get() 回傳什麼？","e":"內部上拉電阻讓沒接東西的輸入讀到 high。","o":["true","丟出例外","隨機","false"],"a":0},{"type":"scenario","s":{"symptom":"Tuner X 顯示 TalonFX 21、22 正常，但之後的 CANcoder 23 和 Pigeon 2 都不見了。","evidence":["接線是 CANivore → 21 → 22 → CANcoder 23 → Pigeon 2 → 120 Ω","斷電量 CAN-H 與 CAN-L 是 120 Ω"]},"q":"問題最可能在哪？","e":"daisy-chain 斷在哪，後面的裝置就全部消失；量到 120 Ω 也代表從量的地方只看得到一端終端。修好那段線之後應該量到大約 60 Ω，裝置也會全部出現。","lab":"can","o":["Pigeon 2 的韌體","TalonFX 22 到 CANcoder 23 之間的線","CANivore 的名稱","TalonFX 21 的 ID"],"a":1},{"type":"scenario","s":{"symptom":"升降機構開機後，按下「回到底部」，它反而往下撞到底。","evidence":["只有 TalonFX 內建編碼器","關機時機構停在半空中","沒有歸零程序"]},"q":"根本原因與修正是？","e":"相對編碼器不知道開機時實際在哪。先歸零，位置讀值才會跟實際一樣。","o":["內建編碼器開機從 0 算起，程式以為已經在底部；開機後先執行歸零（碰到極限開關再 setPosition）","要改用 Coast","kP 太大","編碼器壞了"],"a":0},{"type":"scenario","s":{"symptom":"手臂在經過某個角度時突然猛甩一下。","evidence":["手臂用 RemoteCANcoder","CANcoder 讀數在那個角度從 0.5 跳到 -0.5","AbsoluteSensorDiscontinuityPoint 設 0.5"]},"q":"應該怎麼修正？","e":"讀數跳了一整圈，閉迴路以為誤差突然暴增。把斷點移到行程外面，讀數就連續了，不會再猛甩。","o":["把 CANcoder 裝到馬達軸上","調整斷點（和 MagnetOffset），讓讀數跳躍的位置落在手臂到不了的角度","改用 DutyCycleOut","把 kD 調大"],"a":1},{"type":"scenario","s":{"symptom":"常開極限開關的線在比賽中被撞掉，升降機構一路往下推到底。","evidence":["開關接地，DIO 有內部上拉","程式用 get() == false 判斷「碰到了」"]},"q":"比較安全的設計是？","e":"常開接法線掉了會讀成「沒碰到」；常閉接法壞掉時是停，不是撞。用常閉的話，斷線時機構會停下來。","o":["把上拉電阻剪掉","改用常閉開關：線掉了會讀成「碰到了」，機構停下來而不是撞下去","拿掉極限開關，只靠軟體極限","在程式裡把 get() 反過來就好"],"a":1},{"type":"scenario","s":{"symptom":"Tuner X 裡兩顆 TalonFX 顯示紅色卡片，其他裝置正常。","evidence":["兩顆都是 TalonFX","兩顆的 ID 都是 21"]},"q":"下一步怎麼做？","e":"同型號、同 ID 才會衝突；不同型號（像 TalonFX 21 跟 CANcoder 21）不會。所以兩顆都正常出現。","lab":"can","o":["更新 CANivore 韌體","換一條 CAN 線","只接其中一顆，把 ID 改成唯一的值並貼上標籤，再接回另一顆","把其中一顆改成 CANcoder"],"a":2}],"13":[{"type":"recall","q":"機構有 100:1 減速，Phoenix 6 的 kP = 1 代表？","e":"Phoenix 6 的增益是機構單位，等於馬達要差 100 圈才輸出 1 V。","o":["機構誤差 1 度輸出 1 V","輸出 1% duty cycle","機構誤差 1 圈輸出 1 V","馬達誤差 1 圈輸出 1 V"],"a":2},{"type":"scenario","s":{"symptom":"手臂每次都停在目標下方約 6 度，不會再往上。","evidence":["只用 kP = 20，kG = 0","誤差停住時，輸出電壓大約等於撐住手臂需要的電壓","把 kP 加倍後誤差變成約一半"]},"q":"下一步應該調哪個參數？","e":"純 P 要有誤差才有輸出，誤差 × kP 剛好撐住重力的時候就停住了；kP 加大只會讓誤差變小，永遠不會是 0。kG 調到接近真實值，停止誤差就會大幅縮小。","lab":"pid","o":["加 kD","加上 kG（重力前饋）","加 kI","繼續加大 kP 直到誤差消失"],"a":1},{"type":"scenario","s":{"symptom":"手臂到位時會衝過頭約 14 度，再慢慢回來。","evidence":["kG 已經接近真實值","kP 很大，輸出在移動初期飽和在 12 V","kD = 0"]},"q":"下一步先試什麼？","e":"kD 像阻尼，速度越快就越往反方向出力；kP 太大也會過衝。加 kD 之後過衝變小，到位可能會稍微慢一點。","lab":"pid","o":["把 kG 加倍","加一點 kD，或降低 kP","把輸出上限改成 24 V","加 kI"],"a":1},{"type":"scenario","s":{"symptom":"手臂加了 kI 之後，大幅移動時先衝過頭很多，好幾秒才回到目標。","evidence":["小幅移動時看起來沒問題","kG = 0"]},"q":"最好的處理是？","e":"誤差大的時候積分累積太多，這就是積分飽和。真正缺的是 kG，不是 I。拿掉 kI、補上 kG，就不會有那種拖很久的過衝。","o":["把 kI 再加大讓它更快回來","降低或拿掉 kI，改用 kG 處理重力","把 kD 設成負的","把控制週期改成 50 Hz"],"a":1},{"type":"scenario","s":{"symptom":"手臂在水平附近撐得住，抬到接近垂直時卻被往上推過頭。","evidence":["kG 是用手臂水平時量的","GravityType 是 Elevator_Static（預設值）"]},"q":"問題在哪？","e":"Elevator_Static 在任何角度都給一樣的 kG；但手臂快垂直的時候，需要的重力補償趨近 0。改成 Arm_Cosine 各角度才撐得住。","o":["GravityType 要設成 Arm_Cosine，讓 kG 隨 cos θ 變小","kG 量錯了，要量垂直時的值","手臂太輕","kP 太小"],"a":0},{"type":"scenario","s":{"symptom":"你把網路上別隊的 kP = 30 填進 Slot0，手臂一動就劇烈振盪。","evidence":["那一隊的 kP 是在 WPILib PIDController 裡用弧度調的","Slot0 的誤差單位是機構端的圈數"]},"q":"原因是什麼？","e":"1 圈 = 2π 弧度，同樣的誤差用圈數算，數字小了 2π 倍，所以 kP 要大 2π 倍才等效，直接照抄會差很多。用你們自己機構量出來、調出來的值。","o":["Slot0 不支援 kP","別隊的機構比較重","單位不同：同一個 kP，在圈數單位下比弧度大約 2π 倍","要改成 DutyCycle"],"a":2}],"14":[{"type":"recall","q":"MotionMagicJerk 設為 0 代表？","e":"jerk 不是 0 才是 S-curve；數字越小越圓滑，也越慢。","o":["使用預設 jerk","機構不會動","不限制 jerk，軌跡是梯形","最圓滑的 S-curve"],"a":2},{"type":"scenario","s":{"symptom":"手臂用 MotionMagic，每次移動結束前都跟不上軌跡，最後衝過目標。","evidence":["實際位置在加速段就開始落後","移動中輸出電壓一直在 12 V","巡航速度設成 12 ÷ kV 的 1.2 倍"]},"q":"下一步怎麼改？","e":"軌跡比機構給得出來的還快，輸出一飽和就跟不上了。把巡航速度降下來，實際位置就會貼著軌跡走，不再衝過頭。","lab":"profile","o":["把 kP 加大","把 jerk 設成 0","把巡航速度降到機構能力以下，留餘裕給 PID 與電壓下降","改用 DutyCycleOut"],"a":2},{"type":"scenario","s":{"symptom":"升降機構只移動 3 公分，卻發現速度從來沒達到設定的巡航速度。","evidence":["巡航速度與加速度設定正確","到位時間正常"]},"q":"這代表什麼？","e":"加速跟減速要的距離加起來超過總距離，還沒到巡航速度就得開始減速。這是正常的，不用改。","lab":"profile","o":["正常：距離太短，走的是三角形軌跡","MotionMagic 壞了","巡航速度的單位錯了","加速度設太大"],"a":0},{"type":"scenario","s":{"symptom":"你把 MotionMagicCruiseVelocity 填 80（馬達在規格表上的轉速），手臂一動就猛衝。","evidence":["SensorToMechanismRatio = 50","80 是馬達端 rot/s"]},"q":"問題在哪？","e":"設了之後所有讀值和設定都變成機構端單位。把數字換算成手臂端的速度，動作就正常了。","o":["要改成 rad/s","設了 SensorToMechanismRatio 之後，速度是機構端單位；80 rot/s 對手臂來說快了約 50 倍","MotionMagic 不能用在手臂","要把 jerk 設成 80"],"a":1},{"type":"scenario","s":{"symptom":"隊上沒有 Pro 授權，程式改用 DynamicMotionMagicVoltage 後，機構完全不動。","evidence":["Tuner X 顯示 UnlicensedFeatureInUse 故障"]},"q":"該怎麼處理？","e":"這點跟 EnableFOC 不一樣：Dynamic MotionMagic 沒授權會直接關掉輸出。改回一般 MotionMagic 就恢復了。","o":["把 EnableFOC 關掉","改用 CANivore 以外的 bus","改回 MotionMagicVoltage；需要兩種速度就在狀態改變時套用不同的 MotionMagicConfigs","把 jerk 設成 0"],"a":2}],"15":[{"type":"recall","q":"SysId 的 Quasistatic 測試在量什麼？","e":"Dynamic 測試才是突然給一個固定電壓，量加速的表現。","o":["最高速度","電壓緩慢上升，量維持速度所需的電壓（加速度可忽略）","電池內阻","加速時的行為"],"a":1},{"type":"scenario","s":{"symptom":"SysId 分析直接失敗，無法載入資料。","evidence":["同一次開機裡，先測了手臂，接著測了升降","SignalLogger 從頭到尾沒有 stop 過"]},"q":"原因與修正是？","e":"只有裡面只有一個 routine 的日誌才能分析。分開記錄之後就能各自載入了。","o":["一份日誌裡有兩個 routine；每測完一個機構就 stop，重新 start 開新檔","資料太少","要改用 DutyCycleOut","SysId 不支援升降"],"a":0},{"type":"scenario","s":{"symptom":"手臂的 SysId 結果裡 kG 看起來完全不合理，手臂在某些角度撐不住。","evidence":["CANcoder 的 0 度對應手臂往下 20 度","分析類型選 Arm"]},"q":"最可能的原因是？","e":"先把 MagnetOffset 修好讓 0 度是水平，再重測一次，kG 就會合理，各角度都撐得住。","o":["SysId 不適合手臂","電池太滿","Arm 模型用 cos θ，0 度必須是水平；零點錯了 kG 就算錯","測試時間太長"],"a":2},{"type":"scenario","s":{"symptom":"Dynamic 測試時手臂撞到機械極限，之後算出的 kA 很怪。","evidence":["dynamic 步階電壓用預設值","沒有開軟體極限"]},"q":"下一次測試應該怎麼做？","e":"SysIdRoutine 不會幫你停；撞到極限那段資料會讓擬合跑掉。快到極限就放開，資料乾淨了，kA 也會合理。","o":["把 kA 直接設成 0","只做 quasistatic","降低步階電壓、開啟軟體極限，並在接近極限前放開按鍵","延長測試時間"],"a":2},{"type":"scenario","s":{"symptom":"用 SysId 建議的 kP、kD 上機，手臂到位時會輕微振盪。","evidence":["kS、kG、kV 來自同一次 SysId，看起來合理"]},"q":"正確的看法是？","e":"WPILib 自己都說這些增益是 educated guesses。上機微調 kP、kD 到不會晃為止。","o":["回饋增益只是有根據的起點，照第 13 章的順序上機微調","SysId 算錯了，整份結果都不能用","要重新跑 SysId 直到不振盪","要把 kG 調大"],"a":0},{"type":"scenario","s":{"symptom":"升降機構只跑了正向的 quasistatic 與 dynamic，SysId 算出的 kG 和隊友手動量的差很多。","evidence":["反向兩項測試沒有跑","kV 看起來合理"]},"q":"最可能的原因是？","e":"往上時截距是 kG + kS，往下時是 kG − kS；少了反向就只看得到兩個加起來。補跑反向測試，kS 和 kG 就分得開了。","lab":"fit","o":["kV 算錯了","電池電量不足","SysId 不支援升降機構","只有一個方向時，摩擦和重力都是同一個方向，kS 與 kG 分不開"],"a":3},{"type":"scenario","s":{"symptom":"SysId 的 quasistatic 速度對時間圖前面有一段速度幾乎是 0、電壓卻在上升的「尾巴」，算出的 kS 偏小。","evidence":["Velocity Threshold 設得很低"]},"q":"下一步做什麼？","e":"那條尾巴代表門檻設太低，把還沒開始動的資料也算進去了。重新分析就好，不用重跑測試，尾巴消失後 kS 就回到合理的值。","lab":"fit","o":["重新跑測試並把電壓上升速率加快","把 kS 手動乘兩倍","調高 Velocity Threshold 重新分析，排除還沒開始動的點","忽略它，kS 不重要"],"a":2}],"16":[{"type":"recall","q":"紅方時 PathPlanner 翻轉路徑，場地座標原點在哪？","e":"原點永遠在藍方。","o":["藍方","紅方","機器人起始位置","場地中央"],"a":0},{"type":"scenario","s":{"symptom":"在紅方時，自動程式的路徑一開始就往錯的方向走。","evidence":["在藍方測試都正常","翻轉判斷寫在 RobotContainer 建構子裡，存成一個 boolean"]},"q":"原因與修正是？","e":"DriverStation.getAlliance() 在連上之前可能是空的。寫成 lambda 在路徑開始時才讀，顏色就會是對的。","o":["PathPlanner 不支援紅方","路徑要畫兩份","要把原點移到紅方","開機時可能還沒連上 FMS，顏色讀錯；翻轉判斷要寫成 lambda，在路徑開始時才判斷"],"a":3},{"type":"scenario","s":{"symptom":"自動程式跑到 armScore 那一步什麼都沒做，接著直接走下一條路徑。","evidence":["GUI 裡的名稱是 ArmScore","程式註冊的是 NamedCommands.registerCommand(\"armScore\", ...)"]},"q":"問題在哪？","e":"名字要跟 GUI 裡一字不差，改成一樣之後那一步就會做得分動作。","o":["名稱大小寫不一致，對不上","armScore 沒有 require","要先執行 GUI","Named Commands 只能用在事件標記"],"a":0},{"type":"scenario","s":{"symptom":"自動程式在 intake 那一步後就停住，後面的路徑都沒跑。","evidence":["intake 的 Named Command 是 intake.run(...) 做的","Auto 是 sequential 群組"]},"q":"應該怎麼改？","e":"sequential 群組要前一步結束才會進下一步。換成吸到物件就結束的指令，自動程式就會繼續往下跑。","o":["在 intake 後面加 waitSeconds","放進 Auto 的指令要會結束，例如改成吸到物件就結束","把 Auto 改成 parallel","把 intake 刪掉"],"a":1},{"type":"scenario","s":{"symptom":"自動路徑一轉彎，機器人就往反方向轉，越走越偏。","evidence":["直線段正常","陀螺儀是順時針為正"]},"q":"下一步檢查什麼？","e":"朝向反了的話，走直線看不出來，一轉彎就錯。把方向修正過來轉彎就對了。","o":["陀螺儀方向：WPILib 是逆時針為正，順時針為正的讀值要反過來","輪子直徑","PathPlanner 的 PID","路徑檔有沒有部署"],"a":0}],"17":[{"type":"recall","q":"WPILib 對 AprilTag 視覺量測的朝向標準差建議怎麼設？","e":"陀螺儀的朝向標準差要小，視覺的朝向標準差要大。","o":["設為 0","和 x、y 一樣","非常小","非常大，把朝向交給陀螺儀"],"a":3},{"type":"scenario","s":{"symptom":"看到標籤時，機器人在場上的估計位置會瞬間跳動，路徑跟隨跟著亂跑。","evidence":["程式每次看到標籤就 resetPose(視覺位置)"]},"q":"應該怎麼改？","e":"視覺量測偶爾會跳，直接重設位置也會跟著跳。用融合的話，會照標準差決定信多少，位置就會平順地被修正。","lab":"fusion","o":["改用 addVisionMeasurement 融合，並依距離設定標準差","只在自動階段用視覺","把相機拿掉","提高相機解析度"],"a":0},{"type":"scenario","s":{"symptom":"機器人在遠處看到一個標籤時，估計位置被拉偏了將近半公尺。","evidence":["和標籤的距離約 5 m","只看到 1 個標籤","視覺標準差固定是 0.05 m"]},"q":"下一步怎麼改？","e":"遠處的量測誤差本來就大，給它固定的小標準差等於太相信它了。讓標準差隨距離變大，遠處的影響變小，近處還是能有效修正。","lab":"fusion","o":["把里程計的標準差調大","只相信遠的標籤","把視覺標準差調成 0","讓 x、y 標準差隨距離放大（看到多個標籤時可以縮小）"],"a":3},{"type":"scenario","s":{"symptom":"機器人邊轉邊移動時，視覺修正後的位置常常錯得離譜；靜止時很準。","evidence":["使用 MegaTag2","每一輪都有呼叫 SetRobotOrientation"]},"q":"比較合理的處理是？","e":"轉很快的時候，影像跟時間很容易對不上。把這些不可靠的量測丟掉，位置就不會亂跳。","o":["把朝向標準差調小","旋轉太快時丟掉這筆量測（例如 CTRE 範例的每秒 2 圈門檻）","把旋轉速度限制為 0","改成每 5 秒才讀一次"],"a":1},{"type":"scenario","s":{"symptom":"整場比賽下來，儀表板上的 Vision/Accepted 幾乎沒增加。","evidence":["相機有畫面","程式裡 Limelight 名稱是 \"limelight\"，網頁設定的名稱是 \"limelight-front\""]},"q":"最可能的原因是？","e":"名字錯了就讀不到任何估計，est 會是空的或沒有標籤。改成一致之後計數就會開始增加。","o":["旋轉門檻太嚴","名稱不一致，程式讀不到 Limelight 的資料","機器人都沒看到標籤","標準差太大"],"a":1}],"18":[{"type":"recall","q":"重播時 setUseTiming(false) 會？","e":"AdvantageKit 明講了這不會影響準確度。","o":["只重播前 15 秒","讓重播盡快跑完，不影響準確度","讓重播結果不準","關閉日誌"],"a":1},{"type":"scenario","s":{"symptom":"你在重播時把手臂的 kP 改大，想看手臂會不會少一點過衝，結果日誌裡的手臂位置完全沒變。","evidence":["手臂照第 6 章的 IO 架構寫"]},"q":"正確的解讀是？","e":"改了輸出也影響不了重播的輸入。想看新參數下會怎麼動，要用模擬（第 6 章 D 部分）。","o":["kP 沒有部署","重播壞了","要把 setUseTiming 設成 true","重播改變不了輸入：位置是從日誌讀回的；要看新的動作請用模擬"],"a":3},{"type":"scenario","s":{"symptom":"重播出來的 Arm/AtGoal 和比賽時操作手看到的完全對不上。","evidence":["Metadata 的 GitSHA 是上週的 commit","你用的是今天的程式重播","BuildConstants 的 dirty 是 true"]},"q":"正確的判斷和下一步是？","e":"重播需要當時那份程式。GitSHA 可以找回 commit，但 dirty 的修改沒被記下來。Event Deploy 會在每次部署前自動 commit，以後就不會這樣。這次就先用最接近的版本重播，註明可能不準，下次比賽改用 event 分支。","o":["要 checkout 回那個 GitSHA；但 dirty 代表當時有沒 commit 的修改，重播可能無法完全還原，以後比賽要用 event 分支讓部署前自動 commit","直接相信重播結果","把 kP 調回去再重播","把日誌刪掉"],"a":0},{"type":"scenario","s":{"symptom":"比賽後才發現某場的日誌是空的。","evidence":["roboRIO 上沒有插隨身碟","程式用 WPILOGWriter 預設路徑"]},"q":"要怎麼避免下次再發生？","e":"WPILOGWriter 在 roboRIO 上預設寫到 USB 隨身碟。插好隨身碟，每場就都有日誌可以查。","o":["把「FAT32 隨身碟有插、有空間」放進賽前檢查，或在程式裡偵測後發 Alert","只用 DS Log","改用 SmartDashboard 記錄","在 Pit 手動複製"],"a":0},{"type":"scenario","s":{"symptom":"重播時自動程式選到的和比賽時不一樣。","evidence":["自動程式選單用 SmartDashboard.putData(AutoBuilder.buildAutoChooser())"]},"q":"應該怎麼改？","e":"從 NetworkTables 讀的值沒被記錄，重播時讀不到當時選了什麼。換成 LoggedDashboardChooser，重播就會用當時選的那個自動程式。","o":["重播時手動選","把選單放在 Constants","改用 LoggedDashboardChooser 包住選單，讓選擇被記錄成輸入","把選單刪掉，只用一個自動程式"],"a":2}],"19":[{"type":"recall","q":"roboRIO 1.0 在電壓低於多少時進入 brownout 保護（第 2 階段）？","e":"6.8 V 是第 1 階段，低於 4.5 V 可能會斷電；roboRIO 2.0 的預設是 6.75 V。","o":["6.3 V","7.5 V","6.8 V","4.5 V"],"a":0},{"type":"scenario","s":{"symptom":"比賽中機構動作偶爾停一下又恢復，駕駛覺得「程式當了」。","evidence":["DS 的 CAN/Power 分頁 12V fault 計數增加","DS Log 在那幾個時間點電壓掉到 6 V 附近"]},"q":"最可能的原因和下一步是？","e":"brownout 時 roboRIO 會停掉 CAN 馬達控制器的輸出，電壓回來才恢復。換電池、設好電流限制，就不會再發生。","lab":"triage","o":["brownout；先換充飽的電池、檢查接頭，並確認各機構的電流限制","CAN 斷線，換線","程式 bug，馬上改程式","無線電重開"],"a":0},{"type":"scenario","s":{"symptom":"上場後 Driver Station 顯示「No robot code is currently running」。","evidence":["Communications 是綠的","剛剛在 Pit 部署了新程式"]},"q":"下一步做什麼？","e":"通訊正常但程式沒在跑，可能是掛了、還在開機，或是部署失敗。修好之後 Robot Code 燈會變綠。","lab":"triage","o":["看 Console 有沒有例外；來不及查就部署已知可以動的版本","換無線電","重開 Driver Station","換電池"],"a":0},{"type":"scenario","s":{"symptom":"DS Log 顯示斷線期間其他裝置都 ping 得到，只有 roboRIO 不回應，接著出現「Time since robot boot」事件。","evidence":["斷線約 30 秒"]},"q":"判斷是什麼問題？","e":"這就是 roboRIO 重開的典型樣子。把電源接頭鎖緊、避免 brownout，就不會再重開。","lab":"triage","o":["無線電重開","roboRIO 重開：檢查 roboRIO 的電源線與 brownout","Driver Station 筆電睡眠","網路線卡榫斷了"],"a":1},{"type":"scenario","s":{"symptom":"兩場比賽之間發現自動程式有 bug，只剩時間改，來不及在練習場測。","evidence":["上一個版本在比賽中可以正常動"]},"q":"最好的做法是？","e":"沒測過的修改，風險通常比原本的問題還大。這場先用穩定版本打完，下一段空檔再修、再測。","o":["同時改好幾個地方碰運氣","直接部署修改後的版本","把自動程式關掉並不告訴隊友","用已知可以動的版本上場，比賽後再修"],"a":3}]};
 
 /* ---------- 課程資料與共用工具 ----------
  * COURSE_DATA、QUIZ_DATA 由 tools/build.mjs 從 src/data/course.json 與 src/quiz/*.json 注入。

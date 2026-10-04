@@ -1,8 +1,8 @@
   <p class="headline-code">CAN ID 08｜WPILib 基礎</p>
   <h1>Subsystem 與 Command：借用體育館</h1>
-  <p class="lede">Command-based 這個名字就是從這章來的。我們要講一個指令從開始到結束會經過哪四個方法、requirements 怎麼避免兩個指令同時搶一個機構、指令被打斷時會怎樣，還有預設指令（default command）到底拿來幹嘛。</p>
+  <p class="lede">Command-based 這個名字就是從這章來的。這章講一個指令從開始到結束會經過哪四個方法、requirements 怎麼避免兩個指令同時搶一個機構、指令被打斷時會怎樣，還有預設指令（default command）到底拿來幹嘛。</p>
 
-  <h2>先講個比喻：體育館借用規則</h2>
+  <h2>比喻：體育館借用規則</h2>
   <div class="story">
     <p>學校有幾間特別教室：體育館、音樂教室、實驗室，每種都只有一間，各有自己的設備和管理規則。別人要用，就要透過管理的老師。</p>
     <p>要在體育館辦活動，得先在登記簿寫「這個活動要用體育館」。如果同時要用體育館跟音樂教室，兩間都要登記。</p>
@@ -118,7 +118,7 @@ drive.setDefaultCommand(
   <div class="note warn"><strong>用 Commands 工具類別，卻忘了傳 Subsystem</strong>指令一樣會跑，但排程器不知道它在用機構，結果兩個指令可能同時在控制同一顆馬達。盡量用 Subsystem 自己的 factory，就不會漏。</div>
   <div class="note warn"><strong>預設指令自己會結束</strong>像是拿 <code>runOnce</code> 當預設指令，它一結束 Subsystem 就空了，下一輪又被排上去，變成每輪都在重複 <code>initialize</code> 和 <code>end</code>。預設指令請用 <code>run</code>。</div>
   <div class="note warn"><strong>在 execute() 裡等東西</strong>跟第 7 章一樣，指令裡寫 while 迴圈或 sleep 會卡死整個主迴圈。要等某件事發生，就讓 <code>isFinished()</code> 回傳那個條件。</div>
-  <div class="note coach"><strong>教練提醒</strong>寫任何指令之前先問自己：「它控制了哪些機構？」答案就是它的 requirements。Code review 看到控制馬達卻沒有 requirements 的指令，我一律退回。</div>
+  <div class="note coach"><strong>教練提醒</strong>寫任何指令之前先問自己：「它控制了哪些機構？」答案就是它的 requirements。Code review 看到控制馬達卻沒有 requirements 的指令，一律退回。</div>
 
   <h2>小測驗</h2>
   <div class="quiz"></div>

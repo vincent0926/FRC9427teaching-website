@@ -1,6 +1,6 @@
   <p class="headline-code">CAN ID 06｜架構</p>
   <h1>IO 架構：導師只看點名表</h1>
-  <p class="lede">這章是整個課程最長的一章，也是隊上程式最核心的部分。我們拿一支手臂（Arm）從頭走到尾：每一層管什麼、資料怎麼流、硬體跟模擬怎麼互換，最後升級成 AdvantageKit 的寫法。內容切成六塊，不用一口氣讀完，A 先讀，其他看需要。</p>
+  <p class="lede">這章是整個課程最長的一章，也是隊上程式最核心的部分。這裡拿一支手臂（Arm）從頭走到尾：每一層管什麼、資料怎麼流、硬體跟模擬怎麼互換，最後升級成 AdvantageKit 的寫法。內容切成六塊，不用一口氣讀完，A 先讀，其他看需要。</p>
 
   <div class="partmap">
     <button class="pcard" data-part="A"><b>A　觀念與全貌</b><span>比喻、分層圖、各層職責、每 20 ms 資料流。所有人先讀這部分。</span></button>
@@ -11,7 +11,7 @@
     <button class="pcard" data-part="F"><b>F　測試與常見錯誤</b><span>用假的 IO 寫單元測試、模擬、重播，以及十一個常見錯誤。</span></button>
   </div>
 
-  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026.2.2、Phoenix 6 26.3.0、AdvantageKit 2026 的文件寫的。有個坑先講：WPILib 和 CTRE 網站上標 latest 的文件已經是 2027 年版了（WPILib 的 Java 套件名稱也改了），查資料記得切到 stable。程式裡要實測的數字我都標了 TODO，拜託不要照抄。</div>
+  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026.2.2、Phoenix 6 26.3.0、AdvantageKit 2026 的文件寫的。先注意一件事：WPILib 和 CTRE 網站上標 latest 的文件已經是 2027 年版了（WPILib 的 Java 套件名稱也改了），查資料記得切到 stable。程式裡要實測的數字都標了 TODO，不要照抄。</div>
 
   <div class="parttabs" role="tablist" aria-label="本章部分">
     <button role="tab" data-part="A">A 觀念</button>
@@ -24,7 +24,7 @@
 
   <!-- ===== PART A ===== -->
   <section class="cpart" data-part="A" role="tabpanel">
-    <h2>A-1　先講個比喻：導師、班長和點名表</h2>
+    <h2>A-1　比喻：導師、班長和點名表</h2>
     <div class="story">
       <p>每節課開始前，導師會決定全班要去哪：回教室、去操場，還是到禮堂。導師只要說一句「去禮堂」，這就是班級的目標。</p>
       <p>至於怎麼走、走多快、轉彎要不要放慢，是班長在現場自己處理的，導師不會跟在旁邊每一步都下指令。班長手上有一本「帶隊守則」，寫著最快能走多快、起步跟停下要多平順。這本守則開學就交給班長了，不會每節課重發一次。</p>
@@ -89,7 +89,7 @@
     </table>
 
     <h3>閉迴路要放在哪裡</h3>
-    <p>IO 的輸出可以是電壓、設定點，也可以是 PID 常數，每種用一個簡單的方法表示就好<a class="ref" href="#src6-1">[1]</a>。AdvantageKit 官方的 TalonFX swerve 範本是把回授放在馬達控制器裡跑，齒輪比也交給 TalonFX 韌體處理，不在 roboRIO 上算<a class="ref" href="#src6-4">[4]</a>。我們的手臂偏好用 MotionMagic，它本來就是在 TalonFX 裡面產生軌跡、跑閉迴路，所以這章的 <code>ArmIO</code> 主要輸出是 <code>setPositionGoal(弧度)</code>，<code>setVoltage</code> 只留給 SysId 和手動測試。</p>
+    <p>IO 的輸出可以是電壓、設定點，也可以是 PID 常數，每種用一個簡單的方法表示就好<a class="ref" href="#src6-1">[1]</a>。AdvantageKit 官方的 TalonFX swerve 範本是把回授放在馬達控制器裡跑，齒輪比也交給 TalonFX 韌體處理，不在 roboRIO 上算<a class="ref" href="#src6-4">[4]</a>。隊上的手臂偏好用 MotionMagic，它本來就是在 TalonFX 裡面產生軌跡、跑閉迴路，所以這章的 <code>ArmIO</code> 主要輸出是 <code>setPositionGoal(弧度)</code>，<code>setVoltage</code> 只留給 SysId 和手動測試。</p>
     <p>當然也可以反過來，在 roboRIO 上用 <code>ProfiledPIDController</code> 加 <code>ArmFeedforward</code> 算電壓，再呼叫 <code>setVoltage</code>。好處是連控制邏輯都能被 AdvantageKit 重播；壞處是少了控制器內部那個高頻迴路，增益也要另外調。兩種都有人用，這是取捨，官方沒有說哪個才對。</p>
 
     <h3>單位在哪裡換算</h3>
@@ -108,7 +108,7 @@
       </tbody>
     </table>
     <p>所以指令設的新目標，最多大概晚 20 ms 才送出去。對手臂來說這點延遲可以忽略，換來的好處是「所有 IO 呼叫都集中在 periodic、每輪只讀一次輸入」，AdvantageKit 重播要能對得上，靠的就是這個<a class="ref" href="#src6-1">[1]</a>。</p>
-    <div class="note limit"><strong>哪些是推論</strong>「按鍵排程的指令，同一輪就會跑 execute」是我從 WPILib 原始碼的順序推出來的，官方文件沒有明講，不要把它當成保證。</div>
+    <div class="note limit"><strong>哪些是推論</strong>「按鍵排程的指令，同一輪就會跑 execute」是從 WPILib 原始碼的順序推出來的，官方文件沒有明講，不要把它當成保證。</div>
   </section>
 
   <!-- ===== PART B ===== -->
@@ -239,7 +239,7 @@ public class ArmSubsystem extends SubsystemBase {
             () -&gt; manualVolts = 0.0);
     }
 }</code></pre>
-    <p>講幾個重點。<code>run</code>、<code>runOnce</code>、<code>startEnd</code> 是 WPILib <code>Subsystem</code> 提供的 factory，用它們做出來的指令會自動 require 這個 Subsystem<a class="ref" href="#src6-19">[19]</a>。<code>ControlMode</code> 是為了讓 IO 只在 periodic 裡被呼叫：如果 <code>manualVoltage</code> 直接去呼叫 <code>io.setVoltage</code>，下一輪 periodic 的 <code>setPositionGoal</code> 馬上就把它蓋掉了。</p>
+    <p>幾個重點。<code>run</code>、<code>runOnce</code>、<code>startEnd</code> 是 WPILib <code>Subsystem</code> 提供的 factory，用它們做出來的指令會自動 require 這個 Subsystem<a class="ref" href="#src6-19">[19]</a>。<code>ControlMode</code> 是為了讓 IO 只在 periodic 裡被呼叫：如果 <code>manualVoltage</code> 直接去呼叫 <code>io.setVoltage</code>，下一輪 periodic 的 <code>setPositionGoal</code> 馬上就把它蓋掉了。</p>
     <div class="note coach"><strong>教練提醒：重新 Enable 的瞬間手臂會動</strong>這個寫法在 Disabled 時會停止輸出，但目標還留著。所以重新 Enable 的那一刻，手臂會直接往那個目標衝過去。要改成 Disabled 時把目標設回 <code>STOW</code> 也可以，看隊上需求，但不管怎麼寫，Enable 前都要喊。</div>
 
     <h2>B-4　兩種 Command 寫法</h2>
@@ -450,12 +450,12 @@ public class ArmIOHardware implements ArmIO {
 
     <h2>C-2　逐項說明</h2>
     <h3>CANivore：用 CANBus 物件</h3>
-    <p>Phoenix 6 2026 年把「用字串指定 CAN bus」的建構子標成 deprecated 了，預計 2027 年移除，要改用傳 <code>CANBus</code> 物件的版本<a class="ref" href="#src6-8">[8]</a>。所以我們的 CANivore「9427」寫成 <code>new CANBus("9427")</code>，而且集中宣告在一個地方，不要到處 new。</p>
+    <p>Phoenix 6 2026 年把「用字串指定 CAN bus」的建構子標成 deprecated 了，預計 2027 年移除，要改用傳 <code>CANBus</code> 物件的版本<a class="ref" href="#src6-8">[8]</a>。所以隊上的 CANivore「9427」寫成 <code>new CANBus("9427")</code>，而且集中宣告在一個地方，不要到處 new。</p>
 
     <h3>Follower：2026 年改用 MotorAlignmentValue</h3>
     <p>Phoenix 6 26.3.0 的 <code>Follower</code> 只剩一個建構子：<code>Follower(int LeaderID, MotorAlignmentValue MotorAlignment)</code>。<code>Aligned</code> 是方向跟 leader 設定的 Invert 一樣，<code>Opposed</code> 是相反<a class="ref" href="#src6-9">[9]</a>。重點來了：follower 的方向是<strong>相對於 leader 的 Invert</strong> 來決定的，跟 follower 自己的 <code>Inverted</code> 無關。以前那個 boolean 參數已經被換掉了<a class="ref" href="#src6-8">[8]</a>，看到舊範例別照抄。</p>
     <p>另外，leader 對應輸出類型的狀態訊號（DutyCycle、MotorVoltage 這些）一定要開著，它的更新頻率就是 follower 輸出的更新速度，不能低於 20 Hz<a class="ref" href="#src6-9">[9]</a>。所以程式在 <code>optimizeBusUtilizationForAll</code> 之前，先把 leader 的 <code>getMotorVoltage()</code> 和 <code>getDutyCycle()</code> 設成 50 Hz。</p>
-    <div class="note"><strong>設定要不要也套到 follower 上？</strong>Follower 在跟隨的時候不會用自己的 PID 增益。不過 CTRE 員工在 Chief Delphi 回覆過（社群來源，2026-02-25），至少 neutral mode 和電流限制還是要套。我們「同一份設定兩顆都套、兩顆都重設編碼器」的做法剛好符合，兩顆的位置讀數也會一致。</div>
+    <div class="note"><strong>設定要不要也套到 follower 上？</strong>Follower 在跟隨的時候不會用自己的 PID 增益。不過 CTRE 員工在 Chief Delphi 回覆過（社群來源，2026-02-25），至少 neutral mode 和電流限制還是要套。「同一份設定兩顆都套、兩顆都重設編碼器」的做法剛好符合，兩顆的位置讀數也會一致。</div>
 
     <h3>重力補償：kG 與 Arm_Cosine</h3>
     <p>重力補償會隨角度變的機構（像手臂），<code>GravityType</code> 要選 <code>Arm_Cosine</code>。預設值是 <code>Elevator_Static</code>，忘了改就是錯的<a class="ref" href="#src6-10">[10]</a>。kG 是讓手臂水平向前停住所需要的輸出，這也是 0 度一定要是水平的原因。重心有偏的話，可以用 <code>GravityArmPositionOffset</code> 修正<a class="ref" href="#src6-10">[10]</a>。</p>
@@ -467,10 +467,10 @@ public class ArmIOHardware implements ArmIO {
     <p>這個設定是「感測器轉數對機構輸出的比例」，大於 1 就是減速。CTRE 明講<strong>不建議</strong>拿它來做別的單位換算，單位換算應該在程式裡用單位函式庫做<a class="ref" href="#src6-12">[12]</a>。所以這裡只放齒輪比，轉數換弧度在 Java 這邊做。</p>
 
     <h3>訊號刷新：refreshAll</h3>
-    <p>多個訊號用 <code>BaseStatusSignal.refreshAll(...)</code> 一次刷新，不要一個一個 refresh。timeout 設 0 的 <code>waitForAll()</code> 跟 <code>refreshAll()</code> 其實一樣，而 CANivore 的時間同步要 Pro 授權<a class="ref" href="#src6-13">[13]</a>。我們沒有 Pro，就用不會卡住的 <code>refreshAll</code>，免得拖慢主迴圈。</p>
+    <p>多個訊號用 <code>BaseStatusSignal.refreshAll(...)</code> 一次刷新，不要一個一個 refresh。timeout 設 0 的 <code>waitForAll()</code> 跟 <code>refreshAll()</code> 其實一樣，而 CANivore 的時間同步要 Pro 授權<a class="ref" href="#src6-13">[13]</a>。沒有 Pro 的話，就用不會卡住的 <code>refreshAll</code>，免得拖慢主迴圈。</p>
 
     <h3>設定只在建構時套用</h3>
-    <p>套用設定會卡住等回應（範例的 timeout 是 0.25 秒），所以只能在建構子裡做。<code>setBrakeMode</code> 這種執行中切換的方法，也只在狀態改變時呼叫一次，千萬不要放進 periodic。至於要重試幾次：CTRE 員工在同一則回覆說重試一次（總共兩次）沒問題，第二次還失敗的話，再多試通常也沒用（社群來源），所以 <code>retry</code> 只重試一次。</p>
+    <p>套用設定會卡住等回應（範例的 timeout 是 0.25 秒），所以只能在建構子裡做。<code>setBrakeMode</code> 這種執行中切換的方法，也只在狀態改變時呼叫一次，不要放進 periodic。至於要重試幾次：CTRE 員工在同一則回覆說重試一次（總共兩次）沒問題，第二次還失敗的話，再多試通常也沒用（社群來源），所以 <code>retry</code> 只重試一次。</p>
   </section>
 
   <!-- ===== PART D ===== -->
@@ -486,7 +486,7 @@ public class ArmIOHardware implements ArmIO {
         <tr><td>官方範本</td><td>—</td><td>AdvantageKit TalonFX swerve 範本的模擬增益放在 <code>ModuleIOSim.java</code><a class="ref" href="#src6-4">[4]</a></td></tr>
       </tbody>
     </table>
-    <p>我們手臂要驗證的就是 MotionMagic 和 kG 這些設定本身，所以推薦 (b)。</p>
+    <p>這支手臂要驗證的就是 MotionMagic 和 kG 這些設定本身，所以推薦 (b)。</p>
 
     <h2>D-2　做法 (b)：Phoenix 模擬</h2>
     <pre><code>package frc.robot.subsystems.arm;
@@ -538,8 +538,8 @@ public class ArmIOSim extends ArmIOHardware {
 }</code></pre>
     <h3>依據與注意事項</h3>
     <p>模擬裡的 PID 和電流限制要正常運作，一定要設 <code>RawRotorPosition</code> 和 <code>RotorVelocity</code>，而且給的是齒輪比之前的轉子數值。CTRE 範例的流程就是：設供電電壓 → 讀馬達電壓 → 更新物理模型 → 寫回轉子位置和速度<a class="ref" href="#src6-14">[14]</a>。</p>
-    <p>有一個限制要特別注意：模擬目前不支援多條 CAN bus，所有裝置都會跑到同一條 bus 上，所以 CAN ID 在所有 bus 之間都不能重複<a class="ref" href="#src6-14">[14]</a>。如果 CANivore 和 roboRIO bus 上剛好有同 ID 的裝置，模擬時就會打架。</p>
-    <p><code>SingleJointedArmSim</code> 在 WPILib 2026.2.2 的建構子參數順序是：馬達模型、齒輪比、轉動慣量、手臂長度、最小角度、最大角度、要不要模擬重力、起始角度<a class="ref" href="#src6-16">[16]</a>。它會照手臂角度去算重力<a class="ref" href="#src6-17">[17]</a>。CTRE 範例用的是 <code>getKrakenX60Foc</code>，我們沒有 Pro、不用 FOC，所以用 <code>getKrakenX60</code>。</p>
+    <p>有一個限制要特別注意：模擬目前不支援多條 CAN bus，所有裝置都會跑到同一條 bus 上，所以 CAN ID 在所有 bus 之間都不能重複<a class="ref" href="#src6-14">[14]</a>。如果 CANivore 和 roboRIO bus 上剛好有同 ID 的裝置，模擬時就會衝突。</p>
+    <p><code>SingleJointedArmSim</code> 在 WPILib 2026.2.2 的建構子參數順序是：馬達模型、齒輪比、轉動慣量、手臂長度、最小角度、最大角度、要不要模擬重力、起始角度<a class="ref" href="#src6-16">[16]</a>。它會照手臂角度去算重力<a class="ref" href="#src6-17">[17]</a>。CTRE 範例用的是 <code>getKrakenX60Foc</code>；沒有 Pro、不用 FOC 的話，用 <code>getKrakenX60</code>。</p>
     <p>SimState 更新得越頻繁，模擬的 PID 就越接近實機，CTRE 的建議是用 WPILib 的 <code>Notifier</code> 另外開一個比較快的迴圈<a class="ref" href="#src6-14">[14]</a>。這章為了簡單，就每 20 ms 更新一次。</p>
     <div class="note limit"><strong>這個模擬沒有模擬到的</strong>Follower 的 SimState 沒有更新，所以模擬裡 follower 的電流和溫度都是 0。不影響手臂位置就是了，因為位置只從 leader 讀。</div>
 
@@ -571,7 +571,7 @@ public void updateInputs(ArmIOInputs inputs) {
     inputs.leaderConnected = true;
     inputs.followerConnected = true;
 }</code></pre>
-    <div class="note warn"><strong>ArmFeedforward 有幾個方法被棄用了</strong>WPILib 2026.2.2 裡，<code>ArmFeedforward</code> 帶加速度的三參數 <code>calculate</code>，和帶 dt 的四參數版本，都從 2025 年起標成棄用、之後會移除，要改用 <code>calculateWithVelocities</code><a class="ref" href="#src6-22">[22]</a>。上面用的兩參數 <code>calculate(位置, 速度)</code> 沒被棄用，可以放心。</div>
+    <div class="note warn"><strong>ArmFeedforward 有幾個方法被棄用了</strong>WPILib 2026.2.2 裡，<code>ArmFeedforward</code> 帶加速度的三參數 <code>calculate</code>，和帶 dt 的四參數版本，都從 2025 年起標成棄用、之後會移除，要改用 <code>calculateWithVelocities</code><a class="ref" href="#src6-22">[22]</a>。上面用的兩參數 <code>calculate(位置, 速度)</code> 沒被棄用。</div>
   </section>
 
   <!-- ===== PART E ===== -->
@@ -588,7 +588,7 @@ public void updateInputs(ArmIOInputs inputs) {
         <tr><td>選擇 IO</td><td><code>RobotBase.isReal()</code></td><td><code>Constants.currentMode</code>：REAL、SIM、REPLAY</td></tr>
       </tbody>
     </table>
-    <p><code>ArmIOHardware</code> 和 <code>ArmIOSim</code> 一行都不用改，這就是 IO 架構爽的地方。</p>
+    <p><code>ArmIOHardware</code> 和 <code>ArmIOSim</code> 一行都不用改，這就是 IO 架構的好處。</p>
 
     <h2>E-2　@AutoLog</h2>
     <pre><code>import org.littletonrobotics.junction.AutoLog;
@@ -600,7 +600,7 @@ public interface ArmIO {
     }
     // 方法和簡易版完全相同
 }</code></pre>
-    <p>加上 <code>@AutoLog</code> 之後，AdvantageKit 會自動幫你產生寫入和讀回日誌的程式，類別名稱就是原名後面加 <code>AutoLogged</code><a class="ref" href="#src6-2">[2]</a>。這個類別是 build 的時候由 annotation processor 生出來的，所以 <code>build.gradle</code> 要照官方安裝步驟加設定<a class="ref" href="#src6-6">[6]</a>。找不到 <code>ArmIOInputsAutoLogged</code> 的話，九成是 build 設定沒弄好。</p>
+    <p>加上 <code>@AutoLog</code> 之後，AdvantageKit 會自動幫你產生寫入和讀回日誌的程式，類別名稱就是原名後面加 <code>AutoLogged</code><a class="ref" href="#src6-2">[2]</a>。這個類別是 build 的時候由 annotation processor 生出來的，所以 <code>build.gradle</code> 要照官方安裝步驟加設定<a class="ref" href="#src6-6">[6]</a>。找不到 <code>ArmIOInputsAutoLogged</code> 的話，通常是 build 設定沒弄好。</p>
 
     <h2>E-3　Subsystem 的變化</h2>
     <pre><code>import org.littletonrobotics.junction.Logger;
