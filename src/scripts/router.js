@@ -9,7 +9,7 @@ function route(){
   if (h === "") renderMap(null);
   else if (h === "final") showFinal();
   else if (h === "coach") showCoach();
-  else if (m){ const id = +m[1]; READY.includes(id) ? showChapter(id) : ALL.some(x => x[0] === id) ? showSoon(id) : showHome(); }
+  else if (m){ const id = +m[1]; ALL.some(x => x[0] === id) ? showChapter(id) : showHome(); }
   else showHome();
   const anchor = m && m[2] && (document.getElementById("lab-" + m[2]) || document.getElementById(m[2]));
   if (anchor) anchor.scrollIntoView({ block: "start" }); else window.scrollTo(0, 0);

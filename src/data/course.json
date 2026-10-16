@@ -81,7 +81,9 @@
         "java"
       ],
       "verified": "2026-09",
-      "legacy": []
+      "legacy": [
+        "2027 年起控制系統換成 Systemcore，安裝流程與套件名稱會改變。"
+      ]
     },
     {
       "id": 1,
@@ -272,7 +274,8 @@
       ],
       "verified": "2026-09",
       "legacy": [
-        "Phoenix 6 的 Follower 原本的 boolean 參數已改用 MotorAlignmentValue（Aligned／Opposed）。"
+        "Phoenix 6 的 Follower 原本的 boolean 參數已改用 MotorAlignmentValue（Aligned／Opposed）。",
+        "WPILib 與 CTRE 網站標示 latest 的文件已是 2027 版（WPILib 的 Java 套件名稱也改了），查資料請看 stable。"
       ]
     },
     {
@@ -804,7 +807,9 @@
         "phoenix6"
       ],
       "verified": "2026-09-27",
-      "legacy": []
+      "legacy": [
+        "Limelight 與 PhotonVision 的韌體和函式庫每年更新，使用前對照當年的版本。"
+      ]
     },
     {
       "id": 18,

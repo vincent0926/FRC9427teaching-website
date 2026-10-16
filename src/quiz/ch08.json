@@ -2,7 +2,7 @@
   {
     "type": "recall",
     "q": "A 被 B 打斷時，A 的 end(interrupted) 收到什麼？",
-    "e": "被打斷或取消時一樣會呼叫 end，參數為 true。",
+    "e": "被打斷或被取消時一樣會呼叫 end，而且參數是 true。",
     "lab": "scheduler",
     "o": [
       "不會呼叫 end",
@@ -22,7 +22,7 @@
       ]
     },
     "q": "這個結果是？",
-    "e": "預設是 kCancelSelf。如果得分動作不應被打斷，可以用 withInterruptBehavior(kCancelIncoming)。預期結果：依需求選擇誰優先。",
+    "e": "預設是 kCancelSelf，所以這是正常行為。如果得分動作不該被打斷，可以用 withInterruptBehavior(kCancelIncoming)。要誰優先，看你們的需求決定。",
     "lab": "scheduler",
     "o": [
       "預期行為：新指令排程時，正在執行、require 同一個 Subsystem 的指令會被取消",
@@ -41,7 +41,7 @@
       ]
     },
     "q": "少了什麼？",
-    "e": "Commands 工具類別的 factory 要自己傳 Subsystem；Subsystem 自己的 runOnce 才會自動 require。預期結果：排程時正確取消衝突的指令。",
+    "e": "Commands 工具類別的 factory 要自己把 Subsystem 傳進去；Subsystem 自己的 runOnce 才會自動 require。補上之後，排程時衝突的指令就會被正確取消。",
     "lab": "scheduler",
     "o": [
       "isFinished",
@@ -60,7 +60,7 @@
       ]
     },
     "q": "應該怎麼改？",
-    "e": "WPILib 要求預設指令必須 require 它所屬的 Subsystem；Commands.run 沒有傳入 Subsystem 就沒有 requirements。Subsystem 自己的 run 會自動 require。預期結果：例外消失，沒有其他指令時執行預設指令。",
+    "e": "預設指令一定要 require 它所屬的 Subsystem；Commands.run 沒傳 Subsystem 就沒有 requirements。改用 Subsystem 自己的 run 就會自動 require，例外會消失，沒有其他指令時就跑預設指令。",
     "o": [
       "讓預設指令 require intake，例如改成 intake.run(() -> intake.stop())",
       "改用 onTrue 綁定",
@@ -79,7 +79,7 @@
       ]
     },
     "q": "比較安全的改法是？",
-    "e": "保留目標本身不是錯，但要決定 Enable 那一刻機構會做什麼。預期結果：重新 Enable 時手臂停在安全位置或慢慢回去。",
+    "e": "保留目標本身不是錯，但你要想清楚 Enable 那一刻機構會做什麼。可以讓手臂停在安全位置，或慢慢回去。",
     "o": [
       "在 Disabled 時把目標設回安全位置（例如 STOW），並且 Enable 前喊出來",
       "把 kP 調小",

@@ -2,7 +2,7 @@
   {
     "type": "recall",
     "q": "robotPeriodic() 在哪些模式會執行？",
-    "e": "robotPeriodic 在每一種模式、每一輪都會呼叫。",
+    "e": "robotPeriodic 在每一種模式、每一輪都會被呼叫。",
     "lab": "loop",
     "o": [
       "只有 Disabled",
@@ -22,7 +22,7 @@
       ]
     },
     "q": "原因與修正是？",
-    "e": "periodic 必須很快回傳，等待要交給指令架構每輪檢查。預期結果：overrun 消失，其他 Subsystem 繼續更新。",
+    "e": "periodic 一定要很快就回傳，要等的東西交給指令架構每輪去檢查。這樣 overrun 就會消失，其他 Subsystem 也能繼續更新。",
     "lab": "loop",
     "o": [
       "把 20 ms 改成 100 ms",
@@ -42,7 +42,7 @@
       ]
     },
     "q": "下一步檢查什麼？",
-    "e": "排程器每輪 run() 才會呼叫 Subsystem 的 periodic、檢查按鍵、執行指令。預期結果：補上那一行後綁定開始作用。",
+    "e": "排程器每輪 run() 才會去呼叫 Subsystem 的 periodic、檢查按鍵、跑指令。把那一行補回去，綁定就有反應了。",
     "lab": "loop",
     "o": [
       "robotPeriodic() 裡有沒有 CommandScheduler.getInstance().run()",
@@ -62,7 +62,7 @@
       ]
     },
     "q": "原因是什麼？",
-    "e": "Logger.start() 之前讀的時間和 DS 資料不是確定的。改成在 Logger.start() 之後才建立 RobotContainer。預期結果：重播與實機一致。",
+    "e": "Logger.start() 之前讀到的時間和 DS 資料不是確定的。改成在 Logger.start() 之後才建 RobotContainer，重播才會跟實機一樣。",
     "o": [
       "Logger.start() 要放在 robotPeriodic",
       "欄位初始化比建構子先執行，Intake 在 Logger.start() 之前就讀了時間",
@@ -81,7 +81,7 @@
       ]
     },
     "q": "應該怎麼改？",
-    "e": "沒跑完的自動指令會繼續佔住 Subsystem，駕駛的指令搶不到。預期結果：進入 Teleop 後駕駛立刻取得控制。",
+    "e": "沒跑完的自動指令會一直佔著 Subsystem，駕駛的指令搶不到。在 teleopInit 取消它，進 Teleop 駕駛就能馬上接手。",
     "o": [
       "把自動階段縮短",
       "在 teleopInit() 取消還在執行的自動指令",
