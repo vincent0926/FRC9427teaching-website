@@ -1,7 +1,6 @@
   <p class="headline-code">CAN ID 11｜硬體</p>
   <h1>Phoenix 6 與 TalonFX：班長的工作手冊</h1>
   <p class="lede">隊上的馬達幾乎都是 TalonFX，所以這章會常常用到。內容包括怎麼在 CANivore「9427」上建立 TalonFX、怎麼寫一份完整的設定、各種控制請求差在哪、沒有 Pro 授權的時候 FOC 會怎樣，最後介紹 Phoenix Tuner X。</p>
-  <div class="note"><strong>版本說明</strong>這章是照 Phoenix 6 的 2026 版（26.x）文件寫的。CTRE 網站上標 latest 的已經是 2027 年版了，查資料記得切到 stable。</div>
 
   <h2>比喻：班長的工作手冊</h2>
   <div class="story">
@@ -94,7 +93,6 @@ armLeader.getConfigurator().apply(config);</code></pre>
   <h2>EnableFOC 與 Pro 授權</h2>
   <p>FOC（Field Oriented Control）是一種換相方式，CTRE 說它可以讓峰值功率多大約 15%。支援 FOC 的控制請求都有一個 <code>EnableFOC</code> 欄位<a class="ref" href="#src11-3">[3]</a>，API 裡預設是 true，但要用 FOC 得有 Phoenix Pro 授權<a class="ref" href="#src11-6">[6]</a>。</p>
   <p>那沒有 Pro 怎麼辦？第 6 章留下的問題在這裡解答：控制<strong>沒授權</strong>的裝置時，支援 <code>EnableFOC</code> 的請求會自動退回一般（非 FOC）換相<a class="ref" href="#src11-3">[3]</a>。所以不改 <code>EnableFOC</code> 也能正常跑，只是沒有 FOC 的效能加成。只有 <code>TorqueCurrentFOC</code> 這種本身就靠 FOC 的請求，才真的非 Pro 不可。</p>
-  <div class="note"><strong>模擬時要對應</strong>第 6 章 D 部分提過，CTRE 的模擬範例用的是 <code>DCMotor.getKrakenX60Foc</code>。沒有 Pro 的話，實機跑的是一般換相，模擬就該用 <code>DCMotor.getKrakenX60</code>，兩邊才對得上。</div>
 
   <h2>讀取感測資料</h2>
   <p>TalonFX 的讀值是用 <code>StatusSignal</code> 拿的。完整寫法第 6 章 C 部分示範過了：訊號存成欄位，每個週期用 <code>BaseStatusSignal.refreshAll(...)</code> 一次刷新，再用 <code>getValueAsDouble()</code> 取值<a class="ref" href="#src11-8">[8]</a>。兩件事要記得：Phoenix 6 的位置單位是轉數（rotations）、速度是每秒轉數；設了 <code>SensorToMechanismRatio</code> 之後，讀到的就是機構端的數值。</p>

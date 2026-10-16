@@ -3,10 +3,10 @@ function renderMap(current){
   const done = loadDone();
   document.getElementById("map").innerHTML = COURSE.map(p => `
     <div class="part">${p.part}</div>
-    <ul class="nodes">${p.items.map(([id,title,,ready]) => {
-      const cls = ["node", ready ? "ready" : "", done.includes(id) ? "done" : "", current === id ? "active" : ""].join(" ");
+    <ul class="nodes">${p.items.map(([id,title]) => {
+      const cls = ["node", "ready", done.includes(id) ? "done" : "", current === id ? "active" : ""].join(" ");
       return `<li><button class="${cls}" data-go="${id}" ${current===id?'aria-current="page"':''}>
-        <span class="id">${pad(id)}</span><span>${title}</span>${ready ? "" : '<span class="soon">撰寫中</span>'}</button></li>`;
+        <span class="id">${pad(id)}</span><span>${title}</span></button></li>`;
     }).join("")}</ul>`).join("") + `
     <div class="part">檢核</div>
     <ul class="nodes"><li><button class="node ready ${current === "final" ? "active" : ""}" data-go="final" ${current === "final" ? 'aria-current="page"' : ""}>
@@ -36,15 +36,6 @@ function showCoach(){
   mount("tpl-coach");
   initCoach();
   renderMap("coach");
-}
-
-function showSoon(id){
-  const [, title, desc] = ALL.find(x => x[0] === id);
-  mount("tpl-soon");
-  document.getElementById("soonId").textContent = `CAN ID ${pad(id)}`;
-  document.getElementById("soonTitle").textContent = title;
-  document.getElementById("soonDesc").textContent = desc;
-  renderMap(id);
 }
 
 function showChapter(id){

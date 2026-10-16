@@ -138,29 +138,7 @@
       <tr><td>重播時</td><td>不適用</td><td>可用 <code>setUseTiming(false)</code> 讓每輪盡快執行，但讀到的時間戳仍與真機器人相同<a class="ref" href="#src7-7">[7]</a></td></tr>
     </tbody>
   </table>
-  <pre><code>public class Robot extends LoggedRobot {
-    private final RobotContainer m_robotContainer;
-
-    public Robot() {
-        // 一定要放在建構子最前面，在任何其他初始化之前
-        Logger.recordMetadata("ProjectName", "FRC9427");
-        if (isReal()) {
-            Logger.addDataReceiver(new WPILOGWriter()); // 寫入 roboRIO 上的 USB 隨身碟
-            Logger.addDataReceiver(new NT4Publisher()); // 即時發布到 NetworkTables
-        }
-        // 模擬與重播的設定見第 18 章
-        Logger.start(); // 之後就不能再新增接收端或 metadata
-
-        m_robotContainer = new RobotContainer();
-    }
-
-    @Override
-    public void robotPeriodic() {
-        CommandScheduler.getInstance().run(); // 和 TimedRobot 版本一樣，不能少
-    }
-}</code></pre>
-  <p>順序很重要。Logger 的設定要放在 <code>Robot</code> 建構子最前面，比任何初始化都早；<code>Logger.start()</code> 之後就不能再加資料接收端、重播來源或 metadata 了<a class="ref" href="#src7-7">[7]</a>。如果你先建了 <code>RobotContainer</code>，Subsystem 可能在記錄框架還沒準備好的時候就開始讀輸入。另外 <code>WPILOGWriter</code> 預設寫到 USB 隨身碟，所以 roboRIO 上一定要插一支 FAT32 的隨身碟<a class="ref" href="#src7-7">[7]</a>。</p>
-  <div class="note coach"><strong>教練提醒</strong>有用 AdvantageKit 的話，賽前檢查清單要多一項：roboRIO 上的 USB 隨身碟有插、是 FAT32、還有空間。沒日誌的話，出事的時候就什麼都不能重播，只能靠記憶猜。</div>
+  <p>完整的 Logger 設定程式在第 6 章 E-5。重點只有一個：Logger 要在建構子最前面設定並啟動，<code>Logger.start()</code> 之後就不能再加資料接收端、重播來源或 metadata；如果先建了 <code>RobotContainer</code>，Subsystem 可能在記錄框架還沒準備好時就開始讀輸入<a class="ref" href="#src7-7">[7]</a>。</p>
 
   <h2>Loop overrun：老師講太久</h2>
   <p>某一輪超過 20 毫秒，主控台就會跳 <code>Loop time of 0.02s overrun</code>，後面還會列出這一輪每個階段花多久。Command 排程器也有自己的計時，超時會印 <code>CommandScheduler loop overrun</code>，一樣附上每個 Subsystem 和指令的耗時<a class="ref" href="#src7-4">[4]</a><a class="ref" href="#src7-6">[6]</a>。看到這些警告，直接找列表裡時間最長的那一項，通常兇手就是它。</p>

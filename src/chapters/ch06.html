@@ -11,7 +11,6 @@
     <button class="pcard" data-part="F"><b>F　測試與常見錯誤</b><span>用假的 IO 寫單元測試、模擬、重播，以及十一個常見錯誤。</span></button>
   </div>
 
-  <div class="note"><strong>版本說明</strong>這章是照 WPILib 2026.2.2、Phoenix 6 26.3.0、AdvantageKit 2026 的文件寫的。先注意一件事：WPILib 和 CTRE 網站上標 latest 的文件已經是 2027 年版了（WPILib 的 Java 套件名稱也改了），查資料記得切到 stable。程式裡要實測的數字都標了 TODO，不要照抄。</div>
 
   <div class="parttabs" role="tablist" aria-label="本章部分">
     <button role="tab" data-part="A">A 觀念</button>
@@ -671,7 +670,7 @@ switch (Constants.currentMode) {
         CommandScheduler.getInstance().run();
     }
 }</code></pre>
-    <p>Logger 一定要在建構子最前面設定、啟動，然後才建 <code>RobotContainer</code>（第 7 章會再提）。實機要記錄的話，roboRIO 上要插一支 FAT32 的 USB 隨身碟<a class="ref" href="#src6-6">[6]</a>。重播的完整流程在第 18 章。</p>
+    <p>Logger 一定要在建構子最前面設定、啟動，然後才建 <code>RobotContainer</code>。實機要記錄的話，roboRIO 上要插一支 FAT32 的 USB 隨身碟<a class="ref" href="#src6-6">[6]</a>。重播的完整流程在第 18 章。</p>
   </section>
 
   <!-- ===== PART F ===== -->
